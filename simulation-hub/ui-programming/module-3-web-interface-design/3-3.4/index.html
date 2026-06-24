@@ -953,8 +953,11 @@
 
                         <!-- Bottom Action navigation -->
                         <div
-                            style="margin-top: 24px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 16px;">
-                            <button class="btn btn-primary" id="next-level-btn" onclick="goToNextLevel()" disabled>
+                            style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-secondary" id="prev-level-btn" onclick="goToPrevLevel()" style="display: none;">
+                                <i class="ti ti-arrow-left"></i> Previous Level
+                            </button>
+                            <button class="btn btn-primary" id="next-level-btn" onclick="goToNextLevel()">
                                 Next Level <i class="ti ti-arrow-right"></i>
                             </button>
                         </div>
@@ -1139,18 +1142,15 @@
             document.getElementById("level-task-box").innerHTML = state.levelData[lvlNum].task;
 
             // Disable Next button initially unless level already completed
-            document.getElementById("next-level-btn").disabled = !state.levelCompleted[lvlNum];
+            document.getElementById("prev-level-btn").style.display = (lvlNum > 1) ? "inline-flex" : "none";
+            document.getElementById("next-level-btn").disabled = false;
 
             // Render level workspace content
             renderWorkspace(lvlNum);
         }
 
         function jumpToLevel(lvlNum) {
-            if (lvlNum <= state.maxUnlockedLevel) {
-                loadLevel(lvlNum);
-            } else {
-                showErrorFeedback("Level Locked", "Complete preceding levels to unlock this challenge!");
-            }
+            loadLevel(lvlNum);
         }
 
         function resetLevel() {
@@ -1193,6 +1193,12 @@
 
         function hideFeedback() {
             document.getElementById("action-feedback").className = "feedback-panel";
+        }
+
+        function goToPrevLevel() {
+            if (state.currentLevel > 1) {
+                loadLevel(state.currentLevel - 1);
+            }
         }
 
         function goToNextLevel() {
