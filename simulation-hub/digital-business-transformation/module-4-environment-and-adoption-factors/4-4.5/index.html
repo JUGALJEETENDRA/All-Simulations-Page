@@ -1,1 +1,4111 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 4.5 Simulation - PaySphere CDPO Command Center</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #FF9800;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Stepper Progress Bar */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .step-item.unlocked {
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+        }
+
+        .step-item.completed {
+            color: var(--success);
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.unlocked .step-badge {
+            background-color: #E0E0E0;
+            color: var(--text-dark);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+            max-width: 120px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        .step-divider.completed {
+            background-color: var(--success);
+        }
+
+        /* Main Workspace Container */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Panels */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons & Interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-red-light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Native Dialog (Modal) Styles */
+        dialog {
+            margin: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            font-family: var(--font-body);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .dialog-body {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Welcome Screen & Board Memo */
+        .welcome-memo {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #FFCDD2;
+            padding-bottom: 16px;
+        }
+
+        .memo-logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .memo-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .memo-body {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memo-highlight {
+            background-color: var(--primary-red-light);
+            border-left: 4px solid var(--primary-red);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Objective Boxes */
+        .objective-box {
+            background-color: #ECEFF1;
+            border-left: 4px solid #455A64;
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .objective-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #37474F;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* LEVEL 1: Payment Route Architect */
+        .l1-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l1-selector-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            scrollbar-width: thin;
+        }
+
+        .l1-selector-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .l1-selector-btn.active {
+            background: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+        }
+
+        .l1-builder-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .l1-cards-pool {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 350px;
+            border: 2px dashed var(--border-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            background-color: var(--bg-light);
+        }
+
+        .l1-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            user-select: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .l1-card:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+            transform: translateX(4px);
+        }
+
+        .l1-slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--white);
+        }
+
+        .l1-slot {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            align-items: center;
+            gap: 12px;
+            min-height: 50px;
+            border-bottom: 1px solid var(--bg-light);
+            padding-bottom: 6px;
+        }
+
+        .l1-slot-label {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .l1-slot-box {
+            border: 2px dashed #E0E0E0;
+            border-radius: var(--radius-sm);
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            background-color: var(--bg-light);
+            transition: var(--transition);
+        }
+
+        .l1-slot-box.occupied {
+            border-style: solid;
+            border-color: var(--border-color);
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        .l1-slot-box.occupied:hover {
+            border-color: var(--danger);
+            background-color: var(--danger-light);
+        }
+
+        /* L1 Routing Animation styles */
+        .l1-animation-panel {
+            grid-column: span 2;
+            background-color: #1A1A1A;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            color: var(--white);
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 900px) {
+            .l1-animation-panel {
+                grid-column: span 1;
+            }
+        }
+
+        .network-map {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 40px 0;
+            overflow-x: auto;
+        }
+
+        .network-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+            width: 100px;
+            text-align: center;
+        }
+
+        .node-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #333333;
+            border: 2px solid #555555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #AAAAAA;
+            transition: var(--transition);
+        }
+
+        .network-node.active .node-icon {
+            background-color: var(--primary-red);
+            border-color: var(--white);
+            box-shadow: 0 0 16px var(--primary-red);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .network-node.success .node-icon {
+            background-color: var(--success);
+            border-color: var(--white);
+            box-shadow: 0 0 16px var(--success);
+            color: var(--white);
+        }
+
+        .node-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #CCCCCC;
+            font-family: var(--font-display);
+        }
+
+        .network-link-container {
+            position: absolute;
+            top: 64px;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background-color: #333333;
+            z-index: 1;
+        }
+
+        .network-link-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-red) 0%, var(--success) 100%);
+            transition: width 0.1s linear;
+        }
+
+        .l1-explanation-card {
+            background-color: #262626;
+            border: 1px solid #333333;
+            border-left: 4px solid var(--success);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            color: #E0E0E0;
+            min-height: 80px;
+        }
+
+        /* LEVEL 2: Fraud Detection Center */
+        .l2-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1000px) {
+            .l2-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l2-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .l2-tx-row {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .l2-tx-row:hover {
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .l2-tx-row.selected {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .l2-tx-row.classified-correct {
+            border-left: 6px solid var(--success);
+        }
+
+        .l2-tx-row.classified-incorrect {
+            border-left: 6px solid var(--danger);
+        }
+
+        .l2-tx-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tx-id {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .tx-desc {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .tx-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-family: var(--font-display);
+        }
+
+        .tx-badge.pending {
+            background-color: #ECEFF1;
+            color: #455A64;
+        }
+
+        .tx-badge.safe {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .tx-badge.suspicious {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .tx-badge.risk {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .l2-sidebar {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 140px;
+            height: fit-content;
+        }
+
+        .l2-sidebar-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        .l2-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .l2-form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .l2-choice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .l2-choice-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .l2-choice-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .l2-choice-btn.active[data-val="safe"] {
+            background-color: var(--success);
+            color: var(--white);
+            border-color: var(--success);
+        }
+
+        .l2-choice-btn.active[data-val="suspicious"] {
+            background-color: var(--warning);
+            color: var(--white);
+            border-color: var(--warning);
+        }
+
+        .l2-choice-btn.active[data-val="high-risk"] {
+            background-color: var(--danger);
+            color: var(--white);
+            border-color: var(--danger);
+        }
+
+        .l2-choice-btn.active-action {
+            background-color: var(--text-dark);
+            color: var(--white);
+            border-color: var(--text-dark);
+        }
+
+        .tx-details-table {
+            width: 100%;
+            font-size: 0.8rem;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+        }
+
+        .tx-details-table td {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .tx-details-table td:first-child {
+            color: var(--text-muted);
+            font-weight: 500;
+            width: 120px;
+        }
+
+        .tx-details-table td:last-child {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* LEVEL 3: Cyberattack Defense Room */
+        .l3-container {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1000px) {
+            .l3-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l3-infra-map {
+            background-color: #0E1726;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            position: relative;
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+
+        /* SVG Grid Layout overlay background */
+        .infra-grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(rgba(198, 40, 40, 0.15) 1px, transparent 0),
+                radial-gradient(rgba(198, 40, 40, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            z-index: 1;
+        }
+
+        .infra-node {
+            position: absolute;
+            background-color: #172A45;
+            border: 2px solid #306FC0;
+            color: var(--white);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            width: 150px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: var(--transition);
+        }
+
+        .infra-node:hover {
+            transform: scale(1.05);
+            border-color: var(--white);
+            box-shadow: 0 0 16px rgba(48, 111, 192, 0.5);
+        }
+
+        .infra-node.active-target {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 24px rgba(198, 40, 40, 0.8);
+            animation: pulseNodeRed 1s infinite alternate;
+        }
+
+        @keyframes pulseNodeRed {
+            from {
+                box-shadow: 0 0 8px rgba(198, 40, 40, 0.5);
+            }
+
+            to {
+                box-shadow: 0 0 28px rgba(198, 40, 40, 1);
+            }
+        }
+
+        .infra-node.defended {
+            border-color: var(--success);
+            box-shadow: 0 0 20px rgba(46, 125, 50, 0.7);
+        }
+
+        .infra-node-icon {
+            font-size: 1.5rem;
+        }
+
+        .infra-node-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: var(--font-display);
+        }
+
+        .infra-health-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #333;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .infra-health-fill {
+            width: 100%;
+            height: 100%;
+            background-color: var(--success);
+            transition: var(--transition);
+        }
+
+        /* Node Coordinates */
+        #node-user {
+            top: 60px;
+            left: 60px;
+        }
+
+        #node-db {
+            top: 60px;
+            right: 60px;
+        }
+
+        #node-gateway {
+            bottom: 60px;
+            left: 60px;
+        }
+
+        #node-merchant {
+            bottom: 60px;
+            right: 60px;
+        }
+
+        #node-server {
+            top: 200px;
+            left: calc(50% - 75px);
+        }
+
+        .l3-arsenal {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .arsenal-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .arsenal-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .defense-weapon {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+        }
+
+        .defense-weapon:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateX(4px);
+        }
+
+        .defense-weapon.selected {
+            background-color: var(--accent-blue-light);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(21, 101, 192, 0.2);
+        }
+
+        .weapon-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-blue);
+        }
+
+        .weapon-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .weapon-name {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .weapon-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .l3-alert-box {
+            background-color: #FFF3E0;
+            border-left: 4px solid var(--warning);
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .l3-alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .l3-alert-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .l3-alert-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #E65100;
+        }
+
+        .l3-alert-desc {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        /* LEVEL 4: Privacy & Cyber Law Advisor */
+        .l4-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l4-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l4-pool {
+            background-color: var(--bg-light);
+            border: 2px dashed var(--border-color);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 400px;
+        }
+
+        .l4-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            user-select: none;
+        }
+
+        .l4-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow-md);
+        }
+
+        .l4-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .l4-card-badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            background-color: #ECEFF1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .l4-zone-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .l4-zone {
+            background-color: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            min-height: 120px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .l4-zone.drag-over {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+        }
+
+        .l4-zone-header {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .l4-zone-legal .l4-zone-header {
+            color: var(--success);
+        }
+
+        .l4-zone-illegal .l4-zone-header {
+            color: var(--danger);
+        }
+
+        .l4-zone-modify .l4-zone-header {
+            color: var(--warning);
+        }
+
+        .l4-card.placed {
+            padding: 10px 12px;
+            font-size: 0.82rem;
+            background-color: var(--bg-light);
+            border-left: 4px solid var(--border-color);
+        }
+
+        .l4-zone-legal .l4-card.placed {
+            border-left-color: var(--success);
+        }
+
+        .l4-zone-illegal .l4-card.placed {
+            border-left-color: var(--danger);
+        }
+
+        .l4-zone-modify .l4-card.placed {
+            border-left-color: var(--warning);
+        }
+
+        /* Remediation Form styles */
+        .l4-remediation-container {
+            margin-top: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .remediation-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background-color: var(--bg-light);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .remediation-row label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .remediation-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        /* LEVEL 5: FinTech Command Center */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 950px) {
+            .l5-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar KPIs */
+        .l5-kpi-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .l5-sidebar-header {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+        }
+
+        .l5-kpi-card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background-color: var(--bg-light);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .l5-kpi-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .kpi-val {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .kpi-meter-container {
+            width: 100%;
+            height: 6px;
+            background-color: #E0E0E0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .kpi-meter-fill {
+            height: 100%;
+            width: 50%;
+            background-color: var(--primary-red);
+            transition: var(--transition);
+        }
+
+        .kpi-target-indicator {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* L5 Main simulator screen */
+        .l5-simulator-console {
+            background-color: #0E1726;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 520px;
+            position: relative;
+        }
+
+        .l5-console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1E293B;
+            padding-bottom: 16px;
+        }
+
+        .console-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .console-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: statusPulse 1.5s infinite alternate;
+        }
+
+        @keyframes statusPulse {
+            from {
+                opacity: 0.4;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .console-status-dot.paused {
+            background-color: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .console-status-text {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #94A3B8;
+        }
+
+        .console-day-ticker {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        /* Console Log Ticker */
+        .l5-terminal-ticker {
+            flex-grow: 1;
+            background-color: #030712;
+            border: 1px solid #1F2937;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #38BDF8;
+            overflow-y: auto;
+            max-height: 280px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+            scrollbar-width: thin;
+        }
+
+        .terminal-row {
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .terminal-row.alert {
+            color: var(--warning);
+        }
+
+        .terminal-row.success {
+            color: var(--success);
+        }
+
+        .terminal-row.critical {
+            color: var(--danger);
+            font-weight: 700;
+            animation: pulseTerminalText 1s infinite alternate;
+        }
+
+        @keyframes pulseTerminalText {
+            from {
+                opacity: 0.6;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Decision Modal Card overlaying the console */
+        .l5-incident-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .incident-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-top: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            max-width: 580px;
+            width: 100%;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: cardSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                transform: translateY(24px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .incident-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .incident-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .incident-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .incident-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .incident-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .incident-opt-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .incident-opt-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .incident-opt-title {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .incident-opt-impact {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Scorecard Review styles */
+        .scorecard-banner {
+            text-align: center;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+        }
+
+        .scorecard-banner.success {
+            background-color: var(--success-light);
+            border: 1px solid rgba(46, 125, 50, 0.2);
+            color: var(--success);
+        }
+
+        .scorecard-banner.fail {
+            background-color: var(--danger-light);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            color: var(--danger);
+        }
+
+        .scorecard-banner h2 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .scorecard-banner p {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 750px) {
+            .scorecard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scorecard-col {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .scorecard-col-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .scorecard-col.strengths {
+            border-top: 4px solid var(--success);
+        }
+
+        .scorecard-col.strengths .scorecard-col-title {
+            color: var(--success);
+        }
+
+        .scorecard-col.weaknesses {
+            border-top: 4px solid var(--warning);
+        }
+
+        .scorecard-col.weaknesses .scorecard-col-title {
+            color: var(--warning);
+        }
+
+        .scorecard-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .scorecard-list li {
+            font-size: 0.88rem;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .scorecard-list li::before {
+            position: absolute;
+            left: 0;
+            font-weight: 800;
+        }
+
+        .scorecard-col.strengths .scorecard-list li::before {
+            content: "✓";
+            color: var(--success);
+        }
+
+        .scorecard-col.weaknesses .scorecard-list li::before {
+            content: "•";
+            color: var(--warning);
+            font-size: 1.25rem;
+            top: -2px;
+        }
+
+        /* Bottom Nav buttons */
+        .bottom-nav {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Toast Popup system */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .toast {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: toastSlideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast.danger {
+            border-left-color: var(--danger);
+        }
+
+        /* General layout helpers */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .flex-row-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Persistent Nav Footer */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            /* Flex when active */
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sticky Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>Digital Business & Transformation – Module 4.5 Simulation</h1>
+                    <p>Digital Payment Systems, Financial Transaction Environments, Data Protection, Privacy
+                        Regulations, and Cyber Laws</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showHelpManual()">Operations Manual</button>
+                </div>
+            </div>
+
+            <!-- Stepper Progress Tracker -->
+            <div class="stepper">
+                <div class="step-item unlocked active" id="step-btn-1" onclick="navigateToLevel(1)">
+                    <span class="step-badge">1</span>
+                    <span>Route Architect</span>
+                </div>
+                <div class="step-divider" id="step-div-1"></div>
+                <div class="step-item" id="step-btn-2" onclick="navigateToLevel(2)">
+                    <span class="step-badge">🔒</span>
+                    <span>Fraud Analyst</span>
+                </div>
+                <div class="step-divider" id="step-div-2"></div>
+                <div class="step-item" id="step-btn-3" onclick="navigateToLevel(3)">
+                    <span class="step-badge">🔒</span>
+                    <span>Cyber Defense</span>
+                </div>
+                <div class="step-divider" id="step-div-3"></div>
+                <div class="step-item" id="step-btn-4" onclick="navigateToLevel(4)">
+                    <span class="step-badge">🔒</span>
+                    <span>Legal Advisor</span>
+                </div>
+                <div class="step-divider" id="step-div-4"></div>
+                <div class="step-item" id="step-btn-5" onclick="navigateToLevel(5)">
+                    <span class="step-badge">🔒</span>
+                    <span>FinTech Console</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Payment Security & Cyber Laws (Module 4.5)
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. Payment Infrastructure:</strong> Secure financial systems
+                        rely on encrypted payment gateways, 3D authentication, bank settlement loops, and direct instant
+                        payment APIs (like UPI).</p>
+                    <p><strong>2. Data Protection (GDPR/DPDP):</strong> Statutory acts require strict user consent
+                        parameters, explicit rights to data erasure, and localized cloud encryption storage to ensure
+                        user privacy.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Cyber Laws & Liabilities:</strong> Laws establish strict
+                        legal liabilities for unauthorized data exposures, identity theft, and lack of transaction
+                        logging.</p>
+                    <p><strong>4. Security Operations:</strong> CDPOs balance speed of payment checkouts against fraud
+                        prevention metrics, firewalls, and tokenized APIs to defend networks against threats.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Onboarding Screen / Introduction -->
+        <section id="screen-onboarding" class="screen active">
+            <div class="welcome-memo">
+                <div class="memo-header">
+                    <div class="memo-logo">🛡️ PaySphere</div>
+                    <div class="memo-meta">
+                        <div>MEMORANDUM</div>
+                        <div>REF: CDPO-APPOINTMENT</div>
+                    </div>
+                </div>
+                <div class="memo-body">
+                    <p><strong>TO: Chief Digital Payments Officer (CDPO)</strong></p>
+                    <p>Welcome to <strong>PaySphere</strong>. As our newly appointed CDPO, you are inheriting
+                        operational control of a multi-million transaction infrastructure. Our digital payment pipelines
+                        route billions in transaction volume every day.</p>
+                    <p>Our platform handles critical customer accounts, gateways, bank nodes, and sensitive financial
+                        records. Your executive mission is simple but highly challenging:</p>
+
+                    <div class="memo-highlight">
+                        Build a frictionless transaction routing system, configure real-time fraud classification rules,
+                        defend our network servers against active cyberattack campaigns, and enforce compliance
+                        parameters to satisfy stringent regulatory cyber laws.
+                    </div>
+
+                    <p>The regulatory guidelines require sequential platform validation. You must complete five
+                        technical levels, auditing transactions, applying security tools, and steering PaySphere through
+                        a 30-day corporate simulation. The Board expects maximum Security, Trust, Compliance, and
+                        Transaction Success.</p>
+                    <p>Operations begin immediately. Access the command panels below.</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn" onclick="startSimulation()">Begin Technical Validation</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 1: Payment Route Architect -->
+        <section id="screen-l1" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 1: Payment Route Architect</div>
+                    <span class="l1-slot-label">Digital Transaction Pipelines</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Digital payment networks move funds securely through a precise sequence of gateway, acquiring, and
+                    issuing interfaces. Select a transaction pathway (UPI, Credit Card, etc.) and arrange the
+                    transaction steps in the correct chronological order on the right. Verify the routing to watch money
+                    flow through the network.
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Active Payment
+                        Instrument:</label>
+                    <div class="l1-selector-bar" id="l1-selector-bar">
+                        <button class="l1-selector-btn active" onclick="selectL1Instrument('upi')">UPI Payment</button>
+                        <button class="l1-selector-btn" onclick="selectL1Instrument('credit-card')">Credit Card
+                            Authorization</button>
+                        <button class="l1-selector-btn" onclick="selectL1Instrument('debit-card')">Debit Card
+                            Clearance</button>
+                        <button class="l1-selector-btn" onclick="selectL1Instrument('mobile-wallet')">Mobile Wallet
+                            Settlement</button>
+                        <button class="l1-selector-btn" onclick="selectL1Instrument('net-banking')">Net Banking
+                            Transfer</button>
+                        <button class="l1-selector-btn" onclick="selectL1Instrument('qr')">QR Scan Payment</button>
+                    </div>
+                </div>
+
+                <div class="l1-container">
+                    <!-- Left: Scrambled Steps Pool -->
+                    <div class="l1-builder-zone">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700;">Scrambled
+                            Journey Steps</h3>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -8px;">Click cards below to
+                            move them into the slot builder sequence:</p>
+                        <div class="l1-cards-pool" id="l1-cards-pool">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Slot Builder -->
+                    <div class="l1-builder-zone">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 700;">Route Assembly
+                            Board</h3>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: -8px;">Chronological
+                            sequence (Click items to remove):</p>
+                        <div class="l1-slots-container" id="l1-slots-container">
+                            <!-- Slots created by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Animation Display (Shown after correct verify) -->
+                    <div class="l1-animation-panel" id="l1-animation-panel">
+                        <h3
+                            style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 8px;">
+                            <span>⚡ Live Routing Trace:</span>
+                            <span id="l1-anim-instrument" style="color: var(--success);">UPI Flow</span>
+                        </h3>
+                        <div class="network-map">
+                            <div class="network-link-container">
+                                <div class="network-link-progress" id="network-link-progress"></div>
+                            </div>
+                            <div class="network-node" id="node-1">
+                                <div class="node-icon">👤</div>
+                                <div class="node-label">Customer</div>
+                            </div>
+                            <div class="network-node" id="node-2">
+                                <div class="node-icon">📱</div>
+                                <div class="node-label">App Interface</div>
+                            </div>
+                            <div class="network-node" id="node-3">
+                                <div class="node-icon">🌐</div>
+                                <div class="node-label">Gateway</div>
+                            </div>
+                            <div class="network-node" id="node-4">
+                                <div class="node-icon">🏛️</div>
+                                <div class="node-label">Clearing House</div>
+                            </div>
+                            <div class="network-node" id="node-5">
+                                <div class="node-icon">🏦</div>
+                                <div class="node-label">Issuing Bank</div>
+                            </div>
+                            <div class="network-node" id="node-6">
+                                <div class="node-icon">🏪</div>
+                                <div class="node-label">Merchant</div>
+                            </div>
+                        </div>
+                        <div class="l1-explanation-card" id="l1-explanation-card">
+                            Active Step Trace: Select verify to monitor pipeline latency and bank logs.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel1()">Reset Board</button>
+                    <button class="btn" id="l1-submit-btn" onclick="verifyLevel1Routing()">Verify Routing
+                        Sequence</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Fraud Detection Center -->
+        <section id="screen-l2" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 2: Fraud Detection Center</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--warning-light); color: var(--warning);">Security Level:
+                        Elevated</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Monitor the live PaySphere transaction ledger. Analyze incoming transaction profiles for indicators
+                    of financial crime (such as velocity limits, anomalous IP addresses, card credentials attacks, or
+                    suspicious geolocation splits). Classify all 5 profiles as Safe, Suspicious, or High Risk, and
+                    assign the appropriate operations action.
+                </div>
+
+                <div class="l2-container">
+                    <!-- Left: Log List -->
+                    <div class="l2-grid" id="l2-log-grid">
+                        <!-- Injected by JS -->
+                    </div>
+
+                    <!-- Right: Analysis Panel -->
+                    <div class="l2-sidebar" id="l2-analysis-panel">
+                        <div class="l2-sidebar-title">Select a transaction to inspect</div>
+                        <div id="l2-sidebar-content" style="display: none; flex-direction: column; gap: 16px;">
+                            <div
+                                style="background-color: var(--bg-light); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <table class="tx-details-table">
+                                    <tr>
+                                        <td>ID</td>
+                                        <td id="det-id">TX-101</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amount</td>
+                                        <td id="det-amount">₹500</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Location</td>
+                                        <td id="det-loc">Mumbai</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Time</td>
+                                        <td id="det-time">2:00 PM</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Device Profile</td>
+                                        <td id="det-dev">Android</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Failed Attempts</td>
+                                        <td id="det-attempts">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Historical Pattern</td>
+                                        <td id="det-pattern">Matches average usage</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Classification options -->
+                            <div class="l2-form-group">
+                                <label>Risk Classification:</label>
+                                <div class="l2-choice-grid">
+                                    <button class="l2-choice-btn" data-type="class" data-val="safe"
+                                        onclick="setL2Classification('safe')">Safe</button>
+                                    <button class="l2-choice-btn" data-type="class" data-val="suspicious"
+                                        onclick="setL2Classification('suspicious')">Suspicious</button>
+                                    <button class="l2-choice-btn" data-type="class" data-val="high-risk"
+                                        onclick="setL2Classification('high-risk')">High Risk</button>
+                                </div>
+                            </div>
+
+                            <!-- Action options -->
+                            <div class="l2-form-group">
+                                <label>Operations Deployment Action:</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                    <button class="l2-choice-btn" data-type="action" data-val="approve"
+                                        onclick="setL2Action('approve')">Approve</button>
+                                    <button class="l2-choice-btn" data-type="action" data-val="flag"
+                                        onclick="setL2Action('flag')">Flag & Hold</button>
+                                    <button class="l2-choice-btn" data-type="action" data-val="block"
+                                        onclick="setL2Action('block')">Block Account</button>
+                                    <button class="l2-choice-btn" data-type="action" data-val="investigate"
+                                        onclick="setL2Action('investigate')">Investigate</button>
+                                </div>
+                            </div>
+
+                            <button class="btn" style="width: 100%; font-size: 0.85rem;"
+                                onclick="saveL2Decision()">Record Analysis Decision</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel2()">Reset Ledger Decisions</button>
+                    <button class="btn" id="l2-submit-btn" onclick="verifyLevel2Decisions()" disabled>Submit Fraud
+                        Audit</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Cyberattack Defense Room -->
+        <section id="screen-l3" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 3: Cyberattack Defense Room</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--danger-light); color: var(--danger);">Intrusion Alerts
+                        Active</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Hackers are launching digital attack campaigns against the PaySphere core servers. An threat alert
+                    will trigger detailing the vector (Phishing, SQL Injection, malware payload, DDoS flow). Select the
+                    threatened server node on the map, then select the optimal defense protocol from your security
+                    arsenal. Defend all 5 nodes to secure the network.
+                </div>
+
+                <!-- Threat warning bar -->
+                <div class="l3-alert-box" id="l3-threat-alert">
+                    <span class="l3-alert-icon">🚨</span>
+                    <div class="l3-alert-text">
+                        <span class="l3-alert-title" id="alert-title">INCOMING ATTACK VECTOR</span>
+                        <span class="l3-alert-desc" id="alert-desc">Monitor infrastructure for signals.</span>
+                    </div>
+                </div>
+
+                <div class="l3-container">
+                    <!-- Left: Interactive Server Map -->
+                    <div class="l3-infra-map" id="l3-network-map">
+                        <div class="infra-grid-bg"></div>
+
+                        <!-- Core Nodes -->
+                        <div class="infra-node" id="node-user" onclick="selectInfraNode('user')">
+                            <span class="infra-node-icon">👤</span>
+                            <span class="infra-node-name">User Accounts</span>
+                            <div class="infra-health-bar">
+                                <div class="infra-health-fill" id="health-user"></div>
+                            </div>
+                            <span style="font-size: 0.65rem; font-family: var(--font-mono); color: #888;"
+                                id="status-label-user">Protected</span>
+                        </div>
+
+                        <div class="infra-node" id="node-db" onclick="selectInfraNode('db')">
+                            <span class="infra-node-icon">🗄️</span>
+                            <span class="infra-node-name">Payment Database</span>
+                            <div class="infra-health-bar">
+                                <div class="infra-health-fill" id="health-db"></div>
+                            </div>
+                            <span style="font-size: 0.65rem; font-family: var(--font-mono); color: #888;"
+                                id="status-label-db">Protected</span>
+                        </div>
+
+                        <div class="infra-node" id="node-server" onclick="selectInfraNode('server')">
+                            <span class="infra-node-icon">⚙️</span>
+                            <span class="infra-node-name">Transaction Server</span>
+                            <div class="infra-health-bar">
+                                <div class="infra-health-fill" id="health-server"></div>
+                            </div>
+                            <span style="font-size: 0.65rem; font-family: var(--font-mono); color: #888;"
+                                id="status-label-server">Protected</span>
+                        </div>
+
+                        <div class="infra-node" id="node-gateway" onclick="selectInfraNode('gateway')">
+                            <span class="infra-node-icon">💳</span>
+                            <span class="infra-node-name">Mobile Application</span>
+                            <div class="infra-health-bar">
+                                <div class="infra-health-fill" id="health-gateway"></div>
+                            </div>
+                            <span style="font-size: 0.65rem; font-family: var(--font-mono); color: #888;"
+                                id="status-label-gateway">Protected</span>
+                        </div>
+
+                        <div class="infra-node" id="node-merchant" onclick="selectInfraNode('merchant')">
+                            <span class="infra-node-icon">🏬</span>
+                            <span class="infra-node-name">Merchant Portal</span>
+                            <div class="infra-health-bar">
+                                <div class="infra-health-fill" id="health-merchant"></div>
+                            </div>
+                            <span style="font-size: 0.65rem; font-family: var(--font-mono); color: #888;"
+                                id="status-label-merchant">Protected</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Defenses Arsenal -->
+                    <div class="l3-arsenal">
+                        <div class="arsenal-title">Security Arsenal Protocols</div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -8px;">Select a tool to
+                            apply to the active node:</p>
+
+                        <div class="arsenal-grid">
+                            <div class="defense-weapon" id="def-mfa" onclick="selectDefenseTool('mfa')">
+                                <div class="weapon-icon">📱</div>
+                                <div class="weapon-meta">
+                                    <span class="weapon-name">Multi-factor Authentication (MFA)</span>
+                                    <span class="weapon-desc">Adds validation factor (OTP/Biometrics)</span>
+                                </div>
+                            </div>
+
+                            <div class="defense-weapon" id="def-updates" onclick="selectDefenseTool('updates')">
+                                <div class="weapon-icon">🔄</div>
+                                <div class="weapon-meta">
+                                    <span class="weapon-name">Continuous Security patches</span>
+                                    <span class="weapon-desc">Closes systems software backdoors</span>
+                                </div>
+                            </div>
+
+                            <div class="defense-weapon" id="def-encryption" onclick="selectDefenseTool('encryption')">
+                                <div class="weapon-icon">🔒</div>
+                                <div class="weapon-meta">
+                                    <span class="weapon-name">AES-256 Data Encryption</span>
+                                    <span class="weapon-desc">Protects database tables data columns</span>
+                                </div>
+                            </div>
+
+                            <div class="defense-weapon" id="def-access" onclick="selectDefenseTool('access')">
+                                <div class="weapon-icon">🔑</div>
+                                <div class="weapon-meta">
+                                    <span class="weapon-name">Access Control Lists (RBAC)</span>
+                                    <span class="weapon-desc">Restricts user system admin privileges</span>
+                                </div>
+                            </div>
+
+                            <div class="defense-weapon" id="def-firewall" onclick="selectDefenseTool('firewall')">
+                                <div class="weapon-icon">🛡️</div>
+                                <div class="weapon-meta">
+                                    <span class="weapon-name">Network Firewall (WAF)</span>
+                                    <span class="weapon-desc">Blocks malicious incoming IP network load</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background-color: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; margin-top: 10px; font-size: 0.82rem;"
+                            id="l3-feedback-text">
+                            Security logs: Map state stable. Select "Initialize Threat Cycle" to engage.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel3()">Reset Network Nodes</button>
+                    <button class="btn" id="l3-action-btn" onclick="startL3ThreatCycle()">Initialize Threat
+                        Cycle</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: Privacy & Cyber Law Advisor -->
+        <section id="screen-l4" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 4: Privacy & Cyber Law Advisor</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue);">Compliance
+                        Review</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    PaySphere must comply with global cyber laws (such as GDPR, IT Act 2000, and IT Rules 2011). Audit
+                    the five corporate practices listed in the pool. Drag or click cards to sort them into **Legal /
+                    Compliant**, **Illegal / Non-compliant**, or **Needs Modification**. For illegal or modifiable
+                    entries, select the compliant corrective action.
+                </div>
+
+                <div class="l4-container">
+                    <!-- Left: Practices pool -->
+                    <div class="l4-pool-container">
+                        <h3
+                            style="font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 8px;">
+                            Available Practices Deck</h3>
+                        <div class="l4-pool" id="l4-practice-pool">
+                            <!-- Cards injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Sorting Buckets -->
+                    <div class="l4-zone-group">
+                        <div class="l4-zone l4-zone-legal" id="zone-legal" ondragover="allowL4Drop(event)"
+                            ondrop="handleL4Drop(event, 'legal')">
+                            <div class="l4-zone-header">Legal / Compliant (Transparency & Consent)</div>
+                            <!-- Card targets drop here -->
+                        </div>
+
+                        <div class="l4-zone l4-zone-illegal" id="zone-illegal" ondragover="allowL4Drop(event)"
+                            ondrop="handleL4Drop(event, 'illegal')">
+                            <div class="l4-zone-header">Illegal / Non-compliant (Fines & Breaches)</div>
+                            <!-- Card targets drop here -->
+                        </div>
+
+                        <div class="l4-zone l4-zone-modify" id="zone-modify" ondragover="allowL4Drop(event)"
+                            ondrop="handleL4Drop(event, 'modify')">
+                            <div class="l4-zone-header">Needs Modification (Policy Overhaul)</div>
+                            <!-- Card targets drop here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remediation select fields (Triggered after correct sorting) -->
+                <div class="l4-remediation-container" id="l4-remediation-panel">
+                    <h3
+                        style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--primary-red); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                        Compliance Remediation Actions Plan</h3>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: -8px;">Correct non-compliant
+                        practices to meet regulatory guidelines:</p>
+
+                    <div class="remediation-row" id="rem-row-location">
+                        <label>Practices P1: Location Tracking Without Consent</label>
+                        <select class="remediation-select" id="sel-rem-location">
+                            <option value="none">-- Select Remediation Strategy --</option>
+                            <option value="allow">Log the tracking and ignore notifications to protect marketing
+                                analytics data.</option>
+                            <option value="opt-in">Require explicit user opt-in prompt with granular consent toggles (IT
+                                Act 43A compliant).</option>
+                            <option value="obfuscate">Obfuscate location collection in a 20-page legal terms of service
+                                document.</option>
+                        </select>
+                    </div>
+
+                    <div class="remediation-row" id="rem-row-retention">
+                        <label>Practices P2: Indefinite Storage of Customer Account Logs</label>
+                        <select class="remediation-select" id="sel-rem-retention">
+                            <option value="none">-- Select Remediation Strategy --</option>
+                            <option value="purge">Implement data retention schedule purging sensitive card logs 90 days
+                                after inactivity (GDPR Storage Limit).</option>
+                            <option value="encrypt-all">Store backups on external cloud networks without delete triggers
+                                to maintain recovery archives.</option>
+                            <option value="terms">Charge users a secondary administration fee to opt-in to early log
+                                deletions.</option>
+                        </select>
+                    </div>
+
+                    <div class="remediation-row" id="rem-row-deletion">
+                        <label>Practices P3: Restricting User Profile Erasure</label>
+                        <select class="remediation-select" id="sel-rem-deletion">
+                            <option value="none">-- Select Remediation Strategy --</option>
+                            <option value="email">Force users to mail physical letters to PaySphere legal office for
+                                deletion approval.</option>
+                            <option value="ignore">Retain profiles but hide them from active portal query lists to
+                                preserve databases metrics.</option>
+                            <option value="erasure">Develop an automated portal dashboard providing clean profile
+                                deletions within 30 days (GDPR Art. 17 Erasure).</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel4()">Reset Board</button>
+                    <button class="btn" id="l4-submit-btn" onclick="verifyLevel4Compliance()">Verify Compliance
+                        Plan</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 5: FinTech Command Center -->
+        <section id="screen-l5" class="screen">
+            <div class="l5-layout">
+                <!-- Left: Dashboard Side panels -->
+                <div class="l5-kpi-sidebar">
+                    <div class="l5-sidebar-header">KPI Dashboard</div>
+
+                    <!-- Security Score -->
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Security Score</span>
+                            <span class="kpi-val" id="kpi-security">70</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-security"
+                                style="width: 70%; background-color: var(--primary-red);"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 85</div>
+                    </div>
+
+                    <!-- Success Rate -->
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Success Rate</span>
+                            <span class="kpi-val" id="kpi-success">90%</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-success"
+                                style="width: 90%; background-color: var(--warning);"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 95%</div>
+                    </div>
+
+                    <!-- Customer Trust -->
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Customer Trust</span>
+                            <span class="kpi-val" id="kpi-trust">75</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-trust"
+                                style="width: 75%; background-color: var(--warning);"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 80</div>
+                    </div>
+
+                    <!-- Compliance -->
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Compliance</span>
+                            <span class="kpi-val" id="kpi-compliance">80</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-compliance"
+                                style="width: 80%; background-color: var(--success);"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 90</div>
+                    </div>
+
+                    <!-- Revenue -->
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Rev. Index</span>
+                            <span class="kpi-val" id="kpi-revenue">60</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-revenue"
+                                style="width: 60%; background-color: var(--success);"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 75</div>
+                    </div>
+                </div>
+
+                <!-- Right: Console terminal -->
+                <div class="l5-simulator-console">
+                    <!-- Console Header -->
+                    <div class="l5-console-header">
+                        <div class="console-status">
+                            <div class="console-status-dot" id="console-status-dot"></div>
+                            <span class="console-status-text" id="console-status-text">INITIALIZED // STANDBY</span>
+                        </div>
+                        <div class="console-day-ticker" id="console-day-ticker">DAY 1 OF 30</div>
+                    </div>
+
+                    <!-- Interactive logs readout -->
+                    <div class="l5-terminal-ticker" id="l5-terminal-ticker">
+                        <div class="terminal-row">[SYSTEM] PaySphere terminal systems connected.</div>
+                        <div class="terminal-row">[SYSTEM] CDPO credentials validated. Security score baseline
+                            established.</div>
+                        <div class="terminal-row">[SYSTEM] Select "Launch 30-Day Cycle" to start operations ticker.
+                        </div>
+                    </div>
+
+                    <!-- Action Controls -->
+                    <div class="btn-group" style="margin-top: auto;">
+                        <button class="btn" id="l5-start-btn" onclick="startL5Ticker()">Launch 30-Day Cycle</button>
+                        <button class="btn btn-secondary" id="l5-pause-btn" onclick="pauseL5Ticker()" disabled>Pause
+                            Cycle</button>
+                    </div>
+
+                    <!-- Overlay incident cards -->
+                    <div class="l5-incident-overlay" id="l5-incident-overlay">
+                        <div class="incident-card" id="l5-incident-card">
+                            <div class="incident-header">
+                                <span class="incident-badge">CRITICAL WARNING</span>
+                                <h4 class="incident-title" id="inc-title">DATA BREACH ATTEMPT</h4>
+                            </div>
+                            <p class="incident-desc" id="inc-desc">Hackers have targeted merchant portal server APIs.
+                                Action required to mitigate legal risk.</p>
+                            <div class="incident-options" id="inc-options">
+                                <!-- Options dynamically loaded -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- HELP MANUAL POPUP DIALOG -->
+    <dialog id="help-manual-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📖 Operations Reference Manual</span>
+            </div>
+            <div class="dialog-body">
+                <p><strong>Digital Payment System Flow</strong></p>
+                <p>Digital transactions navigate several authentication and clearing stages. The transaction initiates
+                    at the consumer app, gets verified for limits and PIN codes (Authentication), routes through Payment
+                    Gateways, gets verified by issuing bank nodes, gets captured on transaction settlement logs
+                    (Merchant Receives Money), and sends confirmation alerts.</p>
+
+                <p style="margin-top: 10px;"><strong>Fraud Identification Metrics</strong></p>
+                <p>Security teams flag anomalous behavior. High-value international routing (out-of-profile), repeated
+                    incorrect password logs (brute-force warning indicators), or impossible geolocation velocities (
+                    Delhi to Mumbai transactions in 2 minutes) warrant blocks or suspensions.</p>
+
+                <p style="margin-top: 10px;"><strong>Security Arsenal Countermeasures</strong></p>
+                <p>WAF block DDoS sweeps. MFA halts phishing entry pipelines. Security updates seal OS kernel loopholes.
+                    Encryption shields stored DB profiles from SQL leakage risks.</p>
+
+                <p style="margin-top: 10px;"><strong>Regulatory Cyber Laws</strong></p>
+                <p>GDPR guidelines enforce Transparency (Privacy Policies), Purpose and Storage limits (purging
+                    redundant records), and the Right to Erasure (Article 17 account deletion mandates). IT Act 2000
+                    (Section 43A/72A) enforces statutory data protection rules and penalties on platforms displaying
+                    negligent controls.</p>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeHelpManual()">Close Reference Manual</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- LEARNING SUMMARY DIALOG -->
+    <dialog id="summary-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span id="summary-dialog-title">Level 1 Complete: Learning Audit Summary</span>
+            </div>
+            <div class="dialog-body" id="summary-dialog-content">
+                <!-- Injected dynamically based on active level completed -->
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" id="summary-next-btn" onclick="confirmSummaryNextLevel()">Advance to Next
+                    Level</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- SCORECARD RESULT CONTAINER DIALOG -->
+    <dialog id="scorecard-dialog">
+        <div class="dialog-container" style="max-width: 800px;">
+            <div class="dialog-header">
+                <span>📊 PaySphere Board Operations Review</span>
+            </div>
+
+            <div class="scorecard-banner" id="scorecard-banner">
+                <h2 id="scorecard-status">Digital Payment Ecosystem Successfully Managed</h2>
+                <p id="scorecard-desc">Your platform remained secure, trustworthy, and legally compliant.</p>
+            </div>
+
+            <div class="scorecard-grid">
+                <div class="scorecard-col strengths">
+                    <h4 class="scorecard-col-title">Strengths & Achievements</h4>
+                    <ul class="scorecard-list" id="scorecard-strengths-list">
+                        <!-- Injected -->
+                    </ul>
+                </div>
+                <div class="scorecard-col weaknesses">
+                    <h4 class="scorecard-col-title">Operational Improvements Needed</h4>
+                    <ul class="scorecard-list" id="scorecard-weaknesses-list">
+                        <!-- Injected -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dialog-footer" style="margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="resetFullSimulation()">Re-run Simulation</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Persistent Bottom Nav Bar (No Lock Level Navigation) -->
+    <div class="nav-footer" id="navigationFooter" style="display: none;">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Level</button>
+            <div style="font-family: var(--font-display); font-weight: 700; color: var(--primary-red); font-size: 0.95rem;"
+                id="footerLevelText">
+                Level 1 of 5
+            </div>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    <script>
+        // System State
+        const state = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true, true, true],
+            completedLevels: [false, false, false, false, false],
+
+            // Level 1 variables
+            l1: {
+                instrument: 'upi',
+                steps: [
+                    { id: 'step-1', text: 'Customer Initiates Payment' },
+                    { id: 'step-2', text: 'Authentication' },
+                    { id: 'step-3', text: 'Payment Gateway Processing' },
+                    { id: 'step-4', text: 'Bank Verification' },
+                    { id: 'step-5', text: 'Transaction Approval' },
+                    { id: 'step-6', text: 'Merchant Receives Money' },
+                    { id: 'step-7', text: 'Confirmation Message' }
+                ],
+                scrambled: [],
+                ordered: []
+            },
+
+            // Level 2 variables
+            l2: {
+                selectedTx: null,
+                txs: [
+                    {
+                        id: 'TX-101',
+                        amount: '₹500',
+                        loc: 'Mumbai, India',
+                        time: '2:00 PM',
+                        device: 'Android Mobile (Known IP)',
+                        attempts: 1,
+                        pattern: 'Consistent with weekly food delivery records.',
+                        risk: null,      // Student classification
+                        action: null,    // Student action
+                        correctRisk: 'safe',
+                        correctAction: 'approve',
+                        rationale: 'Normal amount, matching recurring profile, local coordinates.'
+                    },
+                    {
+                        id: 'TX-102',
+                        amount: '₹2,00,000',
+                        loc: 'Paris, France',
+                        time: '3:15 AM (Local)',
+                        device: 'Unknown Windows Terminal',
+                        attempts: 1,
+                        pattern: 'Anomalous large transfer, first international activity.',
+                        risk: null,
+                        action: null,
+                        correctRisk: 'high-risk',
+                        correctAction: 'block',
+                        rationale: 'High value transfer, anomalous late hours, foreign IP address.'
+                    },
+                    {
+                        id: 'TX-103',
+                        amount: '₹12,000',
+                        loc: 'Bangalore, India',
+                        time: '11:45 AM',
+                        device: 'Simulated Device Emulator',
+                        attempts: 10,
+                        pattern: 'Ten consecutive failed authentication logs on credentials.',
+                        risk: null,
+                        action: null,
+                        correctRisk: 'suspicious',
+                        correctAction: 'investigate',
+                        rationale: 'Multiple authentication failures suggest credential brute force.'
+                    },
+                    {
+                        id: 'TX-104',
+                        amount: '₹1,800',
+                        loc: 'Delhi, India',
+                        time: '9:00 AM',
+                        device: 'Known iPad',
+                        attempts: 1,
+                        pattern: 'Matches recurring monthly payment profile.',
+                        risk: null,
+                        action: null,
+                        correctRisk: 'safe',
+                        correctAction: 'approve',
+                        rationale: 'Matches regular pre-authorized monthly subscription profile.'
+                    },
+                    {
+                        id: 'TX-105',
+                        amount: '₹45,000',
+                        loc: 'Delhi & Bangalore',
+                        time: '4:32 PM',
+                        device: 'Generic Mobile Phone',
+                        attempts: 2,
+                        pattern: 'Same card logged in Delhi and Bangalore in 2 minutes.',
+                        risk: null,
+                        action: null,
+                        correctRisk: 'high-risk',
+                        correctAction: 'block',
+                        rationale: 'Geographical velocity error (Impossible Travel). Suggests credentials theft.'
+                    }
+                ]
+            },
+
+            // Level 3 variables
+            l3: {
+                activeThreatIndex: 0,
+                selectedNode: null,
+                selectedTool: null,
+                damageApplied: false,
+                nodes: {
+                    user: { label: 'User Accounts', health: 100, originalHealth: 100 },
+                    db: { label: 'Payment Database', health: 100, originalHealth: 100 },
+                    server: { label: 'Transaction Server', health: 100, originalHealth: 100 },
+                    gateway: { label: 'Mobile Application', health: 100, originalHealth: 100 },
+                    merchant: { label: 'Merchant Portal', health: 100, originalHealth: 100 }
+                },
+                threats: [
+                    {
+                        id: 'phishing',
+                        title: 'Phishing Campaign Launch',
+                        desc: 'Fraudsters send spoofed login links targeting user credentials on User Accounts portal.',
+                        targetNode: 'user',
+                        correctTool: 'mfa',
+                        rationale: 'MFA requires verification details, protecting accounts even if logins are stolen.'
+                    },
+                    {
+                        id: 'sql',
+                        title: 'Database SQL Injection Scan',
+                        desc: 'SQL commands injected into query forms attempting to steal records from Payment Database.',
+                        targetNode: 'db',
+                        correctTool: 'encryption',
+                        rationale: 'Encryption renders stored table columns unreadable to database intruders.'
+                    },
+                    {
+                        id: 'malware',
+                        title: 'Malware Exploit Sweep',
+                        desc: 'Trojans scanning Merchant Portal system ports to exploit older browser backdoors.',
+                        targetNode: 'merchant',
+                        correctTool: 'updates',
+                        rationale: 'Regular updates and hotfixes secure backdoors and patch software leaks.'
+                    },
+                    {
+                        id: 'hijack',
+                        title: 'Administrator Privilege Hijack',
+                        desc: 'Compromised admin portal logins attempting to access Transaction Server routing tables.',
+                        targetNode: 'server',
+                        correctTool: 'access',
+                        rationale: 'Strict role access controls prevent compromised accounts from getting master keys.'
+                    },
+                    {
+                        id: 'ddos',
+                        title: 'Distributed Denial of Service (DDoS)',
+                        desc: 'Botnets overloading Mobile Application server gateways to cause platform timeouts.',
+                        targetNode: 'gateway',
+                        correctTool: 'firewall',
+                        rationale: 'Firewall (WAF) filters and rate-limits bad traffic, preserving platform operations.'
+                    }
+                ]
+            },
+
+            // Level 4 variables
+            l4: {
+                pool: [
+                    { id: 'p1', code: 'P1', text: 'Collect and store customer GPS location continuously in background without explicit permission.', correctZone: 'illegal' },
+                    { id: 'p2', code: 'P2', text: 'Retain complete customer database logs and transaction records indefinitely for secondary analytics.', correctZone: 'modify' },
+                    { id: 'p3', code: 'P3', text: 'Remove the "Delete My Account" button to maximize user retention and database size.', correctZone: 'illegal' },
+                    { id: 'p4', code: 'P4', text: 'Provide an easily accessible privacy policy outlining third-party data processing agreements.', correctZone: 'legal' },
+                    { id: 'p5', code: 'P5', text: 'Require active user opt-in and consent banners before tracking marketing cookies.', correctZone: 'legal' }
+                ],
+                placements: {
+                    legal: [],
+                    illegal: [],
+                    modify: []
+                },
+                selectedCard: null
+            },
+
+            // Level 5 variables
+            l5: {
+                day: 1,
+                status: 'idle', // 'running', 'paused', 'ended'
+                timerId: null,
+                kpis: {
+                    security: 70,
+                    success: 90,
+                    trust: 75,
+                    compliance: 80,
+                    revenue: 60
+                },
+                logs: [],
+                activeEvent: null,
+                historyChoices: [],
+                events: {
+                    5: {
+                        badge: 'Security Breach Warning',
+                        title: 'Security Breach Warning',
+                        desc: 'A vulnerability in our gateway code is identified. Rogue logs indicate API key scanning is active.',
+                        options: [
+                            {
+                                text: 'Disclose breach transparently to customers and regulators, applying immediate security hotfix.',
+                                impact: { security: 15, compliance: 15, trust: 10, revenue: -15 },
+                                log: 'Day 5 Choice: Transparently disclosed breach. Fixed vulnerabilities, though revenue decreased due to audit fees.'
+                            },
+                            {
+                                text: 'Quietly patch the vulnerability and defer public disclosure.',
+                                impact: { security: 10, compliance: -25, trust: -20, revenue: 10 },
+                                log: 'Day 5 Choice: Deferred breach disclosure. Regulators issued warnings, causing customer trust to crash.'
+                            }
+                        ]
+                    },
+                    10: {
+                        badge: 'Database Outage',
+                        title: 'Database Outage Alert',
+                        desc: 'The primary clearing database server has crashed due to memory leaks. Transaction flow is interrupted.',
+                        options: [
+                            {
+                                text: 'Redirect traffic to redundant cloud failover cluster.',
+                                impact: { revenue: -10, success: 10, trust: 5, security: 5 },
+                                log: 'Day 10 Choice: Failed over to backup server. Preserved payment rate but operational overhead increased.'
+                            },
+                            {
+                                text: 'Wait for primary database node to reboot natively.',
+                                impact: { revenue: -5, success: -20, trust: -15, security: -5 },
+                                log: 'Day 10 Choice: Decided to wait on server reboot. Transaction success plummeted and clients churned.'
+                            }
+                        ]
+                    },
+                    15: {
+                        badge: 'Regulatory Compliance',
+                        title: 'Regulatory Cyber Law Mandate',
+                        desc: 'Regulators issue strict encryption compliance guidelines on mobile wallet transactions.',
+                        options: [
+                            {
+                                text: 'Upgrade transaction encryption systems immediately.',
+                                impact: { compliance: 20, revenue: -15, security: 5 },
+                                log: 'Day 15 Choice: Complied with rules. Security upgraded, but engineering costs reduced revenues.'
+                            },
+                            {
+                                text: 'Delay compliance upgrades until next quarter.',
+                                impact: { compliance: -25, revenue: 10, security: -5 },
+                                log: 'Day 15 Choice: Postponed upgrades. Operating margins saved, but compliance penalties applied.'
+                            }
+                        ]
+                    },
+                    20: {
+                        badge: 'Fraud Wave Warning',
+                        title: 'Suspicious Transaction Surge',
+                        desc: 'An automated security scan flags a spike in velocity card logs across international clearing hubs.',
+                        options: [
+                            {
+                                text: 'Enable strict Multi-Factor Authentication (MFA) on all credit card transactions.',
+                                impact: { security: 20, trust: 10, success: -5, revenue: -5 },
+                                log: 'Day 20 Choice: Enabled strict MFA. Fraud halted, though transaction success took minor friction hits.'
+                            },
+                            {
+                                text: 'Log transaction warnings but allow checkouts to continue.',
+                                impact: { security: -20, trust: -15, success: 5, revenue: 15 },
+                                log: 'Day 20 Choice: Bypassed checks. Preserved processing rates but high chargebacks reduced customer trust.'
+                            }
+                        ]
+                    },
+                    25: {
+                        badge: 'Integration Choice',
+                        title: 'Mobile Wallet Integration Request',
+                        desc: 'A major international merchant requests fast wallet integrations. Vulnerability scanning is incomplete.',
+                        options: [
+                            {
+                                text: 'Execute third-party security audits prior to wallet launch.',
+                                impact: { revenue: 20, compliance: 10, security: 5, trust: 5 },
+                                log: 'Day 25 Choice: Conducted audit before integration. Platform is secure and regulatory compliant.'
+                            },
+                            {
+                                text: 'Fast-track wallet launch directly to capture early market share.',
+                                impact: { revenue: 30, security: -20, compliance: -15, trust: -10 },
+                                log: 'Day 25 Choice: Fast-tracked wallet integration. Vulnerabilities in partner code leaked API keys.'
+                            }
+                        ]
+                    },
+                    28: {
+                        badge: 'Traffic Influx',
+                        title: 'Platform Volume Spikes',
+                        desc: 'Annual seasonal marketing sales double incoming transaction requests.',
+                        options: [
+                            {
+                                text: 'Dynamically scale server capacity with high-availability load balancing.',
+                                impact: { revenue: -15, success: 10, trust: 10, security: 5 },
+                                log: 'Day 28 Choice: Scaled infrastructure. Transaction pipeline remained stable under load.'
+                            },
+                            {
+                                text: 'Maintain default hardware architecture to save operational overhead.',
+                                impact: { success: -25, trust: -20, security: -10, revenue: -5 },
+                                log: 'Day 28 Choice: Kept standard hardware. Systems overloaded, causing payment timeout drops.'
+                            }
+                        ]
+                    }
+                },
+            }
+        };
+
+        // Initialize Onboarding Page
+        window.addEventListener('DOMContentLoaded', () => {
+            initLevel1();
+            initLevel2();
+            initLevel4();
+            updateNavigationPills();
+        });
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✓';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '🚨';
+
+            toast.innerHTML = `<span>${icon}</span><div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Stepper Navigation
+        function updateNavigationPills() {
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                const divider = document.getElementById(`step-div-${i}`);
+                const badge = btn.querySelector('.step-badge');
+
+                // Reset classes
+                btn.className = 'step-item';
+                if (divider) divider.className = 'step-divider';
+
+                if (state.unlockedLevels[i - 1]) {
+                    btn.classList.add('unlocked');
+                    badge.innerText = i;
+                } else {
+                    badge.innerText = '🔒';
+                }
+
+                if (state.currentLevel === i) {
+                    btn.classList.add('active');
+                }
+
+                if (state.completedLevels[i - 1]) {
+                    btn.classList.add('completed');
+                    if (divider) divider.classList.add('completed');
+                } else {
+                    if (divider && state.currentLevel > i) {
+                        divider.classList.add('active');
+                    }
+                }
+            }
+
+            // Update bottom nav footer details
+            const prevBtn = document.getElementById('footerPrevBtn');
+            const nextBtn = document.getElementById('footerNextBtn');
+            const levelText = document.getElementById('footerLevelText');
+
+            if (prevBtn && nextBtn && levelText) {
+                levelText.innerText = `Level ${state.currentLevel} of 5`;
+                prevBtn.disabled = (state.currentLevel === 1);
+                nextBtn.disabled = (state.currentLevel === 5);
+            }
+        }
+
+        function navigateToLevel(levelIndex) {
+            if (state.unlockedLevels[levelIndex - 1]) {
+                // Deactivate current
+                document.querySelector('.screen.active').classList.remove('active');
+                state.currentLevel = levelIndex;
+
+                let targetId = `screen-l${levelIndex}`;
+                document.getElementById(targetId).classList.add('active');
+
+                // Show footer
+                document.getElementById('navigationFooter').style.display = 'flex';
+
+                updateNavigationPills();
+                showToast(`Switched to Command Panel Level ${levelIndex}`, 'info');
+
+                // Trigger any level start hooks if needed
+                if (levelIndex === 3) {
+                    resetLevel3();
+                }
+            } else {
+                showToast("Level locked. Complete previous operations to unlock.", "warning");
+            }
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 5) {
+                navigateToLevel(state.currentLevel + 1);
+            }
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1) {
+                navigateToLevel(state.currentLevel - 1);
+            }
+        }
+
+        function startSimulation() {
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            document.getElementById('navigationFooter').style.display = 'flex';
+            navigateToLevel(1);
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        // Help Manual Controls
+        const helpDialog = document.getElementById('help-manual-dialog');
+        function showHelpManual() { helpDialog.showModal(); }
+        function closeHelpManual() { helpDialog.close(); }
+
+        // LEVEL 1 LOGIC
+        const l1Explanations = {
+            'step-1': 'The customer chooses an instrument (e.g. UPI app scan) and inputs the payment details.',
+            'step-2': 'Credentials check (such as MPIN, card CVV, or 3D-secure OTP) is entered to authenticate the identity of the cardholder.',
+            'step-3': 'Payment Gateway tokenizes and encrypts payload, sending the secure auth request to Acquirer banks.',
+            'step-4': 'Clearing networks route to the Issuing Bank to check fund availability and account limitations.',
+            'step-5': 'Authorization codes are issued back to gateway nodes signaling confirmation of routing paths.',
+            'step-6': 'Cleared operational funds are routed to Merchant ledger accounts (Settlement queues active).',
+            'step-7': 'Gateway pushes live status triggers, updating interface views showing successful payment confirmations.'
+        };
+
+        function initLevel1() {
+            // Shuffle steps
+            state.l1.scrambled = [...state.l1.steps].sort(() => Math.random() - 0.5);
+            state.l1.ordered = [];
+            renderLevel1();
+        }
+
+        function selectL1Instrument(ins) {
+            state.l1.instrument = ins;
+            const buttons = document.querySelectorAll('.l1-selector-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Render specific context updates
+            document.getElementById('l1-explanation-card').innerText = `Instrument changed to ${ins.toUpperCase()}. Arrange pipeline to simulate.`;
+            document.getElementById('l1-animation-panel').style.display = 'none';
+            initLevel1();
+        }
+
+        function renderLevel1() {
+            const pool = document.getElementById('l1-cards-pool');
+            const slots = document.getElementById('l1-slots-container');
+
+            pool.innerHTML = '';
+            slots.innerHTML = '';
+
+            // Scrambled cards
+            state.l1.scrambled.forEach((card) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'l1-card';
+                cardEl.draggable = true;
+                cardEl.innerHTML = `<span>${card.text}</span> <span>➔</span>`;
+                cardEl.addEventListener('click', () => addCardToRoute(card.id));
+                cardEl.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', card.id));
+                pool.appendChild(cardEl);
+            });
+
+            // Slots 1 to 7
+            for (let i = 0; i < 7; i++) {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'l1-slot';
+
+                const label = document.createElement('span');
+                label.className = 'l1-slot-label';
+                label.innerText = `Step ${i + 1}`;
+
+                const box = document.createElement('div');
+                box.className = 'l1-slot-box';
+                box.setAttribute('data-index', i);
+
+                // Allow drops
+                box.addEventListener('dragover', (e) => e.preventDefault());
+                box.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    placeCardInSlot(cardId, i);
+                });
+
+                // Render placed cards
+                if (state.l1.ordered[i]) {
+                    const card = state.l1.ordered[i];
+                    box.className = 'l1-slot-box occupied';
+                    box.innerHTML = `<span style="font-size:0.85rem; font-weight:600;">${card.text}</span>`;
+                    box.addEventListener('click', () => removeCardFromRoute(i));
+                } else {
+                    box.innerHTML = '<span style="color:#B0BEC5; font-size:0.75rem;">Drop Step Here</span>';
+                }
+
+                slotDiv.appendChild(label);
+                slotDiv.appendChild(box);
+                slots.appendChild(slotDiv);
+            }
+        }
+
+        function addCardToRoute(cardId) {
+            if (state.l1.ordered.length < 7) {
+                const card = state.l1.scrambled.find(c => c.id === cardId);
+                state.l1.ordered.push(card);
+                state.l1.scrambled = state.l1.scrambled.filter(c => c.id !== cardId);
+                renderLevel1();
+            }
+        }
+
+        function placeCardInSlot(cardId, index) {
+            const card = state.l1.scrambled.find(c => c.id === cardId) || state.l1.ordered.find(c => c && c.id === cardId);
+
+            // Clean from current spots
+            state.l1.scrambled = state.l1.scrambled.filter(c => c.id !== cardId);
+            state.l1.ordered = state.l1.ordered.filter(c => c && c.id !== cardId);
+
+            // Put in slot
+            state.l1.ordered[index] = card;
+            renderLevel1();
+        }
+
+        function removeCardFromRoute(index) {
+            const card = state.l1.ordered[index];
+            if (card) {
+                state.l1.scrambled.push(card);
+                state.l1.ordered[index] = null;
+                // Compact or leave gap
+                state.l1.ordered = state.l1.ordered.filter(c => c !== null);
+                renderLevel1();
+            }
+        }
+
+        function resetLevel1() {
+            initLevel1();
+            document.getElementById('l1-animation-panel').style.display = 'none';
+        }
+
+        function verifyLevel1Routing() {
+            // Check if 7 items are placed
+            const filled = state.l1.ordered.filter(Boolean);
+            if (filled.length < 7) {
+                showToast("Assemble all 7 route steps to authorize pipeline verification.", "warning");
+                return;
+            }
+
+            let isCorrect = true;
+            for (let i = 0; i < 7; i++) {
+                if (state.l1.ordered[i].id !== `step-${i + 1}`) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if (isCorrect) {
+                showToast("Transaction pipeline verification successful!", "success");
+                animateL1Routing();
+            } else {
+                showToast("Transaction failed. System reports out-of-sequence clearance error.", "danger");
+                document.getElementById('l1-explanation-card').innerHTML = `<span style="color:var(--danger); font-weight:700;">Pipeline Error:</span> Routing verification failed. Ensure Authentication occurs immediately after Customer Initiation, followed by Gateway processing and Bank verification loops.`;
+            }
+        }
+
+        // L1 Route Tracer Animation
+        function animateL1Routing() {
+            const panel = document.getElementById('l1-animation-panel');
+            panel.style.display = 'flex';
+            document.getElementById('l1-anim-instrument').innerText = `${state.l1.instrument.toUpperCase()} Flow Active`;
+
+            const progress = document.getElementById('network-link-progress');
+            const nodes = document.querySelectorAll('.network-node');
+            const explanation = document.getElementById('l1-explanation-card');
+
+            progress.style.width = '0%';
+            nodes.forEach(node => node.className = 'network-node');
+
+            let currentStep = 0;
+            const animateStep = () => {
+                if (currentStep < 7) {
+                    // Update nodes lighting
+                    if (currentStep < 6) {
+                        nodes[currentStep].className = 'network-node active';
+                        if (currentStep > 0) nodes[currentStep - 1].className = 'network-node success';
+                    } else {
+                        nodes[5].className = 'network-node success';
+                    }
+
+                    // Increment link line
+                    progress.style.width = `${(currentStep / 6) * 100}%`;
+
+                    // Show explanation
+                    const stepId = `step-${currentStep + 1}`;
+                    explanation.innerHTML = `<strong>Step ${currentStep + 1}: ${state.l1.steps[currentStep].text}</strong><br>${l1Explanations[stepId]}`;
+
+                    currentStep++;
+                    setTimeout(animateStep, 1500);
+                } else {
+                    nodes.forEach(node => node.className = 'network-node success');
+                    explanation.innerHTML = `<strong>Clearance Verification Complete</strong><br>Money successfully moved through secure API nodes. The PaySphere gateway has authorized Level 1 clearance.`;
+
+                    // Unlock Level 2
+                    state.completedLevels[0] = true;
+                    state.unlockedLevels[1] = true;
+                    updateNavigationPills();
+
+                    // Show summary dialog
+                    setTimeout(() => showSummaryDialog(1), 1000);
+                }
+            };
+
+            animateStep();
+        }
+
+        // LEVEL 2 LOGIC
+        function initLevel2() {
+            renderLevel2();
+        }
+
+        function renderLevel2() {
+            const grid = document.getElementById('l2-log-grid');
+            grid.innerHTML = '';
+
+            let allClassified = true;
+
+            state.l2.txs.forEach((tx, idx) => {
+                const row = document.createElement('div');
+                row.className = `l2-tx-row ${state.l2.selectedTx === idx ? 'selected' : ''}`;
+
+                // If evaluations done, show feedback colors
+                if (state.completedLevels[1]) {
+                    const correctClass = (tx.risk === tx.correctRisk && tx.action === tx.correctAction);
+                    row.classList.add(correctClass ? 'classified-correct' : 'classified-incorrect');
+                }
+
+                let badgeClass = 'pending';
+                let badgeText = 'Audit Pending';
+
+                if (tx.risk) {
+                    badgeClass = tx.risk === 'high-risk' ? 'risk' : tx.risk;
+                    badgeText = tx.risk;
+                } else {
+                    allClassified = false;
+                }
+
+                row.innerHTML = `
+                    <div class="l2-tx-meta">
+                        <span class="tx-id">${tx.id} // ${tx.time}</span>
+                        <span class="tx-desc">${tx.amount} (${tx.loc})</span>
+                    </div>
+                    <div>
+                        <span class="tx-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                `;
+
+                row.addEventListener('click', () => selectL2Tx(idx));
+                grid.appendChild(row);
+            });
+
+            // Enable submit if all classifications recorded
+            document.getElementById('l2-submit-btn').disabled = !allClassified;
+        }
+
+        function selectL2Tx(idx) {
+            state.l2.selectedTx = idx;
+            renderLevel2();
+
+            const sidebar = document.getElementById('l2-sidebar-content');
+            sidebar.style.display = 'flex';
+
+            const tx = state.l2.txs[idx];
+            document.getElementById('det-id').innerText = tx.id;
+            document.getElementById('det-amount').innerText = tx.amount;
+            document.getElementById('det-loc').innerText = tx.loc;
+            document.getElementById('det-time').innerText = tx.time;
+            document.getElementById('det-dev').innerText = tx.device;
+            document.getElementById('det-attempts').innerText = tx.attempts;
+            document.getElementById('det-pattern').innerText = tx.pattern;
+
+            // Set active buttons
+            resetL2ChoiceUI();
+
+            if (tx.risk) {
+                const btn = document.querySelector(`.l2-choice-btn[data-val="${tx.risk}"]`);
+                if (btn) btn.classList.add('active');
+            }
+            if (tx.action) {
+                const btn = document.querySelector(`.l2-choice-btn[data-val="${tx.action}"]`);
+                if (btn) btn.classList.add('active-action');
+            }
+        }
+
+        function resetL2ChoiceUI() {
+            document.querySelectorAll('.l2-choice-btn').forEach(btn => {
+                btn.classList.remove('active', 'active-action');
+            });
+        }
+
+        function setL2Classification(val) {
+            if (state.l2.selectedTx === null) return;
+            const tx = state.l2.txs[state.l2.selectedTx];
+            tx.risk = val;
+
+            // Toggle visual class active state
+            document.querySelectorAll('.l2-choice-btn[data-type="class"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function setL2Action(val) {
+            if (state.l2.selectedTx === null) return;
+            const tx = state.l2.txs[state.l2.selectedTx];
+            tx.action = val;
+
+            document.querySelectorAll('.l2-choice-btn[data-type="action"]').forEach(btn => {
+                btn.classList.remove('active-action');
+            });
+            event.target.classList.add('active-action');
+        }
+
+        function saveL2Decision() {
+            if (state.l2.selectedTx === null) return;
+            const tx = state.l2.txs[state.l2.selectedTx];
+            if (!tx.risk || !tx.action) {
+                showToast("Select both classification and operations action before saving.", "warning");
+                return;
+            }
+
+            showToast(`Recorded decisions for ${tx.id}`, "success");
+            renderLevel2();
+        }
+
+        function verifyLevel2Decisions() {
+            let correctCount = 0;
+            state.l2.txs.forEach((tx) => {
+                if (tx.risk === tx.correctRisk && tx.action === tx.correctAction) {
+                    correctCount++;
+                }
+            });
+
+            state.completedLevels[1] = true;
+            renderLevel2();
+
+            if (correctCount === 5) {
+                showToast("Perfect security audit score! All logs correctly classified.", "success");
+
+                // Unlock Level 3
+                state.unlockedLevels[2] = true;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(2), 1000);
+            } else {
+                showToast(`Audit complete. Classifications graded: ${correctCount}/5 correct.`, "warning");
+                state.unlockedLevels[2] = true; // Still allow navigation but show highlights
+                updateNavigationPills();
+
+                // Expand panel explanation showing rationales
+                const reportContent = state.l2.txs.map(tx => {
+                    const isCorrect = (tx.risk === tx.correctRisk && tx.action === tx.correctAction);
+                    const mark = isCorrect ? '🟢' : '🔴';
+                    return `<div><strong>${mark} ${tx.id} (${tx.amount})</strong>: ${tx.rationale} <br><em>Correct: Classify ${tx.correctRisk.toUpperCase()}, Action: ${tx.correctAction.toUpperCase()}</em></div>`;
+                }).join('<hr style="margin:8px 0; border-color:#EEE;">');
+
+                document.getElementById('l2-analysis-panel').innerHTML = `
+                    <h3 style="font-family:var(--font-display); font-size:1.1rem; color:var(--primary-red);">Security Audit Report</h3>
+                    <div style="font-size:0.82rem; display:flex; flex-direction:column; gap:8px;">
+                        ${reportContent}
+                    </div>
+                `;
+            }
+        }
+
+        function resetLevel2() {
+            state.l2.txs.forEach(tx => {
+                tx.risk = null;
+                tx.action = null;
+            });
+            state.l2.selectedTx = null;
+            state.completedLevels[1] = false;
+            document.getElementById('l2-sidebar-content').style.display = 'none';
+            document.getElementById('l2-submit-btn').disabled = true;
+            initLevel2();
+        }
+
+        // LEVEL 3 LOGIC
+        function resetLevel3() {
+            state.l3.activeThreatIndex = 0;
+            state.l3.selectedNode = null;
+            state.l3.selectedTool = null;
+            state.l3.damageApplied = false;
+
+            // Restore health
+            for (let key in state.l3.nodes) {
+                state.l3.nodes[key].health = 100;
+                updateNodeHealthUI(key);
+                const el = document.getElementById(`node-${key}`);
+                el.className = 'infra-node';
+                document.getElementById(`status-label-${key}`).innerText = 'Protected';
+            }
+
+            document.getElementById('l3-threat-alert').style.display = 'none';
+            document.getElementById('l3-action-btn').disabled = false;
+            document.getElementById('l3-action-btn').innerText = 'Initialize Threat Cycle';
+            document.getElementById('l3-feedback-text').innerText = 'Security logs: Map state stable. Select "Initialize Threat Cycle" to engage.';
+            resetArsenalHighlight();
+        }
+
+        function updateNodeHealthUI(nodeKey) {
+            const fill = document.getElementById(`health-${nodeKey}`);
+            const node = state.l3.nodes[nodeKey];
+            fill.style.width = `${node.health}%`;
+
+            if (node.health > 60) fill.style.backgroundColor = 'var(--success)';
+            else if (node.health > 30) fill.style.backgroundColor = 'var(--warning)';
+            else fill.style.backgroundColor = 'var(--danger)';
+        }
+
+        function startL3ThreatCycle() {
+            document.getElementById('l3-action-btn').disabled = true;
+            triggerL3NextThreat();
+        }
+
+        function triggerL3NextThreat() {
+            if (state.l3.activeThreatIndex >= state.l3.threats.length) {
+                // Check map health integrity
+                let avgHealth = 0;
+                for (let key in state.l3.nodes) avgHealth += state.l3.nodes[key].health;
+                avgHealth /= 5;
+
+                if (avgHealth >= 70) {
+                    showToast("Cyberattack campaign successfully mitigated!", "success");
+                    state.completedLevels[2] = true;
+                    state.unlockedLevels[3] = true;
+                    updateNavigationPills();
+                    setTimeout(() => showSummaryDialog(3), 1000);
+                } else {
+                    showToast("Intrusion mitigation failed. Infrastructure offline.", "danger");
+                    document.getElementById('l3-feedback-text').innerText = 'System Status: Severely compromised. Average node integrity fell below 70%. Reset panel and adapt defenses.';
+                    document.getElementById('l3-action-btn').disabled = false;
+                    document.getElementById('l3-action-btn').innerText = 'Retry Defenses Cycle';
+                }
+                return;
+            }
+
+            const threat = state.l3.threats[state.l3.activeThreatIndex];
+
+            // Display Alert
+            document.getElementById('l3-threat-alert').style.display = 'flex';
+            document.getElementById('alert-title').innerText = `CRITICAL ATTACK: ${threat.title}`;
+            document.getElementById('alert-desc').innerText = threat.desc;
+
+            // Red Pulsing target node
+            const nodeEl = document.getElementById(`node-${threat.targetNode}`);
+            nodeEl.className = 'infra-node active-target';
+            document.getElementById(`status-label-${threat.targetNode}`).innerText = '⚠️ BREACHING';
+
+            document.getElementById('l3-feedback-text').innerText = `Alert: Server ${threat.targetNode.toUpperCase()} is under attack. Select the correct tool and deploy defense.`;
+            state.l3.damageApplied = false;
+
+            // Clear current selections
+            state.l3.selectedNode = null;
+            state.l3.selectedTool = null;
+            resetArsenalHighlight();
+        }
+
+        function selectInfraNode(nodeKey) {
+            const threat = state.l3.threats[state.l3.activeThreatIndex];
+            if (!threat || state.l3.activeThreatIndex >= state.l3.threats.length) return;
+
+            // Can only select node if it is currently active target
+            if (threat.targetNode !== nodeKey) {
+                showToast("System reports routing load stable on this asset. Concentrate on targeted nodes.", "warning");
+                return;
+            }
+
+            state.l3.selectedNode = nodeKey;
+
+            // Highlight node selection
+            document.querySelectorAll('.infra-node').forEach(el => {
+                if (el.id !== `node-${nodeKey}`) el.classList.remove('selected-outline');
+            });
+
+            document.getElementById(`node-${nodeKey}`).classList.add('selected-outline');
+
+            checkL3Match();
+        }
+
+        function selectDefenseTool(toolKey) {
+            const threat = state.l3.threats[state.l3.activeThreatIndex];
+            if (!threat || state.l3.activeThreatIndex >= state.l3.threats.length) return;
+
+            state.l3.selectedTool = toolKey;
+
+            // Highlight tool selection
+            resetArsenalHighlight();
+            document.getElementById(`def-${toolKey}`).classList.add('selected');
+
+            // Auto target the active node
+            state.l3.selectedNode = threat.targetNode;
+
+            checkL3Match();
+        }
+
+        function resetArsenalHighlight() {
+            document.querySelectorAll('.defense-weapon').forEach(w => w.classList.remove('selected'));
+        }
+
+        function checkL3Match() {
+            if (!state.l3.selectedNode || !state.l3.selectedTool) return;
+
+            const threat = state.l3.threats[state.l3.activeThreatIndex];
+            const node = state.l3.nodes[state.l3.selectedNode];
+
+            if (state.l3.selectedTool === threat.correctTool) {
+                // Mitigated!
+                showToast("Threat mitigated successfully!", "success");
+
+                const el = document.getElementById(`node-${state.l3.selectedNode}`);
+                el.className = 'infra-node defended';
+                document.getElementById(`status-label-${state.l3.selectedNode}`).innerText = '🟢 SECURE';
+
+                document.getElementById('l3-feedback-text').innerText = `Defense Success: Deployed ${state.l3.selectedTool.toUpperCase()}. ${threat.rationale}`;
+
+                // Advanced
+                state.l3.activeThreatIndex++;
+                setTimeout(triggerL3NextThreat, 2500);
+            } else {
+                // Wrong defense!
+                if (!state.l3.damageApplied) {
+                    showToast("Ineffective defense! Node is taking operational damage.", "danger");
+                    node.health -= 40;
+                    if (node.health < 0) node.health = 0;
+                    updateNodeHealthUI(state.l3.selectedNode);
+                    state.l3.damageApplied = true;
+
+                    document.getElementById('l3-feedback-text').innerText = `Breach Warning: Applied ${state.l3.selectedTool.toUpperCase()} failed to deflect ${threat.id.toUpperCase()}. Node health decreased.`;
+                } else {
+                    showToast("Vulnerability active. Select another protocol.", "warning");
+                }
+            }
+        }
+
+
+        // LEVEL 4 LOGIC
+        function initLevel4() {
+            renderLevel4();
+        }
+
+        function renderLevel4() {
+            const pool = document.getElementById('l4-practice-pool');
+            pool.innerHTML = '';
+
+            state.l4.pool.forEach((card) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'l4-card';
+                cardEl.draggable = true;
+                cardEl.innerHTML = `
+                    <div class="l4-card-meta">
+                        <span class="l4-card-badge">${card.code}</span>
+                        <span style="font-size:0.75rem; color:var(--text-muted);">Drag or Click</span>
+                    </div>
+                    <div>${card.text}</div>
+                `;
+
+                cardEl.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', card.id);
+                });
+
+                cardEl.addEventListener('click', () => selectL4Card(card.id));
+                pool.appendChild(cardEl);
+            });
+
+            // Render zones contents if clicked
+            renderZonePlacements();
+        }
+
+        function selectL4Card(cardId) {
+            // Interactive click placement fallback
+            state.l4.selectedCard = cardId;
+            const card = state.l4.pool.find(c => c.id === cardId);
+
+            // Ask user where to place using a simple inline button set in sidebar
+            const choiceHTML = `
+                <div style="margin-top:8px; display:flex; gap:6px;">
+                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.72rem;" onclick="moveL4Card('${cardId}', 'legal')">+ Legal</button>
+                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.72rem;" onclick="moveL4Card('${cardId}', 'illegal')">+ Illegal</button>
+                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.72rem;" onclick="moveL4Card('${cardId}', 'modify')">+ Modify</button>
+                </div>
+            `;
+
+            // Inject options into targeted card directly
+            const cards = document.querySelectorAll('.l4-card');
+            renderLevel4(); // reset first
+
+            const cardIndex = state.l4.pool.findIndex(c => c.id === cardId);
+            const cardEls = document.getElementById('l4-practice-pool').children;
+            if (cardEls[cardIndex]) {
+                const optDiv = document.createElement('div');
+                optDiv.innerHTML = choiceHTML;
+                cardEls[cardIndex].appendChild(optDiv);
+            }
+        }
+
+        function moveL4Card(cardId, zone) {
+            const card = state.l4.pool.find(c => c.id === cardId);
+
+            // Remove from pool
+            state.l4.pool = state.l4.pool.filter(c => c.id !== cardId);
+
+            // Clean from other zones
+            for (let z in state.l4.placements) {
+                state.l4.placements[z] = state.l4.placements[z].filter(c => c.id !== cardId);
+            }
+
+            state.l4.placements[zone].push(card);
+            state.l4.selectedCard = null;
+
+            renderLevel4();
+            checkL4RemediationRequirement();
+        }
+
+        function allowL4Drop(e) { e.preventDefault(); }
+
+        function handleL4Drop(e, zone) {
+            e.preventDefault();
+            const cardId = e.dataTransfer.getData('text/plain');
+            moveL4Card(cardId, zone);
+        }
+
+        function renderZonePlacements() {
+            for (let zone in state.l4.placements) {
+                const zoneContainer = document.getElementById(`zone-${zone}`);
+
+                // Clear old nodes but keep header
+                const header = zoneContainer.querySelector('.l4-zone-header');
+                zoneContainer.innerHTML = '';
+                zoneContainer.appendChild(header);
+
+                state.l4.placements[zone].forEach((card) => {
+                    const el = document.createElement('div');
+                    el.className = 'l4-card placed';
+                    el.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
+                            <span>${card.code}</span>
+                            <span style="cursor:pointer;" onclick="removeL4Card('${card.id}', '${zone}')">✕</span>
+                        </div>
+                        <div>${card.text}</div>
+                    `;
+                    zoneContainer.appendChild(el);
+                });
+            }
+        }
+
+        function removeL4Card(cardId, zone) {
+            const card = state.l4.placements[zone].find(c => c.id === cardId);
+            state.l4.placements[zone] = state.l4.placements[zone].filter(c => c.id !== cardId);
+            state.l4.pool.push(card);
+            renderLevel4();
+            checkL4RemediationRequirement();
+        }
+
+        function checkL4RemediationRequirement() {
+            // Show remediation form if P1, P2, P3 are placed correctly in illegal/modify zones
+            const p1Placed = state.l4.placements.illegal.some(c => c.id === 'p1');
+            const p2Placed = state.l4.placements.modify.some(c => c.id === 'p2');
+            const p3Placed = state.l4.placements.illegal.some(c => c.id === 'p3');
+
+            const panel = document.getElementById('l4-remediation-panel');
+            if (p1Placed || p2Placed || p3Placed) {
+                panel.style.display = 'flex';
+                // Show rows selectively
+                document.getElementById('rem-row-location').style.display = p1Placed ? 'flex' : 'none';
+                document.getElementById('rem-row-retention').style.display = p2Placed ? 'flex' : 'none';
+                document.getElementById('rem-row-deletion').style.display = p3Placed ? 'flex' : 'none';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function verifyLevel4Compliance() {
+            if (state.l4.pool.length > 0) {
+                showToast("Audit all practices on the board to confirm compliance clearances.", "warning");
+                return;
+            }
+
+            let sortedCorrectly = true;
+            for (let zone in state.l4.placements) {
+                state.l4.placements[zone].forEach((card) => {
+                    if (card.correctZone !== zone) sortedCorrectly = false;
+                });
+            }
+
+            if (!sortedCorrectly) {
+                showToast("Compliance mismatch! Systems auditing logs show sorting errors.", "danger");
+                return;
+            }
+
+            // Check Remediations
+            const p1Placed = state.l4.placements.illegal.some(c => c.id === 'p1');
+            const p2Placed = state.l4.placements.modify.some(c => c.id === 'p2');
+            const p3Placed = state.l4.placements.illegal.some(c => c.id === 'p3');
+
+            if (p1Placed && document.getElementById('sel-rem-location').value !== 'opt-in') {
+                showToast("P1 Remediation selection is insufficient under IT Act Section 43A guidelines.", "warning");
+                return;
+            }
+            if (p2Placed && document.getElementById('sel-rem-retention').value !== 'purge') {
+                showToast("P2 Remediation selection fails to enforce GDPR storage limitation principles.", "warning");
+                return;
+            }
+            if (p3Placed && document.getElementById('sel-rem-deletion').value !== 'erasure') {
+                showToast("P3 Remediation selection violates right to erasure mandate rules.", "warning");
+                return;
+            }
+
+            showToast("Legal audit and remediation plan successfully authorized!", "success");
+            state.completedLevels[3] = true;
+            state.unlockedLevels[4] = true;
+            updateNavigationPills();
+
+            setTimeout(() => showSummaryDialog(4), 1000);
+        }
+
+        function resetLevel4() {
+            state.l4.pool = [
+                { id: 'p1', code: 'P1', text: 'Collect and store customer GPS location continuously in background without explicit permission.', correctZone: 'illegal' },
+                { id: 'p2', code: 'P2', text: 'Retain complete customer database logs and transaction records indefinitely for secondary analytics.', correctZone: 'modify' },
+                { id: 'p3', code: 'P3', text: 'Remove the "Delete My Account" button to maximize user retention and database size.', correctZone: 'illegal' },
+                { id: 'p4', code: 'P4', text: 'Provide an easily accessible privacy policy outlining third-party data processing agreements.', correctZone: 'legal' },
+                { id: 'p5', code: 'P5', text: 'Require active user opt-in and consent banners before tracking marketing cookies.', correctZone: 'legal' }
+            ];
+            state.l4.placements = { legal: [], illegal: [], modify: [] };
+            state.l4.selectedCard = null;
+            state.completedLevels[3] = false;
+            document.getElementById('l4-remediation-panel').style.display = 'none';
+            document.getElementById('sel-rem-location').value = 'none';
+            document.getElementById('sel-rem-retention').value = 'none';
+            document.getElementById('sel-rem-deletion').value = 'none';
+            initLevel4();
+        }
+
+        // LEVEL 5: FinTech Command Center
+        function updateL5KPIs() {
+            const kpis = state.l5.kpis;
+            document.getElementById('kpi-security').innerText = kpis.security;
+            document.getElementById('kpi-success').innerText = `${kpis.success}%`;
+            document.getElementById('kpi-trust').innerText = kpis.trust;
+            document.getElementById('kpi-compliance').innerText = kpis.compliance;
+            document.getElementById('kpi-revenue').innerText = kpis.revenue;
+
+            // Adjust meters
+            updateMeter('security', kpis.security);
+            updateMeter('success', kpis.success);
+            updateMeter('trust', kpis.trust);
+            updateMeter('compliance', kpis.compliance);
+            updateMeter('revenue', kpis.revenue);
+        }
+
+        function updateMeter(id, val) {
+            const fill = document.getElementById(`meter-${id}`);
+            fill.style.width = `${val}%`;
+
+            // Targets check colors
+            let target = 75;
+            if (id === 'security') target = 85;
+            if (id === 'success') target = 95;
+            if (id === 'trust') target = 80;
+            if (id === 'compliance') target = 90;
+
+            if (val >= target) {
+                fill.style.backgroundColor = 'var(--success)';
+            } else if (val >= target - 15) {
+                fill.style.backgroundColor = 'var(--warning)';
+            } else {
+                fill.style.backgroundColor = 'var(--danger)';
+            }
+        }
+
+        function startL5Ticker() {
+            if (state.l5.status === 'running') return;
+
+            state.l5.status = 'running';
+            document.getElementById('console-status-dot').className = 'console-status-dot';
+            document.getElementById('console-status-text').innerText = 'OPERATIONAL // NETWORK ONLINE';
+            document.getElementById('l5-start-btn').disabled = true;
+            document.getElementById('l5-pause-btn').disabled = false;
+
+            logToTerminal(`[SYSTEM] Starting 30-Day PaySphere operations ticker...`, 'success');
+
+            state.l5.timerId = setInterval(() => {
+                if (state.l5.day < 30) {
+                    state.l5.day++;
+                    document.getElementById('console-day-ticker').innerText = `DAY ${state.l5.day} OF 30`;
+
+                    // Daily natural fluctuations
+                    applyDailyFriction();
+
+                    // Trigger Event Check
+                    if (state.l5.events[state.l5.day]) {
+                        triggerL5Incident(state.l5.day);
+                    } else {
+                        logToTerminal(`Day ${state.l5.day}: Processing node logs... Success Rate at ${state.l5.kpis.success}%.`);
+                    }
+                } else {
+                    endL5Simulation();
+                }
+            }, 1000);
+        }
+
+        function pauseL5Ticker() {
+            if (state.l5.status !== 'running') return;
+
+            clearInterval(state.l5.timerId);
+            state.l5.status = 'paused';
+            document.getElementById('console-status-dot').className = 'console-status-dot paused';
+            document.getElementById('console-status-text').innerText = 'OPERATIONAL // TICKER PAUSED';
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-start-btn').innerText = 'Resume Simulator';
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            logToTerminal(`[SYSTEM] Operations ticker manually paused by CDPO.`, 'alert');
+        }
+
+        function applyDailyFriction() {
+            // Minor fluctuations to keep parameters dynamic
+            const k = state.l5.kpis;
+            k.success = Math.min(100, Math.max(0, k.success + (Math.random() > 0.6 ? 1 : -1)));
+            k.trust = Math.min(100, Math.max(0, k.trust + (Math.random() > 0.5 ? 0 : -1)));
+            updateL5KPIs();
+        }
+
+        function logToTerminal(text, type = '') {
+            const terminal = document.getElementById('l5-terminal-ticker');
+            const row = document.createElement('div');
+            row.className = `terminal-row ${type}`;
+            row.innerText = text;
+            terminal.appendChild(row);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function triggerL5Incident(day) {
+            pauseL5Ticker();
+
+            const event = state.l5.events[day];
+            state.l5.activeEvent = event;
+
+            // Show overlay incident card
+            const overlay = document.getElementById('l5-incident-overlay');
+            overlay.style.display = 'flex';
+
+            document.getElementById('inc-title').innerText = event.title;
+            document.getElementById('inc-desc').innerText = event.desc;
+
+            const optionsBox = document.getElementById('inc-options');
+            optionsBox.innerHTML = '';
+
+            event.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'incident-opt-btn';
+
+                // Construct impact string
+                let impacts = [];
+                for (let k in opt.impact) {
+                    let sign = opt.impact[k] >= 0 ? '+' : '';
+                    impacts.push(`${k.toUpperCase()} ${sign}${opt.impact[k]}`);
+                }
+
+                btn.innerHTML = `
+                    <span class="incident-opt-title">${idx === 0 ? 'Option A' : 'Option B'}: ${opt.text}</span>
+                    <span class="incident-opt-impact">Estimated Projections: ${impacts.join(', ')}</span>
+                `;
+
+                btn.addEventListener('click', () => makeL5Decision(idx));
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function makeL5Decision(optIndex) {
+            const event = state.l5.activeEvent;
+            const option = event.options[optIndex];
+
+            // Apply impacts
+            for (let key in option.impact) {
+                state.l5.kpis[key] = Math.min(100, Math.max(0, state.l5.kpis[key] + option.impact[key]));
+            }
+
+            state.l5.historyChoices.push(option.log);
+            updateL5KPIs();
+
+            // Close card
+            document.getElementById('l5-incident-overlay').style.display = 'none';
+
+            logToTerminal(`[CHOICE] Decided Day ${state.l5.day}: ${option.text.substring(0, 45)}...`, 'success');
+            logToTerminal(`[SYSTEM] ${option.log}`, 'alert');
+
+            // Auto resume
+            startL5Ticker();
+        }
+
+        function endL5Simulation() {
+            clearInterval(state.l5.timerId);
+            state.l5.status = 'ended';
+
+            document.getElementById('console-status-dot').className = 'console-status-dot';
+            document.getElementById('console-status-dot').style.backgroundColor = '#666';
+            document.getElementById('console-status-text').innerText = 'OPERATIONAL // SIMULATION FINISHED';
+
+            logToTerminal(`[SYSTEM] 30-Day simulation run completed. Board results ready.`, 'success');
+
+            // Unlock results dialog
+            showL5Scorecard();
+        }
+
+        function showL5Scorecard() {
+            const kpis = state.l5.kpis;
+            const dialog = document.getElementById('scorecard-dialog');
+
+            const metSecurity = kpis.security >= 85;
+            const metTrust = kpis.trust >= 80;
+            const metCompliance = kpis.compliance >= 90;
+            const metSuccess = kpis.success >= 95;
+            const metRevenue = kpis.revenue >= 75;
+
+            const allMet = metSecurity && metTrust && metCompliance && metSuccess && metRevenue;
+
+            const banner = document.getElementById('scorecard-banner');
+            const title = document.getElementById('scorecard-status');
+            const desc = document.getElementById('scorecard-desc');
+
+            if (allMet) {
+                banner.className = 'scorecard-banner success';
+                title.innerText = 'Digital Payment Ecosystem Successfully Managed';
+                desc.innerText = 'Your platform remained secure, trustworthy, and legally compliant.';
+            } else {
+                banner.className = 'scorecard-banner fail';
+                title.innerText = 'Improvements Needed';
+                desc.innerText = 'Your platform failed to satisfy target thresholds for Board approval.';
+            }
+
+            // Strengths and Weaknesses lists
+            const strengthsList = document.getElementById('scorecard-strengths-list');
+            const weaknessesList = document.getElementById('scorecard-weaknesses-list');
+            strengthsList.innerHTML = '';
+            weaknessesList.innerHTML = '';
+
+            if (metSecurity) strengthsList.innerHTML += `<li><strong>Security Score (${kpis.security})</strong>: Successfully secured database nodes and API channels.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Security Score (${kpis.security})</strong>: Vulnerabilities remained. Requires patches and active encryption checks.</li>`;
+
+            if (metSuccess) strengthsList.innerHTML += `<li><strong>Success Rate (${kpis.success}%)</strong>: Low latency routing maintained stable authorization lanes.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Success Rate (${kpis.success}%)</strong>: Unresolved server outages caused user checkout transaction drops.</li>`;
+
+            if (metTrust) strengthsList.innerHTML += `<li><strong>Customer Trust (${kpis.trust})</strong>: Mitigated data leaks and fraud vectors quickly.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Customer Trust (${kpis.trust})</strong>: Data leaks or security warnings damaged consumer marketplace confidence.</li>`;
+
+            if (metCompliance) strengthsList.innerHTML += `<li><strong>Compliance (${kpis.compliance})</strong>: Satisfied GDPR right to erasure and IT Act transparency rules.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Compliance (${kpis.compliance})</strong>: Bypassed privacy guidelines and laws, resulting in regulatory warnings.</li>`;
+
+            if (metRevenue) strengthsList.innerHTML += `<li><strong>Revenue (${kpis.revenue})</strong>: Balanced secure compliance with profitable wallet upgrades.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Revenue (${kpis.revenue})</strong>: Audit penalties or system upgrades severely reduced financial margins.</li>`;
+
+            dialog.showModal();
+        }
+
+        function resetFullSimulation() {
+            state.l5.day = 1;
+            state.l5.status = 'idle';
+            state.l5.kpis = { security: 70, success: 90, trust: 75, compliance: 80, revenue: 60 };
+            state.l5.historyChoices = [];
+
+            document.getElementById('console-day-ticker').innerText = 'DAY 1 OF 30';
+            document.getElementById('l5-terminal-ticker').innerHTML = `
+                <div class="terminal-row">[SYSTEM] PaySphere terminal systems connected.</div>
+                <div class="terminal-row">[SYSTEM] CDPO credentials validated. Security score baseline established.</div>
+                <div class="terminal-row">[SYSTEM] Select "Launch 30-Day Cycle" to start operations ticker.</div>
+            `;
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-start-btn').innerText = 'Launch 30-Day Cycle';
+            document.getElementById('l5-pause-btn').disabled = true;
+            document.getElementById('scorecard-dialog').close();
+
+            updateL5KPIs();
+        }
+
+
+        // LEARNING SUMMARY SYSTEM
+        const summaries = {
+            1: {
+                title: "Level 1 Complete: Transaction Routing Systems",
+                body: `
+                    <p><strong>Secure Transaction Journeys</strong></p>
+                    <p>In digital payment architectures, a transaction is not a single database lookup. It involves several distinct clearing stages:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Initiation:</strong> Customer selects an instrument and presents authorization (UPI scanner, card networks).</li>
+                        <li><strong>Gateway Tokenization:</strong> The gateway intercepts, encrypts, and tokenizes sensitive card PAN data to keep it secure.</li>
+                        <li><strong>Verification:</strong> Acquirer networks route authorization requests to the issuing bank node to verify available balances.</li>
+                        <li><strong>Settlement:</strong> Once approved, transaction approvals trigger ledger transfers to merchant accounts.</li>
+                    </ul>
+                    <p>Understanding these nodes ensures platforms can optimize checkout pipeline latencies and isolate gateway failover problems.</p>
+                `
+            },
+            2: {
+                title: "Level 2 Complete: Fraud Analytics & Threat Indicators",
+                body: `
+                    <p><strong>Identifying Anomalous Activity</strong></p>
+                    <p>Payment systems protect resources using risk profiling engines. Crucial data points include:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Impossible Travel Velocity:</strong> If card credentials are used in Delhi and Bangalore in under 2 minutes, physical travel limits indicate theft.</li>
+                        <li><strong>Brute Force Signs:</strong> Multiple consecutive authentication check failures indicate credential-stuffing attacks.</li>
+                        <li><strong>IP Risk Anomalies:</strong> Foreign access at late local hours represents abnormal transfer behavior, requiring block alerts.</li>
+                    </ul>
+                    <p>Mitigating these vectors involves device profiling, geofencing, and automated card locks.</p>
+                `
+            },
+            3: {
+                title: "Level 3 Complete: Cybersecurity Defenses Matrix",
+                body: `
+                    <p><strong>System Resilience Protocols</strong></p>
+                    <p>Businesses map assets to specific defenses to protect transaction pathways:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Firewalls (WAF):</strong> Mitigate DDoS attacks by filtering traffic and rate-limiting incoming traffic spikes.</li>
+                        <li><strong>Encryption (AES-256):</strong> Safeguards stored table databases columns from SQL injection attempts.</li>
+                        <li><strong>MFA:</strong> Prevents unauthorized portal takeovers by rendering compromised passwords useless without secondary checks.</li>
+                        <li><strong>Security Updates:</strong> Patches browser and gateway vulnerabilities against trojans and malware exploits.</li>
+                    </ul>
+                `
+            },
+            4: {
+                title: "Level 4 Complete: Privacy Laws & Data Protection Rules",
+                body: `
+                    <p><strong>Statutory Cyber Laws</strong></p>
+                    <p>Operations must comply with international privacy regulations. Key compliance targets are:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Right to Erasure (GDPR Art. 17):</strong> Enforces the option for users to delete profiles and associated histories.</li>
+                        <li><strong>Storage Limitation:</strong> Restricts indefinite data logs. Unused data must be purged.</li>
+                        <li><strong>Consent Rules (IT Act 43A):</strong> Enforces clear user opt-ins before accessing personal metadata (e.g. coordinates tracking).</li>
+                    </ul>
+                    <p>Enforcing these limits protects platforms against compliance fines and class actions.</p>
+                `
+            }
+        };
+
+        const summaryDialog = document.getElementById('summary-dialog');
+        function showSummaryDialog(levelIndex) {
+            const data = summaries[levelIndex];
+            document.getElementById('summary-dialog-title').innerText = data.title;
+            document.getElementById('summary-dialog-content').innerHTML = data.body;
+
+            // Set target next level index
+            document.getElementById('summary-next-btn').setAttribute('data-target-level', levelIndex + 1);
+            summaryDialog.showModal();
+        }
+
+        function confirmSummaryNextLevel() {
+            const nextLevel = parseInt(event.target.getAttribute('data-target-level'));
+            summaryDialog.close();
+
+            if (nextLevel <= 5) {
+                navigateToLevel(nextLevel);
+            }
+        }
+    </script>
+</body>
+
+</html>

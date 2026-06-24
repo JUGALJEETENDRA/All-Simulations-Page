@@ -1,1 +1,3169 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 5.4 - Digital Channel Strategies & Implementation</title>
+    <meta name="description"
+        content="An interactive strategic marketing operations simulation for DBT Module 5.4. Act as the Digital Marketing Director of ConnectHub, manage budgets, map customer journeys, optimize campaigns, and run omnichannel command operations.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #F57C00;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.25s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 90px;
+            /* Space for the sticky footer */
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .logo-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stepper Progress Bar (Globally Unlocked) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+            overflow-x: auto;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .step-item:hover {
+            background-color: rgba(198, 40, 40, 0.05);
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+        }
+
+        .step-item.completed {
+            color: var(--success);
+        }
+
+        .step-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 10px;
+            min-width: 30px;
+            max-width: 80px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        /* Workspace Core */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Card panels */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Onboarding / CEO Memo style */
+        .memo-container {
+            border-left: 4px solid var(--primary-red);
+            background-color: var(--bg-light);
+            padding: 20px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 20px 0;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        .memo-meta {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 16px;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .memo-label {
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .memo-body p {
+            margin-bottom: 12px;
+        }
+
+        /* Dashboards & Metrics */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .metric-target {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-progress {
+            height: 6px;
+            background-color: #E0E0E0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .metric-progress-fill {
+            height: 100%;
+            background-color: var(--primary-red);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .metric-progress-fill.success {
+            background-color: var(--success);
+        }
+
+        /* Buttons & Actions */
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-outline-red {
+            background-color: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+        }
+
+        .btn-outline-red:hover {
+            background-color: var(--primary-red-light);
+        }
+
+        /* Sticky Footer Navigation */
+        footer.nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            border-top: 2px solid var(--border-color);
+            padding: 12px 24px;
+            z-index: 999;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Level 1 Matchmaker Layout */
+        .match-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .match-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .audience-column,
+        .channel-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .audience-card {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .audience-card.correct {
+            border-left: 4px solid var(--success);
+            background-color: var(--success-light);
+        }
+
+        .audience-card.incorrect {
+            border-left: 4px solid var(--danger);
+            background-color: var(--danger-light);
+        }
+
+        .audience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .audience-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .audience-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .audience-selector {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        .audience-feedback {
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: none;
+            padding: 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        .audience-card.correct .audience-feedback {
+            display: block;
+            color: var(--success);
+            background-color: rgba(46, 125, 50, 0.05);
+        }
+
+        .audience-card.incorrect .audience-feedback {
+            display: block;
+            color: var(--danger);
+            background-color: rgba(198, 40, 40, 0.05);
+        }
+
+        .channel-info-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .channel-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .channel-details h4 {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .channel-details p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* Level 2 Campaign Builder */
+        .campaign-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .campaign-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--white);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .campaign-card.active {
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.06);
+        }
+
+        .campaign-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .campaign-cost-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .campaign-card-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .campaign-stats-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 0.75rem;
+            background-color: var(--bg-light);
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+
+        .campaign-stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .campaign-stat-label {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+        }
+
+        .campaign-stat-val {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-top: 2px;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary-red);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Level 3 Customer Journey */
+        .journey-map-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            position: relative;
+            margin: 40px 0;
+            background-color: var(--bg-light);
+            padding: 24px 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 992px) {
+            .journey-map-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .journey-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .journey-step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--primary-red);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .journey-step-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .journey-step-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            max-width: 130px;
+        }
+
+        .journey-select-wrapper {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .journey-select {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--white);
+        }
+
+        .journey-svg-container {
+            position: absolute;
+            top: 36px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @media (max-width: 992px) {
+            .journey-svg-container {
+                display: none;
+            }
+        }
+
+        .journey-line {
+            stroke: var(--border-color);
+            stroke-width: 3;
+            stroke-dasharray: 6 4;
+        }
+
+        .journey-pulse-dot {
+            fill: var(--primary-red);
+            r: 6;
+        }
+
+        /* Level 4 Optimization Room */
+        .optim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .optim-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .optim-card-header {
+            background-color: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .optim-campaign-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .optim-card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-grow: 1;
+        }
+
+        .issue-box {
+            background-color: var(--danger-light);
+            border-left: 4px solid var(--danger);
+            padding: 10px 12px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .issue-label {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--danger);
+            text-transform: uppercase;
+        }
+
+        .issue-desc {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .solution-select-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .solution-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .solution-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            background-color: var(--white);
+        }
+
+        .solution-select.correct-select {
+            border-color: var(--success);
+            background-color: var(--success-light);
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .optim-metrics {
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .optim-mini-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .optim-mm-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .optim-mm-val {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        /* Level 5 Omnichannel Command Center */
+        .cmd-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .cmd-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .cmd-panel-left {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .cmd-panel-right {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .console-box {
+            background-color: #1E1E1E;
+            color: #A9B7C6;
+            border-radius: var(--radius-md);
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            height: 180px;
+            overflow-y: auto;
+            border: 1px solid #333333;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .console-line {
+            line-height: 1.4;
+        }
+
+        .console-line.system {
+            color: #808080;
+        }
+
+        .console-line.success {
+            color: #6A8759;
+        }
+
+        .console-line.warning {
+            color: #BBB529;
+        }
+
+        .console-line.error {
+            color: #FF6B68;
+        }
+
+        .console-line.info {
+            color: #467093;
+        }
+
+        /* Incident Overlay Modal styled nicely */
+        .incident-card {
+            background-color: var(--danger-light);
+            border: 2px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: pulse-border 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-border {
+            from {
+                border-color: var(--primary-red);
+            }
+
+            to {
+                border-color: var(--warning);
+            }
+        }
+
+        .incident-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-red);
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .incident-desc {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .incident-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .incident-option-btn {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            text-align: left;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .incident-option-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .option-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .option-details {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+
+        /* Success & Review Screens */
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .scorecard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .score-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-light);
+            border-left: 4px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .score-item.pass {
+            border-left-color: var(--success);
+            background-color: var(--success-light);
+        }
+
+        .score-item.fail {
+            border-left-color: var(--danger);
+            background-color: var(--danger-light);
+        }
+
+        /* Modals & Popups (Native Dialogs) */
+        dialog {
+            border: none;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 28px;
+            max-width: 600px;
+            width: 90%;
+            margin: auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--white);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dialog-body {
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Utility classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-danger {
+            color: var(--danger);
+        }
+
+        .text-success {
+            color: var(--success);
+        }
+
+        .text-warning {
+            color: var(--warning);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-10 {
+            gap: 10px;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        /* Animation utilities */
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.15);
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sticky Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>Digital Business & Transformation – Module 5.4</h1>
+                    <p>Simulation: Digital Channel Strategies and Implementation</p>
+                </div>
+                <div class="logo-badge">CONNECTHUB</div>
+            </div>
+
+            <!-- Stepper Progress Tracker (Clickable, Globally Unlocked) -->
+            <div class="stepper">
+                <div class="step-item active" onclick="switchLevel(1)" id="step-1">
+                    <span class="step-badge">1</span>
+                    <span>Channel Matchmaker</span>
+                </div>
+                <div class="step-divider" id="div-1"></div>
+
+                <div class="step-item" onclick="switchLevel(2)" id="step-2">
+                    <span class="step-badge">2</span>
+                    <span>Campaign Studio</span>
+                </div>
+                <div class="step-divider" id="div-2"></div>
+
+                <div class="step-item" onclick="switchLevel(3)" id="step-3">
+                    <span class="step-badge">3</span>
+                    <span>Journey Flow</span>
+                </div>
+                <div class="step-divider" id="div-3"></div>
+
+                <div class="step-item" onclick="stepToL4()" id="step-4">
+                    <span class="step-badge">4</span>
+                    <span>Optimization Room</span>
+                </div>
+                <div class="step-divider" id="div-4"></div>
+
+                <div class="step-item" onclick="switchLevel(5)" id="step-5">
+                    <span class="step-badge">5</span>
+                    <span>Command Center</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Panels -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card hidden"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Digital Channel Theory & Implementation
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. Channel Alignment:</strong> Digital touchpoints must
+                        target demographic habits. Gen Z seeks visual storytelling (Instagram, YouTube); B2B segments
+                        need industry authority (LinkedIn); SMEs require immediate CRM updates (WhatsApp Business);
+                        seniors prefer secure lists (Email).</p>
+                    <p><strong>2. Budget Modeling:</strong> Marketing directors allocate capital across paid, earned,
+                        shared, and owned media. The return on marketing investment (ROMI) is optimized by scaling
+                        conversions while containing CAC.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Omnichannel Funnels & Leaks:</strong> Funnel momentum
+                        transitions from Awareness to Advocacy. Breaks in channel coordination cause bounce leaks.
+                        Continuous testing ensures pages load fast and conversion CTAs remain visible.</p>
+                    <p><strong>4. Market Agility:</strong> Command operations require real-time adjustments to
+                        competitor actions, deliverability errors, and data sync conflicts to defend brand retention and
+                        revenue targets.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Briefing Screen (Onboarding) -->
+        <section id="onboarding" class="card">
+            <div class="card-header">
+                <h2 class="card-title">Digital Channel Strategy Operations Briefing</h2>
+                <span class="logo-badge">CONFIDENTIAL</span>
+            </div>
+
+            <div class="memo-container">
+                <div class="memo-meta">
+                    <div class="memo-label">TO:</div>
+                    <div>Digital Marketing Director, ConnectHub</div>
+                    <div class="memo-label">FROM:</div>
+                    <div>Chief Executive Officer, ConnectHub</div>
+                    <div class="memo-label">SUBJECT:</div>
+                    <div>Omnichannel Strategy Launch & KPI Mandate</div>
+                </div>
+
+                <div class="memo-body">
+                    <p>Director,</p>
+                    <p>Welcome to the ConnectHub Operations Center. As our newly appointed <strong>Digital Marketing
+                            Director</strong>, you are responsible for defining and driving our digital presence across
+                        all market channels.</p>
+                    <p>ConnectHub needs a coherent, structured digital channel blueprint. We cannot rely on random posts
+                        or uncoordinated ad buys. You will need to align target audiences with appropriate channels,
+                        model a high-performing budget allocation, wireframe a leak-free customer journey, repair
+                        failing marketing operations, and pilot the network through a 30-day simulated business cycle.
+                    </p>
+                    <p>Keep these final targets in mind for our <strong>Day 30 operations review</strong>:</p>
+                    <ul style="margin-left: 24px; margin-bottom: 16px;">
+                        <li><strong>Reach Index</strong>: &gt; 80%</li>
+                        <li><strong>Engagement Index</strong>: &gt; 80%</li>
+                        <li><strong>Conversion Rate</strong>: &gt; 75%</li>
+                        <li><strong>Customer Retention Rate</strong>: &gt; 80%</li>
+                        <li><strong>Revenue Generation Index</strong>: &gt; 75</li>
+                    </ul>
+                    <p>The operational consoles are online. Review all levels at your own pace using the navigation
+                        menu. Good luck.</p>
+                </div>
+            </div>
+
+            <div class="text-center" style="margin-top: 24px;">
+                <button class="btn btn-primary" onclick="startSimulation()">Open Operations Console</button>
+            </div>
+        </section>
+
+
+        <!-- LEVEL 1: CHANNEL MATCHMAKER -->
+        <section id="level-1-card" class="card hidden">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Level 1: Channel Matchmaker</h2>
+                    <p class="card-subtitle">Map target audiences to the optimal digital channel based on consumer
+                        behavior profiles.</p>
+                </div>
+                <span class="logo-badge" style="background-color: var(--primary-red);">STAGE 1/5</span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p><strong>Instructions:</strong> Review each audience segment card below. Select the digital channel
+                    that matches their content consumption behavior, lifestyle, and relationship expectations. All pairs
+                    must be correct to unlock the summary matrix.</p>
+            </div>
+
+            <div class="match-container">
+                <!-- Left: Audience Segment Cards -->
+                <div class="audience-column">
+                    <h3
+                        style="font-family: var(--font-display); font-size: 1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
+                        Audience Segments</h3>
+
+                    <!-- Card 1 -->
+                    <div class="audience-card" id="audience-college">
+                        <div class="audience-header">
+                            <span class="audience-name">Gen Z College Students</span>
+                            <span class="status-indicator"></span>
+                        </div>
+                        <p class="audience-desc">Seeks highly visual, short-form video content, immediate peer
+                            interactions, trends, and influencer-led reviews. Avoids formal text block messaging.</p>
+                        <select class="audience-selector" onchange="checkMatchmakerSelections()"
+                            data-audience="college">
+                            <option value="">-- Assign Digital Channel --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="whatsapp">WhatsApp Business</option>
+                        </select>
+                        <div class="audience-feedback"></div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="audience-card" id="audience-professional">
+                        <div class="audience-header">
+                            <span class="audience-name">Working Corporate Professionals</span>
+                            <span class="status-indicator"></span>
+                        </div>
+                        <p class="audience-desc">Values industry publications, professional networking, thought
+                            leadership, careers, B2B services, and detailed whitepapers.</p>
+                        <select class="audience-selector" onchange="checkMatchmakerSelections()"
+                            data-audience="professional">
+                            <option value="">-- Assign Digital Channel --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="whatsapp">WhatsApp Business</option>
+                        </select>
+                        <div class="audience-feedback"></div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="audience-card" id="audience-sme">
+                        <div class="audience-header">
+                            <span class="audience-name">Local SME Retailers / Small Businesses</span>
+                            <span class="status-indicator"></span>
+                        </div>
+                        <p class="audience-desc">Needs direct, high-speed customer communication, conversational
+                            commerce support, transactional confirmation updates, and personal service relationships.
+                        </p>
+                        <select class="audience-selector" onchange="checkMatchmakerSelections()" data-audience="sme">
+                            <option value="">-- Assign Digital Channel --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="whatsapp">WhatsApp Business</option>
+                        </select>
+                        <div class="audience-feedback"></div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="audience-card" id="audience-senior">
+                        <div class="audience-header">
+                            <span class="audience-name">Retired Senior Citizens</span>
+                            <span class="status-indicator"></span>
+                        </div>
+                        <p class="audience-desc">Prefers high-trust, structured layout communications. Responsive to
+                            personal email newsletters, family circles, and straightforward discount circulars.</p>
+                        <select class="audience-selector" onchange="checkMatchmakerSelections()" data-audience="senior">
+                            <option value="">-- Assign Digital Channel --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="whatsapp">WhatsApp Business</option>
+                        </select>
+                        <div class="audience-feedback"></div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="audience-card" id="audience-gamer">
+                        <div class="audience-header">
+                            <span class="audience-name">Online Gamers & Tech Enthusiasts</span>
+                            <span class="status-indicator"></span>
+                        </div>
+                        <p class="audience-desc">Consumes streaming walkthroughs, video tutorials, hardware benchmark
+                            comparisons, and deep technical commentary over video format.</p>
+                        <select class="audience-selector" onchange="checkMatchmakerSelections()" data-audience="gamer">
+                            <option value="">-- Assign Digital Channel --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="whatsapp">WhatsApp Business</option>
+                        </select>
+                        <div class="audience-feedback"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Active Channels Reference Board -->
+                <div class="channel-column">
+                    <h3
+                        style="font-family: var(--font-display); font-size: 1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
+                        Active Channel Inventory</h3>
+
+                    <div class="channel-info-card">
+                        <div class="channel-icon">IG</div>
+                        <div class="channel-details">
+                            <h4>Instagram</h4>
+                            <p>Visual branding, image grids, Reels, and interactive story stickers. Highly popular with
+                                Gen Z.</p>
+                        </div>
+                    </div>
+
+                    <div class="channel-info-card">
+                        <div class="channel-icon">LN</div>
+                        <div class="channel-details">
+                            <h4>LinkedIn</h4>
+                            <p>B2B marketing, networking, corporate feeds, and industry trend updates.</p>
+                        </div>
+                    </div>
+
+                    <div class="channel-info-card">
+                        <div class="channel-icon">EM</div>
+                        <div class="channel-details">
+                            <h4>Email Marketing</h4>
+                            <p>Direct communication canal. High personalization potential, great for transaction lists
+                                and seniors.</p>
+                        </div>
+                    </div>
+
+                    <div class="channel-info-card">
+                        <div class="channel-icon">YT</div>
+                        <div class="channel-details">
+                            <h4>YouTube</h4>
+                            <p>Long-form media host. Demonstrations, reviews, streams, and descriptive user tutorials.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="channel-info-card">
+                        <div class="channel-icon">WA</div>
+                        <div class="channel-details">
+                            <h4>WhatsApp Business</h4>
+                            <p>Transactional API support. High open rates, conversational CRM, and direct relationship
+                                support.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: auto; padding: 16px; background-color: var(--primary-red-light); border-radius: var(--radius-md); border: 1px solid rgba(198, 40, 40, 0.2);">
+                        <h4 style="color: var(--primary-red); font-family: var(--font-display); margin-bottom: 6px;">
+                            Strategic Insight</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-dark);">Firms must pair channels with demographic
+                            habits. Choosing the wrong channel leads to low engagement, message dilution, and high
+                            operational customer acquisition cost (CAC).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <button class="btn btn-primary" id="btn-submit-l1" onclick="validateLevel1()">Validate Channel
+                    Strategy</button>
+            </div>
+        </section>
+
+
+        <!-- LEVEL 2: CAMPAIGN BUILDER STUDIO -->
+        <section id="level-2-card" class="card hidden">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Level 2: Campaign Builder Studio</h2>
+                    <p class="card-subtitle">Distribute the operational budget across digital channels to reach the
+                        target conversion index.</p>
+                </div>
+                <span class="logo-badge" style="background-color: var(--primary-red);">STAGE 2/5</span>
+            </div>
+
+            <!-- Budget and Live Metrics Panel -->
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Remaining Budget</span>
+                        <span class="text-danger" style="font-weight: 700;">LIMIT</span>
+                    </div>
+                    <div class="metric-value" id="l2-budget">₹75,000</div>
+                    <div class="metric-target">Total Budget: ₹75,000</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Projected Reach</span>
+                        <span>INDEX</span>
+                    </div>
+                    <div class="metric-value" id="l2-reach">0k</div>
+                    <div class="metric-target">Audience Impressions</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Engagement</span>
+                        <span>INDEX</span>
+                    </div>
+                    <div class="metric-value" id="l2-engagement">0k</div>
+                    <div class="metric-target">Active Likes/Shares/Comments</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Projected Conversions</span>
+                        <span class="text-success" style="font-weight: 700;">GOAL</span>
+                    </div>
+                    <div class="metric-value" id="l2-conversions">0</div>
+                    <div class="metric-target" id="l2-conv-target">Target: Min 1,300</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-fill" id="l2-conv-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p><strong>Scenario:</strong> You have a total budget of <strong>₹75,000</strong>. Allocate resources by
+                    toggling campaigns. You must construct a combination that drives at least <strong>1,300
+                        conversions</strong> without overspending. Track the real-time projections on the dashboard.</p>
+            </div>
+
+            <!-- Channels Options Grid -->
+            <div class="campaign-grid">
+                <!-- Channel 1 -->
+                <div class="campaign-card" id="campaign-card-social">
+                    <div class="campaign-card-header">
+                        <div>
+                            <span class="campaign-cost-badge">₹15,000</span>
+                            <h3 class="campaign-card-title">Social Media Marketing</h3>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Launch interactive organic content,
+                        community posts, and daily stories on Instagram/Facebook.</p>
+                    <div class="campaign-stats-preview">
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Reach</span>
+                            <span class="campaign-stat-val">+20k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Engagemt</span>
+                            <span class="campaign-stat-val">+15k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Conv</span>
+                            <span class="campaign-stat-val">+250</span>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span style="font-size: 0.8rem; font-weight: 600;">Fund Channel</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-social" onchange="updateCampaignBudget()"
+                                data-cost="15000" data-reach="20" data-engagement="15" data-conversions="250">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Channel 2 -->
+                <div class="campaign-card" id="campaign-card-email">
+                    <div class="campaign-card-header">
+                        <div>
+                            <span class="campaign-cost-badge">₹10,000</span>
+                            <h3 class="campaign-card-title">Email Marketing Blast</h3>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Send newsletter discounts and content
+                        roundups directly to the subscriber mailing database.</p>
+                    <div class="campaign-stats-preview">
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Reach</span>
+                            <span class="campaign-stat-val">+5k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Engagemt</span>
+                            <span class="campaign-stat-val">+10k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Conv</span>
+                            <span class="campaign-stat-val">+200</span>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span style="font-size: 0.8rem; font-weight: 600;">Fund Channel</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-email" onchange="updateCampaignBudget()" data-cost="10000"
+                                data-reach="5" data-engagement="10" data-conversions="200">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Channel 3 -->
+                <div class="campaign-card" id="campaign-card-seo">
+                    <div class="campaign-card-header">
+                        <div>
+                            <span class="campaign-cost-badge">₹20,000</span>
+                            <h3 class="campaign-card-title">Search Engine Optimization</h3>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Optimize landing page metadata, keywords,
+                        and domain authority to drive inbound organic search.</p>
+                    <div class="campaign-stats-preview">
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Reach</span>
+                            <span class="campaign-stat-val">+15k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Engagemt</span>
+                            <span class="campaign-stat-val">+5k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Conv</span>
+                            <span class="campaign-stat-val">+350</span>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span style="font-size: 0.8rem; font-weight: 600;">Fund Channel</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-seo" onchange="updateCampaignBudget()" data-cost="20000"
+                                data-reach="15" data-engagement="5" data-conversions="350">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Channel 4 -->
+                <div class="campaign-card" id="campaign-card-influencer">
+                    <div class="campaign-card-header">
+                        <div>
+                            <span class="campaign-cost-badge">₹25,000</span>
+                            <h3 class="campaign-card-title">Influencer Campaign</h3>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Partner with trusted niche influencers to
+                        execute sponsored product reviews and video endorsements.</p>
+                    <div class="campaign-stats-preview">
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Reach</span>
+                            <span class="campaign-stat-val">+30k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Engagemt</span>
+                            <span class="campaign-stat-val">+25k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Conv</span>
+                            <span class="campaign-stat-val">+500</span>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span style="font-size: 0.8rem; font-weight: 600;">Fund Channel</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-influencer" onchange="updateCampaignBudget()"
+                                data-cost="25000" data-reach="30" data-engagement="25" data-conversions="500">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Channel 5 -->
+                <div class="campaign-card" id="campaign-card-paid">
+                    <div class="campaign-card-header">
+                        <div>
+                            <span class="campaign-cost-badge">₹20,000</span>
+                            <h3 class="campaign-card-title">Paid Advertisements</h3>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Run search and display pay-per-click (PPC)
+                        campaigns targeted directly at high-intent cohorts.</p>
+                    <div class="campaign-stats-preview">
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Reach</span>
+                            <span class="campaign-stat-val">+25k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Engagemt</span>
+                            <span class="campaign-stat-val">+10k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Conv</span>
+                            <span class="campaign-stat-val">+400</span>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span style="font-size: 0.8rem; font-weight: 600;">Fund Channel</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-paid" onchange="updateCampaignBudget()" data-cost="20000"
+                                data-reach="25" data-engagement="10" data-conversions="400">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Channel 6 -->
+                <div class="campaign-card" id="campaign-card-website">
+                    <div class="campaign-card-header">
+                        <div>
+                            <span class="campaign-cost-badge">₹10,000</span>
+                            <h3 class="campaign-card-title">Website Improvements</h3>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Optimize checkout flows, clear load speed
+                        bottlenecks, and write clear CTA buttons.</p>
+                    <div class="campaign-stats-preview">
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Reach</span>
+                            <span class="campaign-stat-val">+0k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Engagemt</span>
+                            <span class="campaign-stat-val">+15k</span>
+                        </div>
+                        <div class="campaign-stat-item">
+                            <span class="campaign-stat-label">Conv</span>
+                            <span class="campaign-stat-val">+150</span>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span style="font-size: 0.8rem; font-weight: 600;">Fund Channel</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-website" onchange="updateCampaignBudget()"
+                                data-cost="10000" data-reach="0" data-engagement="15" data-conversions="150">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <button class="btn btn-primary" id="btn-submit-l2" onclick="validateLevel2()">Validate Campaign
+                    Strategy</button>
+            </div>
+        </section>
+
+
+        <!-- LEVEL 3: CUSTOMER JOURNEY MAZE -->
+        <section id="level-3-card" class="card hidden">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Level 3: Customer Journey Flow</h2>
+                    <p class="card-subtitle">Connect the correct digital touchpoints to each stage of the customer
+                        lifecycle.</p>
+                </div>
+                <span class="logo-badge" style="background-color: var(--primary-red);">STAGE 3/5</span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p><strong>Instructions:</strong> Formulate an omnichannel journey by assigning the correct digital
+                    channel touchpoint to each lifecycle phase. An uncoordinated user experience results in customer
+                    leaks. Hit "Verify Journey Flow" to run a customer flow trace animation.</p>
+            </div>
+
+            <!-- Journey Layout -->
+            <div class="journey-map-grid" id="journey-flowchart">
+
+                <!-- SVG Line Overlay (Desktop only) -->
+                <svg class="journey-svg-container" id="journey-svg">
+                    <line x1="8.3%" y1="12" x2="25%" y2="12" class="journey-line" id="line-1" />
+                    <line x1="25%" y1="12" x2="41.6%" y2="12" class="journey-line" id="line-2" />
+                    <line x1="41.6%" y1="12" x2="58.3%" y2="12" class="journey-line" id="line-3" />
+                    <line x1="58.3%" y1="12" x2="75%" y2="12" class="journey-line" id="line-4" />
+                    <line x1="75%" y1="12" x2="91.6%" y2="12" class="journey-line" id="line-5" />
+                    <circle cx="8.3%" cy="12" class="journey-pulse-dot" id="pulse-dot" style="display:none;"></circle>
+                </svg>
+
+                <!-- Stage 1 -->
+                <div class="journey-step" id="jstep-awareness">
+                    <div class="journey-step-number">1</div>
+                    <span class="journey-step-name">Awareness</span>
+                    <span class="journey-step-desc">First discovery of the brand via viral posts or creative media
+                        feeds.</span>
+                    <div class="journey-select-wrapper">
+                        <select class="journey-select" data-stage="awareness">
+                            <option value="">-- Select --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="website-details">Company Website (Details)</option>
+                            <option value="website-store">Company Website (Store)</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="referral">Referral Program</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stage 2 -->
+                <div class="journey-step" id="jstep-interest">
+                    <div class="journey-step-number">2</div>
+                    <span class="journey-step-name">Interest</span>
+                    <span class="journey-step-desc">Customer searches for video tutorials, product walkthroughs, and
+                        specs.</span>
+                    <div class="journey-select-wrapper">
+                        <select class="journey-select" data-stage="interest">
+                            <option value="">-- Select --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="website-details">Company Website (Details)</option>
+                            <option value="website-store">Company Website (Store)</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="referral">Referral Program</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stage 3 -->
+                <div class="journey-step" id="jstep-consideration">
+                    <div class="journey-step-number">3</div>
+                    <span class="journey-step-name">Consideration</span>
+                    <span class="journey-step-desc">Comparing features, technical data, reviews, and reading customer
+                        cases.</span>
+                    <div class="journey-select-wrapper">
+                        <select class="journey-select" data-stage="consideration">
+                            <option value="">-- Select --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="website-details">Company Website (Details)</option>
+                            <option value="website-store">Company Website (Store)</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="referral">Referral Program</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stage 4 -->
+                <div class="journey-step" id="jstep-purchase">
+                    <div class="journey-step-number">4</div>
+                    <span class="journey-step-name">Purchase</span>
+                    <span class="journey-step-desc">Executing transaction, credit verification, and storefront
+                        checkout.</span>
+                    <div class="journey-select-wrapper">
+                        <select class="journey-select" data-stage="purchase">
+                            <option value="">-- Select --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="website-details">Company Website (Details)</option>
+                            <option value="website-store">Company Website (Store)</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="referral">Referral Program</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stage 5 -->
+                <div class="journey-step" id="jstep-retention">
+                    <div class="journey-step-number">5</div>
+                    <span class="journey-step-name">Retention</span>
+                    <span class="journey-step-desc">Receiving personalized updates, product tips, and custom discount
+                        newsletter lists.</span>
+                    <div class="journey-select-wrapper">
+                        <select class="journey-select" data-stage="retention">
+                            <option value="">-- Select --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="website-details">Company Website (Details)</option>
+                            <option value="website-store">Company Website (Store)</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="referral">Referral Program</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stage 6 -->
+                <div class="journey-step" id="jstep-advocacy">
+                    <div class="journey-step-number">6</div>
+                    <span class="journey-step-name">Advocacy</span>
+                    <span class="journey-step-desc">Sharing affiliate reward links and encouraging friends to join for
+                        credit.</span>
+                    <div class="journey-select-wrapper">
+                        <select class="journey-select" data-stage="advocacy">
+                            <option value="">-- Select --</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="website-details">Company Website (Details)</option>
+                            <option value="website-store">Company Website (Store)</option>
+                            <option value="email">Email Marketing</option>
+                            <option value="referral">Referral Program</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <button class="btn btn-primary" id="btn-verify-l3" onclick="validateLevel3()">Verify Journey
+                    Flow</button>
+            </div>
+        </section>
+
+
+        <!-- LEVEL 4: REAL-TIME CAMPAIGN OPTIMIZATION ROOM -->
+        <section id="level-4-card" class="card hidden">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Level 4: Real-Time Campaign Optimization Room</h2>
+                    <p class="card-subtitle">Identify bottlenecks in underperforming campaigns and deploy correct
+                        tactical remedies.</p>
+                </div>
+                <span class="logo-badge" style="background-color: var(--primary-red);">STAGE 4/5</span>
+            </div>
+
+            <!-- Dynamic Dashboards -->
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Social Engagement</span>
+                        <span class="text-success" style="font-weight: 700;">&gt;80% REQ</span>
+                    </div>
+                    <div class="metric-value" id="l4-engagement-val">45%</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-fill" id="l4-engagement-bar" style="width: 45%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Conversion Rate</span>
+                        <span class="text-success" style="font-weight: 700;">&gt;80% REQ</span>
+                    </div>
+                    <div class="metric-value" id="l4-conversion-val">38%</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-fill" id="l4-conversion-bar" style="width: 38%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span>Traffic Quality</span>
+                        <span class="text-success" style="font-weight: 700;">&gt;80% REQ</span>
+                    </div>
+                    <div class="metric-value" id="l4-traffic-val">50%</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-fill" id="l4-traffic-bar" style="width: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p><strong>Instructions:</strong> Read the issues affecting each channel below. Select the appropriate
+                    optimization remedy from the dropdowns to correct the issues. Your actions will immediately update
+                    the live KPIs above. Target index for all columns is <strong>&gt; 80%</strong>.</p>
+            </div>
+
+            <!-- Campaign Optimization Panel Grid -->
+            <div class="optim-grid">
+                <!-- Social Media Panel -->
+                <div class="optim-card">
+                    <div class="optim-card-header">
+                        <span class="optim-campaign-title">Social Media Channel</span>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--warning);">LIVE TESTING</span>
+                    </div>
+                    <div class="optim-card-body">
+                        <div class="issue-box">
+                            <span class="issue-label">Issue #1: Low Engagement</span>
+                            <span class="issue-desc">Impressions are high, but users are scrolling past posts without
+                                clicking like or comments. Content feels dry.</span>
+                        </div>
+
+                        <div class="solution-select-container">
+                            <span class="solution-label">Select Optimization Action:</span>
+                            <select class="solution-select" onchange="updateOptimizationMetrics()"
+                                data-issue="social-engagement">
+                                <option value="">-- Select Tactical Action --</option>
+                                <option value="content">Improve content quality & aesthetic design</option>
+                                <option value="emails">Send personalized newsletters</option>
+                                <option value="speed">Optimize server speed & image hosting</option>
+                                <option value="targeting">Change audience target metrics & lists</option>
+                                <option value="cta">Improve Call-To-Action buttons</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Channel Panel -->
+                <div class="optim-card">
+                    <div class="optim-card-header">
+                        <span class="optim-campaign-title">Email Marketing Channel</span>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--warning);">LIVE TESTING</span>
+                    </div>
+                    <div class="optim-card-body">
+                        <div class="issue-box">
+                            <span class="issue-label">Issue #2: Low CTR</span>
+                            <span class="issue-desc">Emails are successfully delivered, but readers do not click links.
+                                The layout feels generic and lacks relevance.</span>
+                        </div>
+
+                        <div class="solution-select-container">
+                            <span class="solution-label">Select Optimization Action:</span>
+                            <select class="solution-select" onchange="updateOptimizationMetrics()"
+                                data-issue="email-ctr">
+                                <option value="">-- Select Tactical Action --</option>
+                                <option value="content">Improve content quality & aesthetic design</option>
+                                <option value="emails">Send personalized emails based on user segments</option>
+                                <option value="speed">Optimize server speed & image hosting</option>
+                                <option value="targeting">Change audience target metrics & lists</option>
+                                <option value="cta">Improve Call-To-Action buttons</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Website Operations Panel -->
+                <div class="optim-card">
+                    <div class="optim-card-header">
+                        <span class="optim-campaign-title">Website Operations</span>
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--warning);">LIVE TESTING</span>
+                    </div>
+                    <div class="optim-card-body">
+                        <!-- Issue A -->
+                        <div class="issue-box" style="margin-bottom: 8px;">
+                            <span class="issue-label">Issue #3: Slow Page Speed</span>
+                            <span class="issue-desc">Server load times exceed 6 seconds. Customers drop off before
+                                resources load.</span>
+                        </div>
+                        <div class="solution-select-container" style="margin-bottom: 12px;">
+                            <select class="solution-select" onchange="updateOptimizationMetrics()"
+                                data-issue="web-speed">
+                                <option value="">-- Select Tactical Action --</option>
+                                <option value="content">Improve content quality & aesthetic design</option>
+                                <option value="emails">Send personalized newsletters</option>
+                                <option value="speed">Optimize website speed & compress assets</option>
+                                <option value="targeting">Change audience target metrics & lists</option>
+                                <option value="cta">Improve Call-To-Action buttons</option>
+                            </select>
+                        </div>
+
+                        <!-- Issue B -->
+                        <div class="issue-box" style="margin-bottom: 8px;">
+                            <span class="issue-label">Issue #4: High Bounce Rate</span>
+                            <span class="issue-desc">Ad clicks load fast, but visitors exit immediately because landing
+                                content misses their intent.</span>
+                        </div>
+                        <div class="solution-select-container" style="margin-bottom: 12px;">
+                            <select class="solution-select" onchange="updateOptimizationMetrics()"
+                                data-issue="web-bounce">
+                                <option value="">-- Select Tactical Action --</option>
+                                <option value="content">Improve content quality & aesthetic design</option>
+                                <option value="emails">Send personalized newsletters</option>
+                                <option value="speed">Optimize website speed & compress assets</option>
+                                <option value="targeting">Change audience targeting to match keyword intent</option>
+                                <option value="cta">Improve Call-To-Action buttons</option>
+                            </select>
+                        </div>
+
+                        <!-- Issue C -->
+                        <div class="issue-box" style="margin-bottom: 8px;">
+                            <span class="issue-label">Issue #5: Poor Conversions</span>
+                            <span class="issue-desc">Users browse products but checkout conversion remains low because
+                                purchase links are hidden.</span>
+                        </div>
+                        <div class="solution-select-container">
+                            <select class="solution-select" onchange="updateOptimizationMetrics()" data-issue="web-cta">
+                                <option value="">-- Select Tactical Action --</option>
+                                <option value="content">Improve content quality & aesthetic design</option>
+                                <option value="emails">Send personalized newsletters</option>
+                                <option value="speed">Optimize website speed & compress assets</option>
+                                <option value="targeting">Change audience target metrics & lists</option>
+                                <option value="cta">Improve call-to-action buttons & checkout flow</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <button class="btn btn-primary" id="btn-submit-l4" onclick="validateLevel4()">Lock In
+                    Optimizations</button>
+            </div>
+        </section>
+
+
+        <!-- LEVEL 5: OMNICHANNEL COMMAND CENTER -->
+        <section id="level-5-card" class="card hidden">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Level 5: Omnichannel Command Center</h2>
+                    <p class="card-subtitle">Manage ConnectHub's digital channels across a 30-day virtual operations
+                        cycle.</p>
+                </div>
+                <span class="logo-badge" style="background-color: var(--primary-red);">STAGE 5/5</span>
+            </div>
+
+            <div class="cmd-layout">
+                <!-- Left Column: Operations Dashboard Status -->
+                <div class="cmd-panel-left">
+                    <div
+                        style="background-color: var(--bg-light); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; text-align: center;">
+                        <span
+                            style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">CALENDAR
+                            DAY</span>
+                        <div style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--primary-red); margin: 6px 0;"
+                            id="l5-day-counter">DAY 1 / 30</div>
+                        <button class="btn btn-outline-red w-full" id="btn-start-l5" onclick="toggleL5Ticker()">Start
+                            Operations Ticker</button>
+                    </div>
+
+                    <!-- Gauges/KPIs -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Reach</span>
+                                <span id="l5-reach-val">60%</span>
+                            </div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-fill" id="l5-reach-bar" style="width: 60%;"></div>
+                            </div>
+                            <span class="metric-target">Target: &gt;80%</span>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Engagement</span>
+                                <span id="l5-engagement-val">60%</span>
+                            </div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-fill" id="l5-engagement-bar" style="width: 60%;"></div>
+                            </div>
+                            <span class="metric-target">Target: &gt;80%</span>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Conversion Rate</span>
+                                <span id="l5-conv-val">60%</span>
+                            </div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-fill" id="l5-conv-bar" style="width: 60%;"></div>
+                            </div>
+                            <span class="metric-target">Target: &gt;75%</span>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Customer Retention</span>
+                                <span id="l5-retention-val">60%</span>
+                            </div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-fill" id="l5-retention-bar" style="width: 60%;"></div>
+                            </div>
+                            <span class="metric-target">Target: &gt;80%</span>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span>Revenue Index</span>
+                                <span id="l5-revenue-val">60</span>
+                            </div>
+                            <div class="metric-progress">
+                                <div class="metric-progress-fill" id="l5-revenue-bar" style="width: 60%;"></div>
+                            </div>
+                            <span class="metric-target">Target: &gt;75</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Console Log and Active Incidents -->
+                <div class="cmd-panel-right">
+                    <h3
+                        style="font-family: var(--font-display); font-size: 1.1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
+                        Operations Log & Scenario Control</h3>
+
+                    <!-- Dynamic Incident Box -->
+                    <div id="incident-box" class="hidden">
+                        <div class="incident-card">
+                            <div class="incident-header">
+                                <span>⚠ CRITICAL CHANNEL INCIDENT</span>
+                            </div>
+                            <div class="incident-desc" id="incident-desc-content">
+                                A competitor launches a viral TikTok challenge, drawing away youth audience.
+                            </div>
+                            <div class="incident-options" id="incident-options-container">
+                                <!-- Choices added dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Standing Log Feed -->
+                    <div class="flex flex-col gap-10">
+                        <span
+                            style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Command
+                            System Console</span>
+                        <div class="console-box" id="console-logs">
+                            <div class="console-line system">[SYSTEM INITIALIZED] - Channel Operations Center Ready.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Evaluation Overlay (Hidden initially) -->
+            <div id="l5-results-card" class="hidden"
+                style="margin-top: 30px; border-top: 2px solid var(--border-color); padding-top: 24px;">
+                <h3 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;" class="text-center"
+                    id="scorecard-title">Strategy Results</h3>
+
+                <div class="scorecard-grid">
+                    <div
+                        style="background-color: var(--bg-light); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <h4 style="font-family: var(--font-display); margin-bottom: 12px; font-weight: 700;">Operational
+                            Achievements</h4>
+                        <ul class="score-list" id="scorecard-list">
+                            <!-- Populated in JS -->
+                        </ul>
+                    </div>
+                    <div
+                        style="background-color: var(--bg-light); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                        <h4 style="font-family: var(--font-display); margin-bottom: 12px; font-weight: 700;">Performance
+                            Audit Summary</h4>
+                        <div class="flex flex-col gap-10" style="font-size: 0.9rem;">
+                            <div>
+                                <strong>Core Strengths:</strong>
+                                <p id="scorecard-strengths"
+                                    style="color: var(--success); font-weight: 500; margin-top: 4px;"></p>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <strong>Areas for Improvement:</strong>
+                                <p id="scorecard-improvements"
+                                    style="color: var(--danger); font-weight: 500; margin-top: 4px;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="restartLevel5()">Restart Level 5</button>
+                    <button class="btn btn-secondary" onclick="restartEntireSimulation()">Restart Simulation</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Sticky Navigation Footer -->
+    <footer class="nav-footer hidden" id="global-footer">
+        <div class="footer-container">
+            <button class="btn btn-secondary" id="btn-footer-prev" onclick="handleFooterPrev()">Previous Level</button>
+            <div class="footer-info" id="footer-level-title">Level 1: Channel Matchmaker</div>
+            <button class="btn btn-primary" id="btn-footer-next" onclick="handleFooterNext()">Next Level</button>
+        </div>
+    </footer>
+
+    <!-- Native Learning Summary Modals -->
+    <!-- Level 1 Summary -->
+    <dialog id="modal-summary-l1">
+        <div class="dialog-header">
+            <span>✔ Stage 1 Complete: Channel Alignment Theory</span>
+        </div>
+        <div class="dialog-body">
+            <p><strong>Key Concept: Target Audience & Channel Alignment</strong></p>
+            <p>In digital channel strategy, selecting touchpoints depends on audience demographics and behavioral data.
+                B2B channels like LinkedIn demand professional, data-driven content, while visual social channels like
+                Instagram leverage micro-interactions and peer recommendations to influence younger segments.</p>
+            <p><strong>Operational Impact:</strong> Mapping demographics correctly minimizes budget waste and lowers
+                Customer Acquisition Cost (CAC) by focusing creative output on platforms with high contextual relevance.
+            </p>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn btn-primary" onclick="closeSummaryModal('modal-summary-l1', 2)">Proceed to Campaign
+                Studio</button>
+        </div>
+    </dialog>
+
+    <!-- Level 2 Summary -->
+    <dialog id="modal-summary-l2">
+        <div class="dialog-header">
+            <span>✔ Stage 2 Complete: Budget Allocation & Conversion Indexing</span>
+        </div>
+        <div class="dialog-body">
+            <p><strong>Key Concept: Resource Allocation and Return on Marketing Investment (ROMI)</strong></p>
+            <p>A digital director must balance immediate short-term conversions with long-term brand equity assets.
+                Channel mixes should build search visibility (SEO) alongside quick response programs (Paid Search,
+                Social). Overfunding high-cost campaigns causes budget burnouts, while underfunding structural elements
+                limits conversion throughput.</p>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn btn-primary" onclick="closeSummaryModal('modal-summary-l2', 3)">Proceed to Customer
+                Journey Flow</button>
+        </div>
+    </dialog>
+
+    <!-- Level 3 Summary -->
+    <dialog id="modal-summary-l3">
+        <div class="dialog-header">
+            <span>✔ Stage 3 Complete: Omnichannel Customer Lifecycle Mapping</span>
+        </div>
+        <div class="dialog-body">
+            <p><strong>Key Concept: Zero-Leak Customer Journeys</strong></p>
+            <p>Omnichannel strategies guide buyers through custom lifecycles: Awareness, Interest, Consideration,
+                Purchase, Retention, and Advocacy. Using fragmented channels or bad touchpoints breaks user momentum,
+                causing checkout drop-offs.</p>
+            <p><strong>Operational Impact:</strong> Linking channels logically (e.g. Instagram awareness feeding a
+                conversion-ready checkout page, supported by post-purchase retention emails) creates a high-efficiency
+                sales funnel.</p>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn btn-primary" onclick="closeSummaryModal('modal-summary-l3', 4)">Proceed to Optimization
+                Room</button>
+        </div>
+    </dialog>
+
+    <!-- Level 4 Summary -->
+    <dialog id="modal-summary-l4">
+        <div class="dialog-header">
+            <span>✔ Stage 4 Complete: Operational Bottleneck Diagnostics</span>
+        </div>
+        <div class="dialog-body">
+            <p><strong>Key Concept: Continuous Optimization Loops</strong></p>
+            <p>Digital channels are not static assets. Performance drops—such as low open rates, high bounce indexes, or
+                loading latency—must be mapped to correct tactical actions. Investing in content does not fix server
+                speed; modifying targeting is required to stop bounce leaks from irrelevant ad hits.</p>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn btn-primary" onclick="closeSummaryModal('modal-summary-l4', 5)">Proceed to Command
+                Center</button>
+        </div>
+    </dialog>
+
+    <!-- Simulation Script Logic -->
+    <script>
+        // Global Game State
+        const gameState = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true, true, true],
+            l1Completed: false,
+            l2Completed: false,
+            l3Completed: false,
+            l4Completed: false,
+            l5Completed: false,
+
+            // Level 2 Projections
+            l2Allocations: {
+                social: false,
+                email: false,
+                seo: false,
+                influencer: false,
+                paid: false,
+                website: false
+            },
+            l2MaxBudget: 75000,
+
+            // Level 4 Solutions
+            l4Selections: {
+                'social-engagement': '',
+                'email-ctr': '',
+                'web-speed': '',
+                'web-bounce': '',
+                'web-cta': ''
+            },
+
+            // Level 5 Simulator
+            l5Day: 1,
+            l5TickerActive: false,
+            l5TickerId: null,
+            l5KPIs: {
+                reach: 60,
+                engagement: 60,
+                conversion: 60,
+                retention: 60,
+                revenue: 60
+            },
+            l5LoggedEvents: [],
+            l5IncidentsSeen: {
+                5: false,
+                12: false,
+                18: false,
+                25: false
+            }
+        };
+
+        // Channel Matchmaker Core Answers
+        const L1_ANSWERS = {
+            college: 'instagram',
+            professional: 'linkedin',
+            sme: 'whatsapp',
+            senior: 'email',
+            gamer: 'youtube'
+        };
+
+        // Level 3 Customer Journey Answers
+        const L3_ANSWERS = {
+            awareness: 'instagram',
+            interest: 'youtube',
+            consideration: 'website-details',
+            purchase: 'website-store',
+            retention: 'email',
+            advocacy: 'referral'
+        };
+
+        // Level 4 Optimization Answers
+        const L4_ANSWERS = {
+            'social-engagement': 'content',
+            'email-ctr': 'emails',
+            'web-speed': 'speed',
+            'web-bounce': 'targeting',
+            'web-cta': 'cta'
+        };
+
+        // Level 5 Incident Specifications
+        const L5_INCIDENTS = {
+            5: {
+                id: 5,
+                title: "Competitor Viral Campaign Launch",
+                desc: "A competitor launches a viral UGC TikTok challenge, capturing our core youth demographics and drawing away website hits.",
+                options: [
+                    {
+                        title: "Launch UGC influencer co-campaign",
+                        details: "Cost: high spend. Yields: Reach +10%, Engagement +15%, Revenue -10.",
+                        action: () => {
+                            adjustL5KPIs({ reach: 10, engagement: 15, revenue: -10 });
+                            logConsole("Decision logged: Initiated co-campaign with creative influencers. Reach/Engagement increased, budget revenue reduced.", "success");
+                        }
+                    },
+                    {
+                        title: "Increase search engine PPC budget",
+                        details: "Cost: medium spend. Yields: Reach +5%, Engagement -5%, Revenue +0.",
+                        action: () => {
+                            adjustL5KPIs({ reach: 5, engagement: -5, revenue: 0 });
+                            logConsole("Decision logged: Scaled search keywords bids. Impressions increased, engagement dipped.", "info");
+                        }
+                    }
+                ]
+            },
+            12: {
+                id: 12,
+                title: "Organic Influencer Endorsement",
+                desc: "A major lifestyle curator mentions ConnectHub's services in their organic vlog. Traffic surges 300%.",
+                options: [
+                    {
+                        title: "Deploy pixel retargeting & discount code",
+                        details: "Cost: low spend. Yields: Conversion Rate +15%, Engagement +10%, Revenue +15.",
+                        action: () => {
+                            adjustL5KPIs({ conversion: 15, engagement: 10, revenue: 15 });
+                            logConsole("Decision logged: Retargeted traffic surge with visual dynamic banners. Conversion Rate and Revenue boosted.", "success");
+                        }
+                    },
+                    {
+                        title: "Permit organic checkout drift",
+                        details: "Cost: zero spend. Yields: Conversion Rate -5%, Engagement +5%, Revenue +0.",
+                        action: () => {
+                            adjustL5KPIs({ conversion: -5, engagement: 5, revenue: 0 });
+                            logConsole("Decision logged: Maintained status quo. Visitors browsed but bounced due to lack of checkout incentives.", "warning");
+                        }
+                    }
+                ]
+            },
+            18: {
+                id: 18,
+                title: "Email Open Rate Declines",
+                desc: "Major ISPs update email spam heuristics, dropping ConnectHub's deliverability index and email open rate by 40%.",
+                options: [
+                    {
+                        title: "Install double opt-in & clean user list",
+                        details: "Cost: zero spend. Yields: Reach -5%, Conversion Rate +15%, Retention +15.",
+                        action: () => {
+                            adjustL5KPIs({ reach: -5, conversion: 15, retention: 15 });
+                            logConsole("Decision logged: Implemented double opt-in security list sanitation. List size reduced but metrics increased.", "success");
+                        }
+                    },
+                    {
+                        title: "Increase email broadcast frequency",
+                        details: "Cost: zero spend. Yields: Reach +5%, Engagement -15%, Retention -20.",
+                        action: () => {
+                            adjustL5KPIs({ reach: 5, engagement: -15, retention: -20 });
+                            logConsole("Decision logged: Increased weekly emails. High unsubscribe reports logged. Customer trust damaged.", "error");
+                        }
+                    }
+                ]
+            },
+            25: {
+                id: 25,
+                title: "Cross-Channel Offer Conflict",
+                desc: "Customers complain that promo pricing displayed on Instagram visual ads is not accepted by the website shopping checkout.",
+                options: [
+                    {
+                        title: "Integrate database promo sync keys",
+                        details: "Cost: low spend. Yields: Retention +20%, Conversion Rate +15%, Revenue -5.",
+                        action: () => {
+                            adjustL5KPIs({ retention: 20, conversion: 15, revenue: -5 });
+                            logConsole("Decision logged: Integrated synchronized pricing databases. Conversion and retention recovered.", "success");
+                        }
+                    },
+                    {
+                        title: "Add disclaimer text on visual ads",
+                        details: "Cost: zero spend. Yields: Retention -15%, Conversion Rate -10%, Revenue +5.",
+                        action: () => {
+                            adjustL5KPIs({ retention: -15, conversion: -10, revenue: 5 });
+                            logConsole("Decision logged: Added policy small-print warning. Bounce rates increased at cart checkout.", "warning");
+                        }
+                    }
+                ]
+            }
+        };
+
+        // Navigation Controller
+        function startSimulation() {
+            document.getElementById('onboarding').classList.add('hidden');
+            document.getElementById('theory-dashboard-card').classList.remove('hidden');
+            document.getElementById('global-footer').classList.remove('hidden');
+            switchLevel(1);
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                btn.textContent = "Hide Reference";
+            } else {
+                content.classList.add('hidden');
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        function switchLevel(levelNum) {
+            if (!gameState.unlockedLevels[levelNum - 1]) return;
+
+            // Hide all level cards
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`level-${i}-card`).classList.add('hidden');
+                document.getElementById(`step-${i}`).classList.remove('active');
+                if (i < 5) document.getElementById(`div-${i}`).classList.remove('active');
+            }
+
+            // Show target card
+            document.getElementById(`level-${levelNum}-card`).classList.remove('hidden');
+            document.getElementById(`step-${levelNum}`).classList.add('active');
+
+            // Update divider colors
+            for (let i = 1; i < levelNum; i++) {
+                document.getElementById(`div-${i}`).classList.add('active');
+            }
+
+            gameState.currentLevel = levelNum;
+
+            // Update footer UI
+            const levelTitles = [
+                "Level 1: Channel Matchmaker",
+                "Level 2: Campaign Builder Studio",
+                "Level 3: Customer Journey Flow",
+                "Level 4: Real-Time Campaign Optimization Room",
+                "Level 5: Omnichannel Command Center"
+            ];
+            document.getElementById('footer-level-title').textContent = levelTitles[levelNum - 1];
+
+            // Set footer button states
+            document.getElementById('btn-footer-prev').disabled = (levelNum === 1);
+            document.getElementById('btn-footer-next').disabled = (levelNum === 5);
+
+            // Specific Level setups
+            if (levelNum === 2) {
+                updateCampaignBudget();
+            } else if (levelNum === 3) {
+                drawJourneyPath();
+            }
+        }
+
+        function stepToL4() {
+            switchLevel(4);
+            updateOptimizationMetrics();
+        }
+
+        function handleFooterPrev() {
+            if (gameState.currentLevel > 1) {
+                switchLevel(gameState.currentLevel - 1);
+            }
+        }
+
+        function handleFooterNext() {
+            if (gameState.currentLevel < 5) {
+                switchLevel(gameState.currentLevel + 1);
+            }
+        }
+
+        // LEVEL 1: CHANNEL MATCHMAKER LOGIC
+        function checkMatchmakerSelections() {
+            const selectors = document.querySelectorAll('.audience-selector');
+            selectors.forEach(sel => {
+                const audience = sel.getAttribute('data-audience');
+                const card = document.getElementById(`audience-${audience}`);
+                const feedback = card.querySelector('.audience-feedback');
+
+                if (sel.value === '') {
+                    card.className = "audience-card";
+                    feedback.textContent = "";
+                } else if (sel.value === L1_ANSWERS[audience]) {
+                    card.className = "audience-card correct";
+                    feedback.textContent = "✔ Matches behavioral profile.";
+                } else {
+                    card.className = "audience-card incorrect";
+                    feedback.textContent = "✘ Mismatch. Check segment profile requirements.";
+                }
+            });
+        }
+
+        // Validate Level 1 Pairs
+        function validateLevel1() {
+            const selectors = document.querySelectorAll('.audience-selector');
+            let allCorrect = true;
+
+            selectors.forEach(sel => {
+                const audience = sel.getAttribute('data-audience');
+                if (sel.value !== L1_ANSWERS[audience]) {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                gameState.l1Completed = true;
+                document.getElementById('step-1').classList.add('completed');
+                openSummaryModal('modal-summary-l1');
+            } else {
+                alert("Incorrect mapping. Review target segment behaviors and assign channels that minimize CAC.");
+            }
+        }
+
+        // LEVEL 2: CAMPAIGN BUILDER STUDIO LOGIC
+        function updateCampaignBudget() {
+            let totalSpent = 0;
+            let totalReach = 0;
+            let totalEngagement = 0;
+            let totalConversions = 0;
+
+            const channels = [
+                { id: 'social', toggle: 'toggle-social' },
+                { id: 'email', toggle: 'toggle-email' },
+                { id: 'seo', toggle: 'toggle-seo' },
+                { id: 'influencer', toggle: 'toggle-influencer' },
+                { id: 'paid', toggle: 'toggle-paid' },
+                { id: 'website', toggle: 'toggle-website' }
+            ];
+
+            channels.forEach(ch => {
+                const toggle = document.getElementById(ch.toggle);
+                const card = document.getElementById(`campaign-card-${ch.id}`);
+
+                if (toggle.checked) {
+                    card.classList.add('active');
+                    totalSpent += parseInt(toggle.getAttribute('data-cost'));
+                    totalReach += parseInt(toggle.getAttribute('data-reach'));
+                    totalEngagement += parseInt(toggle.getAttribute('data-engagement'));
+                    totalConversions += parseInt(toggle.getAttribute('data-conversions'));
+                    gameState.l2Allocations[ch.id] = true;
+                } else {
+                    card.classList.remove('active');
+                    gameState.l2Allocations[ch.id] = false;
+                }
+            });
+
+            // Budget Counter
+            const remaining = gameState.l2MaxBudget - totalSpent;
+            const budgetElement = document.getElementById('l2-budget');
+            budgetElement.textContent = `₹${remaining.toLocaleString('en-IN')}`;
+
+            if (remaining < 0) {
+                budgetElement.className = "metric-value text-danger";
+            } else {
+                budgetElement.className = "metric-value";
+            }
+
+            // Stats Updates
+            document.getElementById('l2-reach').textContent = `${totalReach}k`;
+            document.getElementById('l2-engagement').textContent = `${totalEngagement}k`;
+            document.getElementById('l2-conversions').textContent = totalConversions;
+
+            // Progress Bar Conversions
+            const pct = Math.min((totalConversions / 1300) * 100, 100);
+            const fill = document.getElementById('l2-conv-bar');
+            fill.style.width = `${pct}%`;
+
+            if (totalConversions >= 1300) {
+                fill.classList.add('success');
+            } else {
+                fill.classList.remove('success');
+            }
+        }
+
+        function validateLevel2() {
+            let totalSpent = 0;
+            let totalConversions = 0;
+
+            const channels = [
+                { id: 'social', toggle: 'toggle-social' },
+                { id: 'email', toggle: 'toggle-email' },
+                { id: 'seo', toggle: 'toggle-seo' },
+                { id: 'influencer', toggle: 'toggle-influencer' },
+                { id: 'paid', toggle: 'toggle-paid' },
+                { id: 'website', toggle: 'toggle-website' }
+            ];
+
+            channels.forEach(ch => {
+                const toggle = document.getElementById(ch.toggle);
+                if (toggle.checked) {
+                    totalSpent += parseInt(toggle.getAttribute('data-cost'));
+                    totalConversions += parseInt(toggle.getAttribute('data-conversions'));
+                }
+            });
+
+            if (totalSpent > gameState.l2MaxBudget) {
+                alert("Budget Overspent! Optimize allocations to stay below ₹75,000 limit.");
+                return;
+            }
+
+            if (totalConversions < 1300) {
+                alert(`Conversion index of ${totalConversions} is below the threshold target of 1,300. Select alternative channels.`);
+                return;
+            }
+
+            gameState.l2Completed = true;
+            document.getElementById('step-2').classList.add('completed');
+            openSummaryModal('modal-summary-l2');
+        }
+
+        // LEVEL 3: CUSTOMER JOURNEY MAZE LOGIC
+        function drawJourneyPath() {
+            // Force redraw SVG layout alignment
+            const svg = document.getElementById('journey-svg');
+            if (svg) {
+                svg.style.display = 'block';
+            }
+        }
+
+        function validateLevel3() {
+            const stages = ['awareness', 'interest', 'consideration', 'purchase', 'retention', 'advocacy'];
+            let correct = true;
+
+            stages.forEach(stage => {
+                const select = document.querySelector(`.journey-select[data-stage="${stage}"]`);
+                const stepCard = document.getElementById(`jstep-${stage}`);
+
+                if (select.value === L3_ANSWERS[stage]) {
+                    stepCard.style.borderColor = "var(--success)";
+                    stepCard.style.backgroundColor = "var(--success-light)";
+                } else {
+                    correct = false;
+                    stepCard.style.borderColor = "var(--danger)";
+                    stepCard.style.backgroundColor = "var(--danger-light)";
+                }
+            });
+
+            if (correct) {
+                // Animate dot trace
+                const dot = document.getElementById('pulse-dot');
+                dot.style.display = 'block';
+
+                let start = null;
+                const duration = 2500; // ms
+
+                function stepAnimation(timestamp) {
+                    if (!start) start = timestamp;
+                    const progress = timestamp - start;
+                    const pct = Math.min(progress / duration, 1);
+
+                    // Simple linear mapping over 6 stages
+                    const pctVal = 8.3 + (pct * 83.3);
+                    dot.setAttribute('cx', `${pctVal}%`);
+
+                    if (pct < 1) {
+                        window.requestAnimationFrame(stepAnimation);
+                    } else {
+                        // Success modal trigger
+                        gameState.l3Completed = true;
+                        document.getElementById('step-3').classList.add('completed');
+                        openSummaryModal('modal-summary-l3');
+                    }
+                }
+
+                window.requestAnimationFrame(stepAnimation);
+            } else {
+                alert("Customer Journey Leak! Check step details. One or more stages contain channels that do not map to buyer intent.");
+            }
+        }
+
+        // LEVEL 4: REAL-TIME CAMPAIGN OPTIMIZATION ROOM LOGIC
+        function updateOptimizationMetrics() {
+            let correctCount = 0;
+            const selectors = document.querySelectorAll('.solution-select');
+
+            selectors.forEach(sel => {
+                const issue = sel.getAttribute('data-issue');
+                if (sel.value === L4_ANSWERS[issue]) {
+                    sel.className = "solution-select correct-select";
+                    correctCount++;
+                } else {
+                    sel.className = "solution-select";
+                }
+            });
+
+            // Base values
+            let engagement = 45;
+            let conversion = 38;
+            let traffic = 50;
+
+            // Increments per correct mapping
+            // social-engagement correct -> +40 engagement
+            // email-ctr correct -> +25 conversion
+            // web-speed correct -> +25 traffic
+            // web-bounce correct -> +15 traffic
+            // web-cta correct -> +25 conversion
+
+            const isSocialCorrect = document.querySelector('.solution-select[data-issue="social-engagement"]').value === L4_ANSWERS['social-engagement'];
+            const isEmailCorrect = document.querySelector('.solution-select[data-issue="email-ctr"]').value === L4_ANSWERS['email-ctr'];
+            const isSpeedCorrect = document.querySelector('.solution-select[data-issue="web-speed"]').value === L4_ANSWERS['web-speed'];
+            const isBounceCorrect = document.querySelector('.solution-select[data-issue="web-bounce"]').value === L4_ANSWERS['web-bounce'];
+            const isCTACorrect = document.querySelector('.solution-select[data-issue="web-cta"]').value === L4_ANSWERS['web-cta'];
+
+            if (isSocialCorrect) engagement += 40;
+            if (isEmailCorrect) conversion += 25;
+            if (isSpeedCorrect) traffic += 25;
+            if (isBounceCorrect) traffic += 15;
+            if (isCTACorrect) conversion += 25;
+
+            // Update Dashboard UI
+            document.getElementById('l4-engagement-val').textContent = `${engagement}%`;
+            document.getElementById('l4-engagement-bar').style.width = `${engagement}%`;
+
+            document.getElementById('l4-conversion-val').textContent = `${conversion}%`;
+            document.getElementById('l4-conversion-bar').style.width = `${conversion}%`;
+
+            document.getElementById('l4-traffic-val').textContent = `${traffic}%`;
+            document.getElementById('l4-traffic-bar').style.width = `${traffic}%`;
+
+            // Adjust metrics fill success colors
+            updateBarStatus('l4-engagement-bar', engagement, 80);
+            updateBarStatus('l4-conversion-bar', conversion, 80);
+            updateBarStatus('l4-traffic-bar', traffic, 80);
+        }
+
+        function updateBarStatus(barId, val, target) {
+            const bar = document.getElementById(barId);
+            if (val >= target) {
+                bar.classList.add('success');
+            } else {
+                bar.classList.remove('success');
+            }
+        }
+
+        function validateLevel4() {
+            let allCorrect = true;
+            const selectors = document.querySelectorAll('.solution-select');
+
+            selectors.forEach(sel => {
+                const issue = sel.getAttribute('data-issue');
+                if (sel.value !== L4_ANSWERS[issue]) {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                gameState.l4Completed = true;
+                document.getElementById('step-4').classList.add('completed');
+                openSummaryModal('modal-summary-l4');
+            } else {
+                alert("Optimization strategy incomplete. Solve all campaign bottlenecks correctly to reach standard operational KPIs.");
+            }
+        }
+
+        // LEVEL 5: OMNICHANNEL COMMAND CENTER LOGIC
+        function toggleL5Ticker() {
+            const btn = document.getElementById('btn-start-l5');
+            if (gameState.l5TickerActive) {
+                stopL5Ticker();
+                btn.textContent = "Resume Operations Ticker";
+            } else {
+                startL5Ticker();
+                btn.textContent = "Pause Operations Ticker";
+            }
+        }
+
+        function startL5Ticker() {
+            gameState.l5TickerActive = true;
+            gameState.l5TickerId = setInterval(() => {
+                processL5Day();
+            }, 1200);
+            logConsole("Command Ticker Online. Running daily simulations...", "success");
+        }
+
+        function stopL5Ticker() {
+            gameState.l5TickerActive = false;
+            clearInterval(gameState.l5TickerId);
+            logConsole("Command Ticker Paused.", "warning");
+        }
+
+        function processL5Day() {
+            gameState.l5Day++;
+            if (gameState.l5Day > 30) {
+                stopL5Ticker();
+                document.getElementById('l5-day-counter').textContent = `DAY 30 / 30`;
+                evaluateL5Results();
+                return;
+            }
+
+            document.getElementById('l5-day-counter').textContent = `DAY ${gameState.l5Day} / 30`;
+
+            // Check for incidents
+            if (L5_INCIDENTS[gameState.l5Day] && !gameState.l5IncidentsSeen[gameState.l5Day]) {
+                stopL5Ticker();
+                triggerIncident(gameState.l5Day);
+                return;
+            }
+
+            // Standard daily variations
+            const deltaReach = Math.floor(Math.random() * 5) - 2;
+            const deltaEng = Math.floor(Math.random() * 5) - 2;
+            const deltaConv = Math.floor(Math.random() * 4) - 1;
+            const deltaRet = Math.floor(Math.random() * 3) - 1;
+            const deltaRev = Math.floor(Math.random() * 5) - 1;
+
+            adjustL5KPIs({
+                reach: deltaReach,
+                engagement: deltaEng,
+                conversion: deltaConv,
+                retention: deltaRet,
+                revenue: deltaRev
+            });
+
+            // Random logs to monospace console
+            const genericLogs = [
+                `Day ${gameState.l5Day}: Organic impressions steady. SEO metrics tracking within parameters.`,
+                `Day ${gameState.l5Day}: Email CTR index stable. Newsletter spam feedback logs zero reports.`,
+                `Day ${gameState.l5Day}: Web server latency at 1.4s. Cart conversions checking out successfully.`,
+                `Day ${gameState.l5Day}: Paid visual display ads matching conversion index forecasts.`
+            ];
+            const randomLog = genericLogs[Math.floor(Math.random() * genericLogs.length)];
+            logConsole(randomLog, "system");
+        }
+
+        function triggerIncident(day) {
+            gameState.l5IncidentsSeen[day] = true;
+            const incident = L5_INCIDENTS[day];
+
+            const desc = document.getElementById('incident-desc-content');
+            desc.textContent = incident.desc;
+
+            const container = document.getElementById('incident-options-container');
+            container.innerHTML = '';
+
+            incident.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "incident-option-btn";
+                btn.onclick = () => selectIncidentOption(day, idx);
+
+                btn.innerHTML = `
+                    <span class="option-title">${opt.title}</span>
+                    <span class="option-details">${opt.details}</span>
+                `;
+                container.appendChild(btn);
+            });
+
+            document.getElementById('incident-box').classList.remove('hidden');
+            logConsole(`CRITICAL EVENT RECEIVED - Day ${day}: ${incident.title}. Awaiting tactical decision.`, "error");
+        }
+
+        function selectIncidentOption(day, optionIdx) {
+            const incident = L5_INCIDENTS[day];
+            const option = incident.options[optionIdx];
+
+            option.action();
+
+            document.getElementById('incident-box').classList.add('hidden');
+
+            // Auto resume ticker
+            startL5Ticker();
+            const btn = document.getElementById('btn-start-l5');
+            btn.textContent = "Pause Operations Ticker";
+        }
+
+        function adjustL5KPIs(deltas) {
+            for (let kpi in deltas) {
+                gameState.l5KPIs[kpi] = Math.max(30, Math.min(gameState.l5KPIs[kpi] + deltas[kpi], 100));
+            }
+            updateL5Dashboard();
+        }
+
+        function updateL5Dashboard() {
+            document.getElementById('l5-reach-val').textContent = `${gameState.l5KPIs.reach}%`;
+            document.getElementById('l5-reach-bar').style.width = `${gameState.l5KPIs.reach}%`;
+            updateBarStatus('l5-reach-bar', gameState.l5KPIs.reach, 80);
+
+            document.getElementById('l5-engagement-val').textContent = `${gameState.l5KPIs.engagement}%`;
+            document.getElementById('l5-engagement-bar').style.width = `${gameState.l5KPIs.engagement}%`;
+            updateBarStatus('l5-engagement-bar', gameState.l5KPIs.engagement, 80);
+
+            document.getElementById('l5-conv-val').textContent = `${gameState.l5KPIs.conversion}%`;
+            document.getElementById('l5-conv-bar').style.width = `${gameState.l5KPIs.conversion}%`;
+            updateBarStatus('l5-conv-bar', gameState.l5KPIs.conversion, 75);
+
+            document.getElementById('l5-retention-val').textContent = `${gameState.l5KPIs.retention}%`;
+            document.getElementById('l5-retention-bar').style.width = `${gameState.l5KPIs.retention}%`;
+            updateBarStatus('l5-retention-bar', gameState.l5KPIs.retention, 80);
+
+            document.getElementById('l5-revenue-val').textContent = gameState.l5KPIs.revenue;
+            document.getElementById('l5-revenue-bar').style.width = `${gameState.l5KPIs.revenue}%`;
+            updateBarStatus('l5-revenue-bar', gameState.l5KPIs.revenue, 75);
+        }
+
+        function logConsole(message, type = "system") {
+            const consoleBox = document.getElementById('console-logs');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            line.textContent = `[${timestamp}] ${message}`;
+
+            consoleBox.appendChild(line);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function evaluateL5Results() {
+            const targets = {
+                reach: 80,
+                engagement: 80,
+                conversion: 75,
+                retention: 80,
+                revenue: 75
+            };
+
+            const list = document.getElementById('scorecard-list');
+            list.innerHTML = '';
+
+            let passAll = true;
+            let strengths = [];
+            let improvements = [];
+
+            const kpiLabels = {
+                reach: 'Reach Index (&gt;80%)',
+                engagement: 'Engagement Index (&gt;80%)',
+                conversion: 'Conversion Rate (&gt;75%)',
+                retention: 'Customer Retention (&gt;80%)',
+                revenue: 'Revenue Index (&gt;75)'
+            };
+
+            for (let kpi in targets) {
+                const passed = gameState.l5KPIs[kpi] >= targets[kpi];
+                const li = document.createElement('li');
+                li.className = passed ? "score-item pass" : "score-item fail";
+
+                li.innerHTML = `
+                    <span>${kpiLabels[kpi]}</span>
+                    <strong>${gameState.l5KPIs[kpi]}${kpi === 'revenue' ? '' : '%'} (Target: ${targets[kpi]}${kpi === 'revenue' ? '' : '%'})</strong>
+                `;
+                list.appendChild(li);
+
+                if (!passed) {
+                    passAll = false;
+                    improvements.push(kpiLabels[kpi].split(' (')[0]);
+                } else {
+                    strengths.push(kpiLabels[kpi].split(' (')[0]);
+                }
+            }
+
+            const title = document.getElementById('scorecard-title');
+            if (passAll) {
+                title.className = "text-center text-success";
+                title.textContent = "Successful Digital Channel Strategy Implemented";
+                logConsole("Evaluation Complete: ConnectHub omnichannel strategies cleared audits.", "success");
+            } else {
+                title.className = "text-center text-danger";
+                title.textContent = "Strategy Needs Improvement";
+                logConsole("Evaluation Complete: ConnectHub strategy failed key audit checkpoints.", "error");
+            }
+
+            document.getElementById('scorecard-strengths').textContent = strengths.length > 0 ? strengths.join(', ') : "None";
+            document.getElementById('scorecard-improvements').textContent = improvements.length > 0 ? improvements.join(', ') : "None";
+
+            document.getElementById('l5-results-card').classList.remove('hidden');
+            gameState.l5Completed = true;
+            document.getElementById('step-5').classList.add('completed');
+        }
+
+        function restartLevel5() {
+            gameState.l5Day = 1;
+            gameState.l5TickerActive = false;
+            clearInterval(gameState.l5TickerId);
+            gameState.l5KPIs = { reach: 60, engagement: 60, conversion: 60, retention: 60, revenue: 60 };
+
+            for (let key in gameState.l5IncidentsSeen) {
+                gameState.l5IncidentsSeen[key] = false;
+            }
+
+            document.getElementById('l5-day-counter').textContent = `DAY 1 / 30`;
+            document.getElementById('l5-results-card').classList.add('hidden');
+            document.getElementById('incident-box').classList.add('hidden');
+
+            const btn = document.getElementById('btn-start-l5');
+            btn.textContent = "Start Operations Ticker";
+
+            const consoleBox = document.getElementById('console-logs');
+            consoleBox.innerHTML = '<div class="console-line system">[SYSTEM INITIALIZED] - Channel Operations Center Ready.</div>';
+
+            updateL5Dashboard();
+        }
+
+        function restartEntireSimulation() {
+            // Reload window is the safest cleanup for state reset
+            window.location.reload();
+        }
+
+        // Native Modal handlers
+        function openSummaryModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.showModal();
+            }
+        }
+
+        function closeSummaryModal(modalId, nextLevelNum) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.close();
+            }
+            if (nextLevelNum) {
+                switchLevel(nextLevelNum);
+            }
+        }
+    </script>
+</body>
+
+</html>

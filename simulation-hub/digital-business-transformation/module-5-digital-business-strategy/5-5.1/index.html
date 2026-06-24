@@ -1,1 +1,3279 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 5.1 Simulation - Startup Incubator & Strategy Center</title>
+    <meta name="description"
+        content="An interactive startup strategy simulation for DBT Module 5.1. Design digital business models, build strategies, pitch to investors, and scale your digital startup as the Chief Strategy Officer.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #FF9800;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Stepper Progress Bar (Unlocked Globally) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+        }
+
+        .step-item.completed {
+            color: var(--success);
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+            max-width: 120px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        .step-divider.completed {
+            background-color: var(--success);
+        }
+
+        /* Main Workspace Container */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Panels */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons & Interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-red-light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Native Dialog (Modal) Styles */
+        dialog {
+            margin: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            font-family: var(--font-body);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .dialog-body {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Welcome Onboarding */
+        .welcome-memo {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #FFCDD2;
+            padding-bottom: 16px;
+        }
+
+        .memo-logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .memo-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .memo-body {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memo-highlight {
+            background-color: var(--primary-red-light);
+            border-left: 4px solid var(--primary-red);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Objective Box */
+        .objective-box {
+            background-color: #ECEFF1;
+            border-left: 4px solid #455A64;
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .objective-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #37474F;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Persistent Navigation Footer */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            /* Flex when active */
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* LEVEL 1: Startup Idea Lab */
+        .l1-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l1-idea-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .l1-idea-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .l1-idea-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .l1-idea-btn.active {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+            border-left: 5px solid var(--primary-red);
+        }
+
+        .l1-idea-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .l1-idea-tagline {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .l1-canvas {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--white);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 650px) {
+            .canvas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-cell {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .canvas-cell-title {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-transform: uppercase;
+        }
+
+        .canvas-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        /* Startup Card */
+        .startup-card {
+            border: 2px solid var(--success);
+            border-radius: var(--radius-lg);
+            background: var(--success-light);
+            padding: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            animation: cardSlideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                transform: translateY(16px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .startup-card-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--success);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .startup-card-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .startup-card-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .startup-card-table td:first-child {
+            font-weight: 700;
+            color: var(--text-dark);
+            width: 180px;
+        }
+
+        /* LEVEL 2: Business Model Designer */
+        .l2-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l2-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l2-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .l2-item-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .l2-item-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .l2-item-card.selected {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+        }
+
+        .l2-item-card.paired {
+            border-left: 6px solid var(--success);
+            background-color: var(--success-light);
+            cursor: default;
+        }
+
+        .l2-item-card.paired:hover {
+            transform: none;
+            border-color: var(--border-color);
+        }
+
+        .l2-model-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .l2-model-target {
+            background-color: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .l2-model-target:hover {
+            border-color: var(--primary-red);
+            background-color: var(--bg-light);
+        }
+
+        .l2-model-target.occupied {
+            border-style: solid;
+            border-color: var(--success);
+            background-color: var(--white);
+            cursor: default;
+        }
+
+        .model-name {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .model-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .model-pairing-text {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* LEVEL 3: Strategy War Room */
+        .l3-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l3-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l3-pool {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .strategy-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .strategy-card:hover {
+            border-color: var(--primary-red);
+            transform: translateX(4px);
+        }
+
+        .strategy-card.selected {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+        }
+
+        .strategy-card.placed {
+            display: none;
+        }
+
+        .l3-board {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .strategy-bucket {
+            background-color: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .strategy-bucket:hover {
+            border-color: var(--primary-red);
+            background-color: var(--bg-light);
+        }
+
+        .bucket-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .strategy-bucket-card {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .strategy-bucket-card span.remove {
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* L3 Live Dashboard */
+        .l3-dashboard {
+            background-color: #ECEFF1;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .l3-dashboard {
+                flex-direction: column;
+            }
+        }
+
+        .l3-metric-box {
+            flex: 1;
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .l3-metric-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .l3-metric-val {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .l3-metric-bar {
+            height: 6px;
+            background-color: #E0E0E0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .l3-metric-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-red);
+            transition: width 0.3s ease;
+        }
+
+        /* LEVEL 4: Startup Investor Pitch */
+        .l4-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l4-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l4-questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .l4-question-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .l4-question-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .l4-question-card.selected {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+        }
+
+        .l4-question-card.placed {
+            display: none;
+        }
+
+        .l4-deck {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .l4-slide {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .l4-slide:hover {
+            border-color: var(--accent-blue);
+            background-color: var(--bg-light);
+        }
+
+        .l4-slide.occupied {
+            border-left-color: var(--success);
+            background-color: var(--success-light);
+            cursor: default;
+        }
+
+        .l4-slide-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .l4-slide-answer {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            border-left: 2px solid var(--border-color);
+            padding-left: 8px;
+        }
+
+        .l4-slide.occupied .l4-slide-answer {
+            color: var(--success);
+            border-left-color: var(--success);
+            font-weight: 500;
+        }
+
+        .confidence-meter-container {
+            background-color: #ECEFF1;
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* LEVEL 5: Startup Growth Simulator */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 950px) {
+            .l5-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .l5-kpi-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .l5-sidebar-header {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+        }
+
+        .l5-kpi-card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background-color: var(--bg-light);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .l5-kpi-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .kpi-val {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .kpi-meter-container {
+            width: 100%;
+            height: 6px;
+            background-color: #E0E0E0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .kpi-meter-fill {
+            height: 100%;
+            width: 50%;
+            background-color: var(--primary-red);
+            transition: var(--transition);
+        }
+
+        .kpi-target-indicator {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* L5 Simulator Console */
+        .l5-simulator-console {
+            background-color: #0E1726;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 520px;
+            position: relative;
+        }
+
+        .l5-console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1E293B;
+            padding-bottom: 16px;
+        }
+
+        .console-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .console-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: statusPulse 1.5s infinite alternate;
+        }
+
+        @keyframes statusPulse {
+            from {
+                opacity: 0.4;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .console-status-dot.paused {
+            background-color: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .console-status-text {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #94A3B8;
+        }
+
+        .console-day-ticker {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .l5-terminal-ticker {
+            flex-grow: 1;
+            background-color: #030712;
+            border: 1px solid #1F2937;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #38BDF8;
+            overflow-y: auto;
+            max-height: 280px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+            scrollbar-width: thin;
+        }
+
+        .terminal-row {
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        .terminal-row.alert {
+            color: var(--warning);
+        }
+
+        .terminal-row.success {
+            color: var(--success);
+        }
+
+        .terminal-row.critical {
+            color: var(--danger);
+            font-weight: 700;
+            animation: pulseTerminalText 1s infinite alternate;
+        }
+
+        /* Decision Modal Card overlaying the console */
+        .l5-incident-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .incident-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-top: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            max-width: 580px;
+            width: 100%;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: cardSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .incident-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .incident-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .incident-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .incident-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .incident-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .incident-opt-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .incident-opt-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .incident-opt-title {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .incident-opt-impact {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Scorecard Review styles */
+        .scorecard-banner {
+            text-align: center;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+        }
+
+        .scorecard-banner.success {
+            background-color: var(--success-light);
+            border: 1px solid rgba(46, 125, 50, 0.2);
+            color: var(--success);
+        }
+
+        .scorecard-banner.fail {
+            background-color: var(--danger-light);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            color: var(--danger);
+        }
+
+        .scorecard-banner h2 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .scorecard-banner p {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 750px) {
+            .scorecard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scorecard-col {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .scorecard-col-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .scorecard-col.strengths {
+            border-top: 4px solid var(--success);
+        }
+
+        .scorecard-col.strengths .scorecard-col-title {
+            color: var(--success);
+        }
+
+        .scorecard-col.weaknesses {
+            border-top: 4px solid var(--warning);
+        }
+
+        .scorecard-col.weaknesses .scorecard-col-title {
+            color: var(--warning);
+        }
+
+        .scorecard-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .scorecard-list li {
+            font-size: 0.88rem;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .scorecard-list li::before {
+            position: absolute;
+            left: 0;
+            font-weight: 800;
+        }
+
+        .scorecard-col.strengths .scorecard-list li::before {
+            content: "✓";
+            color: var(--success);
+        }
+
+        .scorecard-col.weaknesses .scorecard-list li::before {
+            content: "•";
+            color: var(--warning);
+            font-size: 1.25rem;
+            top: -2px;
+        }
+
+        /* Bottom Nav buttons */
+        .bottom-nav {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Toast Popup system */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .toast {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            font-size: 0.88rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: toastSlideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast.danger {
+            border-left-color: var(--danger);
+        }
+
+        /* General layout helpers */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .flex-row-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sticky Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>Digital Business & Transformation – Module 5.1 Simulation</h1>
+                    <p>Digital Business Strategy Definition and Startup-Based Digital Business Models</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showHelpManual()">Incubator Manual</button>
+                </div>
+            </div>
+
+            <!-- Stepper Progress Tracker (Clickable & Unlocked) -->
+            <div class="stepper">
+                <div class="step-item active" id="step-btn-1" onclick="navigateToLevel(1)">
+                    <span class="step-badge">1</span>
+                    <span>Idea Lab</span>
+                </div>
+                <div class="step-divider" id="step-div-1"></div>
+                <div class="step-item" id="step-btn-2" onclick="navigateToLevel(2)">
+                    <span class="step-badge">2</span>
+                    <span>Model Designer</span>
+                </div>
+                <div class="step-divider" id="step-div-2"></div>
+                <div class="step-item" id="step-btn-3" onclick="navigateToLevel(3)">
+                    <span class="step-badge">3</span>
+                    <span>Strategy Board</span>
+                </div>
+                <div class="step-divider" id="step-div-3"></div>
+                <div class="step-item" id="step-btn-4" onclick="navigateToLevel(4)">
+                    <span class="step-badge">4</span>
+                    <span>Investor Pitch</span>
+                </div>
+                <div class="step-divider" id="step-div-4"></div>
+                <div class="step-item" id="step-btn-5" onclick="navigateToLevel(5)">
+                    <span class="step-badge">5</span>
+                    <span>Growth Console</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Digital Strategy & Startup Business Models (Module 5.1)
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. Digital Strategy Definition:</strong> Sets the direction
+                        for digital transformation, aligning technology with customer values to secure competitive
+                        differentiation.</p>
+                    <p><strong>2. Platform Models:</strong> Create value by facilitating interactions between external
+                        producers and consumers (e.g. marketplaces, sharing economies).</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Subscription & SaaS:</strong> SaaS models generate stable
+                        recurring cash flow streams by delivering software over the cloud with monthly subscription
+                        tiers.</p>
+                    <p><strong>4. Freemium Mechanics:</strong> Offer a free core product to build high-volume reach,
+                        while upselling premium features to convert users to paid cohorts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WELCOME SCREEN & ONBOARDING -->
+        <section id="screen-onboarding" class="screen active">
+            <div class="welcome-memo">
+                <div class="memo-header">
+                    <div class="memo-logo">🚀 StartUp Incubator</div>
+                    <div class="memo-meta">
+                        <div>BOARD MEETING</div>
+                        <div>REF: INC-COMPETITION</div>
+                    </div>
+                </div>
+                <div class="memo-body">
+                    <p><strong>TO: Startup Founder & Chief Strategy Officer</strong></p>
+                    <p>Welcome to the <strong>incubator competition</strong>. You have been selected to launch a digital
+                        startup from scratch. In today’s competitive environment, building a business is not just about
+                        writing code—it requires defining a cohesive strategy and matching it to sustainable business
+                        models.</p>
+                    <p>Your executive journey involves five technical milestones:</p>
+
+                    <div class="memo-highlight">
+                        Auditing raw ideas to build a clear canvas, pairing business models (Freemium, Subscription,
+                        D2C, etc.) with platforms, allocating operational strategies in our war room, drafting slides
+                        for an investor pitch review, and running a 12-month growth simulator.
+                    </div>
+
+                    <p>The judges will evaluate your final metrics at Month 12: Users, Revenue, Customer Satisfaction,
+                        Brand Awareness, and Investor Confidence. The target metrics are high, but a structured strategy
+                        will guarantee success.</p>
+                    <p>Select the startup workspace below to initialize your canvas.</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn" onclick="startSimulation()">Begin Operations</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 1: Startup Idea Lab -->
+        <section id="screen-l1" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 1: Startup Idea Lab</div>
+                    <span class="l1-slot-label"
+                        style="text-transform: uppercase; font-family: var(--font-mono); font-size: 0.75rem; background: var(--primary-red-light); color: var(--primary-red); padding: 4px 8px; border-radius: 4px; font-weight: 700;">Idea
+                        Canvas</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Select a core digital startup idea on the left, then use the options on the right to align its
+                    Target Audience, Problem to Solve, Digital Solution, and Unique Value Proposition (UVP). Correctly
+                    mapping these generates a verified Startup Idea Card.
+                </div>
+
+                <div class="l1-layout">
+                    <!-- Left: Idea list -->
+                    <div class="l1-idea-list" id="l1-ideas">
+                        <button class="l1-idea-btn active" onclick="selectL1Idea('online-tutoring')">
+                            <div class="l1-idea-title">EduFlex: Online Tutoring</div>
+                            <div class="l1-idea-tagline">AI-assisted educational tutoring platform.</div>
+                        </button>
+                        <button class="l1-idea-btn" onclick="selectL1Idea('food-delivery')">
+                            <div class="l1-idea-title">BiteSprint: Food Delivery</div>
+                            <div class="l1-idea-tagline">Urban micro-kitchen office lunch deliveries.</div>
+                        </button>
+                        <button class="l1-idea-btn" onclick="selectL1Idea('fitness-coaching')">
+                            <div class="l1-idea-title">PulseFit: Fitness Coaching</div>
+                            <div class="l1-idea-tagline">Skeletal tracking customized workouts.</div>
+                        </button>
+                        <button class="l1-idea-btn" onclick="selectL1Idea('event-management')">
+                            <div class="l1-idea-title">SummitFlow: Event Management</div>
+                            <div class="l1-idea-tagline">Corporate vendor B2B bidding systems.</div>
+                        </button>
+                        <button class="l1-idea-btn" onclick="selectL1Idea('travel-planning')">
+                            <div class="l1-idea-title">WanderAI: Travel Planning</div>
+                            <div class="l1-idea-tagline">Generative AI booking itineraries.</div>
+                        </button>
+                    </div>
+
+                    <!-- Right: Canvas workspace -->
+                    <div class="l1-canvas" id="l1-canvas-board">
+                        <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;"
+                            id="l1-canvas-title">EduFlex Canvas Builder</h3>
+
+                        <div class="canvas-grid">
+                            <div class="canvas-cell">
+                                <span class="canvas-cell-title">Target Audience</span>
+                                <select class="canvas-select" id="canvas-target" onchange="checkL1Completeness()">
+                                    <option value="none">-- Select Target Audience --</option>
+                                    <!-- Injected -->
+                                </select>
+                            </div>
+
+                            <div class="canvas-cell">
+                                <span class="canvas-cell-title">Problem to Solve</span>
+                                <select class="canvas-select" id="canvas-problem" onchange="checkL1Completeness()">
+                                    <option value="none">-- Select Pain Point --</option>
+                                </select>
+                            </div>
+
+                            <div class="canvas-cell">
+                                <span class="canvas-cell-title">Digital Solution</span>
+                                <select class="canvas-select" id="canvas-solution" onchange="checkL1Completeness()">
+                                    <option value="none">-- Select Solution Architecture --</option>
+                                </select>
+                            </div>
+
+                            <div class="canvas-cell">
+                                <span class="canvas-cell-title">Value Proposition (UVP)</span>
+                                <select class="canvas-select" id="canvas-uvp" onchange="checkL1Completeness()">
+                                    <option value="none">-- Select Value Proposition --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="btn" id="l1-verify-btn" onclick="verifyL1Canvas()">Compile Canvas
+                            Opportunity</button>
+
+                        <!-- Startup Idea Card (Success result) -->
+                        <div class="startup-card" id="startup-card">
+                            <div class="startup-card-title" id="startup-card-title">EDUflex Startup Card</div>
+                            <table class="startup-card-table">
+                                <tr>
+                                    <td>Target Market</td>
+                                    <td id="card-market">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Pain Point</td>
+                                    <td id="card-problem">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Platform System</td>
+                                    <td id="card-solution">-</td>
+                                </tr>
+                                <tr>
+                                    <td>Value Proposition</td>
+                                    <td id="card-uvp">-</td>
+                                </tr>
+                            </table>
+                            <div style="font-size: 0.8rem; color: var(--success); font-weight: 700;">✓ OPPORTUNITY
+                                AUDITED AND SAVED IN DATABASE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel1()">Reset Canvas</button>
+                    <button class="btn" id="l1-next-btn" onclick="showSummaryDialog(1)" disabled>Lock & Proceed</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Business Model Designer -->
+        <section id="screen-l2" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 2: Business Model Designer</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px;">Strategic
+                        Revenue Architect</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Select a digital business startup on the left, then click its corresponding business model on the
+                    right to pair them. A correct match will establish a revenue strategy.
+                </div>
+
+                <div class="l2-layout">
+                    <!-- Left: Startups -->
+                    <div class="l2-list" id="l2-startups-list">
+                        <!-- Injected -->
+                    </div>
+
+                    <!-- Right: Business Models -->
+                    <div class="l2-model-zone" id="l2-models-list">
+                        <!-- Injected -->
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel2()">Reset Models</button>
+                    <button class="btn" id="l2-next-btn" onclick="showSummaryDialog(2)" disabled>Lock & Proceed</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Strategy War Room -->
+        <section id="screen-l3" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 3: Strategy War Room</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--warning-light); color: var(--warning); padding: 4px 8px; border-radius: 4px;">Strategic
+                        Resource Allocation</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Allocate strategies into their primary operational areas to build a balanced startup model. Select a
+                    strategy card from the pool, then click a target bucket. Reach a balanced score above 70% across
+                    Reach, Revenue, and Customer Loyalty.
+                </div>
+
+                <!-- Live Dashboard -->
+                <div class="l3-dashboard">
+                    <div class="l3-metric-box">
+                        <span class="l3-metric-name">Market Reach</span>
+                        <span class="l3-metric-val" id="l3-reach-val">0%</span>
+                        <div class="l3-metric-bar">
+                            <div class="l3-metric-bar-fill" id="l3-reach-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="l3-metric-box">
+                        <span class="l3-metric-name">Monthly Revenue</span>
+                        <span class="l3-metric-val" id="l3-revenue-val">0%</span>
+                        <div class="l3-metric-bar">
+                            <div class="l3-metric-bar-fill" id="l3-revenue-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="l3-metric-box">
+                        <span class="l3-metric-name">Customer Loyalty</span>
+                        <span class="l3-metric-val" id="l3-loyalty-val">0%</span>
+                        <div class="l3-metric-bar">
+                            <div class="l3-metric-bar-fill" id="l3-loyalty-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="l3-layout">
+                    <!-- Left: Available strategies -->
+                    <div class="l3-pool" id="l3-pool">
+                        <!-- Injected -->
+                    </div>
+
+                    <!-- Right: Strategy Board -->
+                    <div class="l3-board">
+                        <div class="strategy-grid">
+                            <div class="strategy-bucket" id="bucket-acquisition"
+                                onclick="placeL3Strategy('acquisition')">
+                                <div class="bucket-title">Customer Acquisition</div>
+                                <!-- Placed card -->
+                            </div>
+                            <div class="strategy-bucket" id="bucket-retention" onclick="placeL3Strategy('retention')">
+                                <div class="bucket-title">Customer Retention</div>
+                            </div>
+                            <div class="strategy-bucket" id="bucket-revenue" onclick="placeL3Strategy('revenue')">
+                                <div class="bucket-title">Revenue Generation</div>
+                            </div>
+                            <div class="strategy-bucket" id="bucket-brand" onclick="placeL3Strategy('brand')">
+                                <div class="bucket-title">Brand Building</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel3()">Reset Board</button>
+                    <button class="btn" id="l3-next-btn" onclick="showSummaryDialog(3)" disabled>Lock & Proceed</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: Startup Investor Pitch -->
+        <section id="screen-l4" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 4: Startup Investor Pitch</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px;">Investor
+                        Deck Review</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Prepare the <span id="l4-startup-name"
+                        style="color: var(--primary-red); font-weight: 700;">Startup</span> pitch deck for investor
+                    questions. Select an answer card on the left and click the slide target on the right to slot it.
+                    Achieve 100% Investor Confidence to validate the deck.
+                </div>
+
+                <div class="confidence-meter-container">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 700; color: var(--text-dark);">
+                        <span>Investor Confidence Meter</span>
+                        <span id="l4-confidence-val">0%</span>
+                    </div>
+                    <div class="l3-metric-bar">
+                        <div class="l3-metric-bar-fill" id="l4-confidence-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="l4-layout">
+                    <!-- Left: Questions deck -->
+                    <div class="l4-questions-list" id="l4-questions">
+                        <!-- Injected -->
+                    </div>
+
+                    <!-- Right: Pitch Deck -->
+                    <div class="l4-deck" id="l4-deck">
+                        <div class="l4-slide" id="slide-problem" onclick="placeL4Answer('problem')">
+                            <span class="l4-slide-title">1. Problem Slide</span>
+                            <div class="l4-slide-answer" id="ans-problem">Click an answer on the left to map here...
+                            </div>
+                        </div>
+                        <div class="l4-slide" id="slide-solution" onclick="placeL4Answer('solution')">
+                            <span class="l4-slide-title">2. Solution Slide</span>
+                            <div class="l4-slide-answer" id="ans-solution">Click an answer on the left to map here...
+                            </div>
+                        </div>
+                        <div class="l4-slide" id="slide-target" onclick="placeL4Answer('target')">
+                            <span class="l4-slide-title">3. Target Market Slide</span>
+                            <div class="l4-slide-answer" id="ans-target">Click an answer on the left to map here...
+                            </div>
+                        </div>
+                        <div class="l4-slide" id="slide-revenue" onclick="placeL4Answer('revenue')">
+                            <span class="l4-slide-title">4. Revenue Model Slide</span>
+                            <div class="l4-slide-answer" id="ans-revenue">Click an answer on the left to map here...
+                            </div>
+                        </div>
+                        <div class="l4-slide" id="slide-advantage" onclick="placeL4Answer('advantage')">
+                            <span class="l4-slide-title">5. Competitive Advantage Slide</span>
+                            <div class="l4-slide-answer" id="ans-advantage">Click an answer on the left to map here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <button class="btn btn-secondary" onclick="resetLevel4()">Reset Slides</button>
+                    <button class="btn" id="l4-next-btn" onclick="showSummaryDialog(4)" disabled>Lock & Proceed</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 5: Startup Growth Simulator -->
+        <section id="screen-l5" class="screen">
+            <div class="l5-layout">
+                <!-- Left: Side KPIs -->
+                <div class="l5-kpi-sidebar">
+                    <div class="l5-sidebar-header">KPI Dashboard</div>
+
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Active Users</span>
+                            <span class="kpi-val" id="kpi-users">50</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-users" style="width: 50%;"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 80</div>
+                    </div>
+
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Revenue Index</span>
+                            <span class="kpi-val" id="kpi-revenue">50</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-revenue" style="width: 50%;"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 75</div>
+                    </div>
+
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Customer Satisfaction</span>
+                            <span class="kpi-val" id="kpi-satisfaction">60</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-satisfaction" style="width: 60%;"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 80</div>
+                    </div>
+
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Brand Awareness</span>
+                            <span class="kpi-val" id="kpi-awareness">50</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-awareness" style="width: 50%;"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 75</div>
+                    </div>
+
+                    <div class="l5-kpi-card">
+                        <div class="l5-kpi-meta">
+                            <span class="kpi-title">Investor Confidence</span>
+                            <span class="kpi-val" id="kpi-confidence">60</span>
+                        </div>
+                        <div class="kpi-meter-container">
+                            <div class="kpi-meter-fill" id="meter-confidence" style="width: 60%;"></div>
+                        </div>
+                        <div class="kpi-target-indicator">Target: > 80</div>
+                    </div>
+                </div>
+
+                <!-- Right: Console -->
+                <div class="l5-simulator-console">
+                    <div class="l5-console-header">
+                        <div class="console-status">
+                            <div class="console-status-dot" id="console-status-dot"></div>
+                            <span class="console-status-text" id="console-status-text">INITIALIZED // STANDBY</span>
+                        </div>
+                        <div class="console-day-ticker" id="console-month-ticker">MONTH 1 OF 12</div>
+                    </div>
+
+                    <div class="l5-terminal-ticker" id="l5-terminal-ticker">
+                        <div class="terminal-row">[SYSTEM] Incubator simulators connected.</div>
+                        <div class="terminal-row">[SYSTEM] Startup CSO parameters established.</div>
+                        <div class="terminal-row">[SYSTEM] Select "Launch 12-Month Cycle" to start operations ticker.
+                        </div>
+                    </div>
+
+                    <div class="btn-group" style="margin-top: auto;">
+                        <button class="btn" id="l5-start-btn" onclick="startL5Ticker()">Launch 12-Month Cycle</button>
+                        <button class="btn btn-secondary" id="l5-pause-btn" onclick="pauseL5Ticker()" disabled>Pause
+                            Cycle</button>
+                    </div>
+
+                    <!-- Overlays incident cards -->
+                    <div class="l5-incident-overlay" id="l5-incident-overlay">
+                        <div class="incident-card" id="l5-incident-card">
+                            <div class="incident-header">
+                                <span class="incident-badge">INCUBATOR EVENT</span>
+                                <h4 class="incident-title" id="inc-title">MARKET ADJUSTMENT</h4>
+                            </div>
+                            <p class="incident-desc" id="inc-desc">A competitor moves into your area. Select a strategy.
+                            </p>
+                            <div class="incident-options" id="inc-options">
+                                <!-- Options dynamically loaded -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Footer (Locks removed, Prev/Next active globally) -->
+    <div class="nav-footer" id="navigationFooter" style="display: none;">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Level</button>
+            <div style="font-family: var(--font-display); font-weight: 700; color: var(--primary-red); font-size: 0.95rem;"
+                id="footerLevelText">
+                Level 1 of 5
+            </div>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    <!-- OPERATIONS MANUAL DIALOG -->
+    <dialog id="help-manual-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📖 Incubator operations Manual</span>
+            </div>
+            <div class="dialog-body">
+                <p><strong>Startup Opportunity Validation</strong></p>
+                <p>A successful digital startup maps a clear customer segment to a verified pain point, then resolves it
+                    through a scalable digital tool (Value Proposition).</p>
+
+                <p style="margin-top: 10px;"><strong>Digital Business Models</strong></p>
+                <p>Revenue models dictate startup unit economics: Subscription structures guarantee monthly cash flows;
+                    Freemium options scale user acquisition base channels; Marketplaces coordinate peer-to-peer
+                    projects; Transaction Fee engines take margins on routed funds.</p>
+
+                <p style="margin-top: 10px;"><strong>Startup Strategy Balancing</strong></p>
+                <p>CSOs direct strategies to prevent operational imbalances. Social marketing drives early reach.
+                    Loyalty loops reduce customer acquisition cost friction. Discounts convert users into transactions
+                    at the cost of short-term margins.</p>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeHelpManual()">Close Manual</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- LEARNING SUMMARY DIALOG -->
+    <dialog id="summary-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span id="summary-dialog-title">Level Complete</span>
+            </div>
+            <div class="dialog-body" id="summary-dialog-content">
+                <!-- Injected -->
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" id="summary-next-btn" onclick="confirmSummaryNextLevel()">Advance to Next
+                    Level</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- SCORECARD RESULT CONTAINER DIALOG -->
+    <dialog id="scorecard-dialog">
+        <div class="dialog-container" style="max-width: 800px;">
+            <div class="dialog-header">
+                <span>📊 Incubator Competition Final Scorecard</span>
+            </div>
+
+            <div class="scorecard-banner" id="scorecard-banner">
+                <h2 id="scorecard-status">Successful Digital Startup Created</h2>
+                <p id="scorecard-desc">Your startup successfully built a sustainable digital business strategy.</p>
+            </div>
+
+            <div class="scorecard-grid">
+                <div class="scorecard-col strengths">
+                    <h4 class="scorecard-col-title">Strengths & Achievements</h4>
+                    <ul class="scorecard-list" id="scorecard-strengths-list">
+                        <!-- Injected -->
+                    </ul>
+                </div>
+                <div class="scorecard-col weaknesses">
+                    <h4 class="scorecard-col-title">Strategic Areas for Improvement</h4>
+                    <ul class="scorecard-list" id="scorecard-weaknesses-list">
+                        <!-- Injected -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dialog-footer" style="margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="resetFullSimulation()">Re-run Simulation</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // System State
+        const state = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true, true, true],
+            completedLevels: [false, false, false, false, false],
+
+            // Level 1 variables
+            l1: {
+                activeIdea: 'online-tutoring',
+                selectedTarget: 'none',
+                selectedProblem: 'none',
+                selectedSolution: 'none',
+                selectedUvp: 'none',
+                data: {
+                    'online-tutoring': {
+                        title: 'EduFlex: Online Tutoring',
+                        targets: [
+                            { val: 'parents', text: 'Parents of school-aged children seeking academic support', correct: true },
+                            { val: 'offices', text: 'Time-strapped office employees in dense urban centers', correct: false },
+                            { val: 'tourists', text: 'Weekend vacationers seeking customized local travel guides', correct: false }
+                        ],
+                        problems: [
+                            { val: 'curriculum', text: 'Generic school curriculum failing to address individual child learning gaps', correct: true },
+                            { val: 'lunch', text: 'Slow order arrivals and cold food during brief office lunch breaks', correct: false },
+                            { val: 'gym', text: 'High gym costs and lack of personal tracking causing workout abandonment', correct: false }
+                        ],
+                        solutions: [
+                            { val: 'tutor-app', text: 'AI-driven virtual tutor matching platform with live video tools', correct: true },
+                            { val: 'kitchens', text: 'Micro-kitchen distribution networks with batch delivery routing', correct: false },
+                            { val: 'itinerary', text: 'Generative AI itinerary generator with direct API bookings integration', correct: false }
+                        ],
+                        uvps: [
+                            { val: 'guarantee-mastery', text: 'Guaranteed concept mastery with 24/7 access to qualified subject experts', correct: true },
+                            { val: 'under-20', text: 'Hot gourmet meals delivered directly to your office desk in under 20 minutes', correct: false },
+                            { val: 'under-3', text: 'A completely personalized, booked weekend getaway itinerary in under 3 minutes', correct: false }
+                        ]
+                    },
+                    'food-delivery': {
+                        title: 'BiteSprint: Food Delivery',
+                        targets: [
+                            { val: 'parents', text: 'Parents of school-aged children seeking academic support', correct: false },
+                            { val: 'offices', text: 'Time-strapped office employees in dense urban centers', correct: true },
+                            { val: 'professionals', text: 'Busy corporate professionals seeking active home workouts', correct: false }
+                        ],
+                        problems: [
+                            { val: 'lunch', text: 'Slow order arrivals and cold food during brief office lunch breaks', correct: true },
+                            { val: 'curriculum', text: 'Generic school curriculum failing to address individual learning gaps', correct: false },
+                            { val: 'vendors', text: 'Opaque, fragmented vendor quotes requiring manual emails', correct: false }
+                        ],
+                        solutions: [
+                            { val: 'kitchens', text: 'Micro-kitchen distribution networks with batch delivery routing', correct: true },
+                            { val: 'tutor-app', text: 'AI-driven virtual tutor matching platform with live video tools', correct: false },
+                            { val: 'fit-app', text: 'Real-time body tracking mobile app with live coaching sessions', correct: false }
+                        ],
+                        uvps: [
+                            { val: 'under-20', text: 'Hot gourmet meals delivered directly to your office desk in under 20 minutes', correct: true },
+                            { val: 'guarantee-mastery', text: 'Guaranteed concept mastery with 24/7 access to qualified subject experts', correct: false },
+                            { val: 'calibrated-15', text: 'Customized 15-minute home workouts calibrated by dynamic tracking', correct: false }
+                        ]
+                    },
+                    'fitness-coaching': {
+                        title: 'PulseFit: Fitness Coaching',
+                        targets: [
+                            { val: 'parents', text: 'Parents of school-aged children seeking academic support', correct: false },
+                            { val: 'professionals', text: 'Busy corporate professionals seeking active home workouts', correct: true },
+                            { val: 'summit-planners', text: 'Corporate planning committees organizing annual summits', correct: false }
+                        ],
+                        problems: [
+                            { val: 'gym', text: 'High gym costs and lack of personal tracking causing workout abandonment', correct: true },
+                            { val: 'lunch', text: 'Slow order arrivals and cold food during brief office lunch breaks', correct: false },
+                            { val: 'travel-tabs', text: 'Dozens of open travel tabs and generic, outdated tour packages', correct: false }
+                        ],
+                        solutions: [
+                            { val: 'fit-app', text: 'Real-time body tracking mobile app with live coaching sessions', correct: true },
+                            { val: 'kitchens', text: 'Micro-kitchen distribution networks with batch delivery routing', correct: false },
+                            { val: 'auction-dashboard', text: 'A unified B2B vendor auction and transaction dashboard', correct: false }
+                        ],
+                        uvps: [
+                            { val: 'calibrated-15', text: 'Customized 15-minute home workouts calibrated by dynamic skeletal tracking', correct: true },
+                            { val: 'under-20', text: 'Hot gourmet meals delivered directly to your office desk in under 20 minutes', correct: false },
+                            { val: 'match-2hr', text: 'Guaranteed match with certified service providers within 2 hours of posting', correct: false }
+                        ]
+                    },
+                    'event-management': {
+                        title: 'SummitFlow: Event Management',
+                        targets: [
+                            { val: 'summit-planners', text: 'Corporate planning committees organizing annual summits', correct: true },
+                            { val: 'parents', text: 'Parents of school-aged children seeking academic support', correct: false },
+                            { val: 'tourists', text: 'Weekend vacationers seeking customized local travel guides', correct: false }
+                        ],
+                        problems: [
+                            { val: 'vendors', text: 'Opaque, fragmented vendor quotes requiring hundreds of manually sent emails', correct: true },
+                            { val: 'gym', text: 'High gym costs and lack of personal tracking causing workout abandonment', correct: false },
+                            { val: 'curriculum', text: 'Generic school curriculum failing to address individual learning gaps', correct: false }
+                        ],
+                        solutions: [
+                            { val: 'auction-dashboard', text: 'A unified B2B vendor auction and transaction dashboard', correct: true },
+                            { val: 'fit-app', text: 'Real-time body tracking mobile app with live coaching sessions', correct: false },
+                            { val: 'itinerary', text: 'Generative AI itinerary generator with direct API bookings integration', correct: false }
+                        ],
+                        uvps: [
+                            { val: 'match-2hr', text: 'Guaranteed match with certified service providers within 2 hours of posting requirements', correct: true },
+                            { val: 'under-3', text: 'A completely personalized, booked weekend getaway itinerary in under 3 minutes', correct: false },
+                            { val: 'guarantee-mastery', text: 'Guaranteed concept mastery with 24/7 access to qualified subject experts', correct: false }
+                        ]
+                    },
+                    'travel-planning': {
+                        title: 'WanderAI: Travel Planning',
+                        targets: [
+                            { val: 'tourists', text: 'Weekend vacationers seeking customized local travel guides', correct: true },
+                            { val: 'offices', text: 'Time-strapped office employees in dense urban centers', correct: false },
+                            { val: 'summit-planners', text: 'Corporate planning committees organizing annual summits', correct: false }
+                        ],
+                        problems: [
+                            { val: 'travel-tabs', text: 'Dozens of open travel tabs and generic, outdated tour packages', correct: true },
+                            { val: 'vendors', text: 'Opaque, fragmented vendor quotes requiring manual emails', correct: false },
+                            { val: 'gym', text: 'High gym costs and lack of personal tracking causing workout abandonment', correct: false }
+                        ],
+                        solutions: [
+                            { val: 'itinerary', text: 'Generative AI itinerary generator with direct API bookings integration', correct: true },
+                            { val: 'auction-dashboard', text: 'A unified B2B vendor auction and transaction dashboard', correct: false },
+                            { val: 'tutor-app', text: 'AI-driven virtual tutor matching platform with live video tools', correct: false }
+                        ],
+                        uvps: [
+                            { val: 'under-3', text: 'A completely personalized, booked weekend getaway itinerary in under 3 minutes', correct: true },
+                            { val: 'match-2hr', text: 'Guaranteed match with certified service providers within 2 hours of posting', correct: false },
+                            { val: 'under-20', text: 'Hot gourmet meals delivered directly to your office desk in under 20 minutes', correct: false }
+                        ]
+                    }
+                }
+            },
+
+            // Level 2 variables
+            l2: {
+                selectedStartup: null,
+                pairings: {
+                    'music': null,
+                    'food': null,
+                    'education': null,
+                    'freelance': null,
+                    'ecommerce': null
+                },
+                startups: [
+                    { id: 'music', name: 'SoundStream: Music Streaming App', correctModel: 'subscription' },
+                    { id: 'food', name: 'QuickServe: Food Delivery Platform', correctModel: 'transaction-fee' },
+                    { id: 'education', name: 'LearnFlow: Online Learning Platform', correctModel: 'freemium' },
+                    { id: 'freelance', name: 'GigHub: Freelancer Marketplace', correctModel: 'marketplace' },
+                    { id: 'ecommerce', name: 'ThreadStyle: E-commerce Store', correctModel: 'd2c' }
+                ],
+                models: [
+                    { id: 'subscription', title: 'Subscription Model', desc: 'Enforces recurring periodic charges for continuous cloud interface access.' },
+                    { id: 'freemium', title: 'Freemium Model', desc: 'Distributes core services for free to scale users, charging for advanced tiers.' },
+                    { id: 'marketplace', title: 'Marketplace Model', desc: 'Double-sided platform matching freelance talent to business transaction buyers.' },
+                    { id: 'transaction-fee', title: 'Transaction Fee Model', desc: 'Captures direct commission slices or flat fees on payments routed.' },
+                    { id: 'd2c', title: 'Direct-to-Consumer (D2C)', desc: 'Manufactures and sells branded products directly to end consumers online.' }
+                ],
+                explanations: {
+                    'music-subscription': 'Music Streaming: Enforces recurring monthly charges for continuous cloud access, stabilizing cash flows and funding royalty licensing structures.',
+                    'food-transaction-fee': 'Food Delivery: Captures a commission slice on every order routed between consumer, kitchen, and courier, tying growth directly to transaction velocity.',
+                    'education-freemium': 'Online Learning: Distributes core lecture videos for free to scale user acquisition, while charging fees for premium graded certificates and live tutor access.',
+                    'freelance-marketplace': 'Freelancer Marketplace: Acts as a double-sided platform matching independent talent with business buyers, collecting fees on project completion escrow.',
+                    'ecommerce-d2c': 'E-Commerce Store: Eliminates distributor middlemen by manufacturing and retailing products directly through custom websites, maximizing operating margins and brand control.'
+                }
+            },
+
+            // Level 3 variables
+            l3: {
+                selectedStrategy: null,
+                placements: {
+                    acquisition: null,
+                    retention: null,
+                    revenue: null,
+                    brand: null
+                },
+                pool: [
+                    { id: 'social', text: 'Social Media Marketing', effects: { reach: 25, revenue: 10, loyalty: 5 } },
+                    { id: 'referral', text: 'Referral Programs Plan', effects: { reach: 15, revenue: 5, loyalty: 15 } },
+                    { id: 'discounts', text: 'Promotional Discounts', effects: { reach: 10, revenue: 20, loyalty: -10 } },
+                    { id: 'loyalty', text: 'Loyalty Points System', effects: { reach: 5, revenue: 10, loyalty: 30 } },
+                    { id: 'content', text: 'In-Depth Content Marketing', effects: { reach: 20, revenue: 5, loyalty: 15 } },
+                    { id: 'influencer', text: 'Influencer Campaigns', effects: { reach: 35, revenue: 15, loyalty: 5 } },
+                    { id: 'email', text: 'Targeted Email Workflows', effects: { reach: 5, revenue: 10, loyalty: 20 } }
+                ],
+                metrics: {
+                    reach: 0,
+                    revenue: 0,
+                    loyalty: 0
+                }
+            },
+
+            // Level 4 variables
+            l4: {
+                selectedAnswer: null,
+                slides: {
+                    problem: null,
+                    solution: null,
+                    target: null,
+                    revenue: null,
+                    advantage: null
+                },
+                answers: [
+                    { id: 'a-problem', text: 'Fragmented services and lack of transparent vendor pricing structures.', slide: 'problem', question: 'Q: What customer pain point are you solving?' },
+                    { id: 'a-solution', text: 'An automated, instant-matching mobile platform built with secure APIs.', slide: 'solution', question: 'Q: What makes your startup unique?' },
+                    { id: 'a-target', text: 'Tech-savvy urban professionals aged 22-45 in dense metros.', slide: 'target', question: 'Q: Who is your primary customer segment?' },
+                    { id: 'a-revenue', text: 'A monthly subscription model combined with transaction commission cuts.', slide: 'revenue', question: 'Q: How will your startup generate revenue?' },
+                    { id: 'a-advantage', text: 'Exclusive vendor network contracts and proprietary rating algorithms.', slide: 'advantage', question: 'Q: Who are your competitors and how will you defend your position?' }
+                ]
+            },
+
+            // Level 5 variables
+            l5: {
+                month: 1,
+                status: 'idle',
+                timerId: null,
+                kpis: {
+                    users: 50,
+                    revenue: 50,
+                    satisfaction: 60,
+                    awareness: 50,
+                    confidence: 60
+                },
+                logs: [],
+                activeEvent: null,
+                historyChoices: [],
+                events: {
+                    2: {
+                        badge: 'Traffic Wave',
+                        title: 'App Suddenly Goes Viral',
+                        desc: 'An organic post triggers a massive influx of users. System servers report heavy latency warning.',
+                        options: [
+                            {
+                                text: 'Scale database and server capacity immediately to avoid operational outages.',
+                                impact: { satisfaction: 25, revenue: -15, users: 20, confidence: 10 },
+                                log: 'Month 2 Choice: Scaled infrastructure. Maintained checkout speeds but incurred capital costs.'
+                            },
+                            {
+                                text: 'Invest heavily in user-acquisition ads instead to sustain viral growth.',
+                                impact: { satisfaction: -20, revenue: 10, users: 30, awareness: 25 },
+                                log: 'Month 2 Choice: Funneled funds into ads. Increased user base but platform outages annoyed core clients.'
+                            }
+                        ]
+                    },
+                    4: {
+                        badge: 'Capital Opportunity',
+                        title: 'Incubator Funding Offer',
+                        desc: 'Venture Capital firms offer an investment injection in exchange for platform board dilution.',
+                        options: [
+                            {
+                                text: 'Accept VC offer of ₹1,00,000 for 20% equity.',
+                                impact: { confidence: 25, revenue: 30, satisfaction: 5, awareness: 10 },
+                                log: 'Month 4 Choice: Secured Venture capital. Capital reserve is high but founder controls are reduced.'
+                            },
+                            {
+                                text: 'Bootstrap and fund growth organically from transaction profits.',
+                                impact: { confidence: -10, revenue: -15, satisfaction: -5, users: 10 },
+                                log: 'Month 4 Choice: Bootstrap chosen. Financial buffers are tight, limiting operational scaling.'
+                            }
+                        ]
+                    },
+                    6: {
+                        badge: 'Competitor Alert',
+                        title: 'Rival Platform Launches Clone',
+                        desc: 'Apex Corp launches a similar service at lower prices, targeting your core market.',
+                        options: [
+                            {
+                                text: 'Launch aggressive discount promo campaigns to retain clients.',
+                                impact: { revenue: -20, satisfaction: 20, confidence: 10, awareness: 5 },
+                                log: 'Month 6 Choice: Price matched competitor. Preserved base users but cash reserves fell.'
+                            },
+                            {
+                                text: 'Fast-track unique feature updates to improve value proposition.',
+                                impact: { users: 25, satisfaction: 15, confidence: 15, awareness: 10 },
+                                log: 'Month 6 Choice: Focused on product quality. Attracted new premium users and defended niche.'
+                            }
+                        ]
+                    },
+                    8: {
+                        badge: 'Marketing Boom',
+                        title: 'Celebrity Endorsement Pitch',
+                        desc: 'A prominent industry influencer offers to endorse your startup for custom commissions.',
+                        options: [
+                            {
+                                text: 'Pay upfront fee for high-impact promotional campaign.',
+                                impact: { revenue: -15, awareness: 30, users: 20, confidence: 5 },
+                                log: 'Month 8 Choice: Sponsored influencer post. Reached massive audiences, yielding a user surge.'
+                            },
+                            {
+                                text: 'Offer organic revenue-share affiliate coupons.',
+                                impact: { revenue: -5, awareness: 10, users: 10, confidence: 5 },
+                                log: 'Month 8 Choice: Created affiliate loops. Risk minimized, though audience reach was modest.'
+                            }
+                        ]
+                    },
+                    10: {
+                        badge: 'Retention Slump',
+                        title: 'User Retention Engagement Drops',
+                        desc: 'Dashboard indicators show weekly active usage drop by 15%. Feedbacks complain about UI confusion.',
+                        options: [
+                            {
+                                text: 'Redesign platform interface screens based on UX feedback.',
+                                impact: { satisfaction: 25, revenue: -10, users: 15, confidence: 10 },
+                                log: 'Month 10 Choice: Revamped UI/UX flow. Recovered customer satisfaction levels.'
+                            },
+                            {
+                                text: 'Launch automated email marketing coupons.',
+                                impact: { revenue: 15, satisfaction: 5, users: 5, confidence: -5 },
+                                log: 'Month 10 Choice: Emailed discount codes. Short-term transaction spike but UI remained confusing.'
+                            }
+                        ]
+                    },
+                    11: {
+                        badge: 'Customer Request',
+                        title: 'Feature Request Influx',
+                        desc: 'Large clients request customized analytics integrations to stay on the platform.',
+                        options: [
+                            {
+                                text: 'Hire additional developers to build customized modules.',
+                                impact: { revenue: -20, satisfaction: 25, confidence: 10, users: 10 },
+                                log: 'Month 11 Choice: Built customized modules. Retained large clients but operating costs surged.'
+                            },
+                            {
+                                text: 'Delay custom integrations to protect monthly cash reserves.',
+                                impact: { revenue: 10, satisfaction: -15, confidence: -15, users: -5 },
+                                log: 'Month 11 Choice: Postponed integrations. Margins preserved but primary accounts churned.'
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Initialize Onboarding Page
+        window.addEventListener('DOMContentLoaded', () => {
+            initLevel1();
+            initLevel2();
+            initLevel3();
+            initLevel4();
+            updateNavigationPills();
+        });
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✓';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '🚨';
+
+            toast.innerHTML = `<span>${icon}</span><div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Stepper Navigation
+        function updateNavigationPills() {
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                const divider = document.getElementById(`step-div-${i}`);
+                const badge = btn.querySelector('.step-badge');
+
+                btn.className = 'step-item';
+                if (divider) divider.className = 'step-divider';
+
+                badge.innerText = i;
+                if (state.currentLevel === i) {
+                    btn.classList.add('active');
+                }
+
+                if (state.completedLevels[i - 1]) {
+                    btn.classList.add('completed');
+                    if (divider) divider.classList.add('completed');
+                } else {
+                    if (divider && state.currentLevel > i) {
+                        divider.classList.add('active');
+                    }
+                }
+            }
+
+            // Update bottom nav footer details
+            const prevBtn = document.getElementById('footerPrevBtn');
+            const nextBtn = document.getElementById('footerNextBtn');
+            const levelText = document.getElementById('footerLevelText');
+
+            if (prevBtn && nextBtn && levelText) {
+                levelText.innerText = `Level ${state.currentLevel} of 5`;
+                prevBtn.disabled = (state.currentLevel === 1);
+                nextBtn.disabled = (state.currentLevel === 5);
+            }
+        }
+
+        function navigateToLevel(levelIndex) {
+            document.querySelector('.screen.active').classList.remove('active');
+            state.currentLevel = levelIndex;
+
+            let targetId = `screen-l${levelIndex}`;
+            document.getElementById(targetId).classList.add('active');
+
+            document.getElementById('navigationFooter').style.display = 'flex';
+
+            updateNavigationPills();
+            showToast(`Switched to Command Panel Level ${levelIndex}`, 'info');
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 5) {
+                navigateToLevel(state.currentLevel + 1);
+            }
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1) {
+                navigateToLevel(state.currentLevel - 1);
+            }
+        }
+
+        function startSimulation() {
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            document.getElementById('navigationFooter').style.display = 'flex';
+            navigateToLevel(1);
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        // Help Manual Controls
+        const helpDialog = document.getElementById('help-manual-dialog');
+        function showHelpManual() { helpDialog.showModal(); }
+        function closeHelpManual() { helpDialog.close(); }
+
+        // LEVEL 1 LOGIC
+        function initLevel1() {
+            selectL1Idea('online-tutoring');
+        }
+
+        function selectL1Idea(ideaId) {
+            state.l1.activeIdea = ideaId;
+
+            // Adjust buttons active state
+            document.querySelectorAll('.l1-idea-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Get active target button (in case click didn't trigger via custom dispatch)
+            const targetBtn = Array.from(document.querySelectorAll('.l1-idea-btn')).find(b => b.outerHTML.includes(ideaId));
+            if (targetBtn) targetBtn.classList.add('active');
+            else {
+                // Fallback just in case
+                if (event && event.currentTarget) event.currentTarget.classList.add('active');
+            }
+
+            const activeData = state.l1.data[ideaId];
+            document.getElementById('l1-canvas-title').innerText = `${activeData.title} Canvas Opportunity`;
+
+            // Reset canvas state selectors
+            state.l1.selectedTarget = 'none';
+            state.l1.selectedProblem = 'none';
+            state.l1.selectedSolution = 'none';
+            state.l1.selectedUvp = 'none';
+
+            document.getElementById('startup-card').style.display = 'none';
+            document.getElementById('l1-next-btn').disabled = true;
+
+            // Load selects
+            populateL1Select('canvas-target', activeData.targets, 'Select Target Segment');
+            populateL1Select('canvas-problem', activeData.problems, 'Select Customer Pain Point');
+            populateL1Select('canvas-solution', activeData.solutions, 'Select Digital Platform System');
+            populateL1Select('canvas-uvp', activeData.uvps, 'Select Value Proposition');
+        }
+
+        function populateL1Select(elementId, items, placeholder) {
+            const select = document.getElementById(elementId);
+            select.innerHTML = `<option value="none">-- ${placeholder} --</option>`;
+
+            // Shuffle drop-downs slightly to keep interaction interesting
+            const shuffled = [...items].sort(() => Math.random() - 0.5);
+            shuffled.forEach(item => {
+                select.innerHTML += `<option value="${item.val}">${item.text}</option>`;
+            });
+        }
+
+        function checkL1Completeness() {
+            state.l1.selectedTarget = document.getElementById('canvas-target').value;
+            state.l1.selectedProblem = document.getElementById('canvas-problem').value;
+            state.l1.selectedSolution = document.getElementById('canvas-solution').value;
+            state.l1.selectedUvp = document.getElementById('canvas-uvp').value;
+        }
+
+        function verifyL1Canvas() {
+            checkL1Completeness();
+            if (state.l1.selectedTarget === 'none' || state.l1.selectedProblem === 'none' ||
+                state.l1.selectedSolution === 'none' || state.l1.selectedUvp === 'none') {
+                showToast("Audit all categories on the Canvas before validating.", "warning");
+                return;
+            }
+
+            const activeData = state.l1.data[state.l1.activeIdea];
+            const targetCorrect = activeData.targets.find(t => t.val === state.l1.selectedTarget).correct;
+            const problemCorrect = activeData.problems.find(p => p.val === state.l1.selectedProblem).correct;
+            const solutionCorrect = activeData.solutions.find(s => s.val === state.l1.selectedSolution).correct;
+            const uvpCorrect = activeData.uvps.find(u => u.val === state.l1.selectedUvp).correct;
+
+            if (targetCorrect && problemCorrect && solutionCorrect && uvpCorrect) {
+                showToast("Opportunity Canvas validated!", "success");
+
+                // Render Startup Card
+                const card = document.getElementById('startup-card');
+                document.getElementById('startup-card-title').innerText = activeData.title;
+                document.getElementById('card-market').innerText = activeData.targets.find(t => t.val === state.l1.selectedTarget).text;
+                document.getElementById('card-problem').innerText = activeData.problems.find(p => p.val === state.l1.selectedProblem).text;
+                document.getElementById('card-solution').innerText = activeData.solutions.find(s => s.val === state.l1.selectedSolution).text;
+                document.getElementById('card-uvp').innerText = activeData.uvps.find(u => u.val === state.l1.selectedUvp).text;
+                card.style.display = 'flex';
+
+                state.completedLevels[0] = true;
+                document.getElementById('l1-next-btn').disabled = false;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(1), 1000);
+            } else {
+                showToast("Mismatch in Strategy! Selected values do not resolve the primary pain point.", "danger");
+            }
+        }
+
+        function resetLevel1() {
+            initLevel1();
+        }
+
+        // LEVEL 2 LOGIC
+        function initLevel2() {
+            state.l2.selectedStartup = null;
+            for (let key in state.l2.pairings) state.l2.pairings[key] = null;
+            state.completedLevels[1] = false;
+            document.getElementById('l2-next-btn').disabled = true;
+            renderLevel2();
+        }
+
+        function renderLevel2() {
+            const leftContainer = document.getElementById('l2-startups-list');
+            const rightContainer = document.getElementById('l2-models-list');
+
+            leftContainer.innerHTML = '';
+            rightContainer.innerHTML = '';
+
+            // Draw startups
+            state.l2.startups.forEach((st) => {
+                const card = document.createElement('div');
+                const paired = state.l2.pairings[st.id] !== null;
+                card.className = `l2-item-card ${state.l2.selectedStartup === st.id ? 'selected' : ''} ${paired ? 'paired' : ''}`;
+
+                let modelLabel = '';
+                if (paired) {
+                    const matchedModel = state.l2.models.find(m => m.id === state.l2.pairings[st.id]);
+                    modelLabel = `<span style="font-size:0.75rem; font-weight:700; color:var(--success);">Paired: ${matchedModel.title}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <span style="font-weight:700; font-size:0.92rem;">${st.name}</span>
+                        ${modelLabel}
+                    </div>
+                    <span>➔</span>
+                `;
+
+                if (!paired) {
+                    card.addEventListener('click', () => selectL2Startup(st.id));
+                }
+                leftContainer.appendChild(card);
+            });
+
+            // Draw Models
+            state.l2.models.forEach((model) => {
+                const isUsedKey = Object.keys(state.l2.pairings).find(k => state.l2.pairings[k] === model.id);
+                const isUsed = isUsedKey !== undefined;
+
+                const target = document.createElement('div');
+                target.className = `l2-model-target ${isUsed ? 'occupied' : ''}`;
+
+                let modelHTML = `
+                    <div class="model-name">${model.title}</div>
+                    <div class="model-desc">${model.desc}</div>
+                `;
+
+                if (isUsed) {
+                    const explanationKey = `${isUsedKey}-${model.id}`;
+                    modelHTML += `
+                        <div class="model-pairing-text">✓ Paired and Verified</div>
+                        <div style="font-size:0.75rem; margin-top:4px; line-height:1.3; color:var(--text-muted);">${state.l2.explanations[explanationKey]}</div>
+                    `;
+                }
+
+                target.innerHTML = modelHTML;
+
+                if (!isUsed) {
+                    target.addEventListener('click', () => pairL2Model(model.id));
+                }
+                rightContainer.appendChild(target);
+            });
+        }
+
+        function selectL2Startup(id) {
+            state.l2.selectedStartup = id;
+            renderLevel2();
+        }
+
+        function pairL2Model(modelId) {
+            if (!state.l2.selectedStartup) {
+                showToast("Select a digital startup on the left before pairing.", "warning");
+                return;
+            }
+
+            const st = state.l2.startups.find(s => s.id === state.l2.selectedStartup);
+            if (st.correctModel === modelId) {
+                showToast("Business model pairing successful!", "success");
+                state.l2.pairings[state.l2.selectedStartup] = modelId;
+                state.l2.selectedStartup = null;
+
+                // Check level completeness
+                let allMatched = true;
+                for (let k in state.l2.pairings) {
+                    if (state.l2.pairings[k] === null) allMatched = false;
+                }
+
+                if (allMatched) {
+                    state.completedLevels[1] = true;
+                    document.getElementById('l2-next-btn').disabled = false;
+                    updateNavigationPills();
+                    setTimeout(() => showSummaryDialog(2), 1000);
+                }
+            } else {
+                showToast("Inefficient model match. Unit economics do not fit the platform operations.", "danger");
+            }
+            renderLevel2();
+        }
+
+        function resetLevel2() {
+            initLevel2();
+        }
+
+
+        // LEVEL 3 LOGIC
+        function initLevel3() {
+            state.l3.selectedStrategy = null;
+            for (let key in state.l3.placements) state.l3.placements[key] = null;
+            state.l3.metrics = { reach: 0, revenue: 0, loyalty: 0 };
+            state.completedLevels[2] = false;
+            document.getElementById('l3-next-btn').disabled = true;
+            renderLevel3();
+        }
+
+        function renderLevel3() {
+            const pool = document.getElementById('l3-pool');
+            pool.innerHTML = '';
+
+            state.l3.pool.forEach((card) => {
+                const isPlaced = Object.values(state.l3.placements).some(c => c && c.id === card.id);
+
+                const cardEl = document.createElement('div');
+                cardEl.className = `strategy-card ${state.l3.selectedStrategy === card.id ? 'selected' : ''} ${isPlaced ? 'placed' : ''}`;
+                cardEl.innerText = card.text;
+
+                if (!isPlaced) {
+                    cardEl.addEventListener('click', () => selectL3Strategy(card.id));
+                }
+                pool.appendChild(cardEl);
+            });
+
+            // Render Buckets
+            renderL3Buckets();
+
+            // Recalculate and update dashboard
+            recalculateL3Metrics();
+        }
+
+        function selectL3Strategy(id) {
+            state.l3.selectedStrategy = id;
+            renderLevel3();
+        }
+
+        function renderL3Buckets() {
+            const buckets = ['acquisition', 'retention', 'revenue', 'brand'];
+            buckets.forEach((bKey) => {
+                const bDiv = document.getElementById(`bucket-${bKey}`);
+
+                // Clear old strategy cards
+                const placedCard = bDiv.querySelector('.strategy-bucket-card');
+                if (placedCard) placedCard.remove();
+
+                const strategy = state.l3.placements[bKey];
+                if (strategy) {
+                    const el = document.createElement('div');
+                    el.className = 'strategy-bucket-card';
+                    el.innerHTML = `
+                        <span>${strategy.text}</span>
+                        <span class="remove" onclick="removeL3Strategy('${bKey}', event)">✕</span>
+                    `;
+                    bDiv.appendChild(el);
+                }
+            });
+        }
+
+        function placeL3Strategy(bucketKey) {
+            if (!state.l3.selectedStrategy) return;
+
+            const strategy = state.l3.pool.find(c => c.id === state.l3.selectedStrategy);
+
+            // Assign
+            state.l3.placements[bucketKey] = strategy;
+            state.l3.selectedStrategy = null;
+
+            renderLevel3();
+        }
+
+        function removeL3Strategy(bucketKey, e) {
+            e.stopPropagation(); // prevent re-placing
+            state.l3.placements[bucketKey] = null;
+            renderLevel3();
+        }
+
+        function recalculateL3Metrics() {
+            let reach = 0;
+            let revenue = 0;
+            let loyalty = 0;
+
+            let placementsCount = 0;
+
+            for (let k in state.l3.placements) {
+                const strat = state.l3.placements[k];
+                if (strat) {
+                    reach += strat.effects.reach;
+                    revenue += strat.effects.revenue;
+                    loyalty += strat.effects.loyalty;
+                    placementsCount++;
+                }
+            }
+
+            // Constrain
+            reach = Math.min(100, reach);
+            revenue = Math.min(100, revenue);
+            loyalty = Math.min(100, loyalty);
+
+            state.l3.metrics = { reach, revenue, loyalty };
+
+            // Update UI
+            document.getElementById('l3-reach-val').innerText = `${reach}%`;
+            document.getElementById('l3-revenue-val').innerText = `${revenue}%`;
+            document.getElementById('l3-loyalty-val').innerText = `${loyalty}%`;
+
+            document.getElementById('l3-reach-bar').style.width = `${reach}%`;
+            document.getElementById('l3-revenue-bar').style.width = `${revenue}%`;
+            document.getElementById('l3-loyalty-bar').style.width = `${loyalty}%`;
+
+            // Win condition checks: balance metrics above 70%
+            if (placementsCount === 4) {
+                if (reach >= 70 && revenue >= 70 && loyalty >= 70) {
+                    showToast("Operational strategy matrix balanced!", "success");
+                    state.completedLevels[2] = true;
+                    document.getElementById('l3-next-btn').disabled = false;
+                    updateNavigationPills();
+                    setTimeout(() => showSummaryDialog(3), 1000);
+                } else {
+                    showToast("Strategies allocated, but operations are imbalanced. Adjust metrics to exceed 70%.", "warning");
+                }
+            } else {
+                document.getElementById('l3-next-btn').disabled = true;
+            }
+        }
+
+        function resetLevel3() {
+            initLevel3();
+        }
+
+
+        // LEVEL 4 LOGIC
+        function initLevel4() {
+            state.l4.selectedAnswer = null;
+            for (let key in state.l4.slides) state.l4.slides[key] = null;
+            state.completedLevels[3] = false;
+            document.getElementById('l4-next-btn').disabled = true;
+            renderLevel4();
+        }
+
+        function renderLevel4() {
+            const activeData = state.l1.data[state.l1.activeIdea];
+            const startupName = activeData ? activeData.title : 'Startup';
+            const startupSpan = document.getElementById('l4-startup-name');
+            if (startupSpan) startupSpan.innerText = startupName;
+
+            const list = document.getElementById('l4-questions');
+            list.innerHTML = '';
+
+            state.l4.answers.forEach((ans) => {
+                const isPlaced = Object.values(state.l4.slides).some(s => s && s.id === ans.id);
+
+                const card = document.createElement('div');
+                card.className = `l4-question-card ${state.l4.selectedAnswer === ans.id ? 'selected' : ''} ${isPlaced ? 'placed' : ''}`;
+
+                card.innerHTML = `
+                    <div style="font-weight:700; color:var(--accent-blue); font-size:0.8rem; margin-bottom:4px;">${ans.question}</div>
+                    <div>${ans.text}</div>
+                `;
+
+                if (!isPlaced) {
+                    card.addEventListener('click', () => selectL4Answer(ans.id));
+                }
+                list.appendChild(card);
+            });
+
+            // Render slides content
+            let correctMatchesCount = 0;
+
+            for (let slideKey in state.l4.slides) {
+                const slideDiv = document.getElementById(`slide-${slideKey}`);
+                const answerText = slideDiv.querySelector('.l4-slide-answer');
+
+                const matchedAnswer = state.l4.slides[slideKey];
+                if (matchedAnswer) {
+                    slideDiv.className = 'l4-slide occupied';
+                    answerText.innerText = matchedAnswer.text;
+                    correctMatchesCount++;
+                } else {
+                    slideDiv.className = 'l4-slide';
+                    answerText.innerText = 'Click an answer on the left to map here...';
+                }
+            }
+
+            // Confidence Meter
+            const confidencePercent = (correctMatchesCount / 5) * 100;
+            document.getElementById('l4-confidence-val').innerText = `${confidencePercent}%`;
+            document.getElementById('l4-confidence-bar').style.width = `${confidencePercent}%`;
+
+            if (correctMatchesCount === 5) {
+                showToast("Pitch deck fully validated!", "success");
+                state.completedLevels[3] = true;
+                document.getElementById('l4-next-btn').disabled = false;
+                updateNavigationPills();
+                setTimeout(() => showSummaryDialog(4), 1000);
+            }
+        }
+
+        function selectL4Answer(id) {
+            state.l4.selectedAnswer = id;
+            renderLevel4();
+        }
+
+        function placeL4Answer(slideKey) {
+            if (!state.l4.selectedAnswer) return;
+
+            const answer = state.l4.answers.find(a => a.id === state.l4.selectedAnswer);
+
+            // Validate if slide matches answer's correct mapping
+            if (answer.slide === slideKey) {
+                showToast("Slide details verified!", "success");
+                state.l4.slides[slideKey] = answer;
+                state.l4.selectedAnswer = null;
+                renderLevel4();
+            } else {
+                showToast("Deck feedback: Slide mismatch. This details does not resolve the slide objective.", "danger");
+            }
+        }
+
+        function resetLevel4() {
+            initLevel4();
+        }
+
+
+        // LEVEL 5: Startup Growth Simulator
+        function updateL5KPIs() {
+            const kpis = state.l5.kpis;
+            document.getElementById('kpi-users').innerText = kpis.users;
+            document.getElementById('kpi-revenue').innerText = kpis.revenue;
+            document.getElementById('kpi-satisfaction').innerText = kpis.satisfaction;
+            document.getElementById('kpi-awareness').innerText = kpis.awareness;
+            document.getElementById('kpi-confidence').innerText = kpis.confidence;
+
+            updateMeter('users', kpis.users);
+            updateMeter('revenue', kpis.revenue);
+            updateMeter('satisfaction', kpis.satisfaction);
+            updateMeter('awareness', kpis.awareness);
+            updateMeter('confidence', kpis.confidence);
+        }
+
+        function updateMeter(id, val) {
+            const fill = document.getElementById(`meter-${id}`);
+            fill.style.width = `${val}%`;
+
+            let target = 75;
+            if (id === 'users') target = 80;
+            if (id === 'satisfaction') target = 80;
+            if (id === 'confidence') target = 80;
+
+            if (val >= target) {
+                fill.style.backgroundColor = 'var(--success)';
+            } else if (val >= target - 15) {
+                fill.style.backgroundColor = 'var(--warning)';
+            } else {
+                fill.style.backgroundColor = 'var(--danger)';
+            }
+        }
+
+        function startL5Ticker() {
+            if (state.l5.status === 'running') return;
+
+            state.l5.status = 'running';
+            document.getElementById('console-status-dot').className = 'console-status-dot';
+            document.getElementById('console-status-text').innerText = 'OPERATIONAL // SIMULATING GROWTH';
+            document.getElementById('l5-start-btn').disabled = true;
+            document.getElementById('l5-pause-btn').disabled = false;
+
+            logToTerminal(`[SYSTEM] Starting 12-Month Startup Growth Operations Ticker...`, 'success');
+
+            state.l5.timerId = setInterval(() => {
+                if (state.l5.month < 12) {
+                    state.l5.month++;
+                    document.getElementById('console-month-ticker').innerText = `MONTH ${state.l5.month} OF 12`;
+
+                    applyDailyFriction();
+
+                    if (state.l5.events[state.l5.month]) {
+                        triggerL5Incident(state.l5.month);
+                    } else {
+                        logToTerminal(`Month ${state.l5.month}: Processing subscription payments... Active users at ${state.l5.kpis.users}.`);
+                    }
+                } else {
+                    endL5Simulation();
+                }
+            }, 1200);
+        }
+
+        function pauseL5Ticker() {
+            if (state.l5.status !== 'running') return;
+
+            clearInterval(state.l5.timerId);
+            state.l5.status = 'paused';
+            document.getElementById('console-status-dot').className = 'console-status-dot paused';
+            document.getElementById('console-status-text').innerText = 'OPERATIONAL // TICKER PAUSED';
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-start-btn').innerText = 'Resume simulator';
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            logToTerminal(`[SYSTEM] Operations ticker paused by founder.`, 'alert');
+        }
+
+        function applyDailyFriction() {
+            const k = state.l5.kpis;
+            k.users = Math.min(100, Math.max(0, k.users + (Math.random() > 0.65 ? 1 : -1)));
+            k.satisfaction = Math.min(100, Math.max(0, k.satisfaction + (Math.random() > 0.5 ? 0 : -1)));
+            updateL5KPIs();
+        }
+
+        function logToTerminal(text, type = '') {
+            const terminal = document.getElementById('l5-terminal-ticker');
+            const row = document.createElement('div');
+            row.className = `terminal-row ${type}`;
+            row.innerText = text;
+            terminal.appendChild(row);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function triggerL5Incident(month) {
+            pauseL5Ticker();
+
+            const event = state.l5.events[month];
+            state.l5.activeEvent = event;
+
+            const overlay = document.getElementById('l5-incident-overlay');
+            overlay.style.display = 'flex';
+
+            document.getElementById('inc-title').innerText = event.title;
+            document.getElementById('inc-desc').innerText = event.desc;
+
+            const optionsBox = document.getElementById('inc-options');
+            optionsBox.innerHTML = '';
+
+            event.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'incident-opt-btn';
+
+                let impacts = [];
+                for (let k in opt.impact) {
+                    let sign = opt.impact[k] >= 0 ? '+' : '';
+                    impacts.push(`${k.toUpperCase()} ${sign}${opt.impact[k]}`);
+                }
+
+                btn.innerHTML = `
+                    <span class="incident-opt-title">${idx === 0 ? 'Option A' : 'Option B'}: ${opt.text}</span>
+                    <span class="incident-opt-impact">Estimated Projections: ${impacts.join(', ')}</span>
+                `;
+
+                btn.addEventListener('click', () => makeL5Decision(idx));
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function makeL5Decision(optIndex) {
+            const event = state.l5.activeEvent;
+            const option = event.options[optIndex];
+
+            // Apply impacts
+            for (let key in option.impact) {
+                state.l5.kpis[key] = Math.min(100, Math.max(0, state.l5.kpis[key] + option.impact[key]));
+            }
+
+            state.l5.historyChoices.push(option.log);
+            updateL5KPIs();
+
+            document.getElementById('l5-incident-overlay').style.display = 'none';
+
+            logToTerminal(`[CHOICE] Month ${state.l5.month}: ${option.text.substring(0, 45)}...`, 'success');
+            logToTerminal(`[SYSTEM] ${option.log}`, 'alert');
+
+            startL5Ticker();
+        }
+
+        function endL5Simulation() {
+            clearInterval(state.l5.timerId);
+            state.l5.status = 'ended';
+
+            document.getElementById('console-status-dot').className = 'console-status-dot';
+            document.getElementById('console-status-dot').style.backgroundColor = '#666';
+            document.getElementById('console-status-text').innerText = 'OPERATIONAL // HARVEST STAGE';
+
+            logToTerminal(`[SYSTEM] 12-Month virtual cycle completed. Operations scorecard compiled.`, 'success');
+
+            showL5Scorecard();
+        }
+
+        function showL5Scorecard() {
+            const kpis = state.l5.kpis;
+            const dialog = document.getElementById('scorecard-dialog');
+
+            const metUsers = kpis.users >= 80;
+            const metRevenue = kpis.revenue >= 75;
+            const metSatisfaction = kpis.satisfaction >= 80;
+            const metAwareness = kpis.awareness >= 75;
+            const metConfidence = kpis.confidence >= 80;
+
+            const allMet = metUsers && metRevenue && metSatisfaction && metAwareness && metConfidence;
+
+            const banner = document.getElementById('scorecard-banner');
+            const title = document.getElementById('scorecard-status');
+            const desc = document.getElementById('scorecard-desc');
+
+            if (allMet) {
+                banner.className = 'scorecard-banner success';
+                title.innerText = 'Successful Digital Startup Created';
+                desc.innerText = 'Your startup successfully built a sustainable digital business strategy.';
+            } else {
+                banner.className = 'scorecard-banner fail';
+                title.innerText = 'Startup Needs Better Strategic Planning';
+                desc.innerText = 'Your startup struggled to grow sustainably and satisfy Board thresholds.';
+            }
+
+            const strengthsList = document.getElementById('scorecard-strengths-list');
+            const weaknessesList = document.getElementById('scorecard-weaknesses-list');
+            strengthsList.innerHTML = '';
+            weaknessesList.innerHTML = '';
+
+            if (metUsers) strengthsList.innerHTML += `<li><strong>Active Users (${kpis.users})</strong>: Scaled market share efficiently without server outages.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Active Users (${kpis.users})</strong>: System outages or low marketing failed to retain platform users.</li>`;
+
+            if (metRevenue) strengthsList.innerHTML += `<li><strong>Revenue Index (${kpis.revenue})</strong>: Built stable monthly operating margins.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Revenue Index (${kpis.revenue})</strong>: High operating costs or pricing wars reduced cash reserves.</li>`;
+
+            if (metSatisfaction) strengthsList.innerHTML += `<li><strong>Customer Satisfaction (${kpis.satisfaction})</strong>: Resolved UI bugs and customization requests quickly.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Customer Satisfaction (${kpis.satisfaction})</strong>: Confusing UI designs or unaddressed feature requests drove churn.</li>`;
+
+            if (metAwareness) strengthsList.innerHTML += `<li><strong>Brand Awareness (${kpis.awareness})</strong>: Leveraged influencers and viral loops.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Brand Awareness (${kpis.awareness})</strong>: Weak promotion failed to reach target segments.</li>`;
+
+            if (metConfidence) strengthsList.innerHTML += `<li><strong>Investor Confidence (${kpis.confidence})</strong>: Protected equity and maintained roadmap control.</li>`;
+            else weaknessesList.innerHTML += `<li><strong>Investor Confidence (${kpis.confidence})</strong>: Failed to secure VC interest or bootstrapped controls poorly.</li>`;
+
+            dialog.showModal();
+        }
+
+        function resetFullSimulation() {
+            state.l5.month = 1;
+            state.l5.status = 'idle';
+            state.l5.kpis = { users: 50, revenue: 50, satisfaction: 60, awareness: 50, confidence: 60 };
+            state.l5.historyChoices = [];
+
+            document.getElementById('console-month-ticker').innerText = 'MONTH 1 OF 12';
+            document.getElementById('l5-terminal-ticker').innerHTML = `
+                <div class="terminal-row">[SYSTEM] Incubator simulators connected.</div>
+                <div class="terminal-row">[SYSTEM] Startup CSO parameters established.</div>
+                <div class="terminal-row">[SYSTEM] Select "Launch 12-Month Cycle" to start operations ticker.</div>
+            `;
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-start-btn').innerText = 'Launch 12-Month Cycle';
+            document.getElementById('l5-pause-btn').disabled = true;
+            document.getElementById('scorecard-dialog').close();
+
+            updateL5KPIs();
+        }
+
+
+        // LEARNING SUMMARY SYSTEM
+        const summaries = {
+            1: {
+                title: "Level 1 Complete: Opportunity Definition Canvas",
+                body: `
+                    <p><strong>Building Startup Canvas Structures</strong></p>
+                    <p>Before writing code, founders must validate business opportunities. A strong canvas answers:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Target Segment:</strong> The specific customer segment experiencing pain.</li>
+                        <li><strong>Customer Pain Point:</strong> The core bottleneck (e.g. slow logistics or fragmented vendor quotes).</li>
+                        <li><strong>Digital Platform:</strong> The technology tool designed to automate processes (e.g. generative AI or bidding networks).</li>
+                        <li><strong>Value Proposition:</strong> The quantitative benefit (e.g. delivery in 20 minutes) that drives consumer conversions.</li>
+                    </ul>
+                `
+            },
+            2: {
+                title: "Level 2 Complete: Digital Business Revenue Models",
+                body: `
+                    <p><strong>Revenue Model Architecture</strong></p>
+                    <p>Business models dictate operational scalability. Key structures include:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Subscription Model:</strong> Establishes recurring cash flows to finance platform R&D and licensing.</li>
+                        <li><strong>Freemium Model:</strong> Distributes core components for free to acquire volume, charging for certifications or advanced access.</li>
+                        <li><strong>Transaction Fee Model:</strong> Charges margins on individual transactions, capturing direct fractions of routed value.</li>
+                        <li><strong>Marketplace Model:</strong> Connects buyer and seller nodes directly while minimizing inventory storage overhead.</li>
+                        <li><strong>D2C (Direct-to-Consumer):</strong> Manufactures and sells directly through platforms, bypassing distributors to capture higher margins.</li>
+                    </ul>
+                `
+            },
+            3: {
+                title: "Level 3 Complete: Strategy War Room Mechanics",
+                body: `
+                    <p><strong>Allocating Strategy Resources</strong></p>
+                    <p>A digital business strategy coordinates acquisition, retention, brand building, and monetization channels. Imbalances lead to failure:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li>Acquiring too fast without UI tracking creates a leaking bucket (high churn).</li>
+                        <li>Discount campaigns boost reach and immediate volume but degrade margins and long-term customer loyalty.</li>
+                        <li>Loyalty programs and email retention campaigns stabilize active usage metrics, protecting acquisition margins.</li>
+                    </ul>
+                `
+            },
+            4: {
+                title: "Level 4 Complete: Investor Pitch Preparation",
+                body: `
+                    <p><strong>Drafting the Investor Presentation</strong></p>
+                    <p>Preparing a pitch deck requires translating business metrics into strategic narratives. The deck must address:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>The Pain Point:</strong> Verifiable industry bottlenecks.</li>
+                        <li><strong>The Platform Solution:</strong> The unique technical solution built to scale.</li>
+                        <li><strong>The Addressable Market:</strong> Clear target buyer demographics.</li>
+                        <li><strong>The Revenue Model:</strong> Unit economics and monetization strategies.</li>
+                        <li><strong>The Competitive Advantage:</strong> Defensive moats like proprietary tech or exclusive vendor contracts.</li>
+                    </ul>
+                `
+            }
+        };
+
+        const summaryDialog = document.getElementById('summary-dialog');
+        function showSummaryDialog(levelIndex) {
+            const data = summaries[levelIndex];
+            document.getElementById('summary-dialog-title').innerText = data.title;
+            document.getElementById('summary-dialog-content').innerHTML = data.body;
+
+            document.getElementById('summary-next-btn').setAttribute('data-target-level', levelIndex + 1);
+            summaryDialog.showModal();
+        }
+
+        function confirmSummaryNextLevel() {
+            const nextLevel = parseInt(event.target.getAttribute('data-target-level'));
+            summaryDialog.close();
+
+            if (nextLevel <= 5) {
+                navigateToLevel(nextLevel);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,1 +1,3478 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 5.3 Simulation - Objective Setting & Value Creation</title>
+    <meta name="description"
+        content="An interactive strategic management simulation for DBT Module 5.3. Act as the Chief Value Officer of ValueHub, formulate SMART goals, balance stakeholder satisfaction, and command value chains.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #F57C00;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Stepper Progress Bar (Unlocked Globally) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .step-item.unlocked {
+            color: var(--text-dark);
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            opacity: 1;
+        }
+
+        .step-item.completed {
+            color: var(--success);
+            opacity: 1;
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.unlocked .step-badge {
+            background-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+            max-width: 120px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        .step-divider.completed {
+            background-color: var(--success);
+        }
+
+        /* Main Workspace Container */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Panels */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons & Interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-red-light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Native Dialog (Modal) Styles */
+        dialog {
+            margin: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            font-family: var(--font-body);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .dialog-body {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Welcome Onboarding */
+        .welcome-memo {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #FFCDD2;
+            padding-bottom: 16px;
+        }
+
+        .memo-logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .memo-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .memo-body {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memo-highlight {
+            background-color: var(--primary-red-light);
+            border-left: 4px solid var(--primary-red);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Objective Box */
+        .objective-box {
+            background-color: #ECEFF1;
+            border-left: 4px solid #455A64;
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .objective-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #37474F;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Persistent Navigation Footer */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            /* Flex when active */
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Toast notifications styling */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background-color: #333333;
+            color: var(--white);
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .toast.success {
+            border-left: 5px solid var(--success);
+        }
+
+        .toast.warning {
+            border-left: 5px solid var(--warning);
+        }
+
+        .toast.danger {
+            border-left: 5px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        /* LEVEL 1: SMART Objective Architect */
+        .l1-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .goals-list {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .goal-item-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .goal-item-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .goal-item-btn.active {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+            border-left: 5px solid var(--primary-red);
+        }
+
+        .goal-item-btn.completed {
+            border-left: 5px solid var(--success);
+            background-color: var(--success-light);
+            color: var(--success);
+            cursor: default;
+        }
+
+        .goal-item-btn.completed:hover {
+            background-color: var(--success-light);
+            border-color: var(--success);
+        }
+
+        .builder-workspace {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .builder-component-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .builder-component-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+
+        .component-label {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .builder-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        .builder-select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        .repaired-objectives-card {
+            border: 2px solid var(--success);
+            border-radius: var(--radius-lg);
+            background-color: var(--success-light);
+            padding: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            animation: cardSlideUp 0.4s ease-out forwards;
+        }
+
+        .repaired-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--success);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .repaired-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        /* LEVEL 2: Stakeholder Balance Board */
+        .l2-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l2-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .circle-board-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            min-height: 480px;
+            position: relative;
+        }
+
+        /* Stakeholder Circle Graphic */
+        .stakeholder-circle-graphic {
+            width: 100%;
+            max-width: 440px;
+            height: auto;
+        }
+
+        .circle-sector {
+            fill: #ECEFF1;
+            stroke: var(--white);
+            stroke-width: 4;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .circle-sector:hover {
+            fill: #CFD8DC;
+        }
+
+        .circle-sector.active-selection {
+            stroke: var(--primary-red);
+            stroke-width: 5;
+        }
+
+        .circle-sector.occupied {
+            fill: var(--accent-blue-light);
+            stroke: var(--accent-blue);
+            stroke-width: 4;
+        }
+
+        .circle-label {
+            font-family: var(--font-display);
+            font-size: 12px;
+            font-weight: 700;
+            fill: #37474F;
+            pointer-events: none;
+            text-anchor: middle;
+        }
+
+        .circle-center {
+            fill: var(--white);
+            stroke: var(--border-color);
+            stroke-width: 2;
+        }
+
+        .initiative-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .initiative-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .initiative-card.selected {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+            outline: 2px solid var(--primary-red);
+        }
+
+        .initiative-card.placed {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* LEVEL 3: Value Chain Builder */
+        .value-chain-container {
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+
+        .value-chain-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 900px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .value-chain-stage {
+            background: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            width: 140px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .value-chain-stage:hover {
+            border-color: var(--primary-red);
+            background-color: var(--bg-light);
+        }
+
+        .value-chain-stage.occupied {
+            border-style: solid;
+            border-color: var(--success);
+            background-color: var(--success-light);
+        }
+
+        .stage-title {
+            font-family: var(--font-display);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+        }
+
+        .stage-arrow {
+            color: var(--border-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Pulse trace animation styles */
+        .chain-pulse-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-red);
+            border-radius: 50%;
+            top: 50%;
+            left: 70px;
+            transform: translateY(-50%);
+            box-shadow: 0 0 10px var(--primary-red);
+            z-index: 10;
+            display: none;
+        }
+
+        .value-chain-stage.pulse-active {
+            outline: 3px solid var(--primary-red);
+            background-color: var(--primary-red-light) !important;
+            border-color: var(--primary-red) !important;
+            animation: pulseBg 0.5s infinite alternate;
+        }
+
+        @keyframes pulseBg {
+            from {
+                box-shadow: 0 0 4px rgba(198, 40, 40, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 16px rgba(198, 40, 40, 0.6);
+            }
+        }
+
+        /* LEVEL 4: Impact Decision Lab */
+        .l4-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l4-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scenario-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .scenario-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-transform: uppercase;
+        }
+
+        .scenario-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .scenario-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .scenario-options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .opt-card-btn {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .opt-card-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .opt-card-btn.selected {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+            outline: 2px solid var(--primary-red);
+        }
+
+        .opt-card-btn-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .opt-card-btn-impact {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* LEVEL 5: Value Creation Command Center */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        @media (max-width: 950px) {
+            .l5-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulation-console {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .console-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .console-month {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            text-transform: uppercase;
+        }
+
+        .console-status-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .console-status-badge.running {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .kpi-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 750px) {
+            .kpi-board {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .kpi-card:last-child {
+                grid-column: span 2;
+            }
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .kpi-title {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .kpi-value-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .kpi-gauge-bar {
+            height: 6px;
+            background-color: #ECEFF1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .kpi-gauge-fill {
+            height: 100%;
+            width: 50%;
+            background-color: var(--primary-red);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .terminal-panel {
+            background-color: #1E1E1E;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            color: #A5D6A7;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            min-height: 200px;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terminal-row {
+            line-height: 1.4;
+        }
+
+        .terminal-row.system {
+            color: #90CAF9;
+        }
+
+        .terminal-row.warning {
+            color: #FFE082;
+        }
+
+        .terminal-row.error {
+            color: #EF9A9A;
+        }
+
+        .terminal-row.success {
+            color: #A5D6A7;
+        }
+
+        .l5-incident-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+            display: none;
+            /* Flex when triggered */
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+        }
+
+        .incident-card {
+            background-color: var(--white);
+            border: 2px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: cardSlideUp 0.3s ease-out forwards;
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .incident-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .incident-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .incident-desc {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .incident-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .incident-opt-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .incident-opt-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .incident-opt-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .incident-opt-impact {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Final Scorecard overlay */
+        .scorecard-result {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .scorecard-banner {
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .scorecard-banner.success {
+            background-color: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .scorecard-banner.failed {
+            background-color: var(--danger-light);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+        }
+
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 550px) {
+            .scorecard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scorecard-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .scorecard-box-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .scorecard-box ul {
+            padding-left: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* Responsive structural layouts */
+        @media (max-width: 750px) {
+            main {
+                padding: 0 16px;
+                margin: 16px auto;
+            }
+
+            .nav-footer {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sticky Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>Digital Business & Transformation – Module 5.3 Simulation</h1>
+                    <p>Objective Setting and Value Creation (SMART Goals, Stakeholders, Value Chains)</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showHelpManual()">CVO Manual</button>
+                </div>
+            </div>
+
+            <!-- Stepper Progress Tracker (Unlocked & Clickable Globally) -->
+            <div class="stepper">
+                <div class="step-item active unlocked" id="step-btn-1" onclick="navigateToLevel(1)">
+                    <span class="step-badge">1</span>
+                    <span>Objective Architect</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-2"></div>
+                <div class="step-item unlocked" id="step-btn-2" onclick="navigateToLevel(2)">
+                    <span class="step-badge">2</span>
+                    <span>Stakeholder Board</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-3"></div>
+                <div class="step-item unlocked" id="step-btn-3" onclick="navigateToLevel(3)">
+                    <span class="step-badge">3</span>
+                    <span>Value Chain</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-4"></div>
+                <div class="step-item unlocked" id="step-btn-4" onclick="navigateToLevel(4)">
+                    <span class="step-badge">4</span>
+                    <span>Decision Lab</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-5"></div>
+                <div class="step-item unlocked" id="step-btn-5" onclick="navigateToLevel(5)">
+                    <span class="step-badge">5</span>
+                    <span>Command Center</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Objective Setting & Value Creation (Module 5.3)
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. SMART Objectives:</strong> Business planning requires
+                        translating broad desires into SMART targets: Specific, Measurable, Achievable, Relevant, and
+                        Time-bound. Repaired goals focus organizational operations.</p>
+                    <p><strong>2. Stakeholder Integration:</strong> ValueHub generates value across Investors,
+                        Customers, Employees, Business Owners, and Society. Strategy balancing resolves conflicts
+                        between cohorts to support long-term goals.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Value Chain (Porter):</strong> Operations map value
+                        creation across inbound, production, sales, CRM, and support activities. Trace paths isolate
+                        where value is added and operational leaks occur.</p>
+                    <p><strong>4. Trade-offs Decision:</strong> Managers command KPI balances, reconciling revenue goals
+                        with morale, corporate reputation, and client retention.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WELCOME SCREEN & ONBOARDING -->
+        <section id="screen-intro" class="screen active">
+            <div class="welcome-memo">
+                <div class="memo-header">
+                    <div class="memo-logo">
+                        <span>🏛️</span>
+                        <span>ValueHub Executive Council</span>
+                    </div>
+                    <div class="memo-meta">
+                        <div>PROJECT: STRATEGIC OBJECTIVES</div>
+                        <div>ROLE: CHIEF VALUE OFFICER</div>
+                        <div>DATE: JUN 2026</div>
+                    </div>
+                </div>
+
+                <div class="memo-body">
+                    <p><strong>To: Chief Value Officer (CVO)</strong></p>
+                    <p>Welcome to <strong>ValueHub</strong>. Currently, our company suffers from unfocused strategies,
+                        poorly defined goals, and unbalanced stakeholder value, resulting in declining customer
+                        satisfaction and rising staff churn.</p>
+
+                    <div class="memo-highlight">
+                        Your mission is to completely restructure our business goals, align operational initiatives with
+                        stakeholders, trace value creation stages, balance key trade-off metrics, and operate ValueHub
+                        safely through a 12-month capstone.
+                    </div>
+
+                    <p>Your strategic workbook outlines five core focus levels:</p>
+
+                    <ul
+                        style="padding-left: 24px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem;">
+                        <li><strong>Level 1: Objective Architect (Goal Repair Studio)</strong> – Reconstruct vague
+                            objectives into precise SMART targets (Specific, Measurable, Achievable, Relevant,
+                            Time-bound).</li>
+                        <li><strong>Level 2: Stakeholder Balance Board</strong> – Map initiatives across Customers,
+                            Employees, Investors, Business Owners, and Society.</li>
+                        <li><strong>Level 3: Value Chain Builder</strong> – Trace key corporate operations from Research
+                            to Customer Loyalty and view value flow movements.</li>
+                        <li><strong>Level 4: Impact Decision Lab</strong> – Resolve complex trade-offs balancing Revenue
+                            against Morale, Customer Satisfaction, and Brand Reputation.</li>
+                        <li><strong>Level 5: Value Creation Command Center</strong> – Commands our dashboard gauges over
+                            a 12-month virtual expansion cycle.</li>
+                    </ul>
+
+                    <p>In accordance with leadership parameters, all stage workbooks are unlocked and active. You can
+                        browse through levels using the top navigation pills or the previous/next footer buttons at any
+                        time.</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" onclick="startSimulation()">Initialize Value Council</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 1: Objective Architect -->
+        <section id="screen-l1" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 1: Objective Architect</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--primary-red-light); color: var(--primary-red); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Goal
+                        Repair Studio</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Convert poorly written business goals into SMART objectives. Select a goal on the left, then use the
+                    dropdown slots on the right to build its SMART components. Validate all 5 goals.
+                </div>
+
+                <div class="l1-layout">
+                    <!-- Left: Poor Goals List -->
+                    <div class="goals-list">
+                        <div class="evidence-title">Vague Business Goals</div>
+                        <div id="goals-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: SMART Component slots -->
+                    <div class="builder-workspace">
+                        <div class="evidence-title" id="builder-target-title">Select a Goal to Repair</div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Specific</span>
+                            <select class="builder-select" id="smart-specific">
+                                <option value="none">-- Select Specific Action --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Measurable</span>
+                            <select class="builder-select" id="smart-measurable">
+                                <option value="none">-- Select Metric --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Achievable</span>
+                            <select class="builder-select" id="smart-achievable">
+                                <option value="none">-- Select Target Path --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Relevant</span>
+                            <select class="builder-select" id="smart-relevant">
+                                <option value="none">-- Select Business Context --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Time-bound</span>
+                            <select class="builder-select" id="smart-timebound">
+                                <option value="none">-- Select Deadline --</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                            <button class="btn btn-secondary" onclick="resetLevel1()">Reset Slots</button>
+                            <button class="btn" id="l1-verify-btn" onclick="verifyL1Objective()" disabled>Verify
+                                Objective</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repaired SMART list -->
+                <div class="repaired-objectives-card" id="l1-repaired-box">
+                    <div class="repaired-title">Repaired SMART Objectives Log</div>
+                    <div class="repaired-list" id="l1-repaired-list">
+                        <!-- Injected -->
+                    </div>
+                    <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                        <button class="btn" onclick="showSummaryDialog(1)">Lock SMART Objectives Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Stakeholder Balance Board -->
+        <section id="screen-l2" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 2: Stakeholder Balance Board</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--warning-light); color: var(--warning); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Stakeholder
+                        Value</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Distribute strategic initiatives onto the stakeholder categories. Click an initiative card on the
+                    left, then click the corresponding stakeholder sector on the board.
+                    <br><br>
+                    <strong>Balanced Targets:</strong> Stakeholder Satisfaction &gt; 75% and Business Value &gt; 70%.
+                </div>
+
+                <div class="l2-layout">
+                    <!-- Left: Initiatives Pool -->
+                    <div class="goals-list">
+                        <div class="evidence-title">Initiatives Pool</div>
+                        <div id="initiative-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Circular Board & Dashboard -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="circle-board-container">
+                            <svg class="stakeholder-circle-graphic" viewBox="0 0 500 500">
+                                <!-- Center core metrics -->
+                                <circle class="circle-center" cx="250" cy="250" r="70"></circle>
+
+                                <!-- Sector 1: Customers (Top) -->
+                                <path class="circle-sector" id="sec-customers"
+                                    d="M250 250 L250 50 A200 200 0 0 1 440 185 Z"
+                                    onclick="placeInitiativeIn('customers')"></path>
+                                <!-- Sector 2: Investors (Right) -->
+                                <path class="circle-sector" id="sec-investors"
+                                    d="M250 250 L440 185 A200 200 0 0 1 368 390 Z"
+                                    onclick="placeInitiativeIn('investors')"></path>
+                                <!-- Sector 3: Business Owners (Bottom-Right) -->
+                                <path class="circle-sector" id="sec-owners"
+                                    d="M250 250 L368 390 A200 200 0 0 1 132 390 Z"
+                                    onclick="placeInitiativeIn('owners')"></path>
+                                <!-- Sector 4: Society (Bottom-Left) -->
+                                <path class="circle-sector" id="sec-society"
+                                    d="M250 250 L132 390 A200 200 0 0 1 60 185 Z"
+                                    onclick="placeInitiativeIn('society')"></path>
+                                <!-- Sector 5: Employees (Left) -->
+                                <path class="circle-sector" id="sec-employees"
+                                    d="M250 250 L60 185 A200 200 0 0 1 250 50 Z"
+                                    onclick="placeInitiativeIn('employees')"></path>
+
+                                <!-- Core boundary circle again to overlay borders -->
+                                <circle cx="250" cy="250" r="70" fill="none" stroke="var(--border-color)"
+                                    stroke-width="2"></circle>
+
+                                <!-- Text Labels -->
+                                <text class="circle-label" x="250" y="120">CUSTOMERS</text>
+                                <text class="circle-label" x="350" y="240">INVESTORS</text>
+                                <text class="circle-label" x="250" y="360">OWNERS</text>
+                                <text class="circle-label" x="150" y="300">SOCIETY</text>
+                                <text class="circle-label" x="150" y="180">EMPLOYEES</text>
+
+                                <!-- Center stats -->
+                                <text x="250" y="245" text-anchor="middle" font-size="10" font-weight="700"
+                                    fill="var(--text-muted)">SATISFACTION</text>
+                                <text x="250" y="265" text-anchor="middle" font-size="16" font-weight="bold"
+                                    fill="var(--primary-red)" id="circle-sat-val">40%</text>
+                            </svg>
+                        </div>
+
+                        <!-- Live Metrics Dashboard -->
+                        <div class="demand-dashboard">
+                            <div class="dashboard-header">Stakeholder Metric Gauges</div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Stakeholder Satisfaction Index</span>
+                                    <span id="l2-sat-val">40% (Goal: &gt;75%)</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="l2-sat-bar" style="width: 40%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Business Value Index</span>
+                                    <span id="l2-val-val">40% (Goal: &gt;70%)</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="l2-val-bar" style="width: 40%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="btn-group" style="justify-content: flex-end;">
+                                <button class="btn btn-secondary" onclick="resetLevel2()">Reset Board</button>
+                                <button class="btn" id="l2-verify-btn" onclick="verifyLevel2()">Lock Balance
+                                    Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Value Chain Builder -->
+        <section id="screen-l3" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 3: Value Chain Builder</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Value
+                        Creation Flow</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Organize business actions into the correct value chain stages. Click an action card in the pool
+                    below, then click the correct stage slot box. Once correct, validate the flow to trace the value
+                    path.
+                </div>
+
+                <!-- Value Chain Flow Grid -->
+                <div class="value-chain-container">
+                    <div class="value-chain-flow" id="value-chain-flow">
+                        <!-- Pulse dot overlay -->
+                        <div class="chain-pulse-dot" id="chain-pulse"></div>
+
+                        <!-- Stage 1 -->
+                        <div class="value-chain-stage" id="stage-research" onclick="placeActionInChain('research')">
+                            <span class="stage-title">1. Research</span>
+                            <div class="quad-content" id="content-research"
+                                style="margin-top:8px; font-size:0.75rem; font-weight:600; color:var(--text-dark);">
+                            </div>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <!-- Stage 2 -->
+                        <div class="value-chain-stage" id="stage-development"
+                            onclick="placeActionInChain('development')">
+                            <span class="stage-title">2. Product Dev</span>
+                            <div class="quad-content" id="content-development"
+                                style="margin-top:8px; font-size:0.75rem; font-weight:600; color:var(--text-dark);">
+                            </div>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <!-- Stage 3 -->
+                        <div class="value-chain-stage" id="stage-marketing" onclick="placeActionInChain('marketing')">
+                            <span class="stage-title">3. Marketing</span>
+                            <div class="quad-content" id="content-marketing"
+                                style="margin-top:8px; font-size:0.75rem; font-weight:600; color:var(--text-dark);">
+                            </div>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <!-- Stage 4 -->
+                        <div class="value-chain-stage" id="stage-sales" onclick="placeActionInChain('sales')">
+                            <span class="stage-title">4. Sales</span>
+                            <div class="quad-content" id="content-sales"
+                                style="margin-top:8px; font-size:0.75rem; font-weight:600; color:var(--text-dark);">
+                            </div>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <!-- Stage 5 -->
+                        <div class="value-chain-stage" id="stage-support" onclick="placeActionInChain('support')">
+                            <span class="stage-title">5. Support</span>
+                            <div class="quad-content" id="content-support"
+                                style="margin-top:8px; font-size:0.75rem; font-weight:600; color:var(--text-dark);">
+                            </div>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <!-- Stage 6 -->
+                        <div class="value-chain-stage" id="stage-loyalty" onclick="placeActionInChain('loyalty')">
+                            <span class="stage-title">6. Loyalty</span>
+                            <div class="quad-content" id="content-loyalty"
+                                style="margin-top:8px; font-size:0.75rem; font-weight:600; color:var(--text-dark);">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lower Layout: Action Cards Pool -->
+                <div class="l1-layout" style="margin-top: 12px;">
+                    <div class="goals-list" style="max-height: 250px; overflow-y: auto;">
+                        <div class="evidence-title">Actions Pool</div>
+                        <div id="chain-action-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Flow execution controls & logs -->
+                    <div class="demand-dashboard">
+                        <div class="dashboard-header">Chain Operations Manager</div>
+                        <div id="chain-log"
+                            style="font-family: var(--font-mono); font-size:0.8rem; color:var(--text-muted); min-height:60px;">
+                            Value route status: Waiting for complete pipeline alignment.
+                        </div>
+                        <div class="btn-group" style="justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="resetLevel3()">Clear Chain</button>
+                            <button class="btn" id="l3-verify-btn" onclick="verifyLevel3()">Validate Value
+                                Chain</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: Impact Decision Lab -->
+        <section id="screen-l4" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 4: Impact Decision Lab</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Strategic
+                        Balance</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Evaluate business trade-offs. Select options for each scenario card on the left. Maintain all four
+                    dashboard indicators **above 50%** to validate your consulting report.
+                </div>
+
+                <div class="l4-layout">
+                    <!-- Left: Scenario display -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="scenario-card" id="l4-scenario-panel">
+                            <!-- Scenario details dynamically injected -->
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);"
+                                id="l4-scenario-counter">Scenario 1 of 3</span>
+                            <div class="btn-group" style="margin-top:0;">
+                                <button class="btn btn-secondary" id="l4-prev-scen-btn" onclick="prevScenario()"
+                                    disabled>Previous Scenario</button>
+                                <button class="btn" id="l4-next-scen-btn" onclick="nextScenario()">Next
+                                    Scenario</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Live Metrics gauges -->
+                    <div class="demand-dashboard">
+                        <div class="dashboard-header">Operational Impact KPIs</div>
+
+                        <div class="demand-metric-row">
+                            <div class="demand-metric-info">
+                                <span>Customer Satisfaction</span>
+                                <span id="l4-cust-val">50% (Goal: &gt;50%)</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-bar-fill" id="l4-cust-bar" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="demand-metric-row">
+                            <div class="demand-metric-info">
+                                <span>Employee Morale</span>
+                                <span id="l4-morale-val">50% (Goal: &gt;50%)</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-bar-fill" id="l4-morale-bar" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="demand-metric-row">
+                            <div class="demand-metric-info">
+                                <span>Revenue Growth</span>
+                                <span id="l4-rev-val">50% (Goal: &gt;50%)</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-bar-fill" id="l4-rev-bar" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="demand-metric-row">
+                            <div class="demand-metric-info">
+                                <span>Brand Reputation</span>
+                                <span id="l4-rep-val">50% (Goal: &gt;50%)</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-bar-fill" id="l4-rep-bar" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                            <button class="btn btn-secondary" onclick="resetLevel4()">Reset Decisions</button>
+                            <button class="btn" id="l4-verify-btn" onclick="verifyLevel4()" disabled>Lock
+                                Decisions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 5: Value Creation Command Center (Capstone) -->
+        <section id="screen-l5" class="screen">
+            <div class="card" style="position: relative;">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 5: Value Creation Command Center</div>
+                    <span class="console-status-badge" id="l5-status">Idle</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Manage the operations of ValueHub over a 12-month timeline. Make decisions to keep metrics balanced
+                    above their targets at Month 12:
+                    <br>
+                    <strong>Targets:</strong> Goal Achievement &gt; 85, Customer Value &gt; 80, Employee Satisfaction
+                    &gt; 80, Brand Reputation &gt; 80, Revenue &gt; 75.
+                </div>
+
+                <div class="l5-layout">
+                    <!-- Left: Control Console -->
+                    <div class="simulation-console">
+                        <!-- Top status bar -->
+                        <div class="console-header-bar">
+                            <div class="console-month" id="console-month-ticker">MONTH 1 OF 12</div>
+                            <div>
+                                <button class="btn" id="l5-start-btn" onclick="startL5Ticker()">Launch 12-Month
+                                    Cycle</button>
+                                <button class="btn btn-secondary" id="l5-pause-btn" onclick="pauseL5Ticker()"
+                                    disabled>Pause</button>
+                            </div>
+                        </div>
+
+                        <!-- KPI Dials -->
+                        <div class="kpi-board">
+                            <div class="kpi-card">
+                                <span class="kpi-title">Goal Achievement</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-goal">50</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-goal" style="width: 50%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Customer Value</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-customer">50</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-customer" style="width: 50%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Employee Sat</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-employee">50</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-employee" style="width: 50%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Reputation</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-reputation">50</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-reputation" style="width: 50%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Revenue</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-revenue">50</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-revenue" style="width: 50%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terminal Output -->
+                        <div class="terminal-panel" id="l5-terminal-ticker">
+                            <div class="terminal-row">[SYSTEM] Objective setting database loaded.</div>
+                            <div class="terminal-row">[SYSTEM] CVO console online. Click "Launch 12-Month Cycle".</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Desk Panel -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="region-stats-card">
+                            <div class="stats-header">Value Council Status</div>
+                            <div
+                                style="font-size:0.85rem; display:flex; flex-direction:column; gap:10px; color:var(--text-dark);">
+                                <div><strong> SMART Planner:</strong> 5 strategic business objectives formulated.</div>
+                                <div><strong> Stakeholder Map:</strong> Circular balance board reconciled.</div>
+                                <div><strong> Value Pipeline:</strong> horizontal value chain aligned.</div>
+                                <div><strong> Decisional Lab:</strong> Short vs. long-term trade-offs completed.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OVERLAYS INCIDENT CARDS -->
+                <div class="l5-incident-overlay" id="l5-incident-overlay">
+                    <div class="incident-card" id="l5-incident-card">
+                        <div class="incident-header">
+                            <span class="incident-badge">Value Council Incident</span>
+                            <span id="l5-incident-month"
+                                style="font-family:var(--font-mono); font-size:0.8rem; font-weight:700; color:var(--primary-red);">Month
+                                2</span>
+                        </div>
+                        <h4 class="incident-title" id="inc-title">CUSTOMER METRIC WARNING</h4>
+                        <p class="incident-desc" id="inc-desc">Customer NPS indicates high support churn risks.</p>
+                        <div class="incident-options" id="inc-options">
+                            <!-- Options injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Native Learning Summary Dialog -->
+    <dialog id="summary-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📘</span>
+                <span id="summary-dialog-title">Stage Complete: Strategic Summary</span>
+            </div>
+            <div class="dialog-body" id="summary-dialog-content">
+                <!-- content injected -->
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" id="summary-next-btn" onclick="confirmSummaryNextLevel()">Proceed to Next
+                    Stage</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Scorecard Dialog -->
+    <dialog id="scorecard-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📊</span>
+                <span>ValueHub Executive Scorecard</span>
+            </div>
+            <div class="dialog-body">
+                <div class="scorecard-result">
+                    <div class="scorecard-banner" id="scorecard-banner-status">SUCCESS</div>
+
+                    <div class="scorecard-grid">
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Value Metrics Dashboard</div>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+                                <div style="display:flex; justify-content:space-between;"><span>Goal
+                                        Achievement:</span><strong id="card-goal">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Customer
+                                        Value:</span><strong id="card-customer">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Employee
+                                        Satisfaction:</span><strong id="card-employee">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Brand
+                                        Reputation:</span><strong id="card-reputation">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Revenue:</span><strong
+                                        id="card-revenue">80 / 100</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Analyst Evaluation Review</div>
+                            <div style="font-size:0.82rem; color:var(--text-dark);" id="scorecard-eval-text">
+                                Feedback description...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem; background-color:var(--bg-light); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                        <strong>Chief Value Officer Key Principles:</strong>
+                        <ul style="padding-left:16px;">
+                            <li><strong>SMART Objectives:</strong> Formulating structured goals prevents capital
+                                misallocations.</li>
+                            <li><strong>Stakeholder Balancing:</strong> Managing firm networks yields high retention and
+                                loyalty moats.</li>
+                            <li><strong>Value Chain Flows:</strong> Value chain alignment prevents bottleneck frictions
+                                and optimizes checks.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn btn-secondary" onclick="resetFullSimulation()">Restart Council</button>
+                <button class="btn" onclick="scorecardDialog.close()">Close Review</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Help Manual Dialog -->
+    <dialog id="help-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>🏛️</span>
+                <span>Chief Value Officer Reference Manual</span>
+            </div>
+            <div class="dialog-body">
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:0.9rem;">
+                    <div><strong>SMART Objectives:</strong></div>
+                    <p style="color:var(--text-muted);">Goals must be Specific (not vague), Measurable (indexed value),
+                        Achievable (realistic metrics), Relevant (firm alignment), and Time-bound (deadline fixed).</p>
+
+                    <div><strong>Stakeholder Management:</strong></div>
+                    <p style="color:var(--text-muted);">Firms do not operate in a vacuum. Long-term sustainability
+                        requires balancing customers, employees, owners, investors, and social environment nodes.</p>
+
+                    <div><strong>Porter's Value Chain:</strong></div>
+                    <p style="color:var(--text-muted);">Value moves systematically from upstream Research and
+                        Development to downstream Marketing, transaction checkout Sales, customer Support, and loyalty
+                        retention programs.</p>
+
+                    <div><strong>Strategic Trade-offs:</strong></div>
+                    <p style="color:var(--text-muted);">Short-term cost reductions (e.g. cutting staff) often harm
+                        long-term reputation indexes. Chief Value Officers balance immediate cash gains against
+                        structural capital assets.</p>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeHelpManual()">Return to Console</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Persistent Navigation Footer -->
+    <div class="nav-footer" id="navigationFooter">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Stage</button>
+            <span
+                style="font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--text-dark);"
+                id="footerLevelText">Level 1 of 5</span>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Stage</button>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // System State
+        const state = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true, true, true],
+            completedLevels: [false, false, false, false, false],
+
+            // Level 1: Objective Architect variables
+            l1: {
+                activeGoal: null,
+                completedGoals: [],
+                selections: {
+                    specific: 'none',
+                    measurable: 'none',
+                    achievable: 'none',
+                    relevant: 'none',
+                    timebound: 'none'
+                },
+                goals: {
+                    'sales': {
+                        id: 'sales',
+                        poor: 'Increase sales',
+                        repaired: 'Increase monthly sales revenue by 20% through digital marketing campaigns to maximize operating cash reserves within 6 months.',
+                        correct: {
+                            specific: 'increase-sales',
+                            measurable: 'by-20',
+                            achievable: 'marketing-campaigns',
+                            relevant: 'maximize-cash',
+                            timebound: 'six-months'
+                        }
+                    },
+                    'customers': {
+                        id: 'customers',
+                        poor: 'Get more customers',
+                        repaired: 'Acquire new active platform users by 50,000 via referrals and digital ad buys to expand regional market penetration in Q3.',
+                        correct: {
+                            specific: 'acquire-users',
+                            measurable: 'by-50k',
+                            achievable: 'referrals-ads',
+                            relevant: 'expand-penetration',
+                            timebound: 'q3'
+                        }
+                    },
+                    'app': {
+                        id: 'app',
+                        poor: 'Improve the app',
+                        repaired: 'Reduce application page load time to under 1.5 seconds by optimizing database queries to prevent checkout cart abandonment before the holiday rush.',
+                        correct: {
+                            specific: 'reduce-load',
+                            measurable: 'under-1-5',
+                            achievable: 'optimizing-queries',
+                            relevant: 'prevent-abandonment',
+                            timebound: 'holiday-rush'
+                        }
+                    },
+                    'happy': {
+                        id: 'happy',
+                        poor: 'Make customers happier',
+                        repaired: 'Improve customer NPS rating by 15 points through support staff training to increase customer lifetime retention by year-end.',
+                        correct: {
+                            specific: 'improve-nps',
+                            measurable: 'by-15',
+                            achievable: 'support-training',
+                            relevant: 'increase-retention',
+                            timebound: 'year-end'
+                        }
+                    },
+                    'grow': {
+                        id: 'grow',
+                        poor: 'Grow the business',
+                        repaired: 'Expand retail partner network by 10 accounts by offering incentive bonuses to secure supply-chain self-sufficiency within 90 days.',
+                        correct: {
+                            specific: 'expand-partners',
+                            measurable: 'by-10',
+                            achievable: 'incentive-bonuses',
+                            relevant: 'secure-supply',
+                            timebound: 'ninety-days'
+                        }
+                    }
+                },
+                options: {
+                    specific: [
+                        { val: 'increase-sales', text: 'Increase monthly sales revenue' },
+                        { val: 'acquire-users', text: 'Acquire new active platform users' },
+                        { val: 'reduce-load', text: 'Reduce application page load time' },
+                        { val: 'improve-nps', text: 'Improve customer NPS rating' },
+                        { val: 'expand-partners', text: 'Expand retail partner network' }
+                    ],
+                    measurable: [
+                        { val: 'by-20', text: 'by 20%' },
+                        { val: 'by-50k', text: 'by 50,000' },
+                        { val: 'under-1-5', text: 'to under 1.5 seconds' },
+                        { val: 'by-15', text: 'by 15 points' },
+                        { val: 'by-10', text: 'by 10 accounts' }
+                    ],
+                    achievable: [
+                        { val: 'marketing-campaigns', text: 'through digital marketing campaigns' },
+                        { val: 'referrals-ads', text: 'via referrals and digital ad buys' },
+                        { val: 'optimizing-queries', text: 'by optimizing database queries' },
+                        { val: 'support-training', text: 'through support staff training' },
+                        { val: 'incentive-bonuses', text: 'by offering incentive bonuses' }
+                    ],
+                    relevant: [
+                        { val: 'maximize-cash', text: 'to maximize operating cash reserves' },
+                        { val: 'expand-penetration', text: 'to expand regional market penetration' },
+                        { val: 'prevent-abandonment', text: 'to prevent checkout cart abandonment' },
+                        { val: 'increase-retention', text: 'to increase customer lifetime retention' },
+                        { val: 'secure-supply', text: 'to secure supply-chain self-sufficiency' }
+                    ],
+                    timebound: [
+                        { val: 'six-months', text: 'within 6 months' },
+                        { val: 'q3', text: 'in Q3' },
+                        { val: 'holiday-rush', text: 'before the holiday rush' },
+                        { val: 'year-end', text: 'by year-end' },
+                        { val: 'ninety-days', text: 'within 90 days' }
+                    ]
+                }
+            },
+
+            // Level 2: Stakeholder Board
+            l2: {
+                selectedInitiative: null,
+                placedCards: {
+                    customers: [],
+                    employees: [],
+                    investors: [],
+                    owners: [],
+                    society: []
+                },
+                initiatives: [
+                    { id: 'i1', text: 'Employee training', category: 'employees' },
+                    { id: 'i2', text: 'Faster customer support', category: 'customers' },
+                    { id: 'i3', text: 'Eco-friendly packaging', category: 'society' },
+                    { id: 'i4', text: 'Profit distribution', category: 'investors' },
+                    { id: 'i5', text: 'Product quality improvements', category: 'customers' },
+                    { id: 'i6', text: 'Flexible work policies', category: 'employees' },
+                    { id: 'i7', text: 'Community programs', category: 'society' },
+                    { id: 'i8', text: 'Long-term equity returns', category: 'owners' }
+                ]
+            },
+
+            // Level 3: Value Chain Builder
+            l3: {
+                selectedAction: null,
+                placedActions: {
+                    research: null,
+                    development: null,
+                    marketing: null,
+                    sales: null,
+                    support: null,
+                    loyalty: null
+                },
+                actions: [
+                    { id: 'va1', text: 'Analyze customer behavior', correctStage: 'research' },
+                    { id: 'va2', text: 'Design new features', correctStage: 'development' },
+                    { id: 'va3', text: 'Launch digital campaigns', correctStage: 'marketing' },
+                    { id: 'va4', text: 'Complete customer checkouts', correctStage: 'sales' },
+                    { id: 'va5', text: 'Improve customer support', correctStage: 'support' },
+                    { id: 'va6', text: 'Add loyalty programs', correctStage: 'loyalty' }
+                ]
+            },
+
+            // Level 4: Impact Decision Lab
+            l4: {
+                currentScenario: 1,
+                choices: {
+                    1: null, // null, 'a', or 'b'
+                    2: null,
+                    3: null
+                },
+                scenarios: {
+                    1: {
+                        meta: 'Cost Optimization Strategy',
+                        title: 'Customer Support Staff Rationalization',
+                        desc: 'ValueHub operations board proposes cutting support staff numbers by 50% to optimize quarterly cash balances.',
+                        options: [
+                            {
+                                key: 'a',
+                                text: 'Implement staff cuts immediately to boost cash margins.',
+                                impact: { revenue: 20, customer: -25, morale: -15, reputation: -15 },
+                                log: 'Scen 1: Halved support staff. Cash metrics rose but ticketing backlogs frustrated users.'
+                            },
+                            {
+                                key: 'b',
+                                text: 'Reject cuts and optimize ticketing software routing.',
+                                impact: { revenue: 5, customer: 10, morale: 10, reputation: 5 },
+                                log: 'Scen 1: Support staff maintained. Backends optimized yielding stable NPS scores.'
+                            }
+                        ]
+                    },
+                    2: {
+                        meta: 'Talent Upgrades Investment',
+                        title: 'Technical Developers Training Certifications',
+                        desc: 'Engineering leads request budget allocations for advanced training in new database modules.',
+                        options: [
+                            {
+                                key: 'a',
+                                text: 'Approve full training certification budget.',
+                                impact: { morale: 25, revenue: -15, customer: 15, reputation: 10 },
+                                log: 'Scen 2: Sponsored dev classes. Improved application speed indicators and employee loyalty.'
+                            },
+                            {
+                                key: 'b',
+                                text: 'Reject training, requiring devs to self-learn on tools.',
+                                impact: { revenue: 5, morale: -10, customer: -5, reputation: 0 },
+                                log: 'Scen 2: Training budget withheld. Morale index dropped, slowing feature releases.'
+                            }
+                        ]
+                    },
+                    3: {
+                        meta: 'Infrastructure Security Scan',
+                        title: 'Migration to Cheap Unverified Server Host',
+                        desc: 'A secondary hosting provider offers cloud server slots at 80% cheaper rates, but lacks premium security certs.',
+                        options: [
+                            {
+                                key: 'a',
+                                text: 'Migrate server resources to cut operating costs.',
+                                impact: { revenue: 25, reputation: -20, customer: -10, morale: -5 },
+                                log: 'Scen 3: Migrated to unverified host. Operating margins grew, but customer security trust index collapsed.'
+                            },
+                            {
+                                key: 'b',
+                                text: 'Retain secure premium cloud service providers.',
+                                impact: { reputation: 15, customer: 10, revenue: -5, morale: 5 },
+                                log: 'Scen 3: Retained secure hosting. Guarded client data integrity and corporate branding.'
+                            }
+                        ]
+                    }
+                }
+            },
+
+            // Level 5: Command Center
+            l5: {
+                month: 1,
+                status: 'idle',
+                timerId: null,
+                kpis: {
+                    goal: 50,
+                    customer: 50,
+                    employee: 50,
+                    reputation: 50,
+                    revenue: 50
+                },
+                logs: [],
+                activeEvent: null,
+                historyChoices: [],
+                events: {
+                    2: {
+                        badge: 'Feature Request',
+                        title: 'Corporate Dashboard Request',
+                        desc: 'Enterprise accounts demand advanced compliance analytics modules.',
+                        options: [
+                            {
+                                text: 'Approve custom module building.',
+                                impact: { customer: 15, revenue: -10, goal: 10 },
+                                log: 'Month 2: Custom builder approved. Expanded corporate NPS satisfaction indices.'
+                            },
+                            {
+                                text: 'Maintain current product baseline.',
+                                impact: { revenue: 10, customer: -10, goal: -5 },
+                                log: 'Month 2: Baseline retained. Margins preserved but corporate tier growth stalled.'
+                            }
+                        ]
+                    },
+                    4: {
+                        badge: 'HR Request',
+                        title: 'Employee Upskilling Training',
+                        desc: 'Platform managers request certified courses for cloud tech.',
+                        options: [
+                            {
+                                text: 'Sponsor technical course bundles.',
+                                impact: { employee: 20, reputation: 10, revenue: -10 },
+                                log: 'Month 4: Upskilling funded. Tech team productivity index rose.'
+                            },
+                            {
+                                text: 'Delay upskilling to preserve quarterly cash.',
+                                impact: { employee: -15, revenue: 10, goal: -5 },
+                                log: 'Month 4: Courses postponed. Technical resource debt increased.'
+                            }
+                        ]
+                    },
+                    6: {
+                        badge: 'Sustainability Shift',
+                        title: 'Clean Cloud Transition',
+                        desc: 'Investors request ValueHub servers transition to green carbon-neutral hosts.',
+                        options: [
+                            {
+                                text: 'Transition hosting to clean providers.',
+                                impact: { reputation: 20, customer: 10, revenue: -15 },
+                                log: 'Month 6: Carbon neutral migration complete. Brand reputation metrics surged.'
+                            },
+                            {
+                                text: 'Retain standard coal-powered provider.',
+                                impact: { revenue: 15, reputation: -15, customer: -10 },
+                                log: 'Month 6: Legacy host maintained. Operating costs protected though ESG rates fell.'
+                            }
+                        ]
+                    },
+                    8: {
+                        badge: 'System Warning',
+                        title: 'Technical Outage Occurs',
+                        desc: 'A server crash disrupts customer checkouts for 4 hours.',
+                        options: [
+                            {
+                                text: 'Issue refund service credits to users.',
+                                impact: { customer: 15, reputation: 10, revenue: -15, employee: 5 },
+                                log: 'Month 8: User compensation distributed. Guarded customer trust though revenues dipped.'
+                            },
+                            {
+                                text: 'Patch database bugs without customer refunds.',
+                                impact: { revenue: 10, customer: -20, reputation: -15 },
+                                log: 'Month 8: System patched without rebates. Customer churn index rose.'
+                            }
+                        ]
+                    },
+                    10: {
+                        badge: 'Expansion Opportunity',
+                        title: 'Enterprise Tier Initiative',
+                        desc: 'Strategic opportunity to launch a corporate enterprise portal.',
+                        options: [
+                            {
+                                text: 'Hire dedicated sales consultants.',
+                                impact: { revenue: 25, goal: 15, employee: -10 },
+                                log: 'Month 10: Hired enterprise consultants. Fast-tracked new deal conversions.'
+                            },
+                            {
+                                text: 'Form corporate channel partner bundles.',
+                                impact: { revenue: 15, goal: 10, employee: 5 },
+                                log: 'Month 10: Bundled corporate layers. Expanded sales surface with shared risks.'
+                            }
+                        ]
+                    },
+                    11: {
+                        badge: 'Operational Alignment',
+                        title: 'Support Tool Integration',
+                        desc: 'Managers suggest unifying sales and support CRM tools.',
+                        options: [
+                            {
+                                text: 'Integrate tools for full pipeline visibility.',
+                                impact: { goal: 20, customer: 10, employee: -5 },
+                                log: 'Month 11: CRM systems integrated. Reduced user ticket handling times.'
+                            },
+                            {
+                                text: 'Focus funds on immediate ad marketing campaigns.',
+                                impact: { revenue: 15, goal: -10, customer: -5 },
+                                log: 'Month 11: Ad spend expanded. Boosted immediate volume but backends remained disjointed.'
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        const helpDialog = document.getElementById('help-dialog');
+        const summaryDialog = document.getElementById('summary-dialog');
+        const scorecardDialog = document.getElementById('scorecard-dialog');
+
+        function showHelpManual() { helpDialog.showModal(); }
+        function closeHelpManual() { helpDialog.close(); }
+
+        // Start Simulation Onboarding Trigger
+        function startSimulation() {
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            navigateToLevel(1);
+            document.getElementById('navigationFooter').style.display = 'flex';
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        // Navigation Stepper (Unlocked & Clickable)
+        function updateNavigationPills() {
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                const divider = document.getElementById(`step-div-${i}`);
+                const badge = btn.querySelector('.step-badge');
+
+                btn.className = 'step-item unlocked';
+                if (divider) divider.className = 'step-divider unlocked';
+
+                badge.innerText = i;
+
+                if (state.currentLevel === i) {
+                    btn.classList.add('active');
+                }
+
+                if (state.completedLevels[i - 1]) {
+                    btn.classList.add('completed');
+                    if (divider) divider.classList.add('completed');
+                }
+            }
+
+            // Bottom footer logic
+            const prevBtn = document.getElementById('footerPrevBtn');
+            const nextBtn = document.getElementById('footerNextBtn');
+            const levelText = document.getElementById('footerLevelText');
+
+            if (prevBtn && nextBtn && levelText) {
+                levelText.innerText = `Level ${state.currentLevel} of 5`;
+                prevBtn.disabled = (state.currentLevel === 1);
+                nextBtn.disabled = (state.currentLevel === 5);
+            }
+        }
+
+        function navigateToLevel(levelIndex) {
+            document.querySelector('.screen.active').classList.remove('active');
+            state.currentLevel = levelIndex;
+
+            const targetScreen = document.getElementById(`screen-l${levelIndex}`);
+            targetScreen.classList.add('active');
+
+            // Initialize levels if required
+            if (levelIndex === 1) initLevel1();
+            if (levelIndex === 2) initLevel2();
+            if (levelIndex === 3) initLevel3();
+            if (levelIndex === 4) initLevel4();
+            if (levelIndex === 5) updateL5KPIs();
+
+            updateNavigationPills();
+            showToast(`Value Panel Level ${levelIndex} Activated`, 'info');
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 5) {
+                navigateToLevel(state.currentLevel + 1);
+            }
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1) {
+                navigateToLevel(state.currentLevel - 1);
+            }
+        }
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✓';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '🚨';
+
+            toast.innerHTML = `<span>${icon}</span><div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================= LEVEL 1: Objective Architect =================
+        function initLevel1() {
+            const pool = document.getElementById('goals-pool');
+            pool.innerHTML = '';
+
+            for (let id in state.l1.goals) {
+                const goal = state.l1.goals[id];
+                const btn = document.createElement('button');
+                btn.className = 'goal-item-btn';
+                btn.id = `l1-goal-${id}`;
+
+                const isCompleted = state.l1.completedGoals.includes(id);
+                const isActive = state.l1.activeGoal === id;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isActive) {
+                    btn.classList.add('active');
+                }
+
+                btn.innerHTML = `
+                    <span>${goal.poor}</span>
+                    <span>${isCompleted ? '✓' : isActive ? '▶' : ''}</span>
+                `;
+
+                if (!isCompleted) {
+                    btn.addEventListener('click', () => selectL1Goal(id));
+                }
+
+                pool.appendChild(btn);
+            }
+
+            // Populate select options
+            populateL1Dropdowns();
+            renderL1RepairedObjectives();
+        }
+
+        function selectL1Goal(goalId) {
+            state.l1.activeGoal = goalId;
+
+            // Reset selectors
+            for (let key in state.l1.selections) {
+                state.l1.selections[key] = 'none';
+            }
+
+            document.getElementById('builder-target-title').innerText = `Repairing: "${state.l1.goals[goalId].poor}"`;
+            initLevel1();
+        }
+
+        function populateL1Dropdowns() {
+            const parts = ['specific', 'measurable', 'achievable', 'relevant', 'timebound'];
+
+            parts.forEach((p) => {
+                const select = document.getElementById(`smart-${p}`);
+                select.innerHTML = `<option value="none">-- Select ${p.charAt(0).toUpperCase() + p.slice(1)} component --</option>`;
+
+                if (state.l1.activeGoal) {
+                    // Get options and shuffle for consulting scanning challenge
+                    const opts = [...state.l1.options[p]];
+                    opts.sort(() => Math.random() - 0.5);
+
+                    opts.forEach((o) => {
+                        const optEl = document.createElement('option');
+                        optEl.value = o.val;
+                        optEl.innerText = o.text;
+                        optEl.selected = state.l1.selections[p] === o.val;
+                        select.appendChild(optEl);
+                    });
+                    select.disabled = false;
+                } else {
+                    select.disabled = true;
+                }
+
+                select.onchange = (e) => {
+                    state.l1.selections[p] = e.target.value;
+                    checkL1FormCompleteness();
+                };
+            });
+        }
+
+        function checkL1FormCompleteness() {
+            const verifyBtn = document.getElementById('l1-verify-btn');
+            let completed = true;
+            for (let key in state.l1.selections) {
+                if (state.l1.selections[key] === 'none') {
+                    completed = false;
+                    break;
+                }
+            }
+            verifyBtn.disabled = !completed;
+        }
+
+        function verifyL1Objective() {
+            const goalId = state.l1.activeGoal;
+            if (!goalId) return;
+
+            const goal = state.l1.goals[goalId];
+            let isCorrect = true;
+
+            for (let key in state.l1.selections) {
+                if (state.l1.selections[key] !== goal.correct[key]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if (isCorrect) {
+                showToast("SMART Objective correctly assembled!", "success");
+                state.l1.completedGoals.push(goalId);
+                state.l1.activeGoal = null;
+                document.getElementById('builder-target-title').innerText = 'Select a Goal to Repair';
+
+                // Clear dropdown selections
+                for (let key in state.l1.selections) {
+                    state.l1.selections[key] = 'none';
+                }
+
+                initLevel1();
+
+                if (state.l1.completedGoals.length === 5) {
+                    state.completedLevels[0] = true;
+                    updateNavigationPills();
+                }
+            } else {
+                showToast("Objective verification failed. Check component meanings and align carefully.", "danger");
+            }
+        }
+
+        function renderL1RepairedObjectives() {
+            const container = document.getElementById('l1-repaired-box');
+            const list = document.getElementById('l1-repaired-list');
+            list.innerHTML = '';
+
+            if (state.l1.completedGoals.length > 0) {
+                container.style.display = 'flex';
+                state.l1.completedGoals.forEach((id) => {
+                    const goal = state.l1.goals[id];
+                    const div = document.createElement('div');
+                    div.style.padding = '8px';
+                    div.style.borderBottom = '1px solid rgba(46, 125, 50, 0.1)';
+                    div.innerHTML = `<strong>${goal.poor}:</strong> <span style="font-size:0.85rem; color:#555;">${goal.repaired}</span>`;
+                    list.appendChild(div);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function resetLevel1() {
+            for (let key in state.l1.selections) {
+                state.l1.selections[key] = 'none';
+            }
+            populateL1Dropdowns();
+            document.getElementById('l1-verify-btn').disabled = true;
+            showToast("Slots cleared", "info");
+        }
+
+
+        // ================= LEVEL 2: Stakeholder Balance Board =================
+        function initLevel2() {
+            const pool = document.getElementById('initiative-pool');
+            pool.innerHTML = '';
+
+            state.l2.initiatives.forEach((ini) => {
+                const card = document.createElement('div');
+                card.className = 'initiative-card';
+                card.id = `l2-${ini.id}`;
+                card.innerText = ini.text;
+
+                let isPlaced = false;
+                for (let key in state.l2.placedCards) {
+                    if (state.l2.placedCards[key].some(item => item.id === ini.id)) {
+                        isPlaced = true;
+                        break;
+                    }
+                }
+
+                if (isPlaced) {
+                    card.classList.add('placed');
+                } else {
+                    card.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectL2Initiative(ini.id);
+                    });
+                }
+
+                pool.appendChild(card);
+            });
+
+            renderL2CircleGraphic();
+            recalculateL2Metrics();
+        }
+
+        function selectL2Initiative(iniId) {
+            const selected = document.querySelector('#initiative-pool .initiative-card.selected');
+            if (selected) selected.classList.remove('selected');
+
+            state.l2.selectedInitiative = iniId;
+            document.getElementById(`l2-${iniId}`).classList.add('selected');
+            showToast("Initiative selected. Click a sector on the stakeholder board.", "info");
+        }
+
+        function placeInitiativeIn(stakeholder) {
+            if (!state.l2.selectedInitiative) {
+                showToast("Select an initiative from the left list first.", "warning");
+                return;
+            }
+
+            const initiative = state.l2.initiatives.find(i => i.id === state.l2.selectedInitiative);
+            if (initiative) {
+                state.l2.placedCards[stakeholder].push(initiative);
+                state.l2.selectedInitiative = null;
+
+                initLevel2();
+                showToast(`Slotted to ${stakeholder.toUpperCase()}`, "success");
+            }
+        }
+
+        function renderL2CircleGraphic() {
+            const categories = ['customers', 'employees', 'investors', 'owners', 'society'];
+
+            categories.forEach((cat) => {
+                const path = document.getElementById(`sec-${cat}`);
+                if (state.l2.placedCards[cat].length > 0) {
+                    path.classList.add('occupied');
+                } else {
+                    path.classList.remove('occupied');
+                }
+            });
+        }
+
+        function removeL2Initiative(stakeholder, index, event) {
+            event.stopPropagation();
+            state.l2.placedCards[stakeholder].splice(index, 1);
+            initLevel2();
+            showToast("Returned card to pool", "info");
+        }
+
+        function recalculateL2Metrics() {
+            let satisfaction = 40;
+            let businessVal = 40;
+
+            for (let key in state.l2.placedCards) {
+                state.l2.placedCards[key].forEach((ini) => {
+                    if (ini.category === key) {
+                        satisfaction += 10;
+                        businessVal += 8;
+                    } else {
+                        // Penalty for misalignment
+                        satisfaction -= 5;
+                        businessVal -= 10;
+                    }
+                });
+            }
+
+            satisfaction = Math.max(0, Math.min(100, satisfaction));
+            businessVal = Math.max(0, Math.min(100, businessVal));
+
+            // Render on gauges
+            document.getElementById('circle-sat-val').innerText = `${satisfaction}%`;
+
+            const satValText = document.getElementById('l2-sat-val');
+            const satBar = document.getElementById('l2-sat-bar');
+            satValText.innerText = `${satisfaction}% (Goal: >75%)`;
+            satBar.style.width = `${satisfaction}%`;
+            satBar.className = satisfaction > 75 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            const valText = document.getElementById('l2-val-val');
+            const valBar = document.getElementById('l2-val-bar');
+            valText.innerText = `${businessVal}% (Goal: >70%)`;
+            valBar.style.width = `${businessVal}%`;
+            valBar.className = businessVal > 70 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+        }
+
+        function verifyLevel2() {
+            // Count total placed
+            let totalPlaced = 0;
+            let misaligned = 0;
+
+            for (let key in state.l2.placedCards) {
+                state.l2.placedCards[key].forEach((ini) => {
+                    totalPlaced++;
+                    if (ini.category !== key) {
+                        misaligned++;
+                    }
+                });
+            }
+
+            if (totalPlaced < 8) {
+                showToast(`Alignment incomplete. Distribute all 8 cards. Placed: ${totalPlaced}/8`, "warning");
+                return;
+            }
+
+            if (misaligned > 0) {
+                showToast("Stakeholder friction detected. Ensure actions match stakeholder needs.", "danger");
+                return;
+            }
+
+            // Recalculate
+            let satisfaction = 40;
+            let businessVal = 40;
+            for (let key in state.l2.placedCards) {
+                state.l2.placedCards[key].forEach((ini) => {
+                    satisfaction += 10;
+                    businessVal += 8;
+                });
+            }
+
+            if (satisfaction > 75 && businessVal > 70) {
+                showToast("Stakeholder Balance Board validated!", "success");
+                state.completedLevels[1] = true;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(2), 1500);
+            } else {
+                showToast("Scorecard metrics below required margins.", "danger");
+            }
+        }
+
+        function resetLevel2() {
+            state.l2.selectedInitiative = null;
+            state.l2.placedCards = { customers: [], employees: [], investors: [], owners: [], society: [] };
+            initLevel2();
+            showToast("Balance board cleared", "info");
+        }
+
+
+        // ================= LEVEL 3: Value Chain Builder =================
+        function initLevel3() {
+            const pool = document.getElementById('chain-action-pool');
+            pool.innerHTML = '';
+
+            state.l3.actions.forEach((a) => {
+                const card = document.createElement('div');
+                card.className = 'initiative-card';
+                card.id = `l3-${a.id}`;
+                card.innerText = a.text;
+
+                let isPlaced = false;
+                for (let stage in state.l3.placedActions) {
+                    if (state.l3.placedActions[stage] && state.l3.placedActions[stage].id === a.id) {
+                        isPlaced = true;
+                        break;
+                    }
+                }
+
+                if (isPlaced) {
+                    card.classList.add('placed');
+                } else {
+                    card.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectL3Action(a.id);
+                    });
+                }
+
+                pool.appendChild(card);
+            });
+
+            renderL3ChainStages();
+        }
+
+        function selectL3Action(actId) {
+            const selected = document.querySelector('#chain-action-pool .initiative-card.selected');
+            if (selected) selected.classList.remove('selected');
+
+            state.l3.selectedAction = actId;
+            document.getElementById(`l3-${actId}`).classList.add('selected');
+            showToast("Card selected. Click a stage block on the flowchart.", "info");
+        }
+
+        function placeActionInChain(stage) {
+            if (!state.l3.selectedAction) {
+                showToast("Select an action card from the pool list first.", "warning");
+                return;
+            }
+
+            // Check if stage is already occupied
+            if (state.l3.placedActions[stage]) {
+                showToast("Stage occupied. Return current card first.", "warning");
+                return;
+            }
+
+            const actionObj = state.l3.actions.find(a => a.id === state.l3.selectedAction);
+            if (actionObj) {
+                state.l3.placedActions[stage] = actionObj;
+                state.l3.selectedAction = null;
+
+                initLevel3();
+                showToast("Action mapped to value chain stage", "success");
+            }
+        }
+
+        function renderL3ChainStages() {
+            const stages = ['research', 'development', 'marketing', 'sales', 'support', 'loyalty'];
+
+            stages.forEach((st) => {
+                const stageDiv = document.getElementById(`stage-${st}`);
+                const contentDiv = document.getElementById(`content-${st}`);
+                const action = state.l3.placedActions[st];
+
+                if (action) {
+                    stageDiv.classList.add('occupied');
+                    contentDiv.innerHTML = `
+                        <div>${action.text}</div>
+                        <button class="remove-btn" onclick="removeL3Action('${st}', event)" style="margin-top:4px;">×</button>
+                    `;
+                } else {
+                    stageDiv.classList.remove('occupied');
+                    contentDiv.innerHTML = '<span style="color:var(--text-muted); font-size:0.7rem;">Click to map...</span>';
+                }
+            });
+        }
+
+        function removeL3Action(stage, event) {
+            event.stopPropagation();
+            state.l3.placedActions[stage] = null;
+            initLevel3();
+            showToast("Action returned to pool", "info");
+        }
+
+        function verifyLevel3() {
+            let correctCount = 0;
+            let totalPlaced = 0;
+
+            for (let st in state.l3.placedActions) {
+                const action = state.l3.placedActions[st];
+                if (action) {
+                    totalPlaced++;
+                    if (action.correctStage === st) {
+                        correctCount++;
+                    }
+                }
+            }
+
+            if (totalPlaced < 6) {
+                showToast("Pipeline incomplete. Map all 6 stages.", "warning");
+                return;
+            }
+
+            if (correctCount === 6) {
+                runL3TraceAnimation();
+            } else {
+                showToast("Incorrect pipeline sequence detected. Align logically.", "danger");
+            }
+        }
+
+        function runL3TraceAnimation() {
+            const stages = ['research', 'development', 'marketing', 'sales', 'support', 'loyalty'];
+            const log = document.getElementById('chain-log');
+            const pulse = document.getElementById('chain-pulse');
+
+            log.innerText = "[SYSTEM] Value Chain verified. Launching tracing indicators...";
+            pulse.style.display = 'block';
+
+            let current = 0;
+
+            function traceStep() {
+                if (current < stages.length) {
+                    const st = stages[current];
+                    const stageDiv = document.getElementById(`stage-${st}`);
+
+                    // Highlight current stage
+                    document.querySelectorAll('.value-chain-stage').forEach(el => el.classList.remove('pulse-active'));
+                    stageDiv.classList.add('pulse-active');
+
+                    // Move indicator coordinate
+                    const offsetLeft = stageDiv.offsetLeft + (stageDiv.offsetWidth / 2) - 8;
+                    pulse.style.left = `${offsetLeft}px`;
+
+                    let desc = "";
+                    if (st === 'research') desc = "Value Identified: Customer surveys highlight latency complaints.";
+                    if (st === 'development') desc = "Value Created: Product team programs custom database patch tools.";
+                    if (st === 'marketing') desc = "Value Communicated: Digital promotions increase awareness.";
+                    if (st === 'sales') desc = "Value Captured: Subscriptions are purchased securely.";
+                    if (st === 'support') desc = "Value Sustained: Rapid ticket resolutions maintain stability.";
+                    if (st === 'loyalty') desc = "Value Multiplied: Referral discount campaigns recruit new cycles.";
+
+                    log.innerText = `[STAGE ${current + 1}/6] ${desc}`;
+
+                    current++;
+                    setTimeout(traceStep, 1800);
+                } else {
+                    pulse.style.display = 'none';
+                    document.querySelectorAll('.value-chain-stage').forEach(el => el.classList.remove('pulse-active'));
+                    log.innerText = "[SYSTEM] Value pipeline trace run completed. Flow active.";
+                    showToast("Value Chain verified!", "success");
+
+                    state.completedLevels[2] = true;
+                    updateNavigationPills();
+
+                    setTimeout(() => showSummaryDialog(3), 1500);
+                }
+            }
+
+            traceStep();
+        }
+
+        function resetLevel3() {
+            state.l3.selectedAction = null;
+            state.l3.placedActions = { research: null, development: null, marketing: null, sales: null, support: null, loyalty: null };
+            document.getElementById('chain-pulse').style.display = 'none';
+            document.getElementById('chain-log').innerText = "Value route status: Waiting for complete pipeline alignment.";
+            initLevel3();
+            showToast("Value chain workspace cleared", "info");
+        }
+
+
+        // ================= LEVEL 4: Impact Decision Lab =================
+        function initLevel4() {
+            renderL4Scenario();
+            recalculateL4Metrics();
+        }
+
+        function renderL4Scenario() {
+            const idx = state.l4.currentScenario;
+            const scen = state.l4.scenarios[idx];
+
+            document.getElementById('l4-scenario-counter').innerText = `Scenario ${idx} of 3`;
+            document.getElementById('l4-prev-scen-btn').disabled = (idx === 1);
+            document.getElementById('l4-next-scen-btn').disabled = (idx === 3);
+
+            const panel = document.getElementById('l4-scenario-panel');
+            panel.innerHTML = `
+                <div class="scenario-meta">${scen.meta}</div>
+                <h3 class="scenario-title">${scen.title}</h3>
+                <p class="scenario-desc">${scen.desc}</p>
+                <div class="scenario-options-grid">
+                    <button class="opt-card-btn ${state.l4.choices[idx] === 'a' ? 'selected' : ''}" onclick="selectL4Option('a')">
+                        <span class="opt-card-btn-title">Option A: ${scen.options[0].text}</span>
+                        <span class="opt-card-btn-impact">Revenue ${scen.options[0].impact.revenue > 0 ? '+' : ''}${scen.options[0].impact.revenue}% | Morale ${scen.options[0].impact.morale > 0 ? '+' : ''}${scen.options[0].impact.morale}%</span>
+                    </button>
+                    <button class="opt-card-btn ${state.l4.choices[idx] === 'b' ? 'selected' : ''}" onclick="selectL4Option('b')">
+                        <span class="opt-card-btn-title">Option B: ${scen.options[1].text}</span>
+                        <span class="opt-card-btn-impact">Customer ${scen.options[1].impact.customer > 0 ? '+' : ''}${scen.options[1].impact.customer}% | Reputation ${scen.options[1].impact.reputation > 0 ? '+' : ''}${scen.options[1].impact.reputation}%</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function selectL4Option(choiceKey) {
+            const idx = state.l4.currentScenario;
+            state.l4.choices[idx] = choiceKey;
+
+            renderL4Scenario();
+            recalculateL4Metrics();
+
+            // Check if all choices made
+            const allDecided = (state.l4.choices[1] && state.l4.choices[2] && state.l4.choices[3]);
+            document.getElementById('l4-verify-btn').disabled = !allDecided;
+        }
+
+        function nextScenario() {
+            if (state.l4.currentScenario < 3) {
+                state.l4.currentScenario++;
+                renderL4Scenario();
+            }
+        }
+
+        function prevScenario() {
+            if (state.l4.currentScenario > 1) {
+                state.l4.currentScenario--;
+                renderL4Scenario();
+            }
+        }
+
+        function recalculateL4Metrics() {
+            let customer = 50;
+            let morale = 50;
+            let revenue = 50;
+            let reputation = 50;
+
+            for (let idx = 1; idx <= 3; idx++) {
+                const choiceKey = state.l4.choices[idx];
+                if (choiceKey) {
+                    const option = state.l4.scenarios[idx].options.find(o => o.key === choiceKey);
+                    customer += option.impact.customer || 0;
+                    morale += option.impact.morale || 0;
+                    revenue += option.impact.revenue || 0;
+                    reputation += option.impact.reputation || 0;
+                }
+            }
+
+            customer = Math.max(0, Math.min(100, customer));
+            morale = Math.max(0, Math.min(100, morale));
+            revenue = Math.max(0, Math.min(100, revenue));
+            reputation = Math.max(0, Math.min(100, reputation));
+
+            // Render
+            const cText = document.getElementById('l4-cust-val');
+            const cBar = document.getElementById('l4-cust-bar');
+            cText.innerText = `${customer}% (Goal: >50%)`;
+            cBar.style.width = `${customer}%`;
+            cBar.className = customer > 50 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            const mText = document.getElementById('l4-morale-val');
+            const mBar = document.getElementById('l4-morale-bar');
+            mText.innerText = `${morale}% (Goal: >50%)`;
+            mBar.style.width = `${morale}%`;
+            mBar.className = morale > 50 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            const rText = document.getElementById('l4-rev-val');
+            const rBar = document.getElementById('l4-rev-bar');
+            rText.innerText = `${revenue}% (Goal: >50%)`;
+            rBar.style.width = `${revenue}%`;
+            rBar.className = revenue > 50 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            const repText = document.getElementById('l4-rep-val');
+            const repBar = document.getElementById('l4-rep-bar');
+            repText.innerText = `${reputation}% (Goal: >50%)`;
+            repBar.style.width = `${reputation}%`;
+            repBar.className = reputation > 50 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+        }
+
+        function verifyLevel4() {
+            let customer = 50;
+            let morale = 50;
+            let revenue = 50;
+            let reputation = 50;
+
+            for (let idx = 1; idx <= 3; idx++) {
+                const choiceKey = state.l4.choices[idx];
+                const option = state.l4.scenarios[idx].options.find(o => o.key === choiceKey);
+                customer += option.impact.customer || 0;
+                morale += option.impact.morale || 0;
+                revenue += option.impact.revenue || 0;
+                reputation += option.impact.reputation || 0;
+            }
+
+            if (customer > 50 && morale > 50 && revenue > 50 && reputation > 50) {
+                showToast("Strategic trade-offs successfully balanced!", "success");
+                state.completedLevels[3] = true;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(4), 1500);
+            } else {
+                showToast("Strategic alignment failed. One or more parameters fell below 50%.", "danger");
+            }
+        }
+
+        function resetLevel4() {
+            state.l4.choices = { 1: null, 2: null, 3: null };
+            state.l4.currentScenario = 1;
+            document.getElementById('l4-verify-btn').disabled = true;
+            initLevel4();
+            showToast("Decisions reset", "info");
+        }
+
+
+        // ================= LEVEL 5: Value Creation Command Center =================
+        function updateL5KPIs() {
+            const kpis = state.l5.kpis;
+
+            document.getElementById('kpi-goal').innerText = kpis.goal;
+            document.getElementById('fill-goal').style.width = `${kpis.goal}%`;
+
+            document.getElementById('kpi-customer').innerText = kpis.customer;
+            document.getElementById('fill-customer').style.width = `${kpis.customer}%`;
+
+            document.getElementById('kpi-employee').innerText = kpis.employee;
+            document.getElementById('fill-employee').style.width = `${kpis.employee}%`;
+
+            document.getElementById('kpi-reputation').innerText = kpis.reputation;
+            document.getElementById('fill-reputation').style.width = `${kpis.reputation}%`;
+
+            document.getElementById('kpi-revenue').innerText = kpis.revenue;
+            document.getElementById('fill-revenue').style.width = `${kpis.revenue}%`;
+        }
+
+        function startL5Ticker() {
+            if (state.l5.status === 'running') return;
+
+            state.l5.status = 'running';
+            document.getElementById('l5-status').innerText = 'Running';
+            document.getElementById('l5-status').className = 'console-status-badge running';
+            document.getElementById('l5-start-btn').disabled = true;
+            document.getElementById('l5-pause-btn').disabled = false;
+
+            logToTerminal(`[SYSTEM] Expansion sequence launched. Value indicators connected.`, 'system');
+
+            state.l5.timerId = setInterval(() => {
+                if (state.l5.month < 12) {
+                    state.l5.month++;
+                    document.getElementById('console-month-ticker').innerText = `MONTH ${state.l5.month} OF 12`;
+
+                    if (state.l5.events[state.l5.month]) {
+                        pauseL5Ticker();
+                        triggerL5Incident(state.l5.month);
+                    } else {
+                        applyL5MonthlyFriction();
+                    }
+                } else {
+                    clearInterval(state.l5.timerId);
+                    endL5Simulation();
+                }
+            }, 2000);
+        }
+
+        function pauseL5Ticker() {
+            state.l5.status = 'paused';
+            document.getElementById('l5-status').innerText = 'Paused';
+            document.getElementById('l5-status').className = 'console-status-badge';
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            if (state.l5.timerId) {
+                clearInterval(state.l5.timerId);
+            }
+        }
+
+        function applyL5MonthlyFriction() {
+            const employeeOffset = state.l5.kpis.employee > 70 ? 2 : -2;
+            const reputationOffset = state.l5.kpis.reputation > 70 ? 2 : -2;
+
+            state.l5.kpis.customer = Math.max(0, Math.min(100, state.l5.kpis.customer + employeeOffset));
+            state.l5.kpis.revenue = Math.max(0, Math.min(100, state.l5.kpis.revenue + reputationOffset));
+
+            updateL5KPIs();
+            logToTerminal(`Month ${state.l5.month}: Operational trace complete. Metric influences updated.`);
+        }
+
+        function logToTerminal(text, type = '') {
+            const terminal = document.getElementById('l5-terminal-ticker');
+            const row = document.createElement('div');
+            row.className = `terminal-row ${type}`;
+            row.innerText = text;
+            terminal.appendChild(row);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function triggerL5Incident(month) {
+            const ev = state.l5.events[month];
+            state.l5.activeEvent = ev;
+
+            document.getElementById('l5-incident-month').innerText = `Month ${month}`;
+            document.getElementById('inc-title').innerText = ev.title;
+            document.getElementById('inc-desc').innerText = ev.desc;
+
+            const overlay = document.getElementById('l5-incident-overlay');
+            const optionsDiv = document.getElementById('inc-options');
+            optionsDiv.innerHTML = '';
+
+            ev.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'incident-opt-btn';
+
+                let impacts = [];
+                for (let k in opt.impact) {
+                    impacts.push(`${k.toUpperCase()} ${opt.impact[k] > 0 ? '+' : ''}${opt.impact[k]}`);
+                }
+
+                btn.innerHTML = `
+                    <span class="incident-opt-title">${idx === 0 ? 'Option A' : 'Option B'}: ${opt.text}</span>
+                    <span class="incident-opt-impact">Projected Metrics: ${impacts.join(', ')}</span>
+                `;
+                btn.addEventListener('click', () => makeL5Decision(idx));
+                optionsDiv.appendChild(btn);
+            });
+
+            overlay.style.display = 'flex';
+            logToTerminal(`[WARNING] Month ${month} Incident Alert: ${ev.title}`, 'warning');
+        }
+
+        function makeL5Decision(optIndex) {
+            const ev = state.l5.activeEvent;
+            const choice = ev.options[optIndex];
+
+            for (let k in choice.impact) {
+                state.l5.kpis[k] = Math.max(0, Math.min(100, state.l5.kpis[k] + choice.impact[k]));
+            }
+
+            state.l5.historyChoices.push(choice.log);
+            updateL5KPIs();
+
+            document.getElementById('l5-incident-overlay').style.display = 'none';
+            logToTerminal(`[DECISION] Locked: ${choice.log}`, 'success');
+
+            startL5Ticker();
+        }
+
+        function endL5Simulation() {
+            state.l5.status = 'finished';
+            document.getElementById('l5-status').innerText = 'Finished';
+            document.getElementById('l5-status').className = 'console-status-badge';
+            document.getElementById('l5-start-btn').disabled = true;
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            showL5Scorecard();
+        }
+
+        function showL5Scorecard() {
+            const kpis = state.l5.kpis;
+
+            const won = (
+                kpis.goal >= 85 &&
+                kpis.customer >= 80 &&
+                kpis.employee >= 80 &&
+                kpis.reputation >= 80 &&
+                kpis.revenue >= 75
+            );
+
+            const banner = document.getElementById('scorecard-banner-status');
+            const evalText = document.getElementById('scorecard-eval-text');
+
+            if (won) {
+                banner.innerText = 'SUCCESSFUL VALUE-DRIVEN BUSINESS CREATED';
+                banner.className = 'scorecard-banner success';
+                evalText.innerHTML = `
+                    <p><strong>Congratulations! ValueHub expanded with high stakeholder trust indexes.</strong></p>
+                    <p style="margin-top:6px;">Your management successfully aligned SMART business objectives with customer values, employee upskilling, and secure revenues.</p>
+                    <ul style="margin-top:8px; padding-left:20px;">
+                        <li>Strengths: Maintained high customer NPS values while transitioning to sustainable operations.</li>
+                        <li>Improvements: Ad and training budgets were heavy; refine operational capital allocation.</li>
+                    </ul>
+                `;
+            } else {
+                banner.innerText = 'OBJECTIVES NEED BETTER ALIGNMENT';
+                banner.className = 'scorecard-banner failed';
+                evalText.innerHTML = `
+                    <p><strong>Your value calibration fell below required levels!</strong></p>
+                    <p style="margin-top:6px;">ValueHub struggled to maintain core employee satisfaction and brand trust metrics during server migrations and cost-cutting cycles.</p>
+                    <ul style="margin-top:8px; padding-left:20px;">
+                        <li>Strengths: Sustained core enterprise pricing margins.</li>
+                        <li>Areas of Improvement: Balanced trade-offs are required; avoid heavy cost cuts that degrade support trust.</li>
+                    </ul>
+                `;
+            }
+
+            // Fill KPI values
+            document.getElementById('card-goal').innerText = `${kpis.goal} / 100`;
+            document.getElementById('card-customer').innerText = `${kpis.customer} / 100`;
+            document.getElementById('card-employee').innerText = `${kpis.employee} / 100`;
+            document.getElementById('card-reputation').innerText = `${kpis.reputation} / 100`;
+            document.getElementById('card-revenue').innerText = `${kpis.revenue} / 100`;
+
+            scorecardDialog.showModal();
+        }
+
+        function resetFullSimulation() {
+            state.completedLevels = [false, false, false, false, false];
+
+            // Reset L1
+            state.l1.completedGoals = [];
+            state.l1.activeGoal = null;
+            document.getElementById('l1-repaired-box').style.display = 'none';
+            document.getElementById('builder-target-title').innerText = 'Select a Goal to Repair';
+
+            // Reset L2
+            state.l2.selectedInitiative = null;
+            state.l2.placedCards = { customers: [], employees: [], investors: [], owners: [], society: [] };
+
+            // Reset L3
+            state.l3.selectedAction = null;
+            state.l3.placedActions = { research: null, development: null, marketing: null, sales: null, support: null, loyalty: null };
+            document.getElementById('chain-pulse').style.display = 'none';
+            document.getElementById('chain-log').innerText = "Value route status: Waiting for complete pipeline alignment.";
+
+            // Reset L4
+            state.l4.choices = { 1: null, 2: null, 3: null };
+            state.l4.currentScenario = 1;
+            document.getElementById('l4-verify-btn').disabled = true;
+
+            // Reset L5
+            state.l5.month = 1;
+            state.l5.status = 'idle';
+            state.l5.kpis = { goal: 50, customer: 50, employee: 50, reputation: 50, revenue: 50 };
+            state.l5.historyChoices = [];
+
+            document.getElementById('console-month-ticker').innerText = 'MONTH 1 OF 12';
+            document.getElementById('l5-terminal-ticker').innerHTML = `
+                <div class="terminal-row">[SYSTEM] Objective setting database loaded.</div>
+                <div class="terminal-row">[SYSTEM] CVO console online. Click "Launch 12-Month Cycle".</div>
+            `;
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            scorecardDialog.close();
+            navigateToLevel(1);
+        }
+
+
+        // ================= LEARNING SUMMARY SYSTEM =================
+        const summaries = {
+            1: {
+                title: "Level 1 Complete: Goals Repaired",
+                body: `
+                    <p><strong>SMART Objectives Framework:</strong></p>
+                    <p>Before launching plans, leaders must design SMART goals:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Specific:</strong> Targets a precise area (e.g. reduce load times, improve NPS).</li>
+                        <li><strong>Measurable:</strong> Defines quantitative indices (e.g. 20%, 15 points).</li>
+                        <li><strong>Achievable:</strong> Pragmatic operational actions (e.g. support staff training).</li>
+                        <li><strong>Relevant:</strong> Aligns with the core mission (e.g. prevent cart abandonment).</li>
+                        <li><strong>Time-bound:</strong> Establishes clear milestone deadlines (e.g. within 6 months, Q3).</li>
+                    </ul>
+                `
+            },
+            2: {
+                title: "Level 2 Complete: Stakeholders Reconciled",
+                body: `
+                    <p><strong>Stakeholder Value Creation:</strong></p>
+                    <p>Sustainable firms look beyond immediate profits to satisfy a network of stakeholder nodes:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Customers:</strong> Retained via support speed and product quality adjustments.</li>
+                        <li><strong>Employees:</strong> Motivated through training programs and flexible policies.</li>
+                        <li><strong>Investors & Owners:</strong> Require structured capital distribution and long-term equity growth.</li>
+                        <li><strong>Society:</strong> Values carbon-neutral hosting, green initiatives, and local community programs.</li>
+                    </ul>
+                `
+            },
+            3: {
+                title: "Level 3 Complete: Value Pipeline Aligned",
+                body: `
+                    <p><strong>Upstream to Downstream Operations:</strong></p>
+                    <p>Value moves sequentially through key Porter-aligned pipeline stages:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Research:</strong> Identifies client pain points via user data logs.</li>
+                        <li><strong>Product Dev:</strong> Programs features to resolve the scanned needs.</li>
+                        <li><strong>Marketing & Sales:</strong> Directs product awareness and captures transaction margins.</li>
+                        <li><strong>Support & Loyalty:</strong> Solves post-sale bottlenecks to establish customer referral loops.</li>
+                    </ul>
+                `
+            },
+            4: {
+                title: "Level 4 Complete: Impacts Analyzed",
+                body: `
+                    <p><strong>Strategic Trade-off Management:</strong></p>
+                    <p>CVOs handle complex trade-offs where options contain double-sided impacts:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li>Cutting customer support costs yields immediate cash flow, but degrades long-term NPS and brand reputation.</li>
+                        <li>Investing in full-stack training incurs direct operational expenses, but raises platform speed and team morale.</li>
+                        <li>Moving to cheap hosting reduces server expenses, but increases security compliance risks.</li>
+                    </ul>
+                `
+            }
+        };
+
+        function showSummaryDialog(levelIndex) {
+            const data = summaries[levelIndex];
+            document.getElementById('summary-dialog-title').innerText = data.title;
+            document.getElementById('summary-dialog-content').innerHTML = data.body;
+
+            document.getElementById('summary-next-btn').setAttribute('data-target-level', levelIndex + 1);
+            summaryDialog.showModal();
+        }
+
+        function confirmSummaryNextLevel() {
+            const nextLevel = parseInt(document.getElementById('summary-next-btn').getAttribute('data-target-level'));
+            summaryDialog.close();
+
+            if (nextLevel <= 5) {
+                navigateToLevel(nextLevel);
+            }
+        }
+    </script>
+</body>
+
+</html>

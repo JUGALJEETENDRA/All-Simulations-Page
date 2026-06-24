@@ -1,1 +1,3366 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Digital Business & Transformation - Module 4.4 Regulatory Environment, Compliance, Economic, and Competitive Factors Simulation">
+    <title>Digital Business & Transformation - Module 4.4 Simulation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-red: #C62828;
+            --dark-red: #8E0000;
+            --light-red: #EF5350;
+            --bg-red: #FFF5F5;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --border-color: #DDDDDD;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --warning: #FF9800;
+            --warning-bg: #FFF3E0;
+            --info: #0277BD;
+            --info-bg: #E1F5FE;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 4px 12px rgba(198, 40, 40, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 8px 24px rgba(198, 40, 40, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-red);
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: toastIn 0.3s forwards;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        @keyframes toastIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast.info {
+            border-left-color: var(--info);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* Header CSS */
+        header {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: var(--white);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--light-red);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--white);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        header p {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Stepper Navigation Card */
+        .progress-card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-family: var(--font-display);
+        }
+
+        .progress-title {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .progress-percent {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .progress-bar-container {
+            background: #EAEAEA;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--light-red), var(--primary-red));
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.4s ease-in-out;
+        }
+
+        .level-stepper {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .step-pill {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .step-pill:hover {
+            border-color: var(--light-red);
+            color: var(--primary-red);
+            background: var(--bg-red);
+        }
+
+        .step-pill.active {
+            background: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2);
+        }
+
+        .step-pill.active:hover {
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-pill.completed {
+            background: var(--success-bg);
+            color: var(--success);
+            border-color: #C8E6C9;
+        }
+
+        .step-pill.completed::after {
+            content: ' ✓';
+            font-weight: 700;
+        }
+
+        /* Screen Wrapper */
+        .screen {
+            display: none;
+            animation: slideUp 0.35s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Content Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: var(--primary-red);
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg-red);
+            padding-bottom: 8px;
+        }
+
+        .card p.intro-text {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .objective-box {
+            background: var(--bg-red);
+            border-left: 4px solid var(--primary-red);
+            padding: 15px 18px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--info-bg);
+            border-left: 4px solid var(--info);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--info);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        .objective-box strong {
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            color: var(--dark-red);
+            margin-bottom: 4px;
+        }
+
+        .objective-box p {
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            background: var(--primary-red);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(198, 40, 40, 0.12);
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--dark-red);
+            box-shadow: 0 6px 14px rgba(198, 40, 40, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-red);
+            border: 2px solid var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-red);
+            color: var(--dark-red);
+            border-color: var(--dark-red);
+        }
+
+        .btn-secondary {
+            background: #EAEAEA;
+            color: var(--text-dark);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: #DCDCDC;
+        }
+
+        /* Intro Screen Specifics */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .intro-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .intro-graphic {
+            background: radial-gradient(circle, var(--bg-red) 0%, #FFFFFF 70%);
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .intro-graphic svg {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        /* Modal System */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: modalIn 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--white);
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-content {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            background: var(--bg-light);
+        }
+
+        /* Help Info Trigger Icon */
+        .help-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: var(--info);
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            vertical-align: middle;
+            transition: var(--transition);
+        }
+
+        .help-trigger:hover {
+            background: var(--text-dark);
+        }
+
+        /* LEVEL 1: Drag & Drop Audit Styles */
+        .l1-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .audit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .audit-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--text-muted);
+            border-radius: 8px;
+            padding: 14px 16px;
+            cursor: grab;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .audit-card:hover {
+            transform: translateX(2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+            border-left-color: var(--primary-red);
+        }
+
+        .audit-card:active {
+            cursor: grabbing;
+        }
+
+        .audit-dept-label {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary-red);
+        }
+
+        .audit-card-body {
+            font-size: 0.88rem;
+            color: var(--text-dark);
+        }
+
+        /* Mobile fallback picker UI */
+        .mobile-picker {
+            display: none;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .picker-btn {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .picker-btn:hover {
+            background: var(--bg-red);
+            border-color: var(--light-red);
+            color: var(--primary-red);
+        }
+
+        .picker-btn.active {
+            background: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+        }
+
+        @media (max-width: 600px) {
+            .mobile-picker {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .audit-card {
+                cursor: default;
+            }
+
+            .audit-card:active {
+                cursor: default;
+            }
+        }
+
+        .bins-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bin-zone {
+            background: #FAF8F8;
+            border: 2px dashed #E0D0D0;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 120px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bin-zone.dragover {
+            background: var(--bg-red);
+            border-color: var(--primary-red);
+            transform: scale(1.01);
+        }
+
+        .bin-zone h4 {
+            font-size: 0.92rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bin-badge {
+            background: #ECEFF1;
+            color: #455A64;
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .bin-zone.legal h4 {
+            color: var(--primary-red);
+        }
+
+        .bin-zone.legal .bin-badge {
+            background: var(--bg-red);
+            color: var(--primary-red);
+        }
+
+        .bin-zone.regulatory h4 {
+            color: var(--warning);
+        }
+
+        .bin-zone.regulatory .bin-badge {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .bin-zone.compliant h4 {
+            color: var(--success);
+        }
+
+        .bin-zone.compliant .bin-badge {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .bin-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 50px;
+        }
+
+        /* LEVEL 2: Law Builder Challenge */
+        .l2-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l2-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .regulation-box {
+            border: 1px solid var(--border-color);
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .regulation-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .regulation-desc {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .regulation-consequence {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 6px;
+            border-left: 3px solid var(--warning);
+        }
+
+        .policy-deck {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .policy-item {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .policy-item:hover:not(.disabled) {
+            border-color: var(--primary-red);
+            background: var(--bg-red);
+            transform: translateX(2px);
+        }
+
+        .policy-item.selected {
+            border-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .policy-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .policy-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .policy-title {
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .policy-cost {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .policy-impact {
+            font-size: 0.78rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .policy-status-icon {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: transparent;
+            transition: var(--transition);
+        }
+
+        .policy-item.selected .policy-status-icon {
+            border-color: var(--success);
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .policy-item.ignored .policy-status-icon {
+            border-color: var(--warning);
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .l2-dash {
+            background: #FAF8F8;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .dashboard-val-box {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dash-label {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .dash-val {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        /* LEVEL 3: Competitor War Room */
+        .l3-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l3-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .competitor-card {
+            border: 1px solid var(--border-color);
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid var(--primary-red);
+            margin-bottom: 20px;
+        }
+
+        .competitor-avatar {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: var(--primary-red);
+            color: var(--white);
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .competitor-alert-text {
+            font-size: 1.02rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .response-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .response-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .response-btn:hover {
+            border-color: var(--primary-red);
+            background: var(--bg-red);
+        }
+
+        .response-btn-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--primary-red);
+        }
+
+        .response-btn-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .l3-dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* LEVEL 4: Economic Shock Simulator */
+        .l4-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l4-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .slider-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .slider-val {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 0.92rem;
+        }
+
+        .slider-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-control input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #EAEAEA;
+            outline: none;
+        }
+
+        .slider-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-red);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .slider-control input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        .budget-checker {
+            background: #FAF8F8;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .budget-checker-status {
+            font-family: var(--font-mono);
+            color: var(--primary-red);
+        }
+
+        .budget-checker.valid .budget-checker-status {
+            color: var(--success);
+        }
+
+        /* LEVEL 5: Regulatory Command Center */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l5-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .timeline-tracker {
+            background: var(--text-dark);
+            color: var(--white);
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .timeline-day {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .timeline-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #555;
+            margin: 0 20px;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-progress-fill {
+            height: 100%;
+            background: var(--primary-red);
+            width: 0%;
+            transition: width 0.3s linear;
+        }
+
+        .l5-event-card {
+            border: 1px solid var(--border-color);
+            background: var(--bg-red);
+            border-radius: 8px;
+            padding: 24px;
+            border-left: 4px solid var(--primary-red);
+            margin-bottom: 20px;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        .l5-event-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark-red);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .l5-event-body {
+            font-size: 0.95rem;
+            margin-bottom: 18px;
+            color: var(--text-dark);
+        }
+
+        .l5-event-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .l5-opt-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .l5-opt-btn:hover {
+            border-color: var(--primary-red);
+            background: var(--bg-red);
+        }
+
+        .l5-ticker-status {
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
+
+        .dash-kpis {
+            background: #FAF8F8;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .kpi-row {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 80px;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .kpi-label {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .kpi-bar-outer {
+            height: 6px;
+            background: #ECEFF1;
+            border-radius: 3px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .kpi-bar-inner {
+            height: 100%;
+            background: var(--primary-red);
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+
+        .kpi-value-box {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-val {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .kpi-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: #E0E0E0;
+            color: #666;
+        }
+
+        .kpi-badge.pass {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .kpi-badge.fail {
+            background: var(--bg-red);
+            color: var(--primary-red);
+        }
+
+        /* Final Review Card */
+        .review-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .review-card {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .review-box {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .review-box h4 {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .review-box.strengths {
+            border-left: 4px solid var(--success);
+        }
+
+        .review-box.strengths h4 {
+            color: var(--success);
+        }
+
+        .review-box.weaknesses {
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .review-box.weaknesses h4 {
+            color: var(--primary-red);
+        }
+
+        .review-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.88rem;
+        }
+
+        .review-list li {
+            position: relative;
+            padding-left: 18px;
+        }
+
+        .review-box.strengths .review-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .review-box.weaknesses .review-list li::before {
+            content: '×';
+            position: absolute;
+            left: 0;
+            color: var(--primary-red);
+            font-weight: bold;
+            font-size: 1.1rem;
+            line-height: 0.8;
+        }
+
+        /* Footer styling */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Digital Business & Transformation – Module 4.4 Simulation</h1>
+        <p>Regulatory Environment and Compliance; Economic and Competitive Factors</p>
+    </header>
+
+    <div class="container">
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <div id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--info); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--info); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Regulations & Competitive Factors (Module 4.4)
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. Regulatory Compliance:</strong> Managing external rules
+                        (consumer protection, ad standards) ensures a business operates legally. Failures trigger
+                        audits, legal bans, or financial penalties.</p>
+                    <p><strong>2. Competitive Strategy:</strong> Tracking competitor price shifts and product launches
+                        helps managers design defensive actions to protect market share.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Economic Shocks:</strong> Volatile macroeconomics
+                        (interest rates, inflation) dictate cost of capital and consumer spend. Strategies must scale
+                        budgets to preserve runway.</p>
+                    <p><strong>4. Corporate Compliance Balance:</strong> Executives coordinate legal policy with market
+                        competition to achieve growth without overstepping regulatory boundaries.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Progress & Stepper -->
+        <div class="progress-card" id="stepperContainer" style="display: none;">
+            <div class="progress-header">
+                <span class="progress-title">SmartCorp Operational Readiness</span>
+                <span class="progress-percent" id="simProgressPct">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="simProgressBarFill"></div>
+            </div>
+            <div class="level-stepper">
+                <div class="step-pill" data-level="1" onclick="jumpToLevel(1)">1. Compliance Detective</div>
+                <div class="step-pill" data-level="2" onclick="jumpToLevel(2)">2. Law Builder</div>
+                <div class="step-pill" data-level="3" onclick="jumpToLevel(3)">3. Competitor War Room</div>
+                <div class="step-pill" data-level="4" onclick="jumpToLevel(4)">4. Economic Shock</div>
+                <div class="step-pill" data-level="5" onclick="jumpToLevel(5)">5. Regulatory Command</div>
+            </div>
+        </div>
+
+        <!-- ================= WELCOME SCREEN ================= -->
+        <div class="screen active" id="screenWelcome">
+            <div class="card" style="padding: 40px;">
+                <div class="intro-grid">
+                    <div class="welcome-text">
+                        <h2>Appointment: Chief Compliance & Strategy Officer (CCSO)</h2>
+                        <p class="intro-text" style="font-size: 1.1rem; margin-top: 15px;">
+                            SmartCorp has grown from a high-tech startup into a mid-market digital powerhouse. However,
+                            our rapid expansion has drawn the attention of regulatory bodies, fierce digital
+                            competitors, and volatile economic markets.
+                        </p>
+                        <p class="intro-text">
+                            The Board of Directors has established the role of <strong>Chief Compliance & Strategy
+                                Officer</strong>. Your mission is to establish legal and regulatory compliance controls,
+                            design corporate policy in response to consumer protections, defend market share from
+                            aggressive rival actions, and adjust resource allocations during severe economic shocks.
+                        </p>
+                        <div class="objective-box">
+                            <strong>Strategic Mandate:</strong>
+                            <p>You must maintain trust with users, satisfy legal authorities, remain highly competitive,
+                                and survive financial crises. Good luck, CCSO.</p>
+                        </div>
+                        <button class="btn" onclick="startSimulation()">Initialize Command Center</button>
+                    </div>
+                    <div class="intro-graphic">
+                        <!-- Immersive Office Visual SVG -->
+                        <svg viewBox="0 0 400 300" width="100%">
+                            <rect x="20" y="30" width="360" height="240" rx="15" fill="#FAF9F9" stroke="#DDDDDD"
+                                stroke-width="3" />
+                            <rect x="35" y="45" width="330" height="150" rx="8" fill="#FFFFFF" stroke="#ECEFF1"
+                                stroke-width="2" />
+                            <path d="M35 195 h330 v55 r8 0 r0 8 r-8 0 r0 -55" fill="#37474F" />
+                            <circle cx="55" cy="222" r="10" fill="#EF5350" />
+                            <circle cx="85" cy="222" r="10" fill="#FFB74D" />
+                            <circle cx="115" cy="222" r="10" fill="#81C784" />
+                            <line x1="145" y1="217" x2="245" y2="217" stroke="#ECEFF1" stroke-width="3"
+                                stroke-linecap="round" />
+                            <line x1="145" y1="227" x2="215" y2="227" stroke="#90A4AE" stroke-width="3"
+                                stroke-linecap="round" />
+                            <!-- Graphical representation of dashboard metrics -->
+                            <rect x="55" y="70" width="60" height="100" rx="4" fill="#FFEBEE" />
+                            <rect x="55" y="110" width="60" height="60" rx="4" fill="#C62828" />
+                            <rect x="170" y="70" width="60" height="100" rx="4" fill="#E8F5E9" />
+                            <rect x="170" y="95" width="60" height="75" rx="4" fill="#2E7D32" />
+                            <rect x="285" y="70" width="60" height="100" rx="4" fill="#FFF3E0" />
+                            <rect x="285" y="125" width="60" height="45" rx="4" fill="#FF9800" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LEVEL 1: COMPLIANCE DETECTIVE ================= -->
+        <div class="screen" id="screenL1">
+            <div class="card">
+                <h2>Level 1: Compliance Detective <span class="help-trigger" onclick="showHelp('l1')">?</span></h2>
+                <p class="intro-text">
+                    SmartCorp is undergoing an internal compliance assessment. Different departments have adopted
+                    operational guidelines. Audit each statement and categorize them to identify hidden liabilities.
+                </p>
+                <div class="objective-box">
+                    <strong>Objective:</strong>
+                    <p>Drag the 8 departmental operational practices (on the left) into their correct categories (on the
+                        right): <strong>Legal Issue</strong> (violates consumer or accounting statutes),
+                        <strong>Regulatory Issue</strong> (violates industry commissions or data directives), or
+                        <strong>Compliant Practice</strong> (aligns with modern corporate policy standards).
+                    </p>
+                </div>
+
+                <div class="l1-layout">
+                    <!-- Left: Audit Items -->
+                    <div>
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Departmental Audited Practices</h4>
+                        <div class="audit-list" id="l1AuditList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Drop Zones -->
+                    <div class="bins-list">
+                        <div class="bin-zone legal" data-bin="legal" ondragover="allowDrop(event)"
+                            ondragleave="dragLeave(event)" ondrop="handleDrop(event)">
+                            <h4>Legal Issues (Fraud/Statute Violations) <span class="bin-badge"
+                                    id="badge-legal">0/2</span></h4>
+                            <div class="bin-cards-container" id="bin-legal"></div>
+                        </div>
+                        <div class="bin-zone regulatory" data-bin="regulatory" ondragover="allowDrop(event)"
+                            ondragleave="dragLeave(event)" ondrop="handleDrop(event)">
+                            <h4>Regulatory Issues (Data/Process Infractions) <span class="bin-badge"
+                                    id="badge-regulatory">0/3</span></h4>
+                            <div class="bin-cards-container" id="bin-regulatory"></div>
+                        </div>
+                        <div class="bin-zone compliant" data-bin="compliant" ondragover="allowDrop(event)"
+                            ondragleave="dragLeave(event)" ondrop="handleDrop(event)">
+                            <h4>Compliant Practices (Standard Alignments) <span class="bin-badge"
+                                    id="badge-compliant">0/3</span></h4>
+                            <div class="bin-cards-container" id="bin-compliant"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" id="l1SubmitBtn" onclick="evaluateLevel1()">Analyze Audit Investigation</button>
+                    <button class="btn btn-secondary" onclick="resetLevel1()">Reset Audit Board</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LEVEL 2: LAW BUILDER CHALLENGE ================= -->
+        <div class="screen" id="screenL2">
+            <div class="card">
+                <h2>Level 2: Law Builder Challenge <span class="help-trigger" onclick="showHelp('l2')">?</span></h2>
+                <p class="intro-text">
+                    New consumer data privacy laws and market administrative rules have been introduced. Review each
+                    regulation and adjust SmartCorp's policies using our budget constraints.
+                </p>
+                <div class="objective-box">
+                    <strong>Objective:</strong>
+                    <p>Address all incoming regulations one-by-one by deploying appropriate legal and technical policy
+                        actions. Keep a close eye on your <strong>Policy Budget (₹40,000)</strong> and raise the
+                        <strong>Compliance Meter to 100%</strong>.
+                    </p>
+                </div>
+
+                <div class="l2-layout">
+                    <!-- Left Column: Current Regulation and Actions -->
+                    <div>
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Incoming Regulatory Mandate</h4>
+                        <div class="regulation-box" id="l2RegulationBox">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Policy Deck Options</h4>
+                        <div class="policy-deck" id="l2PolicyDeck">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Compliance Dashboard -->
+                    <div>
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Executive Compliance Board</h4>
+                        <div class="l2-dash">
+                            <div class="dashboard-val-box">
+                                <span class="dash-label">Available Policy Budget</span>
+                                <span class="dash-val" id="l2BudgetVal">₹40,000</span>
+                            </div>
+                            <div class="dashboard-val-box"
+                                style="flex-direction: column; align-items: stretch; gap: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span class="dash-label">Compliance Meter</span>
+                                    <span class="dash-val" id="l2CompliancePct"
+                                        style="color: var(--success);">20%</span>
+                                </div>
+                                <div class="progress-bar-container" style="background: #E0E0E0; margin-bottom: 0;">
+                                    <div class="progress-bar-fill" id="l2ComplianceBar"
+                                        style="width: 20%; background: var(--success);"></div>
+                                </div>
+                            </div>
+                            <div id="l2StatusSummary"
+                                style="font-size: 0.88rem; color: var(--text-muted); background: white; border: 1px solid var(--border-color); padding: 12px; border-radius: 6px;">
+                                Setup status: Select a policy action on the left to start processing the regulation.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" id="l2NextRegBtn" onclick="nextL2Regulation()" disabled>Process Next
+                        Regulation</button>
+                    <button class="btn btn-secondary" onclick="resetLevel2()">Reset Policy Deck</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LEVEL 3: COMPETITOR WAR ROOM ================= -->
+        <div class="screen" id="screenL3">
+            <div class="card">
+                <h2>Level 3: Competitor War Room <span class="help-trigger" onclick="showHelp('l3')">?</span></h2>
+                <p class="intro-text">
+                    Competitors are targeting SmartCorp's clients with aggressive campaigns, feature upgrades, and price
+                    discounts. You must devise corresponding strategy responses.
+                </p>
+                <div class="objective-box">
+                    <strong>Objective:</strong>
+                    <p>Defend our company through 3 rounds of rival moves. Balance your resources to finish the rounds
+                        with <strong>Market Share > 40%</strong>, positive <strong>Revenue</strong>, and high
+                        <strong>Customer Satisfaction</strong>.
+                    </p>
+                </div>
+
+                <div class="l3-layout">
+                    <!-- Left: Current Threat & Strategy Choices -->
+                    <div>
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Rival Intel Feed</h4>
+                        <div class="competitor-card" id="l3ThreatBox">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            SmartCorp Strategy Deck</h4>
+                        <div class="response-options" id="l3ResponseOptions">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Dashboard Metrics -->
+                    <div>
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">Live
+                            Competitive Dashboard</h4>
+                        <div class="l2-dash">
+                            <div class="l3-dash-grid">
+                                <div class="dashboard-val-box"
+                                    style="flex-direction: column; padding: 10px; text-align: center;">
+                                    <span class="dash-label" style="font-size: 0.65rem;">Market Share</span>
+                                    <span class="dash-val" id="l3MarketShareVal" style="font-size: 1.25rem;">50%</span>
+                                </div>
+                                <div class="dashboard-val-box"
+                                    style="flex-direction: column; padding: 10px; text-align: center;">
+                                    <span class="dash-label" style="font-size: 0.65rem;">Revenue</span>
+                                    <span class="dash-val" id="l3RevenueVal" style="font-size: 1.25rem;">₹50k</span>
+                                </div>
+                                <div class="dashboard-val-box"
+                                    style="flex-direction: column; padding: 10px; text-align: center;">
+                                    <span class="dash-label" style="font-size: 0.65rem;">Satisfaction</span>
+                                    <span class="dash-val" id="l3SatisfactionVal" style="font-size: 1.25rem;">70%</span>
+                                </div>
+                            </div>
+                            <div id="l3RoundTracker"
+                                style="font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; text-align: center; color: var(--primary-red);">
+                                Round 1 of 3
+                            </div>
+                            <div id="l3FeedbackPanel"
+                                style="font-size: 0.88rem; color: var(--text-muted); background: white; border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; min-height: 80px;">
+                                Awaiting choice. Choose an action on the left that matches the competitor's competitive
+                                vector.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="resetLevel3()">Restart Battle</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LEVEL 4: ECONOMIC SHOCK SIMULATOR ================= -->
+        <div class="screen" id="screenL4">
+            <div class="card">
+                <h2>Level 4: Economic Shock Simulator <span class="help-trigger" onclick="showHelp('l4')">?</span></h2>
+                <p class="intro-text">
+                    External macroeconomic factors like rising inflation, supply disruptions, and capital market trends
+                    directly affect SmartCorp's bottom line.
+                </p>
+                <div class="objective-box">
+                    <strong>Objective:</strong>
+                    <p>Navigate a 12-month virtual timeline. Reallocate department budgets each month based on incoming
+                        economic shocks. Keep company <strong>Stability above 50%</strong> and maintain positive
+                        <strong>Profit</strong>.
+                    </p>
+                </div>
+
+                <div class="l4-layout">
+                    <!-- Left: Budget allocation sliders -->
+                    <div>
+                        <div class="budget-checker valid" id="l4BudgetChecker">
+                            <span>Monthly Budget Limit: <strong>₹100,000</strong></span>
+                            <span class="budget-checker-status" id="l4BudgetSpent">Total Spent: ₹0</span>
+                        </div>
+
+                        <div class="slider-card">
+                            <div class="slider-header">
+                                <span class="slider-title">Marketing Budget</span>
+                                <span class="slider-val" id="l4ValMarketing">₹25,000</span>
+                            </div>
+                            <div class="slider-control">
+                                <input type="range" min="0" max="100000" step="5000" value="25000"
+                                    id="l4SliderMarketing" oninput="updateL4Budget()">
+                            </div>
+                            <p style="font-size: 0.72rem; color: var(--text-muted);">Acquires customers. Keeping this
+                                under ₹15k harms Customer Retention.</p>
+                        </div>
+
+                        <div class="slider-card">
+                            <div class="slider-header">
+                                <span class="slider-title">Operations Budget</span>
+                                <span class="slider-val" id="l4ValOperations">₹25,000</span>
+                            </div>
+                            <div class="slider-control">
+                                <input type="range" min="0" max="100000" step="5000" value="25000"
+                                    id="l4SliderOperations" oninput="updateL4Budget()">
+                            </div>
+                            <p style="font-size: 0.72rem; color: var(--text-muted);">Covers administrative overhead. If
+                                this is lower than the active inflation baseline, Stability drops.</p>
+                        </div>
+
+                        <div class="slider-card">
+                            <div class="slider-header">
+                                <span class="slider-title">Technology Investment</span>
+                                <span class="slider-val" id="l4ValTech">₹25,000</span>
+                            </div>
+                            <div class="slider-control">
+                                <input type="range" min="0" max="100000" step="5000" value="25000" id="l4SliderTech"
+                                    oninput="updateL4Budget()">
+                            </div>
+                            <p style="font-size: 0.72rem; color: var(--text-muted);">Maintains servers and systems. If
+                                underfunded, cloud storage bills or scale outages will damage Stability.</p>
+                        </div>
+
+                        <div class="slider-card">
+                            <div class="slider-header">
+                                <span class="slider-title">Customer Support Budget</span>
+                                <span class="slider-val" id="l4ValSupport">₹25,000</span>
+                            </div>
+                            <div class="slider-control">
+                                <input type="range" min="0" max="100000" step="5000" value="25000" id="l4SliderSupport"
+                                    oninput="updateL4Budget()">
+                            </div>
+                            <p style="font-size: 0.72rem; color: var(--text-muted);">Supports user inquiries. Keeping
+                                this under ₹15k harms Customer Retention.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Monthly economic shock & Dashboard -->
+                    <div>
+                        <div class="timeline-tracker" style="background: var(--primary-red);">
+                            <span class="timeline-day" id="l4MonthText">Month 1 of 12</span>
+                            <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Economic Shock
+                                Log</span>
+                        </div>
+
+                        <div class="regulation-box" style="border-left: 4px solid var(--warning); margin-bottom: 20px;">
+                            <span class="regulation-tag" style="color: var(--warning);" id="l4ShockTitle">Inflation
+                                Rising</span>
+                            <p class="regulation-desc" id="l4ShockDesc">Macro inflation rises by 10%. Administrative
+                                overhead costs have risen. Up your Operations slider to protect SmartCorp Stability!</p>
+                        </div>
+
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Monthly Financial Indicators</h4>
+                        <div class="l2-dash">
+                            <div class="dashboard-val-box">
+                                <span class="dash-label">Net Profit (Monthly)</span>
+                                <span class="dash-val" id="l4ProfitVal" style="color: var(--success);">₹15,000</span>
+                            </div>
+                            <div class="dashboard-val-box">
+                                <span class="dash-label">Company Stability Index</span>
+                                <span class="dash-val" id="l4StabilityVal">80%</span>
+                            </div>
+                            <div class="dashboard-val-box">
+                                <span class="dash-label">Customer Retention</span>
+                                <span class="dash-val" id="l4RetentionVal">85%</span>
+                            </div>
+                            <div id="l4HelperMessage"
+                                style="font-size: 0.82rem; color: var(--text-muted); background: white; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                Monthly operational check: Allocate your ₹100k budget exactly and click "Process Month"
+                                to proceed.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" id="l4ProcessBtn" onclick="processL4Month()">Process Month</button>
+                    <button class="btn btn-secondary" onclick="resetLevel4()">Restart Simulator</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= LEVEL 5: REGULATORY COMMAND CENTER ================= -->
+        <div class="screen" id="screenL5">
+            <div class="card">
+                <h2>Level 5: Regulatory Command Center <span class="help-trigger" onclick="showHelp('l5')">?</span></h2>
+                <p class="intro-text">
+                    This is the final operational review. You must maintain balance across all regulatory, economic, and
+                    competitive targets for 30 consecutive days.
+                </p>
+                <div class="objective-box" style="margin-bottom: 20px;">
+                    <strong>Operational Thresholds to Win (at Day 30):</strong>
+                    <p style="font-size: 0.88rem; line-height: 1.5;">
+                        Compliance <strong>> 90%</strong> | Revenue Index <strong>> 70</strong> | Market Share <strong>>
+                            75</strong> | Customer Trust <strong>> 80</strong> | Stability <strong>> 80</strong>
+                    </p>
+                </div>
+
+                <div class="l5-layout">
+                    <!-- Left: Day progress & Decisions -->
+                    <div>
+                        <div class="timeline-tracker">
+                            <span class="timeline-day" id="l5DayVal">Day 1 of 30</span>
+                            <div class="timeline-progress-bar">
+                                <div class="timeline-progress-fill" id="l5TimelineFill"></div>
+                            </div>
+                            <span class="timeline-day" style="font-family: var(--font-mono); font-size: 0.9rem;"
+                                id="l5StatusLabel">PAUSED</span>
+                        </div>
+
+                        <!-- Live Event Card -->
+                        <div class="l5-event-card" id="l5EventCard">
+                            <div class="l5-event-title" id="l5EventTitle">
+                                <!-- Title -->
+                            </div>
+                            <div class="l5-event-body" id="l5EventBody">
+                                <!-- Scenario -->
+                            </div>
+                            <div class="l5-event-options" id="l5EventOptions">
+                                <!-- Option buttons -->
+                            </div>
+                        </div>
+
+                        <!-- Manual Day advance and Auto-simulate controls -->
+                        <div id="l5ControlPanel"
+                            style="background: white; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; text-align: center;">
+                            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;"
+                                id="l5ControlHelp">
+                                Click "Start Simulation Run" to tick through the 30-day timeline. When an incident alert
+                                occurs, the system will pause for your tactical commands.
+                            </p>
+                            <div class="btn-group" style="justify-content: center; margin-top: 0;">
+                                <button class="btn" id="l5StartBtn" onclick="toggleL5Ticker()">Start Simulation
+                                    Run</button>
+                                <button class="btn btn-secondary" id="l5StepBtn" onclick="stepL5Day()">Advance Single
+                                    Day</button>
+                            </div>
+                            <div class="l5-ticker-status" id="l5TickerStatus">
+                                Ready to launch dashboard ticker.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Dashboard Metrics -->
+                    <div>
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display); color: var(--text-dark);">
+                            Command Console KPIs</h4>
+                        <div class="dash-kpis">
+                            <div class="kpi-row">
+                                <span class="kpi-label">Compliance</span>
+                                <div class="kpi-bar-outer">
+                                    <div class="kpi-bar-inner" id="kpiBar-compliance" style="width: 75%;"></div>
+                                </div>
+                                <div class="kpi-value-box">
+                                    <span class="kpi-val" id="kpiVal-compliance">75%</span>
+                                    <span class="kpi-badge fail" id="kpiBadge-compliance">&lt;90</span>
+                                </div>
+                            </div>
+                            <div class="kpi-row">
+                                <span class="kpi-label">Revenue</span>
+                                <div class="kpi-bar-outer">
+                                    <div class="kpi-bar-inner" id="kpiBar-revenue" style="width: 70%;"></div>
+                                </div>
+                                <div class="kpi-value-box">
+                                    <span class="kpi-val" id="kpiVal-revenue">70</span>
+                                    <span class="kpi-badge fail" id="kpiBadge-revenue">&lt;70</span>
+                                </div>
+                            </div>
+                            <div class="kpi-row">
+                                <span class="kpi-label">Market Share</span>
+                                <div class="kpi-bar-outer">
+                                    <div class="kpi-bar-inner" id="kpiBar-marketShare" style="width: 70%;"></div>
+                                </div>
+                                <div class="kpi-value-box">
+                                    <span class="kpi-val" id="kpiVal-marketShare">70</span>
+                                    <span class="kpi-badge fail" id="kpiBadge-marketShare">&lt;75</span>
+                                </div>
+                            </div>
+                            <div class="kpi-row">
+                                <span class="kpi-label">Customer Trust</span>
+                                <div class="kpi-bar-outer">
+                                    <div class="kpi-bar-inner" id="kpiBar-trust" style="width: 75%;"></div>
+                                </div>
+                                <div class="kpi-value-box">
+                                    <span class="kpi-val" id="kpiVal-trust">75</span>
+                                    <span class="kpi-badge fail" id="kpiBadge-trust">&lt;80</span>
+                                </div>
+                            </div>
+                            <div class="kpi-row">
+                                <span class="kpi-label">Stability</span>
+                                <div class="kpi-bar-outer">
+                                    <div class="kpi-bar-inner" id="kpiBar-stability" style="width: 75%;"></div>
+                                </div>
+                                <div class="kpi-value-box">
+                                    <span class="kpi-val" id="kpiVal-stability">75</span>
+                                    <span class="kpi-badge fail" id="kpiBadge-stability">&lt;80</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="resetLevel5()">Restart Simulation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= FINAL RESULTS SCREEN ================= -->
+        <div class="screen" id="screenResults">
+            <div class="card" style="padding: 40px; text-align: center;">
+                <h2 id="resultHeading" style="font-size: 2.2rem; border-bottom: none; margin-bottom: 20px;">Strategic
+                    Evaluation Complete</h2>
+                <p id="resultSubtext"
+                    style="font-size: 1.1rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 30px auto;">
+                    Evaluating performance statistics based on regulatory audit reports, market share balances, and
+                    economic viability markers...
+                </p>
+
+                <!-- Strengths & Weaknesses review cards -->
+                <div class="review-card">
+                    <div class="review-box strengths">
+                        <h4>Strengths & Accomplishments</h4>
+                        <ul class="review-list" id="strengthsList">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                    <div class="review-box weaknesses">
+                        <h4>Areas for Improvement</h4>
+                        <ul class="review-list" id="weaknessesList">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="justify-content: center; margin-top: 40px;">
+                    <button class="btn" onclick="restartEntireSimulation()">Restart Full Executive Run</button>
+                    <button class="btn btn-secondary" onclick="jumpToLevel(5)">Return to Command Center</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persistent Bottom Nav Bar (No Lock Level Navigation) -->
+    <div class="nav-footer" id="navigationFooter" style="display: none;">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Level</button>
+            <div style="font-family: var(--font-display); font-weight: 700; color: var(--primary-red); font-size: 0.95rem;"
+                id="footerLevelText">
+                Level 1 of 5
+            </div>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    <!-- Dynamic Learning Summary Modals -->
+    <div class="modal-overlay" id="summaryModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">Audit Assessment Completed</h3>
+                <button class="modal-close" onclick="closeModal('summaryModal')">×</button>
+            </div>
+            <div class="modal-content" id="modalBody">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="modalActionBtn" onclick="closeModal('summaryModal')">Acknowledged</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help / Glossary Modal -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-card" style="max-width: 550px;">
+            <div class="modal-header" style="background: var(--info);">
+                <h3 id="helpTitle">Strategy Dashboard Help</h3>
+                <button class="modal-close" onclick="closeModal('helpModal')">×</button>
+            </div>
+            <div class="modal-content" id="helpBody">
+                <!-- Help contents updated by context -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--info);" onclick="closeModal('helpModal')">Close
+                    Manual</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // GLOBAL SIMULATION STATE
+        const state = {
+            currentLevel: 0, // 0 is welcome screen
+            levelsCompleted: [false, false, false, false, false],
+
+            // Level 1 Data (drag-and-drop audit)
+            l1: {
+                cards: [
+                    { id: 'c1', dept: 'Marketing', text: 'Advertises 70% discounts by artificially inflating original retail prices.', cat: 'legal', correct: null },
+                    { id: 'c2', dept: 'Customer Data', text: 'Collects and stores customer locations in the background without explicit opt-in.', cat: 'regulatory', correct: null },
+                    { id: 'c3', dept: 'Website', text: 'Operates without any privacy policy page or cookie preference configurations.', cat: 'regulatory', correct: null },
+                    { id: 'c4', dept: 'Finance', text: 'Keeps incomplete ledger receipts for digital asset sales, omitting corporate tax details.', cat: 'legal', correct: null },
+                    { id: 'c5', dept: 'HR', text: 'Skips compliance training for new hires, letting them handle user databases immediately.', cat: 'regulatory', correct: null },
+                    { id: 'c6', dept: 'Operations', text: 'Implements end-to-end encryption for all customer communication channels.', cat: 'compliant', correct: null },
+                    { id: 'c7', dept: 'Marketing', text: 'Includes a clear and visible \'Unsubscribe\' link in every marketing newsletter.', cat: 'compliant', correct: null },
+                    { id: 'c8', dept: 'Web Engineering', text: 'Presents users with clear \'Accept All\', \'Reject All\', and settings choices for cookies.', cat: 'compliant', correct: null }
+                ],
+                assigned: {} // mapping cardId -> bin category
+            },
+
+            // Level 2 Data (policy selector)
+            l2: {
+                currentRegIndex: 0,
+                budget: 40000,
+                compliance: 20,
+                regulations: [
+                    {
+                        tag: 'GDPR Article 17 (Right to Erasure)',
+                        desc: 'Users must have the legal right to request the complete deletion of their personal accounts, analytics profiles, and records from corporate servers.',
+                        consequence: 'Regulatory authorities can levy compliance fines up to €20M or 4% of global revenues. Ignore this and customer trust will collapse.',
+                        correctPolicy: 'p1'
+                    },
+                    {
+                        tag: 'ePrivacy Directive (Tracking Consent)',
+                        desc: 'Websites must obtain explicit, affirmative opt-in consent from visitors before initiating any tracking cookies or marketing pixels.',
+                        consequence: 'Class-action privacy lawsuits and localized ISP traffic blocking are common consequences of non-consensual trackers.',
+                        correctPolicy: 'p3'
+                    },
+                    {
+                        tag: 'FTC Deceptive Advertising Guidelines',
+                        desc: 'Digital businesses must clearly and conspicuously disclose endorsement deals, sponsor contributions, and paid affiliate links to consumers.',
+                        consequence: 'The Federal Trade Commission initiates public enforcement actions, audits, and forces corrective marketing campaigns.',
+                        correctPolicy: 'p2'
+                    },
+                    {
+                        tag: 'Sarbanes-Oxley (Audit Governance)',
+                        desc: 'Public and scaling enterprises must conduct independent yearly reviews of data management, financial ledgers, and compliance procedures.',
+                        consequence: 'Executive civil liability, severe audit failures, and complete exclusion from institutional capital markets.',
+                        correctPolicy: 'p4'
+                    }
+                ],
+                policies: [
+                    { id: 'p1', title: 'Add Account Self-Deletion System', cost: 15000, impact: 'Compliance +25%, Trust +15%' },
+                    { id: 'p2', title: 'Draft Comprehensive Digital Disclosures', cost: 5000, impact: 'Compliance +25%, Trust +5%' },
+                    { id: 'p3', title: 'Build Cookie Consent Verification Form', cost: 8000, impact: 'Compliance +25%, Trust +10%' },
+                    { id: 'p4', title: 'Conduct Certified Compliance Seminars', cost: 10000, impact: 'Compliance +25%, Governance +15%' }
+                ],
+                decisions: [] // records chosen policy per regulation ('p1', 'ignored', etc.)
+            },
+
+            // Level 3 Data (competitor war room)
+            l3: {
+                round: 1,
+                marketShare: 50, // %
+                revenue: 50, // ₹k
+                satisfaction: 70, // %
+                threats: [
+                    {
+                        competitor: 'Apex Corp',
+                        action: 'Apex Corp has lowered subscription pricing by 15% across all core SaaS products to steal our price-sensitive customer base.',
+                        responses: [
+                            { text: 'Match the 15% Price Reduction', cost: 15, mShare: 10, satisfaction: 5, feedback: 'SmartCorp keeps its customers, but operational margins take a direct hit. Revenue drops.' },
+                            { text: 'Upgrade Service Quality & SLA Guarantees', cost: 5, mShare: 2, satisfaction: 15, feedback: 'Focusing on quality and support retention safeguards our premium users. Satisfaction spikes.' },
+                            { text: 'Launch a Premium Customer Loyalty Program', cost: 5, mShare: 5, satisfaction: 10, feedback: 'Retention promotions and loyalty milestones prevent customer churn at a fraction of the cost.' },
+                            { text: 'Increase Competitor Advertising Campaigns', cost: 10, mShare: 8, satisfaction: 0, feedback: 'Aggressive marketing offsets competitor growth but does not enhance the customer experience.' }
+                        ]
+                    },
+                    {
+                        competitor: 'ByteSize Ltd',
+                        action: 'ByteSize has introduced 24/7 express customer support channels and SLA recovery response times to attract enterprise clients.',
+                        responses: [
+                            { text: 'Deploy Automated Support AI Agent', cost: 12, mShare: 8, satisfaction: 12, feedback: 'SmartCorp builds an AI portal. It manages high volumes, increasing trust and satisfaction.' },
+                            { text: 'Launch a Loyalty Program Retainer', cost: 4, mShare: 3, satisfaction: 8, feedback: 'Secures high-value client subscriptions but does not match the 24/7 delivery speed.' },
+                            { text: 'Build a Support Staffing Roster Upgrade', cost: 15, mShare: 5, satisfaction: 18, feedback: 'Hiring human support operators guarantees quality service, but requires high salary expenditures.' }
+                        ]
+                    },
+                    {
+                        competitor: 'CyberTech',
+                        action: 'CyberTech integrates advanced generative AI optimization tools, allowing business teams to work twice as fast.',
+                        responses: [
+                            { text: 'Accelerate Core AI Module Development', cost: 20, mShare: 15, satisfaction: 12, feedback: 'SmartCorp releases a robust counter-module. High budget cost, but we recapture digital market share.' },
+                            { text: 'Deploy Broad Hype-Marketing Strategy', cost: 8, mShare: 4, satisfaction: 2, feedback: 'Raises brand awareness temporarily, but clients realize that our product lacks the AI feature.' },
+                            { text: 'Reduce Base Subscription Pricing', cost: 10, mShare: 2, satisfaction: 5, feedback: 'Provides temporary budget relief for clients but does not solve the technology gap.' }
+                        ]
+                    }
+                ],
+                decisions: [], // records chosen option indexes
+                isProcessing: false
+            },
+
+            // Level 4 Data (economic shock)
+            l4: {
+                month: 1,
+                stability: 80,
+                retention: 85,
+                profit: 15000,
+                shocks: [
+                    { title: 'Inflation Rises', desc: 'Administrative and operational overhead is up by ₹10,000. Increase your Operations Budget slider to keep SmartCorp Stable!', minOpsNeeded: 35000, rentHit: -2, stabHit: -5, profHit: -10000 },
+                    { title: 'Supply Chain Disruptions', desc: 'Critical hardware inventory shipping delays are impacting customer deliveries. Increase Operations & Tech budgets to route logistics manually.', minOpsNeeded: 30000, minTechNeeded: 30000, rentHit: -8, stabHit: -8, profHit: -12000 },
+                    { title: 'Technology Cloud Cost Hike', desc: 'Cloud infrastructure hosts apply a 15% rate hike. Boost Technology investment budget to avoid data system throttle thresholds.', minTechNeeded: 40000, rentHit: 0, stabHit: -12, profHit: -8000 },
+                    { title: 'Customer Spending Slump', desc: 'Consumer confidence is down. Sales volumes decrease. Increase Marketing to acquire users, or Customer Support to secure active users.', minOpsNeeded: 20000, rentHit: -15, stabHit: -4, profHit: -20000 },
+                    { title: 'Government Compliance Credits', desc: 'Bonus month! SmartCorp receives corporate compliance tax credits. No extra expense. System stability receives a boost!', rentHit: +5, stabHit: +15, profHit: 10000 },
+                    { title: 'Tech Traffic Load Spike', desc: 'Product traffic suddenly doubles. You must raise Tech and Operations sliders to handle server loads, or customer satisfaction and retention fall.', minOpsNeeded: 30000, minTechNeeded: 35000, rentHit: -12, stabHit: -10, profHit: 5000 },
+                    { title: 'Competitor Expansion Push', desc: 'Rival firm starts poaching local digital segments. Increase Marketing and Support sliders to retain SmartCorp market share.', rentHit: -10, stabHit: -5, profHit: -5000 },
+                    { title: 'Local Data Compliance Fine', desc: 'SmartCorp is audited. A minor record breach triggers a ₹15,000 legal fine. Stability drops. Boost Operations to patch records.', minOpsNeeded: 35000, rentHit: -5, stabHit: -10, profHit: -15000 },
+                    { title: 'System Scale Maintenance', desc: 'Database systems require scheduled upgrades. Boost Tech budget to prevent application server bottlenecks.', minTechNeeded: 35000, rentHit: -3, stabHit: -10, profHit: -5000 },
+                    { title: 'Interest Rates Spike', desc: 'Borrowing capital gets expensive. Operations budget needs careful tracking to maintain stability.', minOpsNeeded: 30000, rentHit: -5, stabHit: -8, profHit: -8000 },
+                    { title: 'Seasonal Spending Surge', desc: 'Holiday sales are active! Profits spike, but operations load increases. Adjust Operations to fulfill orders.', minOpsNeeded: 35000, rentHit: +10, stabHit: 0, profHit: 25000 },
+                    { title: 'Digital Business Normalization', desc: 'Macro market stabilizes. Operational expenses normalize. Maintain balanced sliders to secure a strong finish.', rentHit: +5, stabHit: +5, profHit: 8000 }
+                ]
+            },
+
+            // Level 5 Data (Capston Command Center)
+            l5: {
+                day: 1,
+                kpis: {
+                    compliance: 75,
+                    revenue: 70,
+                    marketShare: 70,
+                    trust: 75,
+                    stability: 75
+                },
+                eventActive: false,
+                tickerInterval: null,
+                tickerSpeed: 1500, // ms per day
+                events: {
+                    3: {
+                        title: 'Cyber Security Policy Act',
+                        desc: 'A federal cybersecurity law is announced. It mandates comprehensive verification audits of web databases within 48 hours.',
+                        options: [
+                            { text: 'Contract Specialist Security Firm (-15 Revenue, +15 Compliance, +10 Trust, +5 Stability)', effect: { revenue: -15, compliance: 15, trust: 10, stability: 5 } },
+                            { text: 'Assign Internal IT Staff Self-Audit (-5 Revenue, +5 Compliance, +2 Trust)', effect: { revenue: -5, compliance: 5, trust: 2 } },
+                            { text: 'Postpone Compliance Integration (0 Cost, -15 Compliance, -10 Trust, -5 Stability)', effect: { compliance: -15, trust: -10, stability: -5 } }
+                        ]
+                    },
+                    8: {
+                        title: 'Rival Portal Launch',
+                        desc: 'Competitor Apex Corp launches an integrated customer portal that supports instant analytics visualization tools.',
+                        options: [
+                            { text: 'Initiate R&D Portal Update (-20 Revenue, +15 Market Share, +10 Stability, +5 Trust)', effect: { revenue: -20, marketShare: 15, stability: 10, trust: 5 } },
+                            { text: 'Match competitor subscription price (-12 Revenue, +10 Market Share, +5 Trust)', effect: { revenue: -12, marketShare: 10, trust: 5 } },
+                            { text: 'Maintain current layout (0 Cost, -15 Market Share, -5 Trust)', effect: { marketShare: -15, trust: -5 } }
+                        ]
+                    },
+                    14: {
+                        title: 'Macroeconomic Inflation Spike',
+                        desc: 'Sudden wholesale and carrier shipping prices jump by 12%. Profit margins are compressed.',
+                        options: [
+                            { text: 'Pass expenses to buyers (+10 Revenue, -10 Customer Trust, -8 Market Share)', effect: { revenue: 10, trust: -10, marketShare: -8 } },
+                            { text: 'Absorb the price increase (-15 Revenue, +10 Stability)', effect: { revenue: -15, stability: 10 } },
+                            { text: 'Optimize internal staff systems (-5 Revenue, +5 Stability, -5 Trust)', effect: { revenue: -5, stability: 5, trust: -5 } }
+                        ]
+                    },
+                    20: {
+                        title: 'Privacy Tracking Backlash',
+                        desc: 'Consumer groups criticize SmartCorp for using heavy tracking scripts in marketing newsletters without confirmation.',
+                        options: [
+                            { text: 'Re-engineer consent checks (-5 Revenue, +15 Compliance, +15 Trust, -10 Market Share)', effect: { revenue: -5, compliance: 15, trust: 15, marketShare: -10 } },
+                            { text: 'Add minor newsletter footer checkbox (0 Cost, +5 Compliance, +5 Trust)', effect: { compliance: 5, trust: 5 } },
+                            { text: 'Ignore criticism and maintain tracking (-20 Compliance, -25 Trust, +10 Market Share)', effect: { compliance: -20, trust: -25, marketShare: 10 } }
+                        ]
+                    },
+                    25: {
+                        title: 'Federal Regulatory Audit',
+                        desc: 'The National Data Board announces a comprehensive audit of SmartCorp customer consent archives.',
+                        options: [
+                            { text: 'Retain Compliance Counsel (-15 Revenue, +20 Compliance, +10 Trust)', effect: { revenue: -15, compliance: 20, trust: 10 } },
+                            { text: 'Submit self-reported logs (-5 Revenue, +5 Compliance, -5 Trust)', effect: { revenue: -5, compliance: 5, trust: -5 } },
+                            { text: 'Request audit extension (-25 Compliance, -15 Trust)', effect: { compliance: -25, trust: -15 } }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // HELP MANIFEST
+        const helpData = {
+            l1: {
+                title: "Compliance Audit Guidelines",
+                body: `<p><strong>Legal Issues</strong> represent statutory violations that break codified laws (e.g. consumer protection, anti-fraud, tax/SOX laws). These lead directly to court cases, criminal charges, and structural bans.</p>
+                       <p style="margin-top: 10px;"><strong>Regulatory Issues</strong> are compliance infractions under specialized commissions (e.g., GDPR, FTC administrative directives). They result in audits, massive structural fines, and processing restrictions.</p>
+                       <p style="margin-top: 10px;"><strong>Compliant Practices</strong> are systems that adhere to modern administrative codes, protecting privacy and transparency natively.</p>`
+            },
+            l2: {
+                title: "Law Builder Playbook",
+                body: `<p>Adapting to new legislation requires matching technical solutions with legal mandates:</p>
+                       <ul style="margin-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                           <li><strong>Right to Erasure (GDPR):</strong> Add Delete Account system.</li>
+                           <li><strong>Digital Disclosures (FTC):</strong> Update Privacy Policies.</li>
+                           <li><strong>Cookie Consent (ePrivacy):</strong> Build Consent Forms.</li>
+                           <li><strong>Internal Audit Governance:</strong> Conduct certified seminars.</li>
+                       </ul>
+                       <p style="margin-top: 10px; color: var(--primary-red);">Warning: Ignoring regulations saves budget, but reduces long-term Compliance metrics.</p>`
+            },
+            l3: {
+                title: "Competitive Playbook",
+                body: `<p>Rivals target different vectors. Select strategies that neutralize competitor advantages:</p>
+                       <ul style="margin-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                           <li><strong>Price Cuts:</strong> Defended by matching prices (hurts margins) or loyalty retainers (low cost, retains core).</li>
+                           <li><strong>Quality/SLA upgrades:</strong> Countered by support system upgrades or human agent expansion.</li>
+                           <li><strong>Technological Innovation:</strong> Counters AI upgrades directly, maintaining value propositions.</li>
+                       </ul>`
+            },
+            l4: {
+                title: "Macroeconomic Playbook",
+                body: `<p>Sliders represent absolute allocations of a fixed ₹100,000 monthly operating budget. If you exceed ₹100k, you cannot submit the month.</p>
+                       <ul style="margin-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                           <li><strong>Operations Budget</strong> offsets inflation and logistics disruptions.</li>
+                           <li><strong>Technology Budget</strong> supports cloud growth and system capacity.</li>
+                           <li><strong>Marketing & Support Budgets</strong> maintain customer retention. Keeping either below ₹15,000 causes customer churn.</li>
+                       </ul>`
+            },
+            l5: {
+                title: "Command Console KPIs",
+                body: `<p>This level acts as your final assessment. Daily operations will introduce minor fluctuations in stats based on compliance states.</p>
+                       <p style="margin-top: 8px;">Respond to incident cards to adjust the metrics. Keep all values above operational thresholds to secure SmartCorp approval.</p>`
+            }
+        };
+
+        // START & INITIALIZATION
+        function startSimulation() {
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            showScreen('screenL1');
+            document.getElementById('stepperContainer').style.display = 'block';
+            document.getElementById('navigationFooter').style.display = 'flex';
+            state.currentLevel = 1;
+            updateStepperUI();
+            initializeLevel1();
+            showToast('Executive Command Center Initialized. Level 1 Active.', 'info');
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        // STEPPER MANAGEMENT
+        function updateStepperUI() {
+            document.querySelectorAll('.step-pill').forEach(pill => {
+                const lvl = parseInt(pill.getAttribute('data-level'));
+                pill.className = 'step-pill';
+                if (lvl === state.currentLevel) {
+                    pill.classList.add('active');
+                } else if (state.levelsCompleted[lvl - 1]) {
+                    pill.classList.add('completed');
+                }
+            });
+
+            // Update Progress Bar
+            const completedCount = state.levelsCompleted.filter(c => c).length;
+            const pct = Math.round((completedCount / 5) * 100);
+            document.getElementById('simProgressPct').innerText = `${pct}%`;
+            document.getElementById('simProgressBarFill').style.width = `${pct}%`;
+
+            // Footer labels
+            document.getElementById('footerLevelText').innerText = `Level ${state.currentLevel} of 5`;
+
+            // Manage disabled states for footer arrows
+            document.getElementById('footerPrevBtn').disabled = (state.currentLevel === 1);
+            document.getElementById('footerNextBtn').disabled = (state.currentLevel === 5);
+        }
+
+        function jumpToLevel(lvl) {
+            // Stop Level 5 ticker if active
+            if (state.l5.tickerInterval) {
+                clearInterval(state.l5.tickerInterval);
+                state.l5.tickerInterval = null;
+                document.getElementById('l5StartBtn').innerText = 'Start Simulation Run';
+                document.getElementById('l5StatusLabel').innerText = 'PAUSED';
+            }
+
+            state.currentLevel = lvl;
+            updateStepperUI();
+
+            if (lvl === 1) {
+                showScreen('screenL1');
+                initializeLevel1();
+            } else if (lvl === 2) {
+                showScreen('screenL2');
+                initializeLevel2();
+            } else if (lvl === 3) {
+                showScreen('screenL3');
+                initializeLevel3();
+            } else if (lvl === 4) {
+                showScreen('screenL4');
+                initializeLevel4();
+            } else if (lvl === 5) {
+                showScreen('screenL5');
+                initializeLevel5();
+            }
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 5) {
+                jumpToLevel(state.currentLevel + 1);
+            }
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1) {
+                jumpToLevel(state.currentLevel - 1);
+            }
+        }
+
+        // ================= LEVEL 1 LOGIC =================
+        function initializeLevel1() {
+            const auditList = document.getElementById('l1AuditList');
+            auditList.innerHTML = '';
+
+            // Empty target bins
+            document.getElementById('bin-legal').innerHTML = '';
+            document.getElementById('bin-regulatory').innerHTML = '';
+            document.getElementById('bin-compliant').innerHTML = '';
+
+            state.l1.cards.forEach(card => {
+                // Check if card is currently assigned
+                const assignedBin = state.l1.assigned[card.id];
+                const cardEl = createAuditCardEl(card);
+
+                if (assignedBin) {
+                    document.getElementById(`bin-${assignedBin}`).appendChild(cardEl);
+                } else {
+                    auditList.appendChild(cardEl);
+                }
+            });
+
+            updateL1BinBadges();
+        }
+
+        function createAuditCardEl(card) {
+            const div = document.createElement('div');
+            div.className = 'audit-card';
+            div.id = card.id;
+            div.draggable = true;
+            div.ondragstart = handleDragStart;
+
+            div.innerHTML = `
+                <span class="audit-dept-label">${card.dept} Department</span>
+                <span class="audit-card-body">${card.text}</span>
+                <div class="mobile-picker">
+                    <button class="picker-btn ${state.l1.assigned[card.id] === 'legal' ? 'active' : ''}" onclick="pickBinL1('${card.id}', 'legal')">Legal</button>
+                    <button class="picker-btn ${state.l1.assigned[card.id] === 'regulatory' ? 'active' : ''}" onclick="pickBinL1('${card.id}', 'regulatory')">Regulatory</button>
+                    <button class="picker-btn ${state.l1.assigned[card.id] === 'compliant' ? 'active' : ''}" onclick="pickBinL1('${card.id}', 'compliant')">Compliant</button>
+                </div>
+            `;
+            return div;
+        }
+
+        function pickBinL1(cardId, binName) {
+            if (state.l1.assigned[cardId] === binName) {
+                // Toggle off
+                delete state.l1.assigned[cardId];
+            } else {
+                state.l1.assigned[cardId] = binName;
+            }
+            initializeLevel1();
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function dragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const binZone = e.currentTarget;
+            binZone.classList.remove('dragover');
+
+            const cardId = e.dataTransfer.getData('text/plain');
+            const cardEl = document.getElementById(cardId);
+            const binName = binZone.getAttribute('data-bin');
+
+            if (cardEl) {
+                state.l1.assigned[cardId] = binName;
+                binZone.querySelector('.bin-cards-container').appendChild(cardEl);
+
+                // Update active states on mobile buttons
+                initializeLevel1();
+            }
+        }
+
+        function updateL1BinBadges() {
+            const counts = { legal: 0, regulatory: 0, compliant: 0 };
+            Object.values(state.l1.assigned).forEach(bin => {
+                if (counts[bin] !== undefined) counts[bin]++;
+            });
+            document.getElementById('badge-legal').innerText = `${counts.legal}/2`;
+            document.getElementById('badge-regulatory').innerText = `${counts.regulatory}/3`;
+            document.getElementById('badge-compliant').innerText = `${counts.compliant}/3`;
+        }
+
+        function evaluateLevel1() {
+            // Verify all cards are assigned
+            const assignedCount = Object.keys(state.l1.assigned).length;
+            if (assignedCount < state.l1.cards.length) {
+                showToast('Please audit and assign all 8 practices before submitting.', 'warning');
+                return;
+            }
+
+            let correctCount = 0;
+            let reportHTML = `<div style="display:flex; flex-direction:column; gap:15px;">
+                <p>Here is the detailed corporate assessment report for SmartCorp's internal operations:</p>`;
+
+            state.l1.cards.forEach(card => {
+                const assignedBin = state.l1.assigned[card.id];
+                const cardEl = document.getElementById(card.id);
+
+                if (assignedBin === card.cat) {
+                    correctCount++;
+                    cardEl.style.borderLeftColor = 'var(--success)';
+                    cardEl.style.backgroundColor = 'var(--success-bg)';
+                    reportHTML += `
+                        <div style="border-left: 4px solid var(--success); padding: 10px; background: var(--success-bg); border-radius: 4px;">
+                            <strong>[✓ CORRECT] ${card.dept} Audit:</strong> ${card.text} <br>
+                            <span style="font-size:0.85rem; color:var(--text-dark); margin-top:5px; display:block;">
+                                <strong>Rationale:</strong> Categorized as a <strong>${card.cat.toUpperCase()}</strong>. ${getL1Explanation(card.id)}
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    cardEl.style.borderLeftColor = 'var(--primary-red)';
+                    cardEl.style.backgroundColor = 'var(--bg-red)';
+                    reportHTML += `
+                        <div style="border-left: 4px solid var(--primary-red); padding: 10px; background: var(--bg-red); border-radius: 4px;">
+                            <strong>[× INCORRECT] ${card.dept} Audit:</strong> ${card.text} <br>
+                            <span style="font-size:0.85rem; color:var(--text-dark); margin-top:5px; display:block;">
+                                <strong>Correction:</strong> Should be classified under <strong>${card.cat.toUpperCase()}</strong> (you chose ${assignedBin.toUpperCase()}). ${getL1Explanation(card.id)}
+                            </span>
+                        </div>
+                    `;
+                }
+            });
+
+            reportHTML += `</div>`;
+
+            // Mark completed
+            state.levelsCompleted[0] = true;
+            updateStepperUI();
+
+            // Open learning modal
+            showModal('Audit Investigation Completed', `
+                <div style="margin-bottom: 20px; text-align:center;">
+                    <span style="font-size: 3rem; color: var(--success);">📋</span>
+                    <h4 style="margin-top:10px;">Audit Accuracy: ${correctCount} / 8 Correct</h4>
+                    <p style="font-size:0.9rem; color:var(--text-muted);">SmartCorp has documented the operational findings. Review the policy breakdown below.</p>
+                </div>
+                ${reportHTML}
+                <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color);">
+                <div class="objective-box" style="margin-bottom:0;">
+                    <strong>Subject Summary: Regulatory Environment and Compliance</strong>
+                    <p style="font-size:0.88rem; line-height: 1.5;">
+                        Digital transformation requires organizations to maintain awareness of their operational footprints. General consumer codes (laws) prohibit deceptive discounts or tax concealment. Administrative agencies (regulators) establish rules covering consent records and internal worker training. Achieving baseline compliance keeps our business protected from operational closures.
+                    </p>
+                </div>
+            `, () => {
+                jumpToLevel(2);
+            });
+        }
+
+        function getL1Explanation(cardId) {
+            switch (cardId) {
+                case 'c1': return 'Deceptive price advertising (inflating base prices to exaggerate discount values) violates Section 5 of the FTC Act. Classified as a Legal Issue due to consumer protection statutes.';
+                case 'c2': return 'Collecting geolocation data in the background without explicit opt-in violates the ePrivacy Directive and GDPR consent guidelines. Classified as a Regulatory Issue.';
+                case 'c3': return 'Failing to display a privacy statement or cookies interface violates California\'s CalOPPA and EU\'s GDPR disclosures. Classified as a Regulatory Issue.';
+                case 'c4': return 'Incomplete asset transactions and tax record omissions violate statutory accounting laws (e.g. Sarbanes-Oxley). Classified as a Legal Issue.';
+                case 'c5': return 'Handling user databases without security training violates administrative data compliance guidelines. Classified as a Regulatory Issue.';
+                case 'c6': return 'Deploying end-to-end encryption is a compliant operational security standard (aligned with ISO27001 data protection patterns).';
+                case 'c7': return 'Clear, functional newsletter unsubscribe pathways are mandatory under the CAN-SPAM Act, representing standard compliance.';
+                case 'c8': return 'Cookie choices (explicit opt-in / opt-out toggles) conform to current ePrivacy regulations, keeping the site compliant.';
+                default: return '';
+            }
+        }
+
+        function resetLevel1() {
+            state.l1.assigned = {};
+            initializeLevel1();
+            showToast('Audit board reset.', 'info');
+        }
+
+
+        // ================= LEVEL 2 LOGIC =================
+        function initializeLevel2() {
+            const reg = state.l2.regulations[state.l2.currentRegIndex];
+
+            // Check if Level 2 is completed
+            if (!reg) {
+                evaluateLevel2();
+                return;
+            }
+
+            document.getElementById('l2RegulationBox').innerHTML = `
+                <span class="regulation-tag">Active Regulation ${state.l2.currentRegIndex + 1} of 4</span>
+                <p class="regulation-desc">${reg.tag}</p>
+                <p style="font-size: 0.9rem; margin-bottom: 12px; color: var(--text-dark);">${reg.desc}</p>
+                <div class="regulation-consequence">
+                    <strong>Business Consequences:</strong> ${reg.consequence}
+                </div>
+            `;
+
+            // Draw policy cards
+            const deck = document.getElementById('l2PolicyDeck');
+            deck.innerHTML = '';
+
+            state.l2.policies.forEach(policy => {
+                const isSelected = state.l2.decisions[state.l2.currentRegIndex] === policy.id;
+                const isUsed = state.l2.decisions.includes(policy.id) && !isSelected;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `policy-item ${isSelected ? 'selected' : ''} ${isUsed ? 'disabled' : ''}`;
+
+                itemDiv.innerHTML = `
+                    <div class="policy-info">
+                        <span class="policy-title">${policy.title}</span>
+                        <span class="policy-cost">Cost: ₹${policy.cost.toLocaleString()}</span>
+                        <span class="policy-impact">Impact: ${policy.impact}</span>
+                    </div>
+                    <div class="policy-status-icon">${isSelected ? '✓' : ''}</div>
+                `;
+
+                if (!isUsed) {
+                    itemDiv.onclick = () => selectL2Policy(policy.id);
+                }
+                deck.appendChild(itemDiv);
+            });
+
+            // Add Ignore Regulation Option
+            const isIgnored = state.l2.decisions[state.l2.currentRegIndex] === 'ignored';
+            const ignoreDiv = document.createElement('div');
+            ignoreDiv.className = `policy-item ${isIgnored ? 'ignored' : ''}`;
+            ignoreDiv.innerHTML = `
+                <div class="policy-info">
+                    <span class="policy-title" style="color: var(--primary-red);">Ignore Regulatory Threat</span>
+                    <span class="policy-cost" style="color: var(--primary-red);">Cost: ₹0</span>
+                    <span class="policy-impact" style="color: var(--primary-red);">Impact: Compliance -20%</span>
+                </div>
+                <div class="policy-status-icon" style="${isIgnored ? 'background: var(--warning); border-color: var(--warning); color: white;' : ''}">!</div>
+            `;
+            ignoreDiv.onclick = () => selectL2Policy('ignored');
+            deck.appendChild(ignoreDiv);
+
+            updateL2DashboardUI();
+        }
+
+        function recalculateL2() {
+            state.l2.budget = 40000;
+            state.l2.compliance = 20;
+
+            for (let i = 0; i <= state.l2.currentRegIndex; i++) {
+                const decision = state.l2.decisions[i];
+                if (!decision) continue;
+
+                const reg = state.l2.regulations[i];
+                if (decision === 'ignored') {
+                    state.l2.compliance -= 20;
+                } else {
+                    const policy = state.l2.policies.find(p => p.id === decision);
+                    if (policy) {
+                        state.l2.budget -= policy.cost;
+                        if (reg.correctPolicy === decision) {
+                            state.l2.compliance += 25;
+                        } else {
+                            state.l2.compliance += 10;
+                        }
+                    }
+                }
+            }
+            state.l2.compliance = Math.max(0, Math.min(100, state.l2.compliance));
+        }
+
+        function selectL2Policy(policyId) {
+            const reg = state.l2.regulations[state.l2.currentRegIndex];
+
+            if (policyId === 'ignored') {
+                state.l2.decisions[state.l2.currentRegIndex] = 'ignored';
+                recalculateL2();
+                document.getElementById('l2StatusSummary').innerHTML = `
+                    <span style="color: var(--warning); font-weight: 700;">[MANDATE IGNORED]</span> SmartCorp ignored the regulatory update. Policy budget was saved, but Compliance levels fell.
+                `;
+                showToast('Regulation ignored. Compliance fell.', 'warning');
+            } else {
+                const selectedPol = state.l2.policies.find(p => p.id === policyId);
+
+                // Temporary calculation to check if current budget allows it (excluding the previous decision for this slot)
+                let tempBudget = 40000;
+                for (let i = 0; i < state.l2.currentRegIndex; i++) {
+                    const dec = state.l2.decisions[i];
+                    if (dec && dec !== 'ignored') {
+                        const p = state.l2.policies.find(x => x.id === dec);
+                        if (p) tempBudget -= p.cost;
+                    }
+                }
+
+                if (tempBudget < selectedPol.cost) {
+                    showToast('Insufficient policy budget to deploy this control!', 'warning');
+                    return;
+                }
+
+                state.l2.decisions[state.l2.currentRegIndex] = policyId;
+                recalculateL2();
+
+                // Check if correct policy was selected
+                if (reg.correctPolicy === policyId) {
+                    document.getElementById('l2StatusSummary').innerHTML = `
+                        <span style="color: var(--success); font-weight: 700;">[OPTIMAL POLICY]</span> Deployed <strong>${selectedPol.title}</strong>. SmartCorp compliance levels increased.
+                    `;
+                    showToast('Optimal policy deployed!', 'success');
+                } else {
+                    document.getElementById('l2StatusSummary').innerHTML = `
+                        <span style="color: var(--warning); font-weight: 700;">[SUB-OPTIMAL POLICY]</span> Deployed <strong>${selectedPol.title}</strong>. This provides basic infrastructure but fails to directly resolve the active mandate. Compliance increased slightly.
+                    `;
+                    showToast('Sub-optimal policy. basic coverage only.', 'info');
+                }
+            }
+
+            // Enable next button
+            document.getElementById('l2NextRegBtn').disabled = false;
+
+            initializeLevel2();
+        }
+
+        function updateL2DashboardUI() {
+            document.getElementById('l2BudgetVal').innerText = `₹${state.l2.budget.toLocaleString()}`;
+            document.getElementById('l2CompliancePct').innerText = `${state.l2.compliance}%`;
+            document.getElementById('l2ComplianceBar').style.width = `${state.l2.compliance}%`;
+        }
+
+        function nextL2Regulation() {
+            state.l2.currentRegIndex++;
+            document.getElementById('l2NextRegBtn').disabled = true;
+            initializeLevel2();
+        }
+
+        function evaluateLevel2() {
+            state.levelsCompleted[1] = true;
+            updateStepperUI();
+
+            const isPerfect = state.l2.compliance === 100;
+            let report = '';
+
+            if (isPerfect) {
+                report = `<p style="color: var(--success); font-weight: 700; font-size:1.1rem; text-align:center;">🏆 Perfect Compliance Achieved (100%)</p>
+                          <p style="margin-top:10px;">Excellent oversight! You allocated SmartCorp resources optimally, addressing GDPR, FTC, and audit updates within budget constraints.</p>`;
+            } else {
+                report = `<p style="color: var(--warning); font-weight: 700; font-size:1.1rem; text-align:center;">⚠️ Partial Compliance Achieved (${state.l2.compliance}%)</p>
+                          <p style="margin-top:10px;">SmartCorp operations survive. However, because you ignored key directives or deployed sub-optimal policy cards, residual compliance liabilities remain on the ledger.</p>`;
+            }
+
+            showModal('Policy Challenge Concluded', `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <span style="font-size:3rem;">⚖️</span>
+                </div>
+                ${report}
+                <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color);">
+                <div class="objective-box" style="margin-bottom:0;">
+                    <strong>Subject Summary: Adapting to Regulatory Shocks</strong>
+                    <p style="font-size:0.88rem; line-height: 1.5;">
+                        Digital environments are dynamic. Firms must continually update their technical architecture (e.g. data consent models, customer deletion systems) to align with national and global frameworks. Designing proactive compliance workflows reduces long-term operational risks.
+                    </p>
+                </div>
+            `, () => {
+                jumpToLevel(3);
+            });
+        }
+
+        function resetLevel2() {
+            state.l2.currentRegIndex = 0;
+            state.l2.budget = 40000;
+            state.l2.compliance = 20;
+            state.l2.decisions = [];
+            document.getElementById('l2NextRegBtn').disabled = true;
+            document.getElementById('l2StatusSummary').innerHTML = 'Setup status: Select a policy action on the left to start processing the regulation.';
+            initializeLevel2();
+            showToast('Policy deck reset.', 'info');
+        }
+
+
+        // ================= LEVEL 3 LOGIC =================
+        function initializeLevel3() {
+            const threat = state.l3.threats[state.l3.round - 1];
+
+            // Check if level finished
+            if (!threat) {
+                evaluateLevel3();
+                return;
+            }
+
+            state.l3.isProcessing = false;
+
+            document.getElementById('l3RoundTracker').innerText = `Round ${state.l3.round} of 3`;
+
+            document.getElementById('l3ThreatBox').innerHTML = `
+                <span class="competitor-avatar">${threat.competitor} Launch</span>
+                <p class="competitor-alert-text">${threat.action}</p>
+            `;
+
+            // strategy options
+            const optionsBox = document.getElementById('l3ResponseOptions');
+            optionsBox.innerHTML = '';
+
+            threat.responses.forEach((resp, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'response-btn';
+                btn.innerHTML = `
+                    <span class="response-btn-title">${resp.text}</span>
+                    <span class="response-btn-desc">Impact: Market Share +${resp.mShare}%, Revenue -₹${resp.cost}k</span>
+                `;
+                btn.onclick = () => selectL3Response(idx);
+                optionsBox.appendChild(btn);
+            });
+
+            updateL3DashboardUI();
+        }
+
+        function selectL3Response(idx) {
+            if (state.l3.isProcessing) return;
+            state.l3.isProcessing = true;
+
+            const threat = state.l3.threats[state.l3.round - 1];
+            const chosen = threat.responses[idx];
+
+            state.l3.decisions.push(idx);
+
+            // Visually disable buttons
+            const btns = document.querySelectorAll('#l3ResponseOptions .response-btn');
+            btns.forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.6';
+                b.style.cursor = 'not-allowed';
+            });
+
+            // Apply metric changes
+            state.l3.marketShare += chosen.mShare;
+            state.l3.revenue -= chosen.cost;
+            state.l3.satisfaction += chosen.satisfaction;
+
+            // Competitor also takes back some market share due to their initial move
+            state.l3.marketShare -= 5;
+            state.l3.satisfaction -= 2;
+
+            // Cap metrics
+            state.l3.marketShare = Math.min(100, Math.max(0, state.l3.marketShare));
+            state.l3.satisfaction = Math.min(100, Math.max(0, state.l3.satisfaction));
+
+            // Log feedback in console
+            document.getElementById('l3FeedbackPanel').innerHTML = `
+                <strong style="color: var(--primary-red);">Round ${state.l3.round} Strategic Analysis:</strong><br>
+                ${chosen.feedback} SmartCorp metrics adjusted.
+            `;
+
+            showToast(`Round ${state.l3.round} response deployed.`, 'success');
+
+            // Move round
+            state.l3.round++;
+
+            setTimeout(() => {
+                initializeLevel3();
+            }, 2500);
+        }
+
+        function updateL3DashboardUI() {
+            document.getElementById('l3MarketShareVal').innerText = `${state.l3.marketShare}%`;
+            document.getElementById('l3RevenueVal').innerText = `₹${state.l3.revenue}k`;
+            document.getElementById('l3SatisfactionVal').innerText = `${state.l3.satisfaction}%`;
+        }
+
+        function evaluateLevel3() {
+            state.levelsCompleted[2] = true;
+            updateStepperUI();
+
+            const winShare = state.l3.marketShare > 40;
+            const winRev = state.l3.revenue > 0;
+            const success = winShare && winRev;
+
+            let report = '';
+            if (success) {
+                report = `<p style="color: var(--success); font-weight:700; text-align:center; font-size:1.1rem;">📈 Competitive Defense Successful</p>
+                          <p style="margin-top:10px;">SmartCorp retains market leadership! By deploying balanced service upgrades and tactical feature releases, you kept Market Share at <strong>${state.l3.marketShare}%</strong> and preserved positive operating revenue.</p>`;
+            } else {
+                report = `<p style="color: var(--primary-red); font-weight:700; text-align:center; font-size:1.1rem;">⚠️ Market Leadership Eroded</p>
+                          <p style="margin-top:10px;">SmartCorp struggled to defend its turf. Total Market Share fell to <strong>${state.l3.marketShare}%</strong> or operational cash reserves were depleted (₹${state.l3.revenue}k).</p>`;
+            }
+
+            showModal('Competitor Actions Concluded', `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <span style="font-size:3rem;">⚔️</span>
+                </div>
+                ${report}
+                <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color);">
+                <div class="objective-box" style="margin-bottom:0;">
+                    <strong>Subject Summary: Economic and Competitive Factors</strong>
+                    <p style="font-size:0.88rem; line-height: 1.5;">
+                        Competitive factors dictate that businesses cannot operate in isolation. Fast-follower feature releases, pricing drops, and loyalty programs represent strategic responses to counter rival moves. Balancing capital expenditures against customer satisfaction is key to sustaining market leadership.
+                    </p>
+                </div>
+            `, () => {
+                jumpToLevel(4);
+            });
+        }
+
+        function resetLevel3() {
+            state.l3.round = 1;
+            state.l3.marketShare = 50;
+            state.l3.revenue = 50;
+            state.l3.satisfaction = 70;
+            state.l3.decisions = [];
+            document.getElementById('l3FeedbackPanel').innerText = 'Awaiting choice. Choose an action on the left that matches the competitor\'s competitive vector.';
+            initializeLevel3();
+            showToast('Competitor war room reset.', 'info');
+        }
+
+
+        // ================= LEVEL 4 LOGIC =================
+        function initializeLevel4() {
+            // Draw month and active shock
+            const shock = state.l4.shocks[state.l4.month - 1];
+
+            if (!shock) {
+                evaluateLevel4();
+                return;
+            }
+
+            document.getElementById('l4MonthText').innerText = `Month ${state.l4.month} of 12`;
+            document.getElementById('l4ShockTitle').innerText = shock.title;
+            document.getElementById('l4ShockDesc').innerText = shock.desc;
+
+            // Reset Sliders to default balanced state on first load if starting over
+            if (state.l4.month === 1 && state.l4.stability === 80) {
+                document.getElementById('l4SliderMarketing').value = 25000;
+                document.getElementById('l4SliderOperations').value = 25000;
+                document.getElementById('l4SliderTech').value = 25000;
+                document.getElementById('l4SliderSupport').value = 25000;
+            }
+
+            updateL4Budget();
+            updateL4DashboardUI();
+        }
+
+        function updateL4Budget() {
+            const mkt = parseInt(document.getElementById('l4SliderMarketing').value);
+            const ops = parseInt(document.getElementById('l4SliderOperations').value);
+            const tech = parseInt(document.getElementById('l4SliderTech').value);
+            const sup = parseInt(document.getElementById('l4SliderSupport').value);
+
+            const total = mkt + ops + tech + sup;
+
+            document.getElementById('l4ValMarketing').innerText = `₹${mkt.toLocaleString()}`;
+            document.getElementById('l4ValOperations').innerText = `₹${ops.toLocaleString()}`;
+            document.getElementById('l4ValTech').innerText = `₹${tech.toLocaleString()}`;
+            document.getElementById('l4ValSupport').innerText = `₹${sup.toLocaleString()}`;
+
+            const checker = document.getElementById('l4BudgetChecker');
+            const spentLabel = document.getElementById('l4BudgetSpent');
+            spentLabel.innerText = `Total Spent: ₹${total.toLocaleString()}`;
+
+            if (total === 100000) {
+                checker.className = 'budget-checker valid';
+                document.getElementById('l4ProcessBtn').disabled = false;
+                document.getElementById('l4HelperMessage').innerHTML = `
+                    <span style="color: var(--success); font-weight:700;">[BUDGET VALID]</span> Allocated exactly ₹100k. Click "Process Month" to simulate impacts.
+                `;
+            } else {
+                checker.className = 'budget-checker';
+                document.getElementById('l4ProcessBtn').disabled = true;
+                const diff = 100000 - total;
+                if (diff > 0) {
+                    document.getElementById('l4HelperMessage').innerHTML = `
+                        Allocation deficit: You have <strong>₹${diff.toLocaleString()}</strong> unallocated. Adjust sliders to spend exactly ₹100k.
+                    `;
+                } else {
+                    document.getElementById('l4HelperMessage').innerHTML = `
+                        Allocation surplus: You have overspent by <strong style="color: var(--primary-red);">₹${Math.abs(diff).toLocaleString()}</strong>. Reduce sliders to spend exactly ₹100k.
+                    `;
+                }
+            }
+        }
+
+        function updateL4DashboardUI() {
+            document.getElementById('l4ProfitVal').innerText = `₹${state.l4.profit.toLocaleString()}`;
+            document.getElementById('l4StabilityVal').innerText = `${state.l4.stability}%`;
+            document.getElementById('l4RetentionVal').innerText = `${state.l4.retention}%`;
+
+            if (state.l4.stability < 55) {
+                document.getElementById('l4StabilityVal').style.color = 'var(--primary-red)';
+            } else {
+                document.getElementById('l4StabilityVal').style.color = 'inherit';
+            }
+        }
+
+        function processL4Month() {
+            const mkt = parseInt(document.getElementById('l4SliderMarketing').value);
+            const ops = parseInt(document.getElementById('l4SliderOperations').value);
+            const tech = parseInt(document.getElementById('l4SliderTech').value);
+            const sup = parseInt(document.getElementById('l4SliderSupport').value);
+
+            const shock = state.l4.shocks[state.l4.month - 1];
+
+            // Evaluate budget allocations against economic shock constraints
+            let stabDelta = shock.stabHit || 0;
+            let rentDelta = shock.rentHit || 0;
+            let profitDelta = shock.profHit || 0;
+
+            // Slider constraints check
+            // 1. Marketing & Customer Support checks
+            if (mkt < 15000) {
+                rentDelta -= 5;
+                stabDelta -= 2;
+            }
+            if (sup < 15000) {
+                rentDelta -= 5;
+                stabDelta -= 2;
+            }
+
+            // 2. Shock-specific checks
+            if (shock.minOpsNeeded && ops < shock.minOpsNeeded) {
+                const diff = (shock.minOpsNeeded - ops) / 5000;
+                stabDelta -= Math.ceil(diff * 4);
+                rentDelta -= Math.ceil(diff * 2);
+            } else if (shock.minOpsNeeded && ops >= shock.minOpsNeeded) {
+                stabDelta += 2; // allocation success bonus
+            }
+
+            if (shock.minTechNeeded && tech < shock.minTechNeeded) {
+                const diff = (shock.minTechNeeded - tech) / 5000;
+                stabDelta -= Math.ceil(diff * 5);
+            } else if (shock.minTechNeeded && tech >= shock.minTechNeeded) {
+                stabDelta += 2; // tech buffer bonus
+            }
+
+            // Standard positive feedback loop for healthy investment
+            if (mkt >= 30000) {
+                rentDelta += 2;
+            }
+
+            // Update stats
+            state.l4.stability += stabDelta;
+            state.l4.retention += rentDelta;
+            state.l4.profit = 15000 + profitDelta + (mkt * 0.1) - (ops < 20000 ? 5000 : 0);
+
+            // Cap levels
+            state.l4.stability = Math.min(100, Math.max(0, state.l4.stability));
+            state.l4.retention = Math.min(100, Math.max(0, state.l4.retention));
+
+            // Advancing month
+            state.l4.month++;
+            showToast(`Month ${state.l4.month - 1} processed.`, 'info');
+
+            initializeLevel4();
+        }
+
+        function evaluateLevel4() {
+            state.levelsCompleted[3] = true;
+            updateStepperUI();
+
+            const isStable = state.l4.stability > 50;
+            let report = '';
+
+            if (isStable) {
+                report = `<p style="color: var(--success); font-weight:700; text-align:center; font-size:1.1rem;">📊 Financial Stabilization Achieved</p>
+                          <p style="margin-top:10px;">SmartCorp weathered the 12-month economic storm. By adjusting ops and tech investments under rising inflation and cloud rate hikes, you completed the simulation with <strong>${state.l4.stability}% Stability</strong> and <strong>${state.l4.retention}% Customer Retention</strong>.</p>`;
+            } else {
+                report = `<p style="color: var(--primary-red); font-weight:700; text-align:center; font-size:1.1rem;">🚨 Structural Instability Triggered</p>
+                          <p style="margin-top:10px;">The business suffered severe disruption. Under-funding ops or system maintenance caused Stability to drop to <strong>${state.l4.stability}%</strong>, impacting long-term viability.</p>`;
+            }
+
+            showModal('Economic Simulation Concluded', `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <span style="font-size:3rem;">📈</span>
+                </div>
+                ${report}
+                <hr style="margin:20px 0; border:none; border-top:1px solid var(--border-color);">
+                <div class="objective-box" style="margin-bottom:0;">
+                    <strong>Subject Summary: Economic Environments & Business Decisions</strong>
+                    <p style="font-size:0.88rem; line-height: 1.5;">
+                        Macroeconomic trends (e.g. interest rates, inflation, supply constraints) are external factors that business leaders cannot control. However, leaders must proactively adapt resource distributions (such as shifting budgets from marketing to core ops and technical infrastructure) to build organizational resilience.
+                    </p>
+                </div>
+            `, () => {
+                jumpToLevel(5);
+            });
+        }
+
+        function resetLevel4() {
+            state.l4.month = 1;
+            state.l4.stability = 80;
+            state.l4.retention = 85;
+            state.l4.profit = 15000;
+            initializeLevel4();
+            showToast('Economic simulator reset.', 'info');
+        }
+
+
+        // ================= LEVEL 5 LOGIC =================
+        function initializeLevel5() {
+            updateL5DashboardUI();
+
+            // Setup default controls view
+            document.getElementById('l5EventCard').style.display = 'none';
+            document.getElementById('l5ControlPanel').style.display = 'block';
+
+            if (state.l5.day > 30) {
+                evaluateLevel5();
+            }
+        }
+
+        function updateL5DashboardUI() {
+            // Update day text
+            document.getElementById('l5DayVal').innerText = `Day ${state.l5.day} of 30`;
+            const timelinePct = (state.l5.day / 30) * 100;
+            document.getElementById('l5TimelineFill').style.width = `${timelinePct}%`;
+
+            // Draw each KPI row with target indicators
+            updateKPIRow('compliance', state.l5.kpis.compliance, 90);
+            updateKPIRow('revenue', state.l5.kpis.revenue, 70);
+            updateKPIRow('marketShare', state.l5.kpis.marketShare, 75);
+            updateKPIRow('trust', state.l5.kpis.trust, 80);
+            updateKPIRow('stability', state.l5.kpis.stability, 80);
+        }
+
+        function updateKPIRow(kpiName, val, target) {
+            const bar = document.getElementById(`kpiBar-${kpiName}`);
+            const label = document.getElementById(`kpiVal-${kpiName}`);
+            const badge = document.getElementById(`kpiBadge-${kpiName}`);
+
+            bar.style.width = `${val}%`;
+            label.innerText = `${val}`;
+
+            if (val >= target) {
+                badge.className = 'kpi-badge pass';
+                badge.innerText = 'PASS';
+                bar.style.backgroundColor = 'var(--success)';
+            } else {
+                badge.className = 'kpi-badge fail';
+                badge.innerText = `FAIL (<${target})`;
+                bar.style.backgroundColor = 'var(--primary-red)';
+            }
+        }
+
+        function toggleL5Ticker() {
+            const btn = document.getElementById('l5StartBtn');
+            const statusLabel = document.getElementById('l5StatusLabel');
+
+            if (state.l5.tickerInterval) {
+                // Pause simulation
+                clearInterval(state.l5.tickerInterval);
+                state.l5.tickerInterval = null;
+                btn.innerText = 'Resume Simulation Run';
+                statusLabel.innerText = 'PAUSED';
+                showToast('Timeline paused.', 'info');
+            } else {
+                // Start simulation ticker
+                btn.innerText = 'Pause Simulation Run';
+                statusLabel.innerText = 'RUNNING';
+                showToast('Command console ticker online.', 'success');
+
+                state.l5.tickerInterval = setInterval(() => {
+                    stepL5Day();
+                }, state.l5.tickerSpeed);
+            }
+        }
+
+        function stepL5Day() {
+            if (state.l5.day >= 30) {
+                clearInterval(state.l5.tickerInterval);
+                state.l5.tickerInterval = null;
+                evaluateLevel5();
+                return;
+            }
+
+            // Normal daily fluctuation
+            state.l5.kpis.revenue += Math.floor(Math.random() * 3) - 1; // minor swings
+            state.l5.kpis.marketShare += Math.floor(Math.random() * 3) - 1;
+            state.l5.kpis.trust += Math.floor(Math.random() * 2) - 1;
+            state.l5.kpis.stability += Math.floor(Math.random() * 2) - 1;
+
+            // Bound KPIs
+            Object.keys(state.l5.kpis).forEach(k => {
+                state.l5.kpis[k] = Math.max(0, Math.min(100, state.l5.kpis[k]));
+            });
+
+            state.l5.day++;
+            updateL5DashboardUI();
+
+            // Check if active day triggers an event
+            const event = state.l5.events[state.l5.day];
+            if (event) {
+                // Pause simulation and display event card
+                if (state.l5.tickerInterval) {
+                    clearInterval(state.l5.tickerInterval);
+                    state.l5.tickerInterval = null;
+                }
+
+                triggerL5Event(event);
+            }
+        }
+
+        function triggerL5Event(event) {
+            document.getElementById('l5StatusLabel').innerText = 'INCIDENT ACTIVE';
+            document.getElementById('l5ControlPanel').style.display = 'none';
+
+            const card = document.getElementById('l5EventCard');
+            card.style.display = 'block';
+
+            document.getElementById('l5EventTitle').innerHTML = `⚡ ALERT: ${event.title}`;
+            document.getElementById('l5EventBody').innerText = event.desc;
+
+            const optsBox = document.getElementById('l5EventOptions');
+            optsBox.innerHTML = '';
+
+            event.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'l5-opt-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => selectL5EventOption(opt);
+                optsBox.appendChild(btn);
+            });
+
+            showToast(`Incident detected: ${event.title}`, 'warning');
+        }
+
+        function selectL5EventOption(option) {
+            // Apply decision changes
+            Object.keys(option.effect).forEach(k => {
+                if (k === 'revenue') state.l5.kpis.revenue += option.effect.revenue;
+                if (k === 'compliance') state.l5.kpis.compliance += option.effect.compliance;
+                if (k === 'trust') state.l5.kpis.trust += option.effect.trust;
+                if (k === 'stability') state.l5.kpis.stability += option.effect.stability;
+                if (k === 'marketShare') state.l5.kpis.marketShare += option.effect.marketShare;
+            });
+
+            // Bound KPIs
+            Object.keys(state.l5.kpis).forEach(k => {
+                state.l5.kpis[k] = Math.max(0, Math.min(100, state.l5.kpis[k]));
+            });
+
+            updateL5DashboardUI();
+            showToast('Decision logged. Dashboard updated.', 'success');
+
+            // Hide event card and restore controls
+            document.getElementById('l5EventCard').style.display = 'none';
+            document.getElementById('l5ControlPanel').style.display = 'block';
+
+            // Auto resume if it was running before
+            const startBtn = document.getElementById('l5StartBtn');
+            if (startBtn.innerText === 'Pause Simulation Run') {
+                document.getElementById('l5StatusLabel').innerText = 'RUNNING';
+                state.l5.tickerInterval = setInterval(() => {
+                    stepL5Day();
+                }, state.l5.tickerSpeed);
+            } else {
+                document.getElementById('l5StatusLabel').innerText = 'PAUSED';
+            }
+        }
+
+        function evaluateLevel5() {
+            state.levelsCompleted[4] = true;
+            updateStepperUI();
+
+            const winComp = state.l5.kpis.compliance >= 90;
+            const winRev = state.l5.kpis.revenue >= 70;
+            const winMkt = state.l5.kpis.marketShare >= 75;
+            const winTrust = state.l5.kpis.trust >= 80;
+            const winStab = state.l5.kpis.stability >= 80;
+
+            const allPass = winComp && winRev && winMkt && winTrust && winStab;
+
+            // Generate strengths and weaknesses lists
+            const strengths = [];
+            const weaknesses = [];
+
+            if (winComp) strengths.push(`Compliance reached ${state.l5.kpis.compliance}% (Target: 90%), satisfying regulatory criteria.`);
+            else weaknesses.push(`Compliance ended at ${state.l5.kpis.compliance}% (Target: 90%). System logs lacked privacy controls.`);
+
+            if (winRev) strengths.push(`Revenue Index reached ${state.l5.kpis.revenue} (Target: 70), ensuring profitability.`);
+            else weaknesses.push(`Revenue ended at ${state.l5.kpis.revenue} (Target: 70). Margin reductions compressed operations.`);
+
+            if (winMkt) strengths.push(`Market Share held at ${state.l5.kpis.marketShare} (Target: 75), defending our product line.`);
+            else weaknesses.push(`Market Share dropped to ${state.l5.kpis.marketShare} (Target: 75). Apex or CyberTech poached clients.`);
+
+            if (winTrust) strengths.push(`Customer Trust reached ${state.l5.kpis.trust} (Target: 80), building strong brand affinity.`);
+            else weaknesses.push(`Customer Trust ended at ${state.l5.kpis.trust} (Target: 80). Privacy concerns damaged reputation.`);
+
+            if (winStab) strengths.push(`Business Stability reached ${state.l5.kpis.stability} (Target: 80), keeping servers and overhead resilient.`);
+            else weaknesses.push(`Business Stability fell to ${state.l5.kpis.stability} (Target: 80), highlighting systems infrastructure gaps.`);
+
+            // Display results screen
+            showScreen('screenResults');
+
+            const heading = document.getElementById('resultHeading');
+            const subtext = document.getElementById('resultSubtext');
+
+            if (allPass) {
+                heading.innerText = 'Business Successfully Navigated Regulations and Competition';
+                heading.style.color = 'var(--success)';
+                subtext.innerText = 'SmartCorp has emerged as a resilient, compliant, and market-dominant force. Your executive leadership successfully balanced policy mandates and macroeconomic shocks.';
+            } else {
+                heading.innerText = 'Strategic Improvements Needed';
+                heading.style.color = 'var(--primary-red)';
+                subtext.innerText = 'Your executive campaign ran into operational headwinds. While parts of SmartCorp remained stable, critical compliance thresholds or market metrics fell below required tolerances.';
+            }
+
+            // Populate lists
+            const strengthsUl = document.getElementById('strengthsList');
+            strengthsUl.innerHTML = '';
+            strengths.forEach(s => {
+                const li = document.createElement('li');
+                li.innerText = s;
+                strengthsUl.appendChild(li);
+            });
+
+            const weaknessesUl = document.getElementById('weaknessesList');
+            weaknessesUl.innerHTML = '';
+            weaknesses.forEach(w => {
+                const li = document.createElement('li');
+                li.innerText = w;
+                weaknessesUl.appendChild(li);
+            });
+        }
+
+        function resetLevel5() {
+            if (state.l5.tickerInterval) {
+                clearInterval(state.l5.tickerInterval);
+                state.l5.tickerInterval = null;
+            }
+            state.l5.day = 1;
+            state.l5.kpis = {
+                compliance: 75,
+                revenue: 70,
+                marketShare: 70,
+                trust: 75,
+                stability: 75
+            };
+            document.getElementById('l5StartBtn').innerText = 'Start Simulation Run';
+            document.getElementById('l5StatusLabel').innerText = 'PAUSED';
+            document.getElementById('l5TickerStatus').innerText = 'Ready to launch dashboard ticker.';
+            initializeLevel5();
+            showToast('Console simulation reset.', 'info');
+        }
+
+        function restartEntireSimulation() {
+            state.levelsCompleted = [false, false, false, false, false];
+            state.l1.assigned = {};
+            state.l2.currentRegIndex = 0;
+            state.l2.budget = 40000;
+            state.l2.compliance = 20;
+            state.l2.decisions = [];
+            state.l3.round = 1;
+            state.l3.marketShare = 50;
+            state.l3.revenue = 50;
+            state.l3.satisfaction = 70;
+            state.l3.decisions = [];
+            state.l4.month = 1;
+            state.l4.stability = 80;
+            state.l4.retention = 85;
+            state.l4.profit = 15000;
+            resetLevel5();
+
+            showScreen('screenWelcome');
+            document.getElementById('stepperContainer').style.display = 'none';
+            document.getElementById('navigationFooter').style.display = 'none';
+            state.currentLevel = 0;
+            updateStepperUI();
+        }
+
+
+        // ================= MODAL & UTILITY LOGIC =================
+        let activeModalCallback = null;
+
+        function showModal(title, bodyHTML, callback = null) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = bodyHTML;
+            document.getElementById('summaryModal').classList.add('active');
+            activeModalCallback = callback;
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'summaryModal' && activeModalCallback) {
+                activeModalCallback();
+                activeModalCallback = null;
+            }
+        }
+
+        function showHelp(levelKey) {
+            const data = helpData[levelKey];
+            if (data) {
+                document.getElementById('helpTitle').innerText = data.title;
+                document.getElementById('helpBody').innerHTML = data.body;
+                document.getElementById('helpModal').classList.add('active');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            container.appendChild(toast);
+
+            // Auto remove toast after 3.5 seconds
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s forwards';
+                toast.addEventListener('animationend', () => {
+                    toast.remove();
+                });
+            }, 3500);
+        }
+
+        // CSS animation keyframes injected for Toast removal
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes toastOut {
+                to { opacity: 0; transform: translateY(10px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+
+</html>

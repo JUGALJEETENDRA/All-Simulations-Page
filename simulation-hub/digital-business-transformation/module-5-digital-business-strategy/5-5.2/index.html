@@ -1,1 +1,3602 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 5.2 Simulation - Strategic Analysis Consulting Center</title>
+    <meta name="description"
+        content="An interactive strategic analysis simulation for DBT Module 5.2. Perform SWOT, analyze market demand, study competitors, build strategy blueprints, and command growth as a Business Strategy Analyst.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #F57C00;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Stepper Progress Bar (Locked Sequentially) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transition: var(--transition);
+            user-select: none;
+            opacity: 0.6;
+        }
+
+        .step-item.unlocked {
+            color: var(--text-dark);
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            opacity: 1;
+        }
+
+        .step-item.completed {
+            color: var(--success);
+            opacity: 1;
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.unlocked .step-badge {
+            background-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+            max-width: 120px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        .step-divider.completed {
+            background-color: var(--success);
+        }
+
+        /* Main Workspace Container */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Panels */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons & Interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-red-light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Native Dialog (Modal) Styles */
+        dialog {
+            margin: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            font-family: var(--font-body);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .dialog-body {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Welcome Onboarding */
+        .welcome-memo {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #FFCDD2;
+            padding-bottom: 16px;
+        }
+
+        .memo-logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .memo-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .memo-body {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memo-highlight {
+            background-color: var(--primary-red-light);
+            border-left: 4px solid var(--primary-red);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Objective Box */
+        .objective-box {
+            background-color: #ECEFF1;
+            border-left: 4px solid #455A64;
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .objective-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #37474F;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Persistent Navigation Footer */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            /* Flex when active */
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Toast notifications styling */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background-color: #333333;
+            color: var(--white);
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .toast.success {
+            border-left: 5px solid var(--success);
+        }
+
+        .toast.warning {
+            border-left: 5px solid var(--warning);
+        }
+
+        .toast.danger {
+            border-left: 5px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        /* LEVEL 1: SWOT Investigation Board */
+        .swot-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .l1-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .evidence-wall {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+
+        .evidence-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .evidence-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .evidence-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .evidence-card.selected {
+            background-color: var(--primary-red-light);
+            border-color: var(--primary-red);
+            outline: 2px solid var(--primary-red);
+        }
+
+        .evidence-card.sorted {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .swot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .swot-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+        }
+
+        .swot-quadrant {
+            background: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .swot-quadrant:hover {
+            border-color: var(--primary-red);
+            background-color: var(--bg-light);
+        }
+
+        .quadrant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .quadrant-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .quadrant-type {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .quadrant-strengths {
+            color: var(--success);
+            border-bottom-color: var(--success);
+        }
+
+        .quadrant-strengths .quadrant-type {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .quadrant-weaknesses {
+            color: #D32F2F;
+            border-bottom-color: #D32F2F;
+        }
+
+        .quadrant-weaknesses .quadrant-type {
+            background-color: #FFEBEE;
+            color: #D32F2F;
+        }
+
+        .quadrant-opportunities {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        .quadrant-opportunities .quadrant-type {
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue);
+        }
+
+        .quadrant-threats {
+            color: var(--warning);
+            border-bottom-color: var(--warning);
+        }
+
+        .quadrant-threats .quadrant-type {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .sorted-card {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: cardPlace 0.2s ease-out;
+        }
+
+        @keyframes cardPlace {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .sorted-card-text {
+            color: var(--text-dark);
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
+
+        .remove-btn:hover {
+            color: var(--primary-red);
+        }
+
+        /* SWOT Matrix Result Layout */
+        .swot-matrix-card {
+            margin-top: 12px;
+            border: 2px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            background-color: var(--white);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: cardSlideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                transform: translateY(16px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .matrix-title {
+            background-color: var(--primary-red);
+            color: var(--white);
+            padding: 12px 20px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .matrix-quad {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 140px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .matrix-quad:nth-child(even) {
+            border-right: none;
+        }
+
+        .matrix-quad h5 {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .matrix-quad ul {
+            padding-left: 20px;
+            font-size: 0.88rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: var(--text-dark);
+        }
+
+        .matrix-theory {
+            background-color: var(--bg-light);
+            padding: 16px 20px;
+            font-size: 0.88rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* LEVEL 2: Demand Heatmap Analyzer */
+        .l2-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l2-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .map-container {
+            background-color: #ECEFF1;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .city-svg {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+        }
+
+        .map-region {
+            fill: #CFD8DC;
+            stroke: var(--white);
+            stroke-width: 3;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .map-region:hover {
+            fill: #B0BEC5;
+        }
+
+        .map-region.active-selection {
+            stroke: var(--primary-red);
+            stroke-width: 4;
+        }
+
+        /* Region demand styles */
+        .map-region.selected-launch {
+            fill: #A5D6A7 !important;
+            /* light green */
+            stroke: var(--success);
+            stroke-width: 4;
+        }
+
+        .map-label {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 700;
+            fill: #37474F;
+            pointer-events: none;
+            text-anchor: middle;
+        }
+
+        .demand-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .region-stats-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stats-header {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .region-action-btn {
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .demand-dashboard {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .dashboard-header {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .demand-metric-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .demand-metric-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        .metric-bar {
+            height: 12px;
+            background-color: #ECEFF1;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-red);
+            border-radius: 6px;
+            transition: width 0.4s ease-out;
+        }
+
+        .metric-bar-fill.success {
+            background-color: var(--success);
+        }
+
+        .metric-bar-fill.warning {
+            background-color: var(--warning);
+        }
+
+        .metric-bar-fill.danger {
+            background-color: var(--danger);
+        }
+
+        /* LEVEL 3: Competitor Intelligence Room */
+        .l3-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 950px) {
+            .l3-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .benchmarking-table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            background-color: var(--white);
+        }
+
+        .benchmark-table th,
+        .benchmark-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .benchmark-table th {
+            background-color: var(--bg-light);
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .benchmark-table tr.smartedge-row {
+            background-color: var(--primary-red-light);
+            font-weight: 600;
+        }
+
+        .benchmark-table tr.smartedge-row td {
+            border-top: 1px solid rgba(198, 40, 40, 0.2);
+            border-bottom: 1px solid rgba(198, 40, 40, 0.2);
+        }
+
+        .rating-badge {
+            background-color: var(--warning-light);
+            color: var(--warning);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .market-share-badge {
+            background-color: var(--accent-blue-light);
+            color: var(--accent-blue);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .intelligence-desk {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .query-widget {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .query-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .query-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        /* Competitive Positioning Chart */
+        .chart-box {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            animation: cardSlideUp 0.4s ease-out forwards;
+        }
+
+        .positioning-svg-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* LEVEL 4: Strategy Blueprint Builder */
+        .l4-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l4-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .actions-pool {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+
+        .strategy-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .strategy-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .blueprint-quadrant {
+            background: var(--white);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .blueprint-quadrant:hover {
+            border-color: var(--primary-red);
+            background-color: var(--bg-light);
+        }
+
+        .blueprint-quadrant-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        /* LEVEL 5: Executive Strategy Command Center */
+        .l5-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+        }
+
+        @media (max-width: 950px) {
+            .l5-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulation-console {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .console-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .console-month {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            text-transform: uppercase;
+        }
+
+        .console-status-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .console-status-badge.running {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .kpi-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 750px) {
+            .kpi-board {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .kpi-card:last-child {
+                grid-column: span 2;
+            }
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .kpi-title {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .kpi-value-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .kpi-gauge-bar {
+            height: 6px;
+            background-color: #ECEFF1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .kpi-gauge-fill {
+            height: 100%;
+            width: 50%;
+            background-color: var(--primary-red);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .terminal-panel {
+            background-color: #1E1E1E;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            color: #A5D6A7;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            min-height: 200px;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terminal-row {
+            line-height: 1.4;
+        }
+
+        .terminal-row.system {
+            color: #90CAF9;
+        }
+
+        .terminal-row.warning {
+            color: #FFE082;
+        }
+
+        .terminal-row.error {
+            color: #EF9A9A;
+        }
+
+        .terminal-row.success {
+            color: #A5D6A7;
+        }
+
+        .l5-incident-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+            display: none;
+            /* Flex when triggered */
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+        }
+
+        .incident-card {
+            background-color: var(--white);
+            border: 2px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: cardSlideUp 0.3s ease-out forwards;
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .incident-badge {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .incident-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .incident-desc {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .incident-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .incident-opt-btn {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .incident-opt-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .incident-opt-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .incident-opt-impact {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Final Scorecard overlay */
+        .scorecard-result {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .scorecard-banner {
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .scorecard-banner.success {
+            background-color: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .scorecard-banner.failed {
+            background-color: var(--danger-light);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+        }
+
+        .scorecard-result-kpi {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 550px) {
+            .scorecard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scorecard-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .scorecard-box-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .scorecard-box ul {
+            padding-left: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* Responsive structural layouts */
+        @media (max-width: 750px) {
+            main {
+                padding: 0 16px;
+                margin: 16px auto;
+            }
+
+            .nav-footer {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sticky Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>Digital Business & Transformation – Module 5.2 Simulation</h1>
+                    <p>Strategic Analysis (SWOT, Demand Analysis, Competition Analysis)</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showHelpManual()">Strategic Manual</button>
+                </div>
+            </div>
+
+            <!-- Stepper Progress Tracker (Sequential Locking) -->
+            <div class="stepper">
+                <div class="step-item active unlocked" id="step-btn-1" onclick="navigateToLevel(1)">
+                    <span class="step-badge">1</span>
+                    <span>SWOT Board</span>
+                </div>
+                <div class="step-divider" id="step-div-2"></div>
+                <div class="step-item" id="step-btn-2" onclick="navigateToLevel(2)">
+                    <span class="step-badge">2</span>
+                    <span>Demand Heatmap</span>
+                </div>
+                <div class="step-divider" id="step-div-3"></div>
+                <div class="step-item" id="step-btn-3" onclick="navigateToLevel(3)">
+                    <span class="step-badge">3</span>
+                    <span>Competitor Intel</span>
+                </div>
+                <div class="step-divider" id="step-div-4"></div>
+                <div class="step-item" id="step-btn-4" onclick="navigateToLevel(4)">
+                    <span class="step-badge">4</span>
+                    <span>Strategy Blueprint</span>
+                </div>
+                <div class="step-divider" id="step-div-5"></div>
+                <div class="step-item" id="step-btn-5" onclick="navigateToLevel(5)">
+                    <span class="step-badge">5</span>
+                    <span>Command Center</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Strategic Analysis (Module 5.2)
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. SWOT Analysis:</strong> Helps evaluate internal
+                        capabilities (Strengths, Weaknesses) alongside external forces (Opportunities, Threats) to
+                        structure resource positioning.</p>
+                    <p><strong>2. Demand Analysis:</strong> Measures client intent, volume demands, price sensitivity,
+                        and requirements to validate market size and launch trajectories.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Competitor Analysis:</strong> Analyzes competitor
+                        features, pricing models, market segments, and capabilities to determine differentiation gaps
+                        and defense loops.</p>
+                    <p><strong>4. Environmental Scanning:</strong> Unites multiple dimensions (SWOT, Competitors,
+                        Customer demand) to form stable business models.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WELCOME SCREEN & ONBOARDING -->
+        <section id="screen-intro" class="screen active">
+            <div class="welcome-memo">
+                <div class="memo-header">
+                    <div class="memo-logo">
+                        <span>🏛️</span>
+                        <span>Alpha Consulting Group</span>
+                    </div>
+                    <div class="memo-meta">
+                        <div>PROJECT: STRATEGIC BRIEF</div>
+                        <div>CLIENT: SMARTEDGE DIGITAL</div>
+                        <div>DATE: JUN 2026</div>
+                    </div>
+                </div>
+
+                <div class="memo-body">
+                    <p><strong>To: Business Strategy Analyst Team</strong></p>
+                    <p>Our client, <strong>SmartEdge</strong>, is a high-growth digital service platform planning a
+                        major geographic expansion. However, before investing expansion capital, their executive board
+                        has requested a rigorous strategic environment analysis.</p>
+
+                    <div class="memo-highlight">
+                        Your mission is to perform environmental scanning, evaluate demographic demands, benchmark key
+                        market competitors, map out an actionable strategy blueprint, and execute the final expansion
+                        plan.
+                    </div>
+
+                    <p>This command console guides you through the strategic process across 5 analysis modules:</p>
+
+                    <ul
+                        style="padding-left: 24px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem;">
+                        <li><strong>Level 1: SWOT Investigation Board</strong> – Categorize corporate evidence logs to
+                            map strengths, weaknesses, opportunities, and threats.</li>
+                        <li><strong>Level 2: Demand Heatmap Analyzer</strong> – Click and scan city region metrics to
+                            balance demand scores against localized risk rates.</li>
+                        <li><strong>Level 3: Competitor Intelligence Room</strong> – Audit rival platforms, query
+                            performance differences, and plot market positioning.</li>
+                        <li><strong>Level 4: Strategy Blueprint Builder</strong> – Match strategic operations to
+                            increase reach, mitigate risks, and build defensive moats.</li>
+                        <li><strong>Level 5: Executive Strategy Command Center</strong> – Steer SmartEdge through a
+                            12-month simulation handling real-time macroeconomic events.</li>
+                    </ul>
+
+                    <p>All environmental analysis layers must lock sequentially. You cannot launch the Month 12
+                        expansion command center until all analytical baselines are resolved.</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" onclick="startSimulation()">Begin Analysis Framework</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 1: SWOT Investigation Board -->
+        <section id="screen-l1" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 1: SWOT Investigation Board</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--primary-red-light); color: var(--primary-red); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Environmental
+                        Scan</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Analyze SmartEdge's internal parameters and external surroundings. Click a card in the Evidence Wall
+                    on the left, then click one of the SWOT quadrants on the right to place it. Match all 8 statements
+                    correctly.
+                </div>
+
+                <div class="l1-layout">
+                    <!-- Left: Evidence Wall -->
+                    <div class="evidence-wall">
+                        <div class="evidence-title">Evidence Wall Logs</div>
+                        <div id="evidence-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Quadrant targets -->
+                    <div class="swot-board-container" style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="swot-grid">
+                            <div class="swot-quadrant quadrant-strengths" id="quad-strengths"
+                                onclick="placeSelectedIn('strengths')">
+                                <div class="quadrant-header">
+                                    <span class="quadrant-title">💪 Strengths</span>
+                                    <span class="quadrant-type">Internal / Pos</span>
+                                </div>
+                                <div class="quad-content" id="content-strengths"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+                            <div class="swot-quadrant quadrant-weaknesses" id="quad-weaknesses"
+                                onclick="placeSelectedIn('weaknesses')">
+                                <div class="quadrant-header">
+                                    <span class="quadrant-title">⚠️ Weaknesses</span>
+                                    <span class="quadrant-type">Internal / Neg</span>
+                                </div>
+                                <div class="quad-content" id="content-weaknesses"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+                            <div class="swot-quadrant quadrant-opportunities" id="quad-opportunities"
+                                onclick="placeSelectedIn('opportunities')">
+                                <div class="quadrant-header">
+                                    <span class="quadrant-title">📈 Opportunities</span>
+                                    <span class="quadrant-type">External / Pos</span>
+                                </div>
+                                <div class="quad-content" id="content-opportunities"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+                            <div class="swot-quadrant quadrant-threats" id="quad-threats"
+                                onclick="placeSelectedIn('threats')">
+                                <div class="quadrant-header">
+                                    <span class="quadrant-title">🚨 Threats</span>
+                                    <span class="quadrant-type">External / Neg</span>
+                                </div>
+                                <div class="quad-content" id="content-threats"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="resetLevel1()">Reset Board</button>
+                            <button class="btn" id="l1-verify-btn" onclick="verifyLevel1()">Verify Evidence
+                                Matrix</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated Visual SWOT Matrix -->
+                <div class="swot-matrix-card" id="swot-matrix-result">
+                    <div class="matrix-title">Strategic Matrix: SWOT Analysis (Validated)</div>
+                    <div class="matrix-grid">
+                        <div class="matrix-quad" style="border-left: 4px solid var(--success);">
+                            <h5 style="color: var(--success);">Strengths (Internal Factors)</h5>
+                            <ul id="matrix-list-strengths"></ul>
+                        </div>
+                        <div class="matrix-quad" style="border-left: 4px solid #D32F2F;">
+                            <h5 style="color: #D32F2F;">Weaknesses (Internal Factors)</h5>
+                            <ul id="matrix-list-weaknesses"></ul>
+                        </div>
+                        <div class="matrix-quad" style="border-left: 4px solid var(--accent-blue);">
+                            <h5 style="color: var(--accent-blue);">Opportunities (External Factors)</h5>
+                            <ul id="matrix-list-opportunities"></ul>
+                        </div>
+                        <div class="matrix-quad" style="border-left: 4px solid var(--warning);">
+                            <h5 style="color: var(--warning);">Threats (External Factors)</h5>
+                            <ul id="matrix-list-threats"></ul>
+                        </div>
+                    </div>
+                    <div class="matrix-theory">
+                        <p><strong>Core Concept Checklist:</strong></p>
+                        <p style="margin-top:6px; color: var(--text-muted);">Internal factors (Strengths & Weaknesses)
+                            fall under direct control of the firm, enabling active management. External factors
+                            (Opportunities & Threats) exist in the surrounding business environment, requiring proactive
+                            strategies to leverage trends or hedge risks.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Demand Heatmap Analyzer -->
+        <section id="screen-l2" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 2: Demand Heatmap Analyzer</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--warning-light); color: var(--warning); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Market
+                        Sizing</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Evaluate expansion targets by selecting city zones. Click on regions in the city map to scan their
+                    demographic metrics. Select a balanced set of zones that reaches a **Combined Demand Score of &gt;
+                    80** while keeping the **Average Risk Score under 30**.
+                </div>
+
+                <div class="l2-layout">
+                    <!-- Left: Interactive City Heatmap -->
+                    <div class="map-container">
+                        <div class="evidence-title" style="align-self: flex-start; width: 100%;">City Expansion Sectors
+                        </div>
+
+                        <svg class="city-svg" viewBox="0 0 500 400">
+                            <!-- Region 1: Metro Central -->
+                            <path class="map-region" id="region-metro" d="M150 100 L350 100 L320 250 L180 250 Z"
+                                onclick="selectRegion('metro')"></path>
+                            <!-- Region 2: North Tech Hub -->
+                            <path class="map-region" id="region-north" d="M150 100 L250 20 L350 100 Z"
+                                onclick="selectRegion('north')"></path>
+                            <!-- Region 3: South Suburbs -->
+                            <path class="map-region" id="region-south" d="M180 250 L320 250 L250 380 Z"
+                                onclick="selectRegion('south')"></path>
+                            <!-- Region 4: East Industrial -->
+                            <path class="map-region" id="region-east" d="M350 100 L480 200 L320 250 Z"
+                                onclick="selectRegion('east')"></path>
+
+                            <!-- Labels -->
+                            <text class="map-label" x="250" y="160">Metro Central</text>
+                            <text class="map-label" x="250" y="70">North Tech Hub</text>
+                            <text class="map-label" x="250" y="300">South Suburbs</text>
+                            <text class="map-label" x="380" y="190">East Industrial</text>
+                        </svg>
+                    </div>
+
+                    <!-- Right: Demand Console Panels -->
+                    <div class="demand-panel">
+                        <!-- Stats Card -->
+                        <div class="region-stats-card" id="region-stats">
+                            <div class="stats-header" id="stats-title">Select a Region to Scan</div>
+                            <div class="stats-grid" id="stats-body">
+                                <div style="grid-column: span 2; color: var(--text-muted); font-size: 0.9rem;">
+                                    Click on the visual map segments on the left to read live sensor and survey metrics.
+                                </div>
+                            </div>
+                            <button class="btn region-action-btn" id="stats-toggle-btn" disabled
+                                onclick="toggleRegionLaunch()">Include in Launch Strategy</button>
+                        </div>
+
+                        <!-- Live Metrics Dashboard -->
+                        <div class="demand-dashboard">
+                            <div class="dashboard-header">Aggregated Strategy Dashboard</div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Selected Launch Zones</span>
+                                    <span id="dash-zones">None</span>
+                                </div>
+                            </div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Accumulated Potential Customers</span>
+                                    <span id="dash-customers">0</span>
+                                </div>
+                            </div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Average Demand Score</span>
+                                    <span id="dash-demand-val">0 / 100</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="dash-demand-bar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Average Risk Score</span>
+                                    <span id="dash-risk-val">0 / 100</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="dash-risk-bar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="btn-group" style="justify-content: flex-end; margin-top: 8px;">
+                                <button class="btn btn-secondary" onclick="resetLevel2()">Clear Plan</button>
+                                <button class="btn" id="l2-verify-btn" onclick="verifyLevel2()">Validate Launch
+                                    Plan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Competitor Intelligence Room -->
+        <section id="screen-l3" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 3: Competitor Intelligence Room</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Benchmarking</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Evaluate competitor strengths and weaknesses. Study the attributes matrix below, resolve the 3
+                    queries in the analyst query widgets, and chart the visual position graph to complete your analysis.
+                </div>
+
+                <div class="l3-layout">
+                    <!-- Left: Table Benchmarks -->
+                    <div class="benchmarking-table-container">
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Firm</th>
+                                    <th>Price Index</th>
+                                    <th>Delivery Speed</th>
+                                    <th>Product Features</th>
+                                    <th>Customer Ratings</th>
+                                    <th>Market Share</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="smartedge-row">
+                                    <td>SmartEdge (You)</td>
+                                    <td>Medium (₹150)</td>
+                                    <td>Slow (5 Days)</td>
+                                    <td>Core Features</td>
+                                    <td><span class="rating-badge">3.8 / 5</span></td>
+                                    <td><span class="market-share-badge">15%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Apex Digital</td>
+                                    <td>Low (₹99)</td>
+                                    <td>Fast (1 Day)</td>
+                                    <td>Core Features</td>
+                                    <td><span class="rating-badge">4.0 / 5</span></td>
+                                    <td><span class="market-share-badge">25%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Horizon Pro</td>
+                                    <td>High (₹299)</td>
+                                    <td>Medium (3 Days)</td>
+                                    <td>Advanced Features</td>
+                                    <td><span class="rating-badge">4.5 / 5</span></td>
+                                    <td><span class="market-share-badge">45%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Nova Core</td>
+                                    <td>Medium (₹150)</td>
+                                    <td>Fast (1 Day)</td>
+                                    <td>Basic Features</td>
+                                    <td><span class="rating-badge">3.5 / 5</span></td>
+                                    <td><span class="market-share-badge">15%</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Right: Intelligence Queries desk -->
+                    <div class="intelligence-desk">
+                        <div class="query-widget">
+                            <div class="query-title">Query 1: Identify Biggest Threat</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">Which rival commands the largest
+                                market share and highest customer ratings?</div>
+                            <select class="query-select" id="query-competitor" onchange="checkL3Query()">
+                                <option value="none">-- Select competitor --</option>
+                                <option value="apex">Apex Digital</option>
+                                <option value="horizon">Horizon Pro</option>
+                                <option value="nova">Nova Core</option>
+                            </select>
+                        </div>
+
+                        <div class="query-widget">
+                            <div class="query-title">Query 2: Primary Competitive Gap</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">Which operational metric represents
+                                SmartEdge's largest performance gap?</div>
+                            <select class="query-select" id="query-gap" onchange="checkL3Query()">
+                                <option value="none">-- Select metric --</option>
+                                <option value="price">Price Index</option>
+                                <option value="speed">Delivery Speed</option>
+                                <option value="features">Product Features</option>
+                            </select>
+                        </div>
+
+                        <div class="query-widget">
+                            <div class="query-title">Query 3: Differentiation Area</div>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">Which dimension provides SmartEdge
+                                the best path to differentiate without starting a price war?</div>
+                            <select class="query-select" id="query-diff" onchange="checkL3Query()">
+                                <option value="none">-- Select strategy --</option>
+                                <option value="match-price">Aggressively lowering prices to ₹99</option>
+                                <option value="feature-innovation">Adding unique features to deliver higher value
+                                </option>
+                                <option value="speed-only">Copying Nova Core's baseline features</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SVG Positioning Chart -->
+                <div class="chart-box" id="l3-chart-box">
+                    <div class="query-title">Market Positioning Map: Price vs. Features/Quality</div>
+                    <div class="positioning-svg-container">
+                        <svg width="450" height="300" viewBox="0 0 450 300"
+                            style="background:#FFF; border:1px solid #CCC; border-radius:8px;">
+                            <!-- Grid lines -->
+                            <line x1="50" y1="250" x2="400" y2="250" stroke="#888" stroke-dasharray="2" />
+                            <line x1="50" y1="50" x2="50" y2="250" stroke="#888" stroke-dasharray="2" />
+                            <line x1="50" y1="150" x2="400" y2="150" stroke="#DDD" />
+                            <line x1="225" y1="50" x2="225" y2="250" stroke="#DDD" />
+
+                            <!-- Axes Labels -->
+                            <text x="225" y="280" text-anchor="middle" font-size="11" font-weight="700"
+                                fill="#333">PRICE INDEX</text>
+                            <text x="15" y="150" transform="rotate(-90 15 150)" text-anchor="middle" font-size="11"
+                                font-weight="700" fill="#333">FEATURES & QUALITY</text>
+                            <text x="50" y="265" font-size="9" fill="#666">Low Price</text>
+                            <text x="390" y="265" text-anchor="end" font-size="9" fill="#666">High Price</text>
+                            <text x="60" y="60" font-size="9" fill="#666">High Quality</text>
+                            <text x="60" y="240" font-size="9" fill="#666">Basic Features</text>
+
+                            <!-- Apex Digital Bubble -->
+                            <circle cx="120" cy="180" r="25" fill="rgba(21, 101, 192, 0.2)" stroke="var(--accent-blue)"
+                                stroke-width="2" />
+                            <text x="120" y="183" font-size="9" font-weight="bold" fill="var(--accent-blue)"
+                                text-anchor="middle">Apex (25%)</text>
+
+                            <!-- Horizon Pro Bubble -->
+                            <circle cx="340" cy="80" r="35" fill="rgba(245, 124, 0, 0.2)" stroke="var(--warning)"
+                                stroke-width="2" />
+                            <text x="340" y="83" font-size="9" font-weight="bold" fill="var(--warning)"
+                                text-anchor="middle">Horizon (45%)</text>
+
+                            <!-- Nova Core Bubble -->
+                            <circle cx="225" cy="210" r="20" fill="rgba(117, 117, 117, 0.2)" stroke="#757575"
+                                stroke-width="2" />
+                            <text x="225" y="213" font-size="9" font-weight="bold" fill="#555" text-anchor="middle">Nova
+                                (15%)</text>
+
+                            <!-- SmartEdge (You) Bubble -->
+                            <circle cx="225" cy="150" r="20" fill="rgba(198, 40, 40, 0.2)" stroke="var(--primary-red)"
+                                stroke-width="3" />
+                            <text x="225" y="153" font-size="9" font-weight="bold" fill="var(--primary-red)"
+                                text-anchor="middle">SmartEdge</text>
+                        </svg>
+                    </div>
+                    <div style="font-size:0.85rem; color:var(--text-muted); text-align:center;">
+                        SmartEdge sits in the center space (medium price, core features), leaving it vulnerable to price
+                        competition from Apex Digital. Differentiation is required.
+                    </div>
+                    <div class="btn-group" style="justify-content: flex-end;">
+                        <button class="btn" onclick="showSummaryDialog(3)">Lock Intel Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 4: Strategy Blueprint Builder -->
+        <section id="screen-l4" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 4: Strategy Blueprint Builder</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Tactical
+                        Planning</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Translate SWOT and competitive gap scans into a tactical action plan. Click an action card in the
+                    pool, then click a target quadrant on the strategy board to place it. Misaligned choices increase
+                    Risk Level.
+                    <br><br>
+                    <strong>Balanced Strategy Targets:</strong> Growth Potential &gt; 70%, Risk Level &lt; 40%,
+                    Competitive Advantage &gt; 70%.
+                </div>
+
+                <div class="l4-layout">
+                    <!-- Left: Strategy Actions Pool -->
+                    <div class="actions-pool">
+                        <div class="evidence-title">Action Item Cards</div>
+                        <div id="strategy-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Board & Live Dashboard -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="strategy-workspace">
+                            <div class="blueprint-quadrant" id="quad-reach" onclick="placeActionIn('reach')">
+                                <div class="blueprint-quadrant-title">Increase Market Reach</div>
+                                <div class="quad-content" id="content-reach"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+
+                            <div class="blueprint-quadrant" id="quad-products" onclick="placeActionIn('products')">
+                                <div class="blueprint-quadrant-title">Improve Products</div>
+                                <div class="quad-content" id="content-products"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+
+                            <div class="blueprint-quadrant" id="quad-risks" onclick="placeActionIn('risks')">
+                                <div class="blueprint-quadrant-title">Reduce Risks</div>
+                                <div class="quad-content" id="content-risks"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+
+                            <div class="blueprint-quadrant" id="quad-diff" onclick="placeActionIn('diff')">
+                                <div class="blueprint-quadrant-title">Differentiate From Rivals</div>
+                                <div class="quad-content" id="content-diff"
+                                    style="display:flex; flex-direction:column; gap:6px;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Live Metrics Dashboard -->
+                        <div class="demand-dashboard">
+                            <div class="dashboard-header">Blueprint Metrics Calibration</div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Growth Potential</span>
+                                    <span id="l4-growth-val">20% (Goal: &gt;70%)</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="l4-growth-bar" style="width: 20%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Risk Level</span>
+                                    <span id="l4-risk-val">20% (Goal: &lt;40%)</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="l4-risk-bar" style="width: 20%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="demand-metric-row">
+                                <div class="demand-metric-info">
+                                    <span>Competitive Advantage</span>
+                                    <span id="l4-advantage-val">20% (Goal: &gt;70%)</span>
+                                </div>
+                                <div class="metric-bar">
+                                    <div class="metric-bar-fill" id="l4-advantage-bar" style="width: 20%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="btn-group" style="justify-content: flex-end;">
+                                <button class="btn btn-secondary" onclick="resetLevel4()">Reset Board</button>
+                                <button class="btn" id="l4-lock-btn" onclick="verifyLevel4()">Lock Blueprint</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 5: Executive Strategy Command Center (Capstone) -->
+        <section id="screen-l5" class="screen">
+            <div class="card" style="position: relative;">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 5: Executive Strategy Command Center</div>
+                    <span class="console-status-badge" id="l5-status">Idle</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Manage the strategic operations of SmartEdge over a 12-month timeline. Keep metrics balanced above
+                    their targets at Month 12:
+                    <br>
+                    <strong>Targets:</strong> Market Share &gt; 75, Revenue &gt; 75, Competitive Strength &gt; 80,
+                    Business Stability &gt; 80, Demand &gt; 80.
+                </div>
+
+                <div class="l5-layout">
+                    <!-- Left: Control & Graph Console -->
+                    <div class="simulation-console">
+                        <!-- Top status bar -->
+                        <div class="console-header-bar">
+                            <div class="console-month" id="console-month-ticker">MONTH 1 OF 12</div>
+                            <div>
+                                <button class="btn" id="l5-start-btn" onclick="startL5Ticker()">Launch 12-Month
+                                    Cycle</button>
+                                <button class="btn btn-secondary" id="l5-pause-btn" onclick="pauseL5Ticker()"
+                                    disabled>Pause</button>
+                            </div>
+                        </div>
+
+                        <!-- KPI gauges -->
+                        <div class="kpi-board">
+                            <div class="kpi-card">
+                                <span class="kpi-title">Market Share</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-share">55</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-share" style="width: 55%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Revenue</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-revenue">55</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-revenue" style="width: 55%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Demand</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-demand">55</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-demand" style="width: 55%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Competitive Strength</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-strength">55</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-strength" style="width: 55%;"></div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-title">Business Stability</span>
+                                <div class="kpi-value-row">
+                                    <span class="kpi-value" id="kpi-stability">55</span>
+                                    <span
+                                        style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">/100</span>
+                                </div>
+                                <div class="kpi-gauge-bar">
+                                    <div class="kpi-gauge-fill" id="fill-stability" style="width: 55%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Real-time terminal log -->
+                        <div class="terminal-panel" id="l5-terminal-ticker">
+                            <div class="terminal-row">[SYSTEM] Strategic analysis database loaded.</div>
+                            <div class="terminal-row">[SYSTEM] Operations console ready. Click "Launch 12-Month Cycle".
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Consulting Summary Desk -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="region-stats-card">
+                            <div class="stats-header">Strategic Baseline Summary</div>
+                            <div
+                                style="font-size:0.85rem; display:flex; flex-direction:column; gap:10px; color:var(--text-dark);">
+                                <div><strong> SWOT Map Checked:</strong> Internal strengths and weaknesses benchmarked.
+                                </div>
+                                <div><strong> Launch Zones Scanned:</strong> Expansions target North Tech and South
+                                    Suburbs.</div>
+                                <div><strong> Competitor Intel Logged:</strong> Differentiating features established.
+                                </div>
+                                <div><strong> Strategy Blueprint Locked:</strong> Tactical blueprints matched.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OVERLAYS INCIDENT CARDS -->
+                <div class="l5-incident-overlay" id="l5-incident-overlay">
+                    <div class="incident-card" id="l5-incident-card">
+                        <div class="incident-header">
+                            <span class="incident-badge">Macro incident</span>
+                            <span id="l5-incident-month"
+                                style="font-family:var(--font-mono); font-size:0.8rem; font-weight:700; color:var(--primary-red);">Month
+                                2</span>
+                        </div>
+                        <h4 class="incident-title" id="inc-title">DEMAND WAVE</h4>
+                        <p class="incident-desc" id="inc-desc">Consumer demand for digital services spikes suddenly.</p>
+                        <div class="incident-options" id="inc-options">
+                            <!-- Options injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Native Learning Summary Dialog -->
+    <dialog id="summary-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📘</span>
+                <span id="summary-dialog-title">Level Complete: Strategic Insights</span>
+            </div>
+            <div class="dialog-body" id="summary-dialog-content">
+                <!-- content injected -->
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" id="summary-next-btn" onclick="confirmSummaryNextLevel()">Unlock Next Analysis
+                    Stage</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Scorecard dialog -->
+    <dialog id="scorecard-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📊</span>
+                <span>SmartEdge Strategic Scorecard</span>
+            </div>
+            <div class="dialog-body">
+                <div class="scorecard-result">
+                    <div class="scorecard-banner" id="scorecard-banner-status">SUCCESS</div>
+
+                    <div class="scorecard-grid">
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Expansion Performance KPIs</div>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+                                <div style="display:flex; justify-content:space-between;"><span>Market
+                                        Share:</span><strong id="card-share">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Revenue:</span><strong
+                                        id="card-revenue">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Demand:</span><strong
+                                        id="card-demand">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Competitive
+                                        Strength:</span><strong id="card-strength">80 / 100</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Business
+                                        Stability:</span><strong id="card-stability">80 / 100</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Strategic Feedback</div>
+                            <div style="font-size:0.82rem; color:var(--text-dark);" id="scorecard-eval-text">
+                                Feedback description...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem; background-color:var(--bg-light); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                        <strong>Consultant Core Review Summary:</strong>
+                        <ul style="padding-left:16px;">
+                            <li><strong>SWOT Scanner:</strong> Enabled proactive defenses against threats.</li>
+                            <li><strong>Heatmap Analyzer:</strong> Balanced expansion potential against operating risks.
+                            </li>
+                            <li><strong>Competitor Audits:</strong> Prevented costly price wars by targeting high-value
+                                features.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn btn-secondary" onclick="resetFullSimulation()">Restart Framework</button>
+                <button class="btn" onclick="scorecardDialog.close()">Close Review</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Help Manual Dialog -->
+    <dialog id="help-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>🏛️</span>
+                <span>Analyst Reference Manual</span>
+            </div>
+            <div class="dialog-body">
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:0.9rem;">
+                    <div><strong>SWOT Analysis Framework:</strong></div>
+                    <p style="color:var(--text-muted);">Useful to identify internal capabilities (strengths and
+                        weaknesses) and external factors (opportunities and threats). Strengths and opportunities
+                        represent helpful drivers, while weaknesses and threats identify risks to mitigate.</p>
+
+                    <div><strong>Market Demand Analysis:</strong></div>
+                    <p style="color:var(--text-muted);">Helps strategic expansion by evaluating demographics
+                        (population, purchasing power) to find targets that maximize customer volume while minimizing
+                        operating risk levels.</p>
+
+                    <div><strong>Competitor Benchmarking:</strong></div>
+                    <p style="color:var(--text-muted);">Compares Price, Quality, and Features to find competitive gaps.
+                        Differentiation models leverage quality and feature sets to bypass direct price wars.</p>
+
+                    <div><strong>Blueprint Integration:</strong></div>
+                    <p style="color:var(--text-muted);">Translates high-level assessments into actionable operations,
+                        balancing business growth vs. risk vs. unique advantages.</p>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeHelpManual()">Return to Console</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Persistent Navigation Footer -->
+    <div class="nav-footer" id="navigationFooter">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Stage</button>
+            <span
+                style="font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--text-dark);"
+                id="footerLevelText">Level 1 of 5</span>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Stage</button>
+        </div>
+    </div>
+
+    <!-- Toast elements container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // System State
+        const state = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true, true, true],
+            completedLevels: [false, false, false, false, false],
+
+            // Level 1: SWOT variables
+            l1: {
+                selectedCard: null,
+                placedCards: {
+                    strengths: [],
+                    weaknesses: [],
+                    opportunities: [],
+                    threats: []
+                },
+                cards: [
+                    { id: 'c1', text: 'Strong brand recognition', category: 'strengths' },
+                    { id: 'c2', text: 'Loyal customer base', category: 'strengths' },
+                    { id: 'c3', text: 'Outdated technology', category: 'weaknesses' },
+                    { id: 'c4', text: 'Limited marketing budget', category: 'weaknesses' },
+                    { id: 'c5', text: 'Growing online shopping trend', category: 'opportunities' },
+                    { id: 'c6', text: 'Increasing internet users', category: 'opportunities' },
+                    { id: 'c7', text: 'New competitor entering the market', category: 'threats' },
+                    { id: 'c8', text: 'Negative customer reviews', category: 'threats' }
+                ]
+            },
+
+            // Level 2: Demand variables
+            l2: {
+                selectedRegion: null,
+                launchPlan: [], // Array of region IDs
+                regions: {
+                    'metro': {
+                        id: 'metro',
+                        name: 'Metro Central',
+                        population: '1.5 Million',
+                        internet: '85%',
+                        power: 'High',
+                        smartphone: '90%',
+                        customers: 1275000,
+                        demand: 90,
+                        risk: 55
+                    },
+                    'north': {
+                        id: 'north',
+                        name: 'North Tech Hub',
+                        population: '0.9 Million',
+                        internet: '95%',
+                        power: 'Very High',
+                        smartphone: '98%',
+                        customers: 855000,
+                        demand: 95,
+                        risk: 20
+                    },
+                    'south': {
+                        id: 'south',
+                        name: 'South Suburbs',
+                        population: '0.75 Million',
+                        internet: '70%',
+                        power: 'Medium',
+                        smartphone: '75%',
+                        customers: 525000,
+                        demand: 70,
+                        risk: 25
+                    },
+                    'east': {
+                        id: 'east',
+                        name: 'East Industrial',
+                        population: '0.4 Million',
+                        internet: '50%',
+                        power: 'Low',
+                        smartphone: '60%',
+                        customers: 200000,
+                        demand: 45,
+                        risk: 60
+                    }
+                }
+            },
+
+            // Level 3: Competitor Intelligence
+            l3: {
+                competitor: 'none',
+                gap: 'none',
+                diff: 'none'
+            },
+
+            // Level 4: Strategy Blueprint
+            l4: {
+                selectedCard: null,
+                placedCards: {
+                    reach: [],
+                    products: [],
+                    risks: [],
+                    diff: []
+                },
+                cards: [
+                    { id: 'a1', text: 'Launch mobile application', correctCategory: 'reach', impact: { growth: 15, risk: 5, advantage: 10 } },
+                    { id: 'a2', text: 'Collaborate with influencers', correctCategory: 'reach', impact: { growth: 10, risk: 5, advantage: 10 } },
+                    { id: 'a3', text: 'Enter new markets', correctCategory: 'reach', impact: { growth: 20, risk: 15, advantage: 5 } },
+                    { id: 'a4', text: 'Add AI-powered features', correctCategory: 'products', impact: { growth: 10, risk: 10, advantage: 20 } },
+                    { id: 'a5', text: 'Improve delivery speed', correctCategory: 'products', impact: { growth: 5, risk: -10, advantage: 15 } },
+                    { id: 'a6', text: 'Improve customer support', correctCategory: 'risks', impact: { growth: 5, risk: -15, advantage: 10 } },
+                    { id: 'a7', text: 'Reduce prices', correctCategory: 'diff', impact: { growth: 10, risk: 5, advantage: 15 } }
+                ]
+            },
+
+            // Level 5: Command Center Simulation
+            l5: {
+                month: 1,
+                status: 'idle',
+                timerId: null,
+                kpis: {
+                    share: 55,
+                    revenue: 55,
+                    demand: 55,
+                    strength: 55,
+                    stability: 55
+                },
+                logs: [],
+                activeEvent: null,
+                historyChoices: [],
+                events: {
+                    2: {
+                        badge: 'Demand Shift',
+                        title: 'Macro Demand Wave Spikes',
+                        desc: 'A massive wave of digital transitions spikes customer demands. Servers warning of congestion.',
+                        options: [
+                            {
+                                text: 'Deploy aggressive search engine marketing campaigns.',
+                                impact: { demand: 15, share: 10, revenue: 10, stability: -5 },
+                                log: 'Month 2: Deployed SEO ads. Captured high volumes but increased infrastructure friction.'
+                            },
+                            {
+                                text: 'Focus on serving current users stably with infrastructure backups.',
+                                impact: { stability: 15, demand: 5, share: 5, revenue: 5 },
+                                log: 'Month 2: Stabilized server architecture. Users report high satisfaction, but immediate growth was capped.'
+                            }
+                        ]
+                    },
+                    4: {
+                        badge: 'Competitor Assault',
+                        title: 'Rival Mobile App Launches',
+                        desc: 'Apex Digital launches a pricing promo campaigns alongside quick delivery promises.',
+                        options: [
+                            {
+                                text: 'Fast-track product team to add customized AI modules.',
+                                impact: { strength: 20, share: 10, revenue: -5, stability: -5 },
+                                log: 'Month 4: Fast-tracked product innovation. Defended brand positioning with unique features.'
+                            },
+                            {
+                                text: 'Cut subscription prices to ₹99 matching Apex pricing.',
+                                impact: { share: 15, revenue: -10, strength: -5, stability: 10 },
+                                log: 'Month 4: Cut price point. Preserved basic user numbers but net expansion margins dropped.'
+                            }
+                        ]
+                    },
+                    6: {
+                        badge: 'Market Correction',
+                        title: 'Purchasing Power Contracts',
+                        desc: 'Macroeconomic corrections decrease overall digital service demands.',
+                        options: [
+                            {
+                                text: 'Diversify into niche corporate markets to find premium orders.',
+                                impact: { demand: 20, strength: 10, stability: -10, revenue: -5 },
+                                log: 'Month 6: Branch expansion started. Opened new sales pipelines but increased working capital stress.'
+                            },
+                            {
+                                text: 'Cut operating and administration costs to protect liquidity.',
+                                impact: { stability: 20, demand: -5, revenue: 15, strength: -5 },
+                                log: 'Month 6: Consolidated overheads. Profit margins protected though product upgrades slowed.'
+                            }
+                        ]
+                    },
+                    8: {
+                        badge: 'Viral Endorsement',
+                        title: 'Influencer Campaign Goes Viral',
+                        desc: 'SmartEdge product receives massive organic reviews, increasing traffic.',
+                        options: [
+                            {
+                                text: 'Hire server developers to guarantee platform speed stability.',
+                                impact: { stability: 20, share: 10, demand: 10, revenue: -5 },
+                                log: 'Month 8: Upgraded cloud scaling capacity. Stabilized customer journey during traffic peaks.'
+                            },
+                            {
+                                text: 'Run referral discount rewards to convert traffic fast.',
+                                impact: { share: 15, revenue: 15, demand: 10, stability: -10 },
+                                log: 'Month 8: Pushed viral referral discounts. Skyrocketed market share, though platform latency was high.'
+                            }
+                        ]
+                    },
+                    10: {
+                        badge: 'Operating Cost Peak',
+                        title: 'Marketing & Technical Costs Rise',
+                        desc: 'Server licensing and online advertisement rates rise by 15% across hubs.',
+                        options: [
+                            {
+                                text: 'Consolidate redundant servers and software.',
+                                impact: { revenue: 20, stability: 15, strength: -5, demand: -5 },
+                                log: 'Month 10: Streamlined tech stacks. Cut core operating costs but slowed features launch.'
+                            },
+                            {
+                                text: 'Increase ads budgets to hold competitive positioning.',
+                                impact: { share: 15, demand: 15, revenue: -10, stability: -5 },
+                                log: 'Month 10: Doubled ad spend. Sustained consumer awareness but operating budget remains high.'
+                            }
+                        ]
+                    },
+                    11: {
+                        badge: 'Expansion Opportunity',
+                        title: 'New City Zone Unlocks',
+                        desc: 'A neighboring metropolis opens access for digital service licensing.',
+                        options: [
+                            {
+                                text: 'Acquire local platform competitor to scale instantly.',
+                                impact: { share: 20, strength: 15, revenue: -10, stability: -10 },
+                                log: 'Month 11: Purchased regional player. Captured high market share index, but integration is complex.'
+                            },
+                            {
+                                text: 'Establish joint venture with local players to minimize risk.',
+                                impact: { stability: 15, share: 10, strength: 10, revenue: -5 },
+                                log: 'Month 11: Launched joint franchise. Reduced financial risks and sustained stable entry.'
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        const helpDialog = document.getElementById('help-dialog');
+        const summaryDialog = document.getElementById('summary-dialog');
+        const scorecardDialog = document.getElementById('scorecard-dialog');
+
+        function showHelpManual() { helpDialog.showModal(); }
+        function closeHelpManual() { helpDialog.close(); }
+
+        // Start Simulation Onboarding Trigger
+        function startSimulation() {
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            navigateToLevel(1);
+            document.getElementById('navigationFooter').style.display = 'flex';
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        // Navigation Stepper
+        function updateNavigationPills() {
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                const divider = document.getElementById(`step-div-${i}`);
+                const badge = btn.querySelector('.step-badge');
+
+                btn.className = 'step-item';
+                if (divider) divider.className = 'step-divider';
+
+                badge.innerText = i;
+
+                if (state.unlockedLevels[i - 1]) {
+                    btn.classList.add('unlocked');
+                    if (divider) divider.classList.add('unlocked');
+                }
+
+                if (state.currentLevel === i) {
+                    btn.classList.add('active');
+                }
+
+                if (state.completedLevels[i - 1]) {
+                    btn.classList.add('completed');
+                    if (divider) divider.classList.add('completed');
+                }
+            }
+
+            // Bottom footer logic
+            const prevBtn = document.getElementById('footerPrevBtn');
+            const nextBtn = document.getElementById('footerNextBtn');
+            const levelText = document.getElementById('footerLevelText');
+
+            if (prevBtn && nextBtn && levelText) {
+                levelText.innerText = `Level ${state.currentLevel} of 5`;
+
+                // Prev is only active if the target level is unlocked
+                prevBtn.disabled = (state.currentLevel === 1 || !state.unlockedLevels[state.currentLevel - 2]);
+
+                // Next is only active if the target level is unlocked
+                nextBtn.disabled = (state.currentLevel === 5 || !state.unlockedLevels[state.currentLevel]);
+            }
+        }
+
+        function navigateToLevel(levelIndex) {
+            if (!state.unlockedLevels[levelIndex - 1]) {
+                showToast("This level is locked! Resolve previous analyses stages.", "warning");
+                return;
+            }
+
+            document.querySelector('.screen.active').classList.remove('active');
+            state.currentLevel = levelIndex;
+
+            const targetScreen = document.getElementById(`screen-l${levelIndex}`);
+            targetScreen.classList.add('active');
+
+            // Initialize levels if required
+            if (levelIndex === 1) initLevel1();
+            if (levelIndex === 2) initLevel2();
+            if (levelIndex === 3) initLevel3();
+            if (levelIndex === 4) initLevel4();
+            if (levelIndex === 5) updateL5KPIs();
+
+            updateNavigationPills();
+            showToast(`Consulting Panel Level ${levelIndex} Activated`, 'info');
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 5 && state.unlockedLevels[state.currentLevel]) {
+                navigateToLevel(state.currentLevel + 1);
+            }
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1 && state.unlockedLevels[state.currentLevel - 2]) {
+                navigateToLevel(state.currentLevel - 1);
+            }
+        }
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✓';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '🚨';
+
+            toast.innerHTML = `<span>${icon}</span><div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================= LEVEL 1: SWOT Investigation Board =================
+        function initLevel1() {
+            const pool = document.getElementById('evidence-pool');
+            pool.innerHTML = '';
+
+            state.l1.cards.forEach((c) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'evidence-card';
+                cardDiv.id = `l1-${c.id}`;
+                cardDiv.innerText = c.text;
+
+                // Track sorted state
+                let isSorted = false;
+                for (let q in state.l1.placedCards) {
+                    if (state.l1.placedCards[q].some(item => item.id === c.id)) {
+                        isSorted = true;
+                        break;
+                    }
+                }
+
+                if (isSorted) {
+                    cardDiv.classList.add('sorted');
+                } else {
+                    cardDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectL1Card(c.id);
+                    });
+                }
+                pool.appendChild(cardDiv);
+            });
+
+            // Render SWOT quadrants content
+            renderL1Quadrants();
+        }
+
+        function selectL1Card(cardId) {
+            // Remove selection from previous cards
+            const selected = document.querySelector('.evidence-card.selected');
+            if (selected) selected.classList.remove('selected');
+
+            state.l1.selectedCard = cardId;
+            const element = document.getElementById(`l1-${cardId}`);
+            if (element) element.classList.add('selected');
+
+            showToast("Evidence selected. Click a target SWOT Quadrant.", "info");
+        }
+
+        function placeSelectedIn(quadrant) {
+            if (!state.l1.selectedCard) {
+                showToast("Select a statement card from the wall first.", "warning");
+                return;
+            }
+
+            const cardObj = state.l1.cards.find(c => c.id === state.l1.selectedCard);
+            if (cardObj) {
+                // Add to quadrant
+                state.l1.placedCards[quadrant].push(cardObj);
+
+                // Reset card variables
+                state.l1.selectedCard = null;
+
+                // Refresh views
+                initLevel1();
+                showToast(`Sorted to ${quadrant.toUpperCase()}`, "success");
+            }
+        }
+
+        function renderL1Quadrants() {
+            const quadrants = ['strengths', 'weaknesses', 'opportunities', 'threats'];
+
+            quadrants.forEach((q) => {
+                const container = document.getElementById(`content-${q}`);
+                container.innerHTML = '';
+
+                state.l1.placedCards[q].forEach((item) => {
+                    const el = document.createElement('div');
+                    el.className = 'sorted-card';
+                    el.innerHTML = `
+                        <span class="sorted-card-text">${item.text}</span>
+                        <button class="remove-btn" onclick="removeL1Card('${q}', '${item.id}', event)">×</button>
+                    `;
+                    container.appendChild(el);
+                });
+            });
+        }
+
+        function removeL1Card(quadrant, cardId, event) {
+            event.stopPropagation(); // prevent quadrant trigger
+
+            state.l1.placedCards[quadrant] = state.l1.placedCards[quadrant].filter(item => item.id !== cardId);
+            initLevel1();
+            showToast("Card returned to Evidence Wall", "info");
+        }
+
+        function verifyLevel1() {
+            // Count total placed
+            let totalPlaced = 0;
+            let correctCount = 0;
+
+            for (let q in state.l1.placedCards) {
+                state.l1.placedCards[q].forEach((card) => {
+                    totalPlaced++;
+                    if (card.category === q) {
+                        correctCount++;
+                    }
+                });
+            }
+
+            if (totalPlaced < 8) {
+                showToast(`Board incomplete. Sort all 8 cards. Placed: ${totalPlaced}/8`, "warning");
+                return;
+            }
+
+            if (correctCount === 8) {
+                showToast("SWOT analysis verified! Matrix unlocked.", "success");
+
+                // Show visual matrix
+                document.getElementById('swot-matrix-result').style.display = 'flex';
+
+                // Populate matrix
+                ['strengths', 'weaknesses', 'opportunities', 'threats'].forEach((q) => {
+                    const list = document.getElementById(`matrix-list-${q}`);
+                    list.innerHTML = '';
+                    state.l1.placedCards[q].forEach((item) => {
+                        const li = document.createElement('li');
+                        li.innerText = item.text;
+                        list.appendChild(li);
+                    });
+                });
+
+                // Complete level and unlock next
+                state.completedLevels[0] = true;
+                state.unlockedLevels[1] = true;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(1), 1500);
+            } else {
+                showToast("Incorrect categorizations detected. Look for internal vs external indicators and retry.", "danger");
+            }
+        }
+
+        function resetLevel1() {
+            state.l1.selectedCard = null;
+            state.l1.placedCards = { strengths: [], weaknesses: [], opportunities: [], threats: [] };
+            document.getElementById('swot-matrix-result').style.display = 'none';
+            initLevel1();
+            showToast("SWOT board cleared", "info");
+        }
+
+
+        // ================= LEVEL 2: Demand Heatmap Analyzer =================
+        function initLevel2() {
+            // Uncheck active selections
+            const selectedElements = document.querySelectorAll('.map-region.active-selection');
+            selectedElements.forEach(el => el.classList.remove('active-selection'));
+
+            // Draw launch statuses on svg regions
+            const regions = ['metro', 'north', 'south', 'east'];
+            regions.forEach((r) => {
+                const el = document.getElementById(`region-${r}`);
+                if (state.l2.launchPlan.includes(r)) {
+                    el.classList.add('selected-launch');
+                } else {
+                    el.classList.remove('selected-launch');
+                }
+            });
+
+            renderL2Dashboard();
+        }
+
+        function selectRegion(regionId) {
+            state.l2.selectedRegion = regionId;
+
+            // UI styling update on map
+            const selectedElements = document.querySelectorAll('.map-region.active-selection');
+            selectedElements.forEach(el => el.classList.remove('active-selection'));
+
+            document.getElementById(`region-${regionId}`).classList.add('active-selection');
+
+            // Render region stats in panel
+            const data = state.l2.regions[regionId];
+            document.getElementById('stats-title').innerText = `Scan: ${data.name}`;
+
+            const isTargeted = state.l2.launchPlan.includes(regionId);
+            const btn = document.getElementById('stats-toggle-btn');
+            btn.disabled = false;
+            btn.className = isTargeted ? 'btn btn-secondary region-action-btn' : 'btn region-action-btn';
+            btn.innerText = isTargeted ? 'Remove from Launch Strategy' : 'Include in Launch Strategy';
+
+            const body = document.getElementById('stats-body');
+            body.innerHTML = `
+                <div class="stat-item"><span class="stat-label">Population</span><span class="stat-value">${data.population}</span></div>
+                <div class="stat-item"><span class="stat-label">Smartphone Penetration</span><span class="stat-value">${data.smartphone}</span></div>
+                <div class="stat-item"><span class="stat-label">Internet Usage</span><span class="stat-value">${data.internet}</span></div>
+                <div class="stat-item"><span class="stat-label">Purchasing Power</span><span class="stat-value">${data.power}</span></div>
+                <div class="stat-item" style="margin-top:8px;"><span class="stat-label">Regional Demand Score</span><span class="stat-value" style="color:var(--primary-red); font-size:1.1rem;">${data.demand} / 100</span></div>
+                <div class="stat-item" style="margin-top:8px;"><span class="stat-label">Localized Risk Index</span><span class="stat-value" style="color:var(--warning); font-size:1.1rem;">${data.risk} / 100</span></div>
+            `;
+        }
+
+        function toggleRegionLaunch() {
+            const rId = state.l2.selectedRegion;
+            if (!rId) return;
+
+            if (state.l2.launchPlan.includes(rId)) {
+                state.l2.launchPlan = state.l2.launchPlan.filter(id => id !== rId);
+                showToast(`Removed ${state.l2.regions[rId].name} from plan`, "info");
+            } else {
+                state.l2.launchPlan.push(rId);
+                showToast(`Added ${state.l2.regions[rId].name} to launch plan`, "success");
+            }
+
+            // Re-select to update button state
+            selectRegion(rId);
+            initLevel2();
+        }
+
+        function renderL2Dashboard() {
+            const plan = state.l2.launchPlan;
+            const zoneText = document.getElementById('dash-zones');
+            const customerText = document.getElementById('dash-customers');
+            const demandVal = document.getElementById('dash-demand-val');
+            const demandBar = document.getElementById('dash-demand-bar');
+            const riskVal = document.getElementById('dash-risk-val');
+            const riskBar = document.getElementById('dash-risk-bar');
+
+            if (plan.length === 0) {
+                zoneText.innerText = 'None Selected';
+                customerText.innerText = '0';
+                demandVal.innerText = '0 / 100';
+                demandBar.style.width = '0%';
+                riskVal.innerText = '0 / 100';
+                riskBar.style.width = '0%';
+                return;
+            }
+
+            let totalCustomers = 0;
+            let sumDemand = 0;
+            let sumRisk = 0;
+            let names = [];
+
+            plan.forEach((rId) => {
+                const data = state.l2.regions[rId];
+                totalCustomers += data.customers;
+                sumDemand += data.demand;
+                sumRisk += data.risk;
+                names.push(data.name);
+            });
+
+            const avgDemand = Math.round(sumDemand / plan.length);
+            const avgRisk = Math.round(sumRisk / plan.length);
+
+            zoneText.innerText = names.join(', ');
+            customerText.innerText = totalCustomers.toLocaleString();
+            demandVal.innerText = `${avgDemand} / 100`;
+            demandBar.style.width = `${avgDemand}%`;
+
+            // Set dynamic colors based on target metrics
+            demandBar.className = avgDemand > 80 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            riskVal.innerText = `${avgRisk} / 100`;
+            riskBar.style.width = `${avgRisk}%`;
+            riskBar.className = avgRisk < 30 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+        }
+
+        function verifyLevel2() {
+            const plan = state.l2.launchPlan;
+            if (plan.length === 0) {
+                showToast("Expansion plan is empty. Select target launch zones.", "warning");
+                return;
+            }
+
+            let sumDemand = 0;
+            let sumRisk = 0;
+            plan.forEach(id => {
+                sumDemand += state.l2.regions[id].demand;
+                sumRisk += state.l2.regions[id].risk;
+            });
+
+            const avgDemand = sumDemand / plan.length;
+            const avgRisk = sumRisk / plan.length;
+
+            if (avgDemand > 80 && avgRisk < 30) {
+                showToast("Launch plan verified! Targets balanced.", "success");
+                state.completedLevels[1] = true;
+                state.unlockedLevels[2] = true;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(2), 1500);
+            } else {
+                showToast("Strategic validation failed. Ensure average Demand > 80 and average Risk < 30.", "danger");
+            }
+        }
+
+        function resetLevel2() {
+            state.l2.launchPlan = [];
+            state.l2.selectedRegion = null;
+            document.getElementById('stats-title').innerText = `Select a Region to Scan`;
+            document.getElementById('stats-body').innerHTML = `
+                <div style="grid-column: span 2; color: var(--text-muted); font-size: 0.9rem;">
+                    Click on the visual map segments on the left to read live sensor and survey metrics.
+                </div>
+            `;
+            document.getElementById('stats-toggle-btn').disabled = true;
+            initLevel2();
+            showToast("Demographics plan cleared", "info");
+        }
+
+
+        // ================= LEVEL 3: Competitor Intelligence Room =================
+        function initLevel3() {
+            // Restore query values
+            document.getElementById('query-competitor').value = state.l3.competitor;
+            document.getElementById('query-gap').value = state.l3.gap;
+            document.getElementById('query-diff').value = state.l3.diff;
+            checkL3Query();
+        }
+
+        function checkL3Query() {
+            const comp = document.getElementById('query-competitor').value;
+            const gap = document.getElementById('query-gap').value;
+            const diff = document.getElementById('query-diff').value;
+
+            state.l3.competitor = comp;
+            state.l3.gap = gap;
+            state.l3.diff = diff;
+
+            const chartBox = document.getElementById('l3-chart-box');
+
+            // Check correct combinations
+            if (comp === 'horizon' && gap === 'speed' && diff === 'feature-innovation') {
+                chartBox.style.display = 'flex';
+
+                // Complete level and unlock next
+                state.completedLevels[2] = true;
+                state.unlockedLevels[3] = true;
+                updateNavigationPills();
+            } else {
+                chartBox.style.display = 'none';
+            }
+        }
+
+
+        // ================= LEVEL 4: Strategy Blueprint Builder =================
+        function initLevel4() {
+            const pool = document.getElementById('strategy-pool');
+            pool.innerHTML = '';
+
+            state.l4.cards.forEach((c) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'evidence-card';
+                cardDiv.id = `l4-${c.id}`;
+                cardDiv.innerText = c.text;
+
+                // Track placed status
+                let isPlaced = false;
+                for (let q in state.l4.placedCards) {
+                    if (state.l4.placedCards[q].some(item => item.id === c.id)) {
+                        isPlaced = true;
+                        break;
+                    }
+                }
+
+                if (isPlaced) {
+                    cardDiv.classList.add('sorted');
+                } else {
+                    cardDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        selectL4Card(c.id);
+                    });
+                }
+                pool.appendChild(cardDiv);
+            });
+
+            renderL4Quadrants();
+        }
+
+        function selectL4Card(cardId) {
+            const selected = document.querySelector('#strategy-pool .evidence-card.selected');
+            if (selected) selected.classList.remove('selected');
+
+            state.l4.selectedCard = cardId;
+            const el = document.getElementById(`l4-${cardId}`);
+            if (el) el.classList.add('selected');
+
+            showToast("Strategic action selected. Click a workspace quadrant.", "info");
+        }
+
+        function placeActionIn(quadrant) {
+            if (!state.l4.selectedCard) {
+                showToast("Select an action card from the pool first.", "warning");
+                return;
+            }
+
+            const cardObj = state.l4.cards.find(c => c.id === state.l4.selectedCard);
+            if (cardObj) {
+                state.l4.placedCards[quadrant].push(cardObj);
+                state.l4.selectedCard = null;
+
+                initLevel4();
+                recalculateL4Metrics();
+                showToast("Action slotted into strategy board", "success");
+            }
+        }
+
+        function renderL4Quadrants() {
+            const quadrants = ['reach', 'products', 'risks', 'diff'];
+            quadrants.forEach((q) => {
+                const container = document.getElementById(`content-${q}`);
+                container.innerHTML = '';
+
+                state.l4.placedCards[q].forEach((item) => {
+                    const el = document.createElement('div');
+                    el.className = 'sorted-card';
+                    el.innerHTML = `
+                        <span class="sorted-card-text" style="font-size:0.75rem;">${item.text}</span>
+                        <button class="remove-btn" onclick="removeL4Card('${q}', '${item.id}', event)">×</button>
+                    `;
+                    container.appendChild(el);
+                });
+            });
+        }
+
+        function removeL4Card(quadrant, cardId, event) {
+            event.stopPropagation();
+            state.l4.placedCards[quadrant] = state.l4.placedCards[quadrant].filter(item => item.id !== cardId);
+            initLevel4();
+            recalculateL4Metrics();
+            showToast("Card returned to action pool", "info");
+        }
+
+        function recalculateL4Metrics() {
+            let growth = 20;
+            let risk = 20;
+            let advantage = 20;
+
+            for (let q in state.l4.placedCards) {
+                state.l4.placedCards[q].forEach((card) => {
+                    if (card.correctCategory === q) {
+                        // Correct allocation benefits
+                        growth += card.impact.growth;
+                        risk += card.impact.risk;
+                        advantage += card.impact.advantage;
+                    } else {
+                        // Penalty for misalignment
+                        risk += 20;
+                    }
+                });
+            }
+
+            // Constrain
+            growth = Math.max(0, Math.min(100, growth));
+            risk = Math.max(0, Math.min(100, risk));
+            advantage = Math.max(0, Math.min(100, advantage));
+
+            // Render values
+            const gText = document.getElementById('l4-growth-val');
+            const gFill = document.getElementById('l4-growth-bar');
+            gText.innerText = `${growth}% (Goal: >70%)`;
+            gFill.style.width = `${growth}%`;
+            gFill.className = growth > 70 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            const rText = document.getElementById('l4-risk-val');
+            const rFill = document.getElementById('l4-risk-bar');
+            rText.innerText = `${risk}% (Goal: <40%)`;
+            rFill.style.width = `${risk}%`;
+            rFill.className = risk < 40 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+
+            const aText = document.getElementById('l4-advantage-val');
+            const aFill = document.getElementById('l4-advantage-bar');
+            aText.innerText = `${advantage}% (Goal: >70%)`;
+            aFill.style.width = `${advantage}%`;
+            aFill.className = advantage > 70 ? 'metric-bar-fill success' : 'metric-bar-fill danger';
+        }
+
+        function verifyLevel4() {
+            // Verify correct placement
+            let totalPlaced = 0;
+            let misaligned = 0;
+
+            for (let q in state.l4.placedCards) {
+                state.l4.placedCards[q].forEach((card) => {
+                    totalPlaced++;
+                    if (card.correctCategory !== q) {
+                        misaligned++;
+                    }
+                });
+            }
+
+            if (totalPlaced < 7) {
+                showToast(`Strategy Blueprint incomplete. Place all 7 action cards. Sorted: ${totalPlaced}/7`, "warning");
+                return;
+            }
+
+            if (misaligned > 0) {
+                showToast("Strategic misalignment! Check card objectives and retry.", "danger");
+                return;
+            }
+
+            // Check metric boundaries
+            let growth = 20;
+            let risk = 20;
+            let advantage = 20;
+            for (let q in state.l4.placedCards) {
+                state.l4.placedCards[q].forEach((card) => {
+                    growth += card.impact.growth;
+                    risk += card.impact.risk;
+                    advantage += card.impact.advantage;
+                });
+            }
+
+            if (growth > 70 && risk < 40 && advantage > 70) {
+                showToast("Strategy Blueprint calibrated successfully!", "success");
+                state.completedLevels[3] = true;
+                state.unlockedLevels[4] = true;
+                updateNavigationPills();
+
+                setTimeout(() => showSummaryDialog(4), 1500);
+            } else {
+                showToast("Strategy parameters out of balance.", "danger");
+            }
+        }
+
+        function resetLevel4() {
+            state.l4.selectedCard = null;
+            state.l4.placedCards = { reach: [], products: [], risks: [], diff: [] };
+            initLevel4();
+            recalculateL4Metrics();
+            showToast("Strategy blueprint workspace cleared", "info");
+        }
+
+
+        // ================= LEVEL 5: Executive Strategy Command Center =================
+        function updateL5KPIs() {
+            const kpis = state.l5.kpis;
+
+            document.getElementById('kpi-share').innerText = kpis.share;
+            document.getElementById('fill-share').style.width = `${kpis.share}%`;
+
+            document.getElementById('kpi-revenue').innerText = kpis.revenue;
+            document.getElementById('fill-revenue').style.width = `${kpis.revenue}%`;
+
+            document.getElementById('kpi-demand').innerText = kpis.demand;
+            document.getElementById('fill-demand').style.width = `${kpis.demand}%`;
+
+            document.getElementById('kpi-strength').innerText = kpis.strength;
+            document.getElementById('fill-strength').style.width = `${kpis.strength}%`;
+
+            document.getElementById('kpi-stability').innerText = kpis.stability;
+            document.getElementById('fill-stability').style.width = `${kpis.stability}%`;
+        }
+
+        function startL5Ticker() {
+            if (state.l5.status === 'running') return;
+
+            state.l5.status = 'running';
+            document.getElementById('l5-status').innerText = 'Running';
+            document.getElementById('l5-status').className = 'console-status-badge running';
+            document.getElementById('l5-start-btn').disabled = true;
+            document.getElementById('l5-pause-btn').disabled = false;
+
+            logToTerminal(`[SYSTEM] Operations running. Expansion cycle initiated.`, 'system');
+
+            state.l5.timerId = setInterval(() => {
+                if (state.l5.month < 12) {
+                    state.l5.month++;
+                    document.getElementById('console-month-ticker').innerText = `MONTH ${state.l5.month} OF 12`;
+
+                    // Trigger dynamic incidents if mapped
+                    if (state.l5.events[state.l5.month]) {
+                        pauseL5Ticker();
+                        triggerL5Incident(state.l5.month);
+                    } else {
+                        // Apply small monthly organic growth/loss based on current stability and strength
+                        applyMonthlyFriction();
+                    }
+                } else {
+                    clearInterval(state.l5.timerId);
+                    endL5Simulation();
+                }
+            }, 2000);
+        }
+
+        function pauseL5Ticker() {
+            state.l5.status = 'paused';
+            document.getElementById('l5-status').innerText = 'Paused';
+            document.getElementById('l5-status').className = 'console-status-badge';
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            if (state.l5.timerId) {
+                clearInterval(state.l5.timerId);
+            }
+        }
+
+        function applyMonthlyFriction() {
+            // Business stability affects revenue
+            const stabilityOffset = state.l5.kpis.stability > 70 ? 2 : -2;
+            // Competitive strength affects share
+            const strengthOffset = state.l5.kpis.strength > 70 ? 2 : -2;
+
+            state.l5.kpis.revenue = Math.max(0, Math.min(100, state.l5.kpis.revenue + stabilityOffset));
+            state.l5.kpis.share = Math.max(0, Math.min(100, state.l5.kpis.share + strengthOffset));
+
+            updateL5KPIs();
+            logToTerminal(`Month ${state.l5.month}: Operational baseline scanned. Stability influence applied.`);
+        }
+
+        function logToTerminal(text, type = '') {
+            const terminal = document.getElementById('l5-terminal-ticker');
+            const row = document.createElement('div');
+            row.className = `terminal-row ${type}`;
+            row.innerText = text;
+            terminal.appendChild(row);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function triggerL5Incident(month) {
+            const ev = state.l5.events[month];
+            state.l5.activeEvent = ev;
+
+            document.getElementById('l5-incident-month').innerText = `Month ${month}`;
+            document.getElementById('inc-title').innerText = ev.title;
+            document.getElementById('inc-desc').innerText = ev.desc;
+
+            const overlay = document.getElementById('l5-incident-overlay');
+            const optionsDiv = document.getElementById('inc-options');
+            optionsDiv.innerHTML = '';
+
+            ev.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'incident-opt-btn';
+
+                let impacts = [];
+                for (let k in opt.impact) {
+                    impacts.push(`${k.toUpperCase()} ${opt.impact[k] > 0 ? '+' : ''}${opt.impact[k]}`);
+                }
+
+                btn.innerHTML = `
+                    <span class="incident-opt-title">${idx === 0 ? 'Option A' : 'Option B'}: ${opt.text}</span>
+                    <span class="incident-opt-impact">Estimated Projections: ${impacts.join(', ')}</span>
+                `;
+
+                btn.addEventListener('click', () => makeL5Decision(idx));
+                optionsDiv.appendChild(btn);
+            });
+
+            overlay.style.display = 'flex';
+            logToTerminal(`[WARNING] Month ${month} strategic incident triggered: ${ev.title}`, 'warning');
+        }
+
+        function makeL5Decision(optIndex) {
+            const ev = state.l5.activeEvent;
+            const choice = ev.options[optIndex];
+
+            // Apply impacts
+            for (let key in choice.impact) {
+                state.l5.kpis[key] = Math.max(0, Math.min(100, state.l5.kpis[key] + choice.impact[key]));
+            }
+
+            state.l5.historyChoices.push(choice.log);
+            updateL5KPIs();
+
+            // Hide overlay
+            document.getElementById('l5-incident-overlay').style.display = 'none';
+            logToTerminal(`[DECISION] Slotted: ${choice.log}`, 'success');
+
+            // Resume ticker
+            startL5Ticker();
+        }
+
+        function endL5Simulation() {
+            state.l5.status = 'finished';
+            document.getElementById('l5-status').innerText = 'Finished';
+            document.getElementById('l5-status').className = 'console-status-badge';
+            document.getElementById('l5-start-btn').disabled = true;
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            showL5Scorecard();
+        }
+
+        function showL5Scorecard() {
+            const kpis = state.l5.kpis;
+
+            // Check win requirements
+            const won = (
+                kpis.share >= 75 &&
+                kpis.revenue >= 75 &&
+                kpis.strength >= 80 &&
+                kpis.stability >= 80 &&
+                kpis.demand >= 80
+            );
+
+            const banner = document.getElementById('scorecard-banner-status');
+            const evalText = document.getElementById('scorecard-eval-text');
+
+            if (won) {
+                banner.innerText = 'SUCCESSFUL STRATEGIC ANALYSIS & PLANNING';
+                banner.className = 'scorecard-banner success';
+                evalText.innerHTML = `
+                    <p><strong>Your Strategic Assessment has succeeded!</strong></p>
+                    <p style="margin-top:6px;">SmartEdge navigated the 12-month expansion cycle with secure market share metrics, high revenues, and a strong competitive moat.</p>
+                    <ul style="margin-top:8px; padding-left:20px;">
+                        <li>Strengths: Maintained high operating stability while scaling feature upgrades.</li>
+                        <li>Improvements: Ad campaigns were expensive; optimize acquisition costs next.</li>
+                    </ul>
+                `;
+            } else {
+                banner.innerText = 'STRATEGY NEEDS IMPROVEMENT';
+                banner.className = 'scorecard-banner failed';
+                evalText.innerHTML = `
+                    <p><strong>Expansion parameters fell short!</strong></p>
+                    <p style="margin-top:6px;">SmartEdge struggled to adapt its strategies effectively during critical macroeconomic incident nodes.</p>
+                    <ul style="margin-top:8px; padding-left:20px;">
+                        <li>Strengths: Leveraged high initial branding metrics.</li>
+                        <li>Areas of Improvement: Better balance needed between pricing reductions (which drop margins) and custom developer expansions.</li>
+                    </ul>
+                `;
+            }
+
+            // Fill KPI values
+            document.getElementById('card-share').innerText = `${kpis.share} / 100`;
+            document.getElementById('card-revenue').innerText = `${kpis.revenue} / 100`;
+            document.getElementById('card-demand').innerText = `${kpis.demand} / 100`;
+            document.getElementById('card-strength').innerText = `${kpis.strength} / 100`;
+            document.getElementById('card-stability').innerText = `${kpis.stability} / 100`;
+
+            scorecardDialog.showModal();
+        }
+
+        function resetFullSimulation() {
+            state.unlockedLevels = [true, true, true, true, true];
+            state.completedLevels = [false, false, false, false, false];
+
+            // Reset SWOT
+            state.l1.placedCards = { strengths: [], weaknesses: [], opportunities: [], threats: [] };
+            document.getElementById('swot-matrix-result').style.display = 'none';
+
+            // Reset Heatmap
+            state.l2.launchPlan = [];
+            state.l2.selectedRegion = null;
+
+            // Reset Competitors
+            state.l3.competitor = 'none';
+            state.l3.gap = 'none';
+            state.l3.diff = 'none';
+            document.getElementById('l3-chart-box').style.display = 'none';
+
+            // Reset strategy blueprint
+            state.l4.placedCards = { reach: [], products: [], risks: [], diff: [] };
+
+            // Reset Command Center
+            state.l5.month = 1;
+            state.l5.status = 'idle';
+            state.l5.kpis = { share: 55, revenue: 55, demand: 55, strength: 55, stability: 55 };
+            state.l5.historyChoices = [];
+
+            document.getElementById('console-month-ticker').innerText = 'MONTH 1 OF 12';
+            document.getElementById('l5-terminal-ticker').innerHTML = `
+                <div class="terminal-row">[SYSTEM] Strategic analysis database loaded.</div>
+                <div class="terminal-row">[SYSTEM] Operations console ready. Click "Launch 12-Month Cycle".</div>
+            `;
+            document.getElementById('l5-start-btn').disabled = false;
+            document.getElementById('l5-pause-btn').disabled = true;
+
+            scorecardDialog.close();
+            navigateToLevel(1);
+        }
+
+
+        // ================= LEARNING SUMMARY SYSTEM =================
+        const summaries = {
+            1: {
+                title: "Level 1 Complete: SWOT Investigations Complete",
+                body: `
+                    <p><strong>SWOT Strategic Analysis Principles:</strong></p>
+                    <p>Strategic analysis scanning separates company attributes into four quadrants:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Strengths:</strong> Internal capacities that give a firm a unique advantage (e.g. loyal user baseline, strong brand equity).</li>
+                        <li><strong>Weaknesses:</strong> Internal resource gaps or technology bottlenecks (e.g. outdated technology stacks, limited cash reserves).</li>
+                        <li><strong>Opportunities:</strong> External trends in the environment that can be leveraged (e.g. increasing internet penetration, growing online trends).</li>
+                        <li><strong>Threats:</strong> External competitive actions or regulations that increase operational risk (e.g. competitor pricing clone launches, rising advertising media costs).</li>
+                    </ul>
+                `
+            },
+            2: {
+                title: "Level 2 Complete: Market Demand Scanner Complete",
+                body: `
+                    <p><strong>Demographic & Sizing Analysis:</strong></p>
+                    <p>Before launching geographic expansions, consultants must evaluate target populations:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Smartphone & Internet Penetration:</strong> Establishes the total addressable audience size for digital service platforms.</li>
+                        <li><strong>Risk/Demand Balance:</strong> High purchasing power hub sectors (like Metro Central) promise instant demand, but carry heavy rental/regulatory risks.</li>
+                        <li><strong>Target Selection:</strong> Optimizing target launch zones requires balancing potential customer sizing metrics against structural risk metrics.</li>
+                    </ul>
+                `
+            },
+            3: {
+                title: "Level 3 Complete: Competitor Benchmarking Locked",
+                body: `
+                    <p><strong>Competitive Advantages & Strategic Moats:</strong></p>
+                    <p>Evaluating competitor profiles (Apex Digital, Horizon Pro, Nova Core) highlights strategic positioning spaces:</p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Competitor Gaps:</strong> Identifies where rival capabilities are weak (e.g., slow delivery speed profiles).</li>
+                        <li><strong>Differentiation Frameworks:</strong> Instead of competing directly on pricing (leading to margin erosion), digital players survive by adding unique product features.</li>
+                        <li><strong>Market Mapping:</strong> Position grids visualize the industry landscape, helping firms build defensive moats.</li>
+                    </ul>
+                `
+            },
+            4: {
+                title: "Level 4 Complete: Blueprint Formulated",
+                body: `
+                    <p><strong>Strategic Blueprint Calibrations:</strong></p>
+                    <p>Blueprints convert high-level audits into corporate operations: </p>
+                    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px; margin:8px 0;">
+                        <li><strong>Reach Expansion:</strong> Involves mobile software launches, influencer promotions, and geographic expansions.</li>
+                        <li><strong>Product Innovations:</strong> Upgrading technology infrastructure (e.g., adding AI custom engines) improves market advantages.</li>
+                        <li><strong>Risk Reductions:</strong> Optimizing customer support stabilizes core user bases and prevents brand churn risks.</li>
+                    </ul>
+                `
+            }
+        };
+
+        function showSummaryDialog(levelIndex) {
+            const data = summaries[levelIndex];
+            document.getElementById('summary-dialog-title').innerText = data.title;
+            document.getElementById('summary-dialog-content').innerHTML = data.body;
+
+            document.getElementById('summary-next-btn').setAttribute('data-target-level', levelIndex + 1);
+            summaryDialog.showModal();
+        }
+
+        function confirmSummaryNextLevel() {
+            const nextLevel = parseInt(document.getElementById('summary-next-btn').getAttribute('data-target-level'));
+            summaryDialog.close();
+
+            if (nextLevel <= 5) {
+                navigateToLevel(nextLevel);
+            }
+        }
+    </script>
+</body>
+
+</html>
