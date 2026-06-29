@@ -1,1 +1,399 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.4 Web & Mobile Evolution - Digital Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fef2f2;
+      --bg-panel: #ffffff;
+      --border-color: #fca5a5;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --accent: #ef4444; 
+      --accent-hover: #dc2626;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+    .layout { display: flex; width: 100%; height: 100%; }
+
+    .sidebar { width: 400px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+    .header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--accent); color: white; }
+    .back-link { color: #fee2e2; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; transition: color 0.2s; }
+    .back-link:hover { color: white; }
+    .header h2 { font-size: 1.25rem; font-weight: 700; }
+
+    .levels { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border-color); }
+    .level-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1rem; border-radius: 8px; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .level-btn:hover { background: var(--bg-main); color: var(--text-main); }
+    .level-btn.active { background: #fee2e2; border-color: var(--accent); color: #dc2626; }
+
+    .explanation-box { padding: 1.5rem; flex: 1; overflow-y: auto; }
+    .explanation-box h3 { margin-bottom: 1rem; color: var(--accent); font-size: 1.1rem; }
+    .explanation-box p { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem; }
+    .explanation-box strong { color: var(--text-main); }
+
+    .main-area { flex: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at center, #ffffff 0%, #fef2f2 100%); overflow: hidden; }
+
+    /* Sim Containers */
+    .sim-container { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; flex-direction: column; align-items: center; justify-content: center; }
+    .sim-container.active { display: flex; }
+
+    /* SIM 1: Static Brochure */
+    .browser-window { width: 600px; height: 450px; background: white; border: 3px solid #94a3b8; border-radius: 8px; display: flex; flex-direction: column; box-shadow: 10px 10px 0px rgba(148, 163, 184, 0.2); font-family: "Times New Roman", Times, serif; }
+    .browser-top { background: #cbd5e1; padding: 8px 15px; border-bottom: 3px solid #94a3b8; display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 700; color: #475569; }
+    .browser-dots div { width: 12px; height: 12px; border-radius: 50%; background: #94a3b8; display: inline-block; }
+    .browser-url { background: white; padding: 4px 10px; border: 2px inset #cbd5e1; flex: 1; margin-left: 20px; font-weight: normal; }
+    .browser-content { padding: 2rem; flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .browser-content h1 { color: #000080; margin-bottom: 1rem; font-size: 2rem; border-bottom: 2px solid #000080; padding-bottom: 0.5rem; width: 100%; }
+    .browser-content p { font-size: 1.2rem; color: #000; margin-bottom: 2rem; line-height: 1.5; }
+    .btn-retro { background: #c0c0c0; border: 3px outset #fff; padding: 10px 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: black; font-family: "Times New Roman", Times, serif; }
+    .btn-retro:active { border: 3px inset #fff; background: #a0a0a0; }
+    
+    .popup-modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: #fef2f2; border: 4px solid var(--accent); padding: 2rem; border-radius: 12px; text-align: center; z-index: 50; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-family: 'Inter', sans-serif; }
+    .popup-modal.show { transform: translate(-50%, -50%) scale(1); }
+    .popup-modal h2 { color: var(--accent); margin-bottom: 1rem; }
+    .popup-modal p { font-weight: 600; color: var(--text-main); margin-bottom: 1.5rem; }
+    .btn-close { background: var(--text-main); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 700; }
+
+    /* SIM 2: Recommendation Engine */
+    .feed-container { width: 700px; padding: 2rem; background: white; border: 2px solid var(--border-color); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .feed-header { text-align: center; font-weight: 800; font-size: 1.5rem; color: var(--text-main); margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; }
+    .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    
+    .content-tile { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.5s; perspective: 1000px; }
+    .content-tile.topic-a { border-color: #3b82f6; background: #eff6ff; }
+    .content-tile.topic-b { border-color: #10b981; background: #ecfdf5; }
+    .content-tile.topic-c { border-color: #f59e0b; background: #fffbeb; }
+    
+    .tile-inner { transition: transform 0.6s; transform-style: preserve-3d; position: relative; width: 100%; height: 120px; }
+    .content-tile.flipping .tile-inner { transform: rotateY(180deg); }
+    
+    .tile-front, .tile-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .tile-back { transform: rotateY(180deg); }
+    
+    .tile-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .tile-title { font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
+    
+    .btn-like { margin-top: 1rem; background: white; border: 2px solid #cbd5e1; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; position: relative; z-index: 5; }
+    .btn-like:hover { transform: scale(1.05); }
+    .topic-a .btn-like:hover { border-color: #3b82f6; color: #3b82f6; }
+    .topic-b .btn-like:hover { border-color: #10b981; color: #10b981; }
+    .topic-c .btn-like:hover { border-color: #f59e0b; color: #f59e0b; }
+
+    .algo-msg { text-align: center; margin-top: 2rem; font-weight: 800; color: var(--accent); opacity: 0; transition: opacity 0.5s; }
+
+    /* SIM 3: Mobile Sensor Suite (Unchanged) */
+    .phone-mockup { width: 320px; height: 600px; background: #1e293b; border-radius: 40px; padding: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 4px solid #94a3b8; position: relative; }
+    .phone-screen { width: 100%; height: 100%; background: white; border-radius: 30px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+    .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 25px; background: #1e293b; border-radius: 0 0 15px 15px; z-index: 20; }
+    .app-header { background: var(--accent); color: white; padding: 2rem 1rem 1rem; text-align: center; font-weight: 800; font-size: 1.2rem; }
+    .map-bg { flex: 1; background: #e2e8f0; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+    .map-grid { position: absolute; width: 200%; height: 200%; background-image: linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px); background-size: 20px 20px; opacity: 0; transition: opacity 0.3s; }
+    .gps-dot { width: 16px; height: 16px; background: var(--accent); border-radius: 50%; border: 3px solid white; box-shadow: 0 0 15px var(--accent); opacity: 0; transition: opacity 0.3s; z-index: 5; }
+    .car-icon { position: absolute; font-size: 1.5rem; transition: all 2s; opacity: 0; }
+    .sensor-panel { display: flex; justify-content: space-around; padding: 1rem; background: #f8fafc; border-top: 1px solid #e5e7eb; z-index: 10; }
+    .sensor-btn { width: 60px; height: 60px; border-radius: 12px; background: white; border: 2px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .sensor-btn:hover { border-color: var(--accent); }
+    .sensor-btn.active { background: #fee2e2; border-color: var(--accent); color: var(--accent); }
+    .sensor-btn svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
+    .camera-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; opacity: 0; transition: opacity 0.3s; z-index: 10; pointer-events: none; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; }
+    .push-notif { position: absolute; top: -100px; left: 10px; right: 10px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 1rem; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 30; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .push-notif.show { top: 35px; }
+    .push-notif strong { display: block; color: var(--text-main); font-size: 0.9rem; }
+    .push-notif p { margin: 0; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Hub
+        </a>
+        <h2>1.4 Web & Mobile Evolution</h2>
+      </div>
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: The Static Brochure</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: The Algorithm</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: The Mobile Sensor</button>
+      </div>
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area">
+      <!-- SIMULATION 1: STATIC BROCHURE -->
+      <div class="sim-container active" id="sim-1">
+        <div class="browser-window">
+          <div class="browser-top">
+            <div class="browser-dots"><div></div><div></div><div></div></div>
+            <div class="browser-url">http://www.business.com/index.html</div>
+          </div>
+          <div class="browser-content">
+            <h1>Acme Corporation</h1>
+            <p>Welcome to our homepage on the World Wide Web!<br><br>We sell the finest industrial supplies. Browse our catalog below and click the button to order.</p>
+            <button class="btn-retro" onclick="showPopup()">BUY NOW</button>
+          </div>
+        </div>
+
+        <div class="popup-modal" id="retro-popup">
+          <h2>Web 1.0 Limitation</h2>
+          <p>Error 404: E-Commerce not found.</p>
+          <p style="font-weight: 400; font-size: 0.95rem;">In Web 1.0, websites were read-only. You cannot process payments here.<br>Please print this page and mail a check.</p>
+          <button class="btn-close" onclick="closePopup()">Close</button>
+        </div>
+      </div>
+
+      <!-- SIMULATION 2: RECOMMENDATION ENGINE -->
+      <div class="sim-container" id="sim-2">
+        <div class="feed-container">
+          <div class="feed-header">Your Content Feed</div>
+          <div class="tile-grid" id="tile-grid">
+            
+            <div class="content-tile topic-a" id="t1">
+              <div class="tile-inner">
+                <div class="tile-front">
+                  <div class="tile-icon">💻</div>
+                  <div class="tile-title">Tech News</div>
+                </div>
+                <div class="tile-back" id="t1-back"></div>
+              </div>
+              <button class="btn-like" onclick="likeTopic('a', 't1')">Like this topic</button>
+            </div>
+
+            <div class="content-tile topic-b" id="t2">
+              <div class="tile-inner">
+                <div class="tile-front">
+                  <div class="tile-icon">⚽</div>
+                  <div class="tile-title">Sports</div>
+                </div>
+                <div class="tile-back" id="t2-back"></div>
+              </div>
+              <button class="btn-like" onclick="likeTopic('b', 't2')">Like this topic</button>
+            </div>
+
+            <div class="content-tile topic-a" id="t3">
+              <div class="tile-inner">
+                <div class="tile-front">
+                  <div class="tile-icon">📱</div>
+                  <div class="tile-title">Gadgets</div>
+                </div>
+                <div class="tile-back" id="t3-back"></div>
+              </div>
+              <button class="btn-like" onclick="likeTopic('a', 't3')">Like this topic</button>
+            </div>
+
+            <div class="content-tile topic-b" id="t4">
+              <div class="tile-inner">
+                <div class="tile-front">
+                  <div class="tile-icon">🏀</div>
+                  <div class="tile-title">Basketball</div>
+                </div>
+                <div class="tile-back" id="t4-back"></div>
+              </div>
+              <button class="btn-like" onclick="likeTopic('b', 't4')">Like this topic</button>
+            </div>
+
+          </div>
+          <div class="algo-msg" id="algo-msg">The algorithm has learned your preferences.</div>
+        </div>
+      </div>
+
+      <!-- SIMULATION 3: MOBILE SENSORS -->
+      <div class="sim-container" id="sim-3">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Mobile Business Models</h2>
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            
+            <div class="push-notif" id="notif">
+              <strong>SuperApp</strong>
+              <p>Your driver is arriving! Contextual alerts based on location.</p>
+            </div>
+
+            <div class="app-header">SuperApp</div>
+            
+            <div class="camera-view" id="cam-view">CAMERA SENSOR ACTIVE<br>(Instagram Model)</div>
+            
+            <div class="map-bg">
+              <div class="map-grid" id="map-grid"></div>
+              <div class="gps-dot" id="gps-dot"></div>
+              <div class="car-icon" id="car1" style="top: 20%; left: 10%;">🚕</div>
+              <div class="car-icon" id="car2" style="top: 70%; left: 80%;">🚕</div>
+            </div>
+
+            <div class="sensor-panel">
+              <div class="sensor-btn" id="btn-gps" onclick="toggleGPS()">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                GPS
+              </div>
+              <div class="sensor-btn" id="btn-cam" onclick="toggleCam()">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                Camera
+              </div>
+              <div class="sensor-btn" id="btn-push" onclick="triggerPush()">
+                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                Push
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const levelsData = {
+      1: {
+        title: "The Static Web (Web 1.0)",
+        desc: "<p><strong>Web 1.0</strong> was the 'read-only' web. Businesses published brochures online, but users couldn't interact.</p><p><em>Try to purchase the product from the retro website to see the limitation.</em></p>",
+      },
+      2: {
+        title: "The Social Web (Web 2.0)",
+        desc: "<p><strong>Web 2.0</strong> introduced two-way communication and user data harvesting.</p><p>The value of the platform is created by analyzing what users interact with.</p><p><em>Like a topic you prefer and watch how the platform adapts to your data.</em></p>",
+      },
+      3: {
+        title: "The Mobile Web",
+        desc: "<p>Smartphones brought constant connectivity and hardware sensors (GPS, Camera).</p><p>This enabled entirely new business models (Uber relies on GPS; Instagram relies on the camera).</p><p><em>Toggle the phone sensors to see how they activate the app features.</em></p>",
+      }
+    };
+
+    function loadLevel(level) {
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-lvl-' + level).classList.add('active');
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+      
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+      
+      if(level === 1) closePopup();
+      if(level === 2) initSim2();
+      if(level === 3) initSim3();
+    }
+
+    // --- SIMULATION 1: STATIC BROCHURE ---
+    function showPopup() {
+      document.getElementById('retro-popup').classList.add('show');
+    }
+    function closePopup() {
+      document.getElementById('retro-popup').classList.remove('show');
+    }
+
+    // --- SIMULATION 2: RECOMMENDATION ENGINE ---
+    const topics = {
+      'a': { icon: '🤖', title: 'AI Startups', colorClass: 'topic-a' },
+      'b': { icon: '🏎️', title: 'Racing', colorClass: 'topic-b' }
+    };
+    let algoFlipped = false;
+
+    function initSim2() {
+      algoFlipped = false;
+      document.getElementById('algo-msg').style.opacity = 0;
+      // Reset tiles
+      ['t1','t2','t3','t4'].forEach(t => document.getElementById(t).classList.remove('flipping'));
+    }
+
+    function likeTopic(topicType, tileId) {
+      if(algoFlipped) return; // run once
+      algoFlipped = true;
+      
+      // Target the tiles that are NOT the chosen topic
+      const tiles = document.querySelectorAll('.content-tile');
+      
+      tiles.forEach(tile => {
+        if(!tile.classList.contains('topic-' + topicType)) {
+          // Flip this tile and change its content to match the preferred topic
+          const back = document.getElementById(tile.id + '-back');
+          back.innerHTML = `<div class="tile-icon">${topics[topicType].icon}</div><div class="tile-title">${topics[topicType].title}</div>`;
+          
+          // Swap borders after flip
+          setTimeout(() => {
+            tile.className = `content-tile flipping ${topics[topicType].colorClass}`;
+          }, 100);
+          
+          // Hide its like button for visual cleanliness
+          tile.querySelector('.btn-like').style.display = 'none';
+        }
+      });
+      
+      setTimeout(() => {
+        document.getElementById('algo-msg').style.opacity = 1;
+      }, 600);
+    }
+
+    // --- SIMULATION 3: MOBILE SENSORS (Unchanged) ---
+    let gpsActive = false;
+    let camActive = false;
+
+    function initSim3() {
+      gpsActive = false; camActive = false;
+      document.getElementById('btn-gps').classList.remove('active');
+      document.getElementById('btn-cam').classList.remove('active');
+      document.getElementById('map-grid').style.opacity = 0;
+      document.getElementById('gps-dot').style.opacity = 0;
+      document.getElementById('car1').style.opacity = 0;
+      document.getElementById('car2').style.opacity = 0;
+      document.getElementById('cam-view').style.opacity = 0;
+    }
+
+    function toggleGPS() {
+      gpsActive = !gpsActive;
+      const btn = document.getElementById('btn-gps');
+      if(gpsActive) {
+        btn.classList.add('active');
+        document.getElementById('map-grid').style.opacity = 1;
+        document.getElementById('gps-dot').style.opacity = 1;
+        document.getElementById('car1').style.opacity = 1;
+        document.getElementById('car2').style.opacity = 1;
+        document.getElementById('car1').style.top = '45%'; document.getElementById('car1').style.left = '40%';
+        document.getElementById('car2').style.top = '60%'; document.getElementById('car2').style.left = '60%';
+      } else {
+        btn.classList.remove('active');
+        document.getElementById('map-grid').style.opacity = 0;
+        document.getElementById('gps-dot').style.opacity = 0;
+        document.getElementById('car1').style.opacity = 0;
+        document.getElementById('car2').style.opacity = 0;
+        document.getElementById('car1').style.top = '20%'; document.getElementById('car1').style.left = '10%';
+        document.getElementById('car2').style.top = '70%'; document.getElementById('car2').style.left = '80%';
+      }
+    }
+
+    function toggleCam() {
+      camActive = !camActive;
+      const btn = document.getElementById('btn-cam');
+      if(camActive) {
+        btn.classList.add('active');
+        document.getElementById('cam-view').style.opacity = 1;
+      } else {
+        btn.classList.remove('active');
+        document.getElementById('cam-view').style.opacity = 0;
+      }
+    }
+
+    let pushTimer;
+    function triggerPush() {
+      const btn = document.getElementById('btn-push');
+      btn.classList.add('active');
+      const notif = document.getElementById('notif');
+      notif.classList.add('show');
+      
+      clearTimeout(pushTimer);
+      pushTimer = setTimeout(() => {
+        notif.classList.remove('show');
+        btn.classList.remove('active');
+      }, 3000);
+    }
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+</html>

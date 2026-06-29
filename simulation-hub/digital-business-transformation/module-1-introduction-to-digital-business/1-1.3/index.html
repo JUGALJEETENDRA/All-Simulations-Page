@@ -1,1 +1,432 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.3 Channels - Digital Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fef2f2;
+      --bg-panel: #ffffff;
+      --border-color: #fca5a5;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --accent: #ef4444;
+      
+      --c-owned: #3b82f6; /* blue */
+      --c-paid: #f59e0b; /* amber */
+      --c-earned: #10b981; /* emerald */
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+    .layout { display: flex; width: 100%; height: 100%; }
+
+    .sidebar { width: 400px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+    .header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--accent); color: white; }
+    .back-link { color: #fee2e2; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; transition: color 0.2s; }
+    .back-link:hover { color: white; }
+    .header h2 { font-size: 1.25rem; font-weight: 700; }
+
+    .levels { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border-color); }
+    .level-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1rem; border-radius: 8px; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .level-btn:hover { background: var(--bg-main); color: var(--text-main); }
+    .level-btn.active { background: #fee2e2; border-color: var(--accent); color: #dc2626; }
+
+    .explanation-box { padding: 1.5rem; flex: 1; overflow-y: auto; }
+    .explanation-box h3 { margin-bottom: 1rem; color: var(--accent); font-size: 1.1rem; }
+    .explanation-box p { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem; }
+    .explanation-box strong { color: var(--text-main); }
+
+    .main-area { flex: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at center, #ffffff 0%, #fef2f2 100%); }
+
+    /* Sim Containers */
+    .sim-container { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; flex-direction: column; align-items: center; justify-content: center; }
+    .sim-container.active { display: flex; }
+
+    /* SIM 1: Plinko */
+    .dashboard { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 600px; background: #ffffff; padding: 1rem 1.5rem; border-radius: 12px; border: 2px solid var(--border-color); margin-bottom: 1rem; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.1); }
+    .dashboard strong { font-size: 1.6rem; color: var(--text-main); }
+    .btn-glow { background: var(--accent); color: #fff; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; cursor: pointer; font-weight: 800; transition: all 0.2s; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); text-transform: uppercase; }
+    .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5); }
+    .btn-glow:disabled { background: #e5e7eb; box-shadow: none; color: #9ca3af; cursor: not-allowed; transform: none; }
+    
+    .game-board { width: 100%; max-width: 600px; height: 500px; background: #fafafa; border-radius: 16px; position: relative; border: 3px solid var(--border-color); overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+    .bucket-container { position: absolute; bottom: 0; width: 100%; height: 80px; display: flex; border-top: 3px solid var(--border-color); background: #ffffff; }
+    .bucket { flex: 1; border-right: 3px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 10px; position: relative; }
+    .bucket:last-child { border-right: none; }
+    .bucket span.count { font-size: 1.8rem; color: var(--text-main); font-weight: 800; z-index: 10; }
+    .bucket-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; transition: height 0.4s; z-index: 1; }
+    .b-owned .bucket-bg { background: rgba(59, 130, 246, 0.2); } .b-paid .bucket-bg { background: rgba(245, 158, 11, 0.2); } .b-earned .bucket-bg { background: rgba(16, 185, 129, 0.2); }
+    .bucket-label { position: absolute; top: -25px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; color: #fff; z-index: 10; text-transform: uppercase; border: 2px solid white; }
+    .b-owned .bucket-label { background: var(--c-owned); } .b-paid .bucket-label { background: var(--c-paid); } .b-earned .bucket-label { background: var(--c-earned); }
+    #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+
+    /* SIM 2: Media Mix Allocator */
+    .alloc-dashboard { width: 80%; background: white; border: 2px solid var(--border-color); border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .alloc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .alloc-slider { flex: 1; margin: 0 2rem; }
+    .alloc-slider input { width: 100%; }
+    .alloc-val { font-size: 1.2rem; font-weight: 800; width: 80px; text-align: right; }
+    .bar-chart { display: flex; align-items: flex-end; height: 150px; gap: 1rem; margin-top: 2rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+    .bar { flex: 1; background: #e5e7eb; border-radius: 8px 8px 0 0; position: relative; transition: height 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; justify-content: center; }
+    .bar span { position: absolute; top: -25px; font-weight: 800; color: var(--text-main); }
+    .bar.owned { background: var(--c-owned); } .bar.paid { background: var(--c-paid); } .bar.earned { background: var(--c-earned); }
+    
+    /* SIM 3: Viral Loop */
+    .viral-arena { width: 80%; height: 500px; background: white; border: 2px solid var(--border-color); border-radius: 16px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .viral-controls { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .btn-viral { padding: 1rem 2rem; border-radius: 30px; border: none; font-weight: 800; color: white; cursor: pointer; transition: transform 0.2s; }
+    .btn-viral:hover { transform: scale(1.05); }
+    .v-owned { background: var(--c-owned); } .v-paid { background: var(--c-paid); } .v-earned { background: var(--c-earned); }
+    
+    .v-node { position: absolute; width: 20px; height: 20px; border-radius: 50%; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform: scale(0); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    @keyframes pop { to { transform: scale(1); } }
+    .v-line { position: absolute; background: #e5e7eb; transform-origin: 0 0; z-index: 0; }
+
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Hub
+        </a>
+        <h2>1.3 Channels</h2>
+      </div>
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: The Traffic Plinko</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: Media Mix Allocator</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: The Viral Engine</button>
+      </div>
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area">
+      
+      <!-- SIMULATION 1: PLINKO -->
+      <div class="sim-container active" id="sim-1">
+        <div class="dashboard">
+          <div>BUDGET: <strong id="budget">10</strong></div>
+          <button class="btn-glow" id="drop-btn" onclick="dropBall()">Drop Budget</button>
+          <div>TRAFFIC: <strong id="score" style="color: var(--accent);">0</strong></div>
+        </div>
+        <div class="game-board" id="board">
+          <canvas id="gameCanvas" width="600" height="500"></canvas>
+          <div class="bucket-container">
+            <div class="bucket b-owned" id="b-owned"><div class="bucket-label">Owned (x1)</div><div class="bucket-bg" id="bg-owned"></div><span class="count" id="c-owned">0</span></div>
+            <div class="bucket b-earned" id="b-earned"><div class="bucket-label">Earned (x3)</div><div class="bucket-bg" id="bg-earned"></div><span class="count" id="c-earned">0</span></div>
+            <div class="bucket b-paid" id="b-paid"><div class="bucket-label">Paid (x2)</div><div class="bucket-bg" id="bg-paid"></div><span class="count" id="c-paid">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATION 2: MEDIA MIX -->
+      <div class="sim-container" id="sim-2">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Allocate $10,000 Budget</h2>
+        <div class="alloc-dashboard">
+          <div style="text-align: right; margin-bottom: 1rem; font-weight: 800; color: var(--accent);">Remaining: $<span id="alloc-rem">10000</span></div>
+          
+          <div class="alloc-row" style="color: var(--c-owned)">
+            <strong>Owned Media</strong>
+            <div class="alloc-slider"><input type="range" id="sl-own" value="0" min="0" max="10000" step="100" oninput="updateAlloc()"></div>
+            <div class="alloc-val">$<span id="v-own">0</span></div>
+          </div>
+          <div class="alloc-row" style="color: var(--c-paid)">
+            <strong>Paid Media</strong>
+            <div class="alloc-slider"><input type="range" id="sl-paid" value="0" min="0" max="10000" step="100" oninput="updateAlloc()"></div>
+            <div class="alloc-val">$<span id="v-paid">0</span></div>
+          </div>
+          <div class="alloc-row" style="color: var(--c-earned)">
+            <strong>Earned Media</strong>
+            <div class="alloc-slider"><input type="range" id="sl-earn" value="0" min="0" max="10000" step="100" oninput="updateAlloc()"></div>
+            <div class="alloc-val">$<span id="v-earn">0</span></div>
+          </div>
+
+          <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn-glow" onclick="runSim2()">Simulate Results</button>
+          </div>
+          
+          <div class="bar-chart">
+            <div class="bar owned" id="bar-own" style="height: 0%"><span>0</span></div>
+            <div class="bar paid" id="bar-paid" style="height: 0%"><span>0</span></div>
+            <div class="bar earned" id="bar-earn" style="height: 0%"><span>0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATION 3: VIRAL LOOP -->
+      <div class="sim-container" id="sim-3">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Network Effects</h2>
+        <div class="viral-arena" id="viral-arena">
+           <!-- Dynamic nodes injected here -->
+        </div>
+        <div class="viral-controls">
+          <button class="btn-viral v-owned" onclick="spawnViral('owned')">Publish Blog Post (Owned)</button>
+          <button class="btn-viral v-paid" onclick="spawnViral('paid')">Buy Ad Campaign (Paid)</button>
+          <button class="btn-viral v-earned" onclick="spawnViral('earned')">Launch Viral Feature (Earned)</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const levelsData = {
+      1: {
+        title: "The Traffic Plinko",
+        desc: "<p>Drop your budget and see where it lands.</p><p><strong>Owned (x1):</strong> Reliable, but scales slowly.</p><p><strong>Paid (x2):</strong> Guaranteed reach, but costs money.</p><p><strong>Earned (x3):</strong> Hardest to hit, but highest ROI via word-of-mouth.</p>"
+      },
+      2: {
+        title: "Media Mix Allocator",
+        desc: "<p>In reality, you allocate budget across all three channels.</p><p>Adjust the sliders to spend your $10,000 budget. See how Paid guarantees immediate traffic, Owned builds a foundation, and Earned acts as a force multiplier.</p>"
+      },
+      3: {
+        title: "The Viral Engine",
+        desc: "<p>Why is Earned media so powerful?</p><p><strong>Network Effects.</strong> Paid and Owned usually yield a 1-to-1 linear return. A viral Earned mechanism means 1 user invites 3 users, who invite 3 more.</p><p><em>Trigger the different channels to see the growth patterns.</em></p>"
+      }
+    };
+
+    function loadLevel(level) {
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-lvl-' + level).classList.add('active');
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+      
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+      
+      if(level === 1) initSim1();
+      if(level === 2) initSim2();
+      if(level === 3) initSim3();
+    }
+
+    // --- SIM 1: PLINKO ---
+    let budget = 10, score = 0, counts = { owned: 0, earned: 0, paid: 0 };
+    let isDropping = false;
+    let canvas, ctx, width, height;
+    const pegs = [], balls = [];
+    const pegRadius = 5, ballRadius = 10, gravity = 0.25, bounce = 0.55;
+
+    function initSim1() {
+      budget = 10; score = 0; counts = { owned: 0, earned: 0, paid: 0 };
+      isDropping = false; balls.length = 0;
+      document.getElementById('budget').innerText = budget;
+      document.getElementById('score').innerText = score;
+      document.getElementById('drop-btn').disabled = false;
+      ['owned', 'earned', 'paid'].forEach(b => {
+        document.getElementById('c-' + b).innerText = '0';
+        document.getElementById('bg-' + b).style.height = '0%';
+      });
+
+      canvas = document.getElementById('gameCanvas');
+      if(!ctx) {
+        ctx = canvas.getContext('2d');
+        width = canvas.width; height = canvas.height;
+        // Gen pegs
+        for(let r=1; r<9; r++) {
+          let cols = r%2===0 ? 8 : 9;
+          let spacing = width / 9;
+          let startX = r%2===0 ? spacing : spacing/2;
+          for(let c=0; c<cols; c++) {
+            pegs.push({x: startX + c*spacing, y: 30 + r*45, flashTime:0});
+          }
+        }
+        updatePlinko();
+      }
+    }
+
+    function dropBall() {
+      if(budget<=0 || isDropping) return;
+      budget--; document.getElementById('budget').innerText = budget;
+      isDropping = true; document.getElementById('drop-btn').disabled = true;
+      balls.push({
+        x: (width/2) + (Math.random()*20-10), y: -10,
+        vx: Math.random()*2-1, vy: 0, color: '#ef4444'
+      });
+    }
+
+    function updatePlinko() {
+      if(!document.getElementById('sim-1').classList.contains('active')) {
+        requestAnimationFrame(updatePlinko); return;
+      }
+      ctx.clearRect(0,0,width,height);
+      // Draw Pegs
+      for(let p of pegs) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, pegRadius, 0, Math.PI*2);
+        if(p.flashTime>0) { ctx.fillStyle='#ef4444'; p.flashTime--; } else { ctx.fillStyle='#cbd5e1'; }
+        ctx.fill(); ctx.closePath();
+      }
+      // Balls
+      for(let i=balls.length-1; i>=0; i--) {
+        let b = balls[i];
+        
+        ctx.beginPath(); ctx.moveTo(b.x-b.vx*3, b.y-b.vy*3); ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle='rgba(239,68,68,0.3)'; ctx.lineWidth=15; ctx.lineCap='round'; ctx.stroke();
+        
+        b.vy+=gravity; b.x+=b.vx; b.y+=b.vy;
+        if(b.x<ballRadius) { b.x=ballRadius; b.vx*=-bounce; }
+        if(b.x>width-ballRadius) { b.x=width-ballRadius; b.vx*=-bounce; }
+        
+        for(let p of pegs) {
+          let dx=b.x-p.x, dy=b.y-p.y, dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist < ballRadius+pegRadius) {
+            p.flashTime=10;
+            let overlap=(ballRadius+pegRadius)-dist, nx=dx/dist, ny=dy/dist;
+            b.x+=nx*overlap; b.y+=ny*overlap;
+            let vDotN=b.vx*nx+b.vy*ny;
+            b.vx-=2*vDotN*nx*bounce; b.vy-=2*vDotN*ny*bounce;
+            b.vx+=(Math.random()-0.5)*2;
+          }
+        }
+        
+        ctx.beginPath(); ctx.arc(b.x, b.y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle=b.color; ctx.fill(); ctx.closePath();
+
+        if(b.y > height-80) {
+          let type = b.x < width/3 ? 'owned' : (b.x < width*2/3 ? 'earned' : 'paid');
+          let mult = type==='owned'?1 : type==='paid'?2 : 3;
+          counts[type]++; document.getElementById('c-'+type).innerText = counts[type];
+          score+=mult*10; document.getElementById('score').innerText = score;
+          document.getElementById('bg-'+type).style.height = Math.min(100, counts[type]*10)+'%';
+          
+          balls.splice(i,1); isDropping=false;
+          if(budget>0) document.getElementById('drop-btn').disabled=false;
+        }
+      }
+      requestAnimationFrame(updatePlinko);
+    }
+
+    // --- SIM 2: MEDIA MIX ---
+    let totalBudget = 10000;
+    function initSim2() {
+      document.getElementById('sl-own').value = 0;
+      document.getElementById('sl-paid').value = 0;
+      document.getElementById('sl-earn').value = 0;
+      updateAlloc();
+      document.getElementById('bar-own').style.height = '0%';
+      document.getElementById('bar-paid').style.height = '0%';
+      document.getElementById('bar-earn').style.height = '0%';
+      document.getElementById('bar-own').querySelector('span').innerText = '0';
+      document.getElementById('bar-paid').querySelector('span').innerText = '0';
+      document.getElementById('bar-earn').querySelector('span').innerText = '0';
+    }
+
+    function updateAlloc() {
+      let own = parseInt(document.getElementById('sl-own').value);
+      let paid = parseInt(document.getElementById('sl-paid').value);
+      let earn = parseInt(document.getElementById('sl-earn').value);
+      let sum = own + paid + earn;
+      
+      if(sum > totalBudget) {
+        // Simple logic: revert the one that caused overflow if necessary, but this is a rough approx
+        // A better UX is tricky without robust state, let's just cap the total dynamically.
+        // Actually, just clamp the active slider visually.
+      }
+      
+      let rem = totalBudget - sum;
+      if(rem < 0) rem = 0; // Just visual failsafe
+      document.getElementById('alloc-rem').innerText = rem;
+      document.getElementById('v-own').innerText = own;
+      document.getElementById('v-paid').innerText = paid;
+      document.getElementById('v-earn').innerText = earn;
+    }
+
+    function runSim2() {
+      let own = parseInt(document.getElementById('sl-own').value);
+      let paid = parseInt(document.getElementById('sl-paid').value);
+      let earn = parseInt(document.getElementById('sl-earn').value);
+      
+      // Algorithm:
+      // Owned gives 1.5x traffic (takes time to build).
+      // Paid gives exact 1x traffic (immediate).
+      // Earned is a gamble: base 0.5x, but a chance to go 10x viral.
+      let trafOwn = Math.floor(own * 1.5);
+      let trafPaid = Math.floor(paid * 1.0);
+      let trafEarn = Math.floor(earn * (Math.random() > 0.5 ? 5.0 : 0.5)); // 50% chance of viral
+
+      let maxTraf = Math.max(trafOwn, trafPaid, trafEarn, 1);
+      
+      document.getElementById('bar-own').style.height = (trafOwn/maxTraf*100) + '%';
+      document.getElementById('bar-own').querySelector('span').innerText = trafOwn;
+      
+      document.getElementById('bar-paid').style.height = (trafPaid/maxTraf*100) + '%';
+      document.getElementById('bar-paid').querySelector('span').innerText = trafPaid;
+      
+      document.getElementById('bar-earn').style.height = (trafEarn/maxTraf*100) + '%';
+      document.getElementById('bar-earn').querySelector('span').innerText = trafEarn;
+    }
+
+    // --- SIM 3: VIRAL LOOP ---
+    let arena;
+    function initSim3() {
+      arena = document.getElementById('viral-arena');
+      arena.innerHTML = '';
+    }
+
+    function spawnViral(type) {
+      // Clear previous
+      arena.innerHTML = '';
+      
+      let color = type==='owned' ? '#3b82f6' : (type==='paid' ? '#f59e0b' : '#10b981');
+      
+      // Center node
+      let cx = 600 * 0.8 / 2; // arena width approx
+      let cy = 500 / 2;
+      
+      createNode(cx, cy, color, 0);
+
+      if(type === 'earned') {
+        // Spawn 3 children
+        setTimeout(() => {
+          let c1 = createNode(cx - 80, cy - 80, color, 1); drawLine(cx, cy, cx-80, cy-80);
+          let c2 = createNode(cx + 80, cy - 80, color, 1); drawLine(cx, cy, cx+80, cy-80);
+          let c3 = createNode(cx, cy + 100, color, 1); drawLine(cx, cy, cx, cy+100);
+          
+          // Next generation
+          setTimeout(() => {
+             createNode(cx - 140, cy - 120, color, 2); drawLine(cx-80, cy-80, cx-140, cy-120);
+             createNode(cx - 40, cy - 140, color, 2); drawLine(cx-80, cy-80, cx-40, cy-140);
+             
+             createNode(cx + 140, cy - 120, color, 2); drawLine(cx+80, cy-80, cx+140, cy-120);
+             createNode(cx + 40, cy - 140, color, 2); drawLine(cx+80, cy-80, cx+40, cy-140);
+
+             createNode(cx - 60, cy + 160, color, 2); drawLine(cx, cy+100, cx-60, cy+160);
+             createNode(cx + 60, cy + 160, color, 2); drawLine(cx, cy+100, cx+60, cy+160);
+          }, 600);
+        }, 600);
+      }
+    }
+
+    function createNode(x, y, color, gen) {
+      let n = document.createElement('div');
+      n.className = 'v-node';
+      n.style.background = color;
+      n.style.left = (x - 10) + 'px';
+      n.style.top = (y - 10) + 'px';
+      arena.appendChild(n);
+      return n;
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+      let length = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+      let angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+      
+      let line = document.createElement('div');
+      line.className = 'v-line';
+      line.style.width = length + 'px';
+      line.style.height = '2px';
+      line.style.left = x1 + 'px';
+      line.style.top = y1 + 'px';
+      line.style.transform = `rotate(${angle}deg)`;
+      arena.appendChild(line);
+    }
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+</html>

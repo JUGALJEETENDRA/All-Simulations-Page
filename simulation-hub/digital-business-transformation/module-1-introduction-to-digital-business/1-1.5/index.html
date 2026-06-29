@@ -1,1 +1,423 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.5 Drivers of Adoption - Digital Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fef2f2;
+      --bg-panel: #ffffff;
+      --border-color: #fca5a5;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --accent: #ef4444;
+      
+      --c-infra: #3b82f6; /* blue */
+      --c-cost: #ef4444; /* red */
+      --c-use: #8b5cf6; /* violet */
+      --c-sec: #f59e0b; /* amber */
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+    .layout { display: flex; width: 100%; height: 100%; }
+
+    .sidebar { width: 400px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+    .header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--accent); color: white; }
+    .back-link { color: #fee2e2; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; transition: color 0.2s; }
+    .back-link:hover { color: white; }
+    .header h2 { font-size: 1.25rem; font-weight: 700; }
+
+    .levels { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border-color); }
+    .level-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1rem; border-radius: 8px; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .level-btn:hover { background: var(--bg-main); color: var(--text-main); }
+    .level-btn.active { background: #fee2e2; border-color: var(--accent); color: #dc2626; }
+
+    .explanation-box { padding: 1.5rem; flex: 1; overflow-y: auto; }
+    .explanation-box h3 { margin-bottom: 1rem; color: var(--accent); font-size: 1.1rem; }
+    .explanation-box p { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem; }
+    .explanation-box strong { color: var(--text-main); }
+
+    .main-area { flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden; background: radial-gradient(circle at center, #ffffff 0%, #fef2f2 100%); }
+
+    /* Sim Containers */
+    .sim-container { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    .sim-container.active { display: flex; }
+
+    /* SIM 1: Rocket Launch */
+    #sim-1 { background: transparent; }
+    .sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, #bae6fd 0%, #38bdf8 100%); z-index: 1; transition: background 3s ease; }
+    .sky.dusk { background: linear-gradient(to top, #fca5a5 0%, #818cf8 100%); }
+    .sky.space { background: linear-gradient(to top, #1e1b4b 0%, #020617 100%); }
+    .stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><circle cx="20" cy="50" r="1.5" fill="%23fff"/><circle cx="150" cy="80" r="1" fill="%23fff"/><circle cx="80" cy="150" r="2" fill="%23fff"/><circle cx="180" cy="10" r="1" fill="%23fff"/><circle cx="50" cy="180" r="1.5" fill="%23fff"/></svg>') repeat; opacity: 0; transition: opacity 3s ease; z-index: 2; }
+    .sky.space .stars { opacity: 1; }
+    
+    .ground { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; background: #ef4444; z-index: 3; transition: transform 3s ease; border-top: 8px solid #dc2626; }
+    .rocket { position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%); width: 100px; height: 180px; z-index: 10; transition: bottom 3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .rocket-svg { width: 100%; height: 100%; filter: drop-shadow(0 15px 20px rgba(0,0,0,0.3)); }
+    .flame-container { position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); width: 50px; height: 75px; display: none; }
+    .rocket.flying .flame-container { display: block; }
+    .flame { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at top, #fef08a 0%, #f97316 50%, #dc2626 100%); border-radius: 50% 50% 20% 20%; animation: fire 0.1s infinite alternate; transform-origin: top center; }
+    @keyframes fire { 0% { transform: scale(1) scaleY(1); opacity: 0.8; } 100% { transform: scale(1.1) scaleY(1.3); opacity: 1; } }
+
+    .main-area.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
+
+    .controls-panel { position: absolute; bottom: 20px; left: 20px; width: 350px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); padding: 1.5rem 2rem; border-radius: 20px; border: 2px solid var(--border-color); z-index: 20; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .slider-group { margin-bottom: 1.2rem; }
+    .slider-group label { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-main); }
+    .slider { width: 100%; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; background: #e5e7eb; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; transition: transform 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    
+    .btn-action { background: var(--accent); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; cursor: pointer; font-weight: 800; width: 100%; font-size: 1.1rem; transition: all 0.2s; margin-top: 1rem; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4); text-transform: uppercase; letter-spacing: 1px; }
+    .btn-action:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6); }
+    .btn-action:disabled { background: #e5e7eb; box-shadow: none; cursor: not-allowed; transform: none; color: #9ca3af; }
+    #launch-feedback { text-align: center; font-weight: 700; margin-top: 1rem; min-height: 20px; font-size: 1rem; }
+
+    /* SIM 2: Trust Bridge */
+    .bridge-scene { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+    .river { position: absolute; bottom: 0; width: 100%; height: 200px; background: #bae6fd; border-top: 10px solid #7dd3fc; }
+    .cliff { position: absolute; bottom: 0; width: 250px; height: 350px; background: #94a3b8; border-radius: 8px 8px 0 0; border: 4px solid #64748b; border-bottom: none; }
+    .cliff-left { left: 50px; }
+    .cliff-right { right: 50px; }
+    
+    .bridge-slots { position: absolute; bottom: 330px; left: 300px; right: 300px; height: 60px; display: flex; gap: 10px; justify-content: space-around; z-index: 10; }
+    .b-slot { flex: 1; border: 4px dashed #94a3b8; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); transition: 0.3s; }
+    .b-slot.drag-over { background: #fee2e2; border-color: var(--accent); }
+    
+    .bridge-inventory { position: absolute; top: 50px; background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border-color); display: flex; gap: 1rem; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .bridge-block { padding: 1rem; background: var(--bg-main); border: 2px solid var(--border-color); border-radius: 8px; font-weight: 800; cursor: grab; user-select: none; transition: transform 0.2s; }
+    .bridge-block:active { cursor: grabbing; transform: scale(1.05); }
+    
+    .user-sprite { position: absolute; bottom: 350px; left: 100px; font-size: 3rem; transition: left 3s linear; z-index: 15; }
+    .user-sprite.fall { animation: fallInRiver 1s forwards; }
+    @keyframes fallInRiver { to { transform: translateY(400px) rotate(180deg); opacity: 0; } }
+
+    /* SIM 3: Resistance Tug of War */
+    .tug-scene { width: 80%; height: 300px; background: white; border: 2px solid var(--border-color); border-radius: 20px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .rope { position: absolute; width: 80%; height: 10px; background: #d4d4d8; z-index: 1; }
+    .knot { position: absolute; width: 30px; height: 30px; background: var(--accent); border-radius: 50%; z-index: 2; transition: left 0.1s; left: 50%; transform: translateX(-50%); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+    
+    .tug-team { position: absolute; font-size: 4rem; z-index: 3; }
+    .team-left { left: 5%; transform: scaleX(-1); }
+    .team-right { right: 5%; }
+    
+    .tug-labels { position: absolute; top: -50px; width: 100%; display: flex; justify-content: space-between; padding: 0 10%; font-weight: 800; font-size: 1.2rem; }
+    
+    .btn-mash { padding: 1.5rem 3rem; font-size: 1.5rem; background: var(--accent); color: white; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; transition: transform 0.1s; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); margin-top: 3rem; text-transform: uppercase; }
+    .btn-mash:active { transform: scale(0.95); box-shadow: 0 5px 10px rgba(239, 68, 68, 0.3); }
+
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Hub
+        </a>
+        <h2>1.5 Drivers of Adoption</h2>
+      </div>
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: Infrastructure & Cost</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: The Trust Bridge</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: Resistance to Change</button>
+      </div>
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area" id="main-area">
+      
+      <!-- SIMULATION 1: ROCKET -->
+      <div class="sim-container active" id="sim-1">
+        <div class="sky" id="sky"><div class="stars"></div></div>
+        <div class="ground" id="ground"></div>
+        <div class="rocket" id="rocket">
+          <svg class="rocket-svg" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="20,130 5,180 20,180" fill="#dc2626"/>
+            <polygon points="80,130 95,180 80,180" fill="#dc2626"/>
+            <polygon points="50,140 45,190 55,190" fill="#991b1b"/>
+            <path d="M 20 130 C 20 60 50 10 50 10 C 50 10 80 60 80 130 Z" fill="#ffffff"/>
+            <rect x="20" y="130" width="60" height="50" fill="#f8fafc"/>
+            <circle cx="50" cy="70" r="15" fill="#e2e8f0"/><circle cx="50" cy="70" r="12" fill="#38bdf8"/>
+            <rect x="20" y="100" width="60" height="10" fill="#ef4444"/>
+          </svg>
+          <div class="flame-container"><div class="flame"></div></div>
+        </div>
+        <div class="controls-panel" id="controls">
+          <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--text-main);">Adoption Parameters</h3>
+          <div class="slider-group">
+            <label>Infrastructure Readiness <span id="val-infra" style="color:var(--c-infra)">20%</span></label>
+            <input type="range" id="sl-infra" class="slider" min="0" max="100" value="20" oninput="updateSl('infra', this.value, 'var(--c-infra)')">
+          </div>
+          <div class="slider-group">
+            <label>Implementation Cost <span id="val-cost" style="color:var(--c-cost)">80%</span></label>
+            <input type="range" id="sl-cost" class="slider" min="0" max="100" value="80" oninput="updateSl('cost', this.value, 'var(--c-cost)')">
+          </div>
+          <button class="btn-action" id="launch-btn" onclick="launchRocket()">Initiate Launch</button>
+          <div id="launch-feedback"></div>
+        </div>
+      </div>
+
+      <!-- SIMULATION 2: TRUST BRIDGE -->
+      <div class="sim-container" id="sim-2">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main); position: absolute; top: 20px;">Bridge the Trust Gap</h2>
+        
+        <div class="bridge-inventory" id="bridge-inv" ondragover="allowDrop(event)" ondrop="drop(event, 'inventory')">
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-1" data-trust="true">Data Encryption</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-2" data-trust="false">Fancy Logo</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-3" data-trust="true">Reliable Uptime</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-4" data-trust="false">Low Prices</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-5" data-trust="true">Compliance Audits</div>
+        </div>
+
+        <div class="bridge-scene">
+          <div class="river"></div>
+          <div class="cliff cliff-left"></div>
+          <div class="cliff cliff-right"></div>
+          
+          <div class="bridge-slots">
+            <div class="b-slot" id="bslot-1" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-1')"></div>
+            <div class="b-slot" id="bslot-2" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-2')"></div>
+            <div class="b-slot" id="bslot-3" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-3')"></div>
+          </div>
+          
+          <div class="user-sprite" id="user-sprite">🏃</div>
+        </div>
+        
+        <div style="position: absolute; bottom: 30px;">
+          <button class="btn-action" onclick="testBridge()">Test Adoption</button>
+          <div id="bridge-feedback" style="text-align: center; font-weight: 700; margin-top: 1rem;"></div>
+        </div>
+      </div>
+
+      <!-- SIMULATION 3: TUG OF WAR -->
+      <div class="sim-container" id="sim-3">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Overcoming Resistance</h2>
+        <div class="tug-scene">
+          <div class="tug-labels">
+            <span style="color: #10b981;">Change Management</span>
+            <span style="color: #ef4444;">Legacy Habits</span>
+          </div>
+          <div class="rope"></div>
+          <div class="knot" id="knot"></div>
+          <div class="tug-team team-left">👷</div>
+          <div class="tug-team team-right">🏢</div>
+        </div>
+        
+        <button class="btn-mash" onclick="pullRope()">Invest in Training (Pull!)</button>
+        <div id="tug-feedback" style="margin-top: 2rem; font-weight: 800; font-size: 1.5rem;"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const levelsData = {
+      1: {
+        title: "Infrastructure & Cost",
+        desc: "<p>Before any technology is adopted, the fundamentals must be in place.</p><p><strong>Task:</strong> Ensure Infrastructure Readiness > 70% and lower Costs < 50% to achieve lift-off.</p>"
+      },
+      2: {
+        title: "The Trust Gap",
+        desc: "<p>Users will not cross over to your digital platform if they don't trust it.</p><p>Superficial features (like logos or low prices) won't hold their weight when it comes to sensitive data.</p><p><strong>Task:</strong> Build a bridge using only the core pillars of Digital Trust.</p>"
+      },
+      3: {
+        title: "Resistance to Change",
+        desc: "<p>Even if the tech is perfect, human habits are hard to break. Legacy systems and fear of change actively pull users backward.</p><p><strong>Task:</strong> Overpower legacy resistance by actively investing in change management and training. Click the button to pull the rope to your side!</p>"
+      }
+    };
+
+    function loadLevel(level) {
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-lvl-' + level).classList.add('active');
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+      
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+      
+      if(level === 1) initSim1();
+      if(level === 2) initSim2();
+      if(level === 3) initSim3();
+    }
+
+    // --- SIMULATION 1: ROCKET ---
+    window.updateSl = function(id, val, color) {
+      const el = document.getElementById('val-' + id);
+      el.innerText = val + '%';
+      const thumb = document.getElementById('sl-' + id);
+      thumb.style.background = 'linear-gradient(90deg, ' + color + ' ' + val + '%, #e5e7eb ' + val + '%)';
+    };
+
+    let isFlying = false;
+    function initSim1() {
+      const rocket = document.getElementById('rocket');
+      rocket.className = 'rocket'; rocket.style.bottom = '180px';
+      isFlying = false;
+      document.getElementById('launch-btn').disabled = false;
+      document.getElementById('launch-feedback').innerText = '';
+      
+      updateSl('infra', document.getElementById('sl-infra').value, 'var(--c-infra)');
+      updateSl('cost', document.getElementById('sl-cost').value, 'var(--c-cost)');
+    }
+
+    function launchRocket() {
+      if(isFlying) return;
+      const infra = parseInt(document.getElementById('sl-infra').value);
+      const cost = parseInt(document.getElementById('sl-cost').value);
+      const success = infra > 70 && cost < 50;
+      
+      const rocket = document.getElementById('rocket');
+      const btn = document.getElementById('launch-btn');
+      btn.disabled = true; rocket.classList.add('flying'); isFlying = true;
+
+      const feedback = document.getElementById('launch-feedback');
+      
+      if(success) {
+        feedback.innerText = "Liftoff Successful! Fundamentals met.";
+        feedback.style.color = "#10b981";
+        rocket.style.bottom = "120%";
+        setTimeout(() => {
+          isFlying = false; rocket.classList.remove('flying');
+          feedback.innerHTML = '<button onclick="loadLevel(2)" class="btn-action" style="margin-top:0">Proceed to Level 2</button>';
+        }, 3000);
+      } else {
+        feedback.innerText = "Launch aborted! Improve infra and reduce costs.";
+        feedback.style.color = "#ef4444";
+        document.getElementById('main-area').classList.add('shake');
+        setTimeout(() => {
+          document.getElementById('main-area').classList.remove('shake');
+          isFlying = false; rocket.classList.remove('flying'); btn.disabled = false;
+        }, 800);
+      }
+    }
+
+    // --- SIMULATION 2: TRUST BRIDGE ---
+    function initSim2() {
+      const user = document.getElementById('user-sprite');
+      user.className = 'user-sprite';
+      user.style.left = '100px';
+      document.getElementById('bridge-feedback').innerText = '';
+    }
+
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add('drag-over'); }
+    document.addEventListener('dragleave', (ev) => { if(ev.target.classList.contains('b-slot')) ev.target.classList.remove('drag-over'); });
+    
+    function drop(ev, targetId) {
+      ev.preventDefault();
+      document.querySelectorAll('.b-slot').forEach(el => el.classList.remove('drag-over'));
+      var data = ev.dataTransfer.getData("text");
+      var item = document.getElementById(data);
+      const zone = document.getElementById(targetId);
+      if(zone && zone.children.length === 0) { zone.appendChild(item); }
+      else if (targetId === 'inventory') { document.getElementById('bridge-inv').appendChild(item); }
+    }
+
+    function testBridge() {
+      let isTrustworthy = true;
+      let slotsFilled = 0;
+      
+      for(let i=1; i<=3; i++) {
+        const slot = document.getElementById('bslot-' + i);
+        if(slot.children.length > 0) {
+          slotsFilled++;
+          if(slot.children[0].dataset.trust === "false") isTrustworthy = false;
+        }
+      }
+
+      const fb = document.getElementById('bridge-feedback');
+      const user = document.getElementById('user-sprite');
+      user.className = 'user-sprite'; // reset
+      user.style.left = '100px';
+
+      if(slotsFilled < 3) {
+        fb.innerText = "The bridge is incomplete. Users won't cross.";
+        fb.style.color = "#ef4444";
+        return;
+      }
+
+      fb.innerText = "Users are attempting to cross...";
+      fb.style.color = "var(--text-main)";
+      
+      // Animate crossing
+      setTimeout(() => { user.style.left = '450px'; }, 100);
+
+      setTimeout(() => {
+        if(!isTrustworthy) {
+          user.classList.add('fall');
+          fb.innerText = "Bridge collapsed! Superficial features cannot support trust.";
+          fb.style.color = "#ef4444";
+        } else {
+          user.style.left = '800px';
+          fb.innerText = "Success! Trust established. Users adopted the platform.";
+          fb.style.color = "#10b981";
+          setTimeout(() => {
+             fb.innerHTML += '<br><button onclick="loadLevel(3)" class="btn-action" style="margin-top:1rem; width:auto;">Proceed to Level 3</button>';
+          }, 1000);
+        }
+      }, 1500); // Wait for user to reach middle
+    }
+
+    // --- SIMULATION 3: TUG OF WAR ---
+    let knotPos = 50; // 0 to 100
+    let tugInterval;
+    let tugActive = false;
+
+    function initSim3() {
+      knotPos = 50;
+      updateKnot();
+      document.getElementById('tug-feedback').innerText = '';
+      tugActive = true;
+      clearInterval(tugInterval);
+      
+      tugInterval = setInterval(() => {
+        if(!tugActive || !document.getElementById('sim-3').classList.contains('active')) return;
+        
+        // Legacy resistance randomly pulls right (adds to pos)
+        knotPos += (Math.random() * 3 + 1);
+        
+        if(knotPos >= 90) {
+          endTug(false);
+        }
+        updateKnot();
+      }, 500);
+    }
+
+    function pullRope() {
+      if(!tugActive) return;
+      knotPos -= 6; // User pulls left
+      if(knotPos <= 10) {
+        endTug(true);
+      }
+      updateKnot();
+    }
+
+    function updateKnot() {
+      document.getElementById('knot').style.left = knotPos + '%';
+    }
+
+    function endTug(win) {
+      tugActive = false;
+      clearInterval(tugInterval);
+      const fb = document.getElementById('tug-feedback');
+      if(win) {
+        fb.innerText = "You successfully drove change management!";
+        fb.style.color = "#10b981";
+      } else {
+        fb.innerText = "Legacy habits won. The digital initiative failed.";
+        fb.style.color = "#ef4444";
+        setTimeout(initSim3, 3000); // Restart
+      }
+    }
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+</html>

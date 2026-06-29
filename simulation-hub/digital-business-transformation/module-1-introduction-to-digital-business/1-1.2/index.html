@@ -1,1 +1,407 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.2 Impact (Cityscape) - Digital Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fef2f2;
+      --bg-panel: #ffffff;
+      --border-color: #fca5a5;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --accent: #ef4444; 
+      
+      --color-sky-day: #bae6fd;
+      --color-sky-sunset: #fca5a5;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+    /* Layout */
+    .layout { display: flex; width: 100%; height: 100%; }
+
+    /* Sidebar */
+    .sidebar { width: 400px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+    .header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--accent); color: white; }
+    .back-link { color: #fee2e2; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; transition: color 0.2s; }
+    .back-link:hover { color: white; }
+    .header h2 { font-size: 1.25rem; font-weight: 700; }
+
+    .levels { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border-color); }
+    .level-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1rem; border-radius: 8px; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .level-btn:hover { background: var(--bg-main); color: var(--text-main); }
+    .level-btn.active { background: #fee2e2; border-color: var(--accent); color: #dc2626; }
+
+    .explanation-box { padding: 1.5rem; flex: 1; overflow-y: auto; }
+    .explanation-box h3 { margin-bottom: 1rem; color: var(--accent); font-size: 1.1rem; }
+    .explanation-box p { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem; }
+    .explanation-box strong { color: var(--text-main); }
+
+    /* Main Area */
+    .main-area { flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden; background: #ffffff; }
+
+    /* Simulation Containers */
+    .sim-container { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; flex-direction: column; align-items: center; justify-content: center; }
+    .sim-container.active { display: flex; }
+    
+    .sim-instruction { position: absolute; top: 2rem; left: 50%; transform: translateX(-50%); background: white; padding: 0.8rem 2rem; border-radius: 30px; font-weight: 700; color: var(--text-muted); font-size: 1rem; border: 2px solid var(--border-color); z-index: 10; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+    /* SIM 1: Cityscape */
+    #sim-1 { background: linear-gradient(180deg, var(--color-sky-day) 0%, #ffffff 100%); transition: background 1s ease; }
+    .sun { position: absolute; top: 10%; right: 10%; width: 80px; height: 80px; background: #fde047; border-radius: 50%; box-shadow: 0 0 40px #fde047; transition: all 1s ease; z-index: 1; }
+    .ground { position: absolute; bottom: 0; width: 100%; height: 15vh; background: #ef4444; border-top: 8px solid #dc2626; z-index: 2; }
+    .city { position: absolute; bottom: 15vh; width: 100%; height: 60vh; display: flex; justify-content: center; align-items: flex-end; gap: 4rem; z-index: 3; padding: 0 2rem; }
+    
+    .building-wrapper { position: relative; cursor: not-allowed; transition: transform 0.3s; filter: grayscale(100%) opacity(0.5); }
+    .building-wrapper.interactive { cursor: pointer; filter: grayscale(0%) opacity(1); }
+    .building-wrapper.interactive:hover { transform: scale(1.05) translateY(-10px); }
+    .building-wrapper.upgraded { cursor: default; filter: grayscale(0%) opacity(1); }
+    
+    .building-label { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); background: white; color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.3s; border: 2px solid var(--border-color); }
+    .building-wrapper:hover .building-label { opacity: 1; }
+    .building-wrapper.upgraded .building-label { opacity: 1; background: var(--accent); color: white; border-color: var(--accent); }
+    
+    .svg-icon { width: 160px; height: auto; transition: all 0.5s; }
+    .particle { position: absolute; background: var(--accent); border-radius: 50%; pointer-events: none; animation: explode 0.8s ease-out forwards; z-index: 10; }
+    @keyframes explode { 0% { transform: scale(1) translate(0, 0); opacity: 1; } 100% { transform: scale(0) translate(var(--tx), var(--ty)); opacity: 0; } }
+
+    /* SIM 2: Assembly Line */
+    .factory-area { width: 80%; height: 400px; background: #f8fafc; border: 4px solid var(--border-color); border-radius: 20px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+    .conveyor { position: absolute; bottom: 80px; width: 100%; height: 20px; background: #475569; border-top: 4px solid #334155; }
+    .box { position: absolute; bottom: 100px; left: -100px; width: 60px; height: 60px; background: #d97706; border: 3px solid #b45309; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; transition: transform 0.2s; }
+    .box:hover { transform: scale(1.1); }
+    .box.processed { background: #10b981; border-color: #059669; cursor: default; }
+    .box.processed:hover { transform: none; }
+    
+    .scanner { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 100px; height: 120px; border: 4px dashed #94a3b8; border-bottom: none; display: flex; flex-direction: column; align-items: center; transition: all 0.3s; opacity: 0; pointer-events: none; }
+    .scanner.active { opacity: 1; border-color: var(--accent); }
+    .laser { width: 4px; height: 100%; background: var(--accent); animation: scan 0.2s infinite; opacity: 0; }
+    .scanner.active .laser { opacity: 1; }
+    @keyframes scan { 0% { transform: translateX(-40px); } 100% { transform: translateX(40px); } }
+    
+    .factory-controls { margin-top: 2rem; display: flex; gap: 1rem; }
+    .btn-action { padding: 1rem 2rem; border-radius: 30px; border: none; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: all 0.2s; }
+    .btn-trad { background: white; color: var(--text-main); border: 2px solid var(--border-color); }
+    .btn-trad:hover { background: #fef2f2; }
+    .btn-digi { background: var(--accent); color: white; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); }
+    .btn-digi:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4); }
+
+    .score-display { position: absolute; top: 20px; right: 30px; font-size: 1.5rem; font-weight: 800; color: var(--text-main); background: white; padding: 0.5rem 1rem; border-radius: 12px; border: 2px solid var(--border-color); }
+
+    /* SIM 3: Market Disruption */
+    .market-arena { position: relative; width: 600px; height: 400px; display: flex; align-items: center; justify-content: center; }
+    .pie-chart { width: 300px; height: 300px; border-radius: 50%; background: conic-gradient(#8b5cf6 0% 100%, var(--accent) 100% 100%); transition: background 0.5s ease; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 8px solid white; position: relative; }
+    
+    .pie-label { position: absolute; font-weight: 800; font-size: 1.2rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .label-trad { top: 40%; left: 20%; }
+    .label-digi { bottom: 40%; right: 20%; opacity: 0; transition: opacity 0.5s; }
+    
+    .disrupt-controls { display: flex; gap: 1rem; margin-top: 2rem; }
+    
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Hub
+        </a>
+        <h2>1.2 Impact on Economy</h2>
+      </div>
+      
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: Cityscape Evolution</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: Assembly Automation</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: Market Disruption</button>
+      </div>
+
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area" id="main-area">
+      <!-- SIMULATION 1: Cityscape -->
+      <div class="sim-container active" id="sim-1">
+        <div class="sun" id="sun"></div>
+        <div class="sim-instruction" id="instruction-1">Digitize the buildings in order.</div>
+        
+        <div class="city">
+          <div class="building-wrapper interactive" id="b-retail" onclick="upgradeBuilding('retail')">
+            <div class="building-label" id="lbl-retail">Physical Store</div>
+            <svg class="svg-icon" id="svg-retail" viewBox="0 0 100 100" fill="none" stroke="#94a3b8" stroke-width="4">
+              <rect x="20" y="40" width="60" height="60" fill="#f1f5f9" />
+              <polygon points="10,40 50,10 90,40" fill="#cbd5e1" />
+              <rect x="40" y="60" width="20" height="40" fill="#cbd5e1" />
+            </svg>
+          </div>
+          <div class="building-wrapper" id="b-finance" onclick="upgradeBuilding('finance')">
+            <div class="building-label" id="lbl-finance">Traditional Bank</div>
+            <svg class="svg-icon" id="svg-finance" viewBox="0 0 100 120" fill="none" stroke="#94a3b8" stroke-width="4">
+              <rect x="15" y="30" width="70" height="90" fill="#f1f5f9" />
+              <polygon points="5,30 50,5 95,30" fill="#cbd5e1" />
+              <rect x="25" y="40" width="10" height="80" fill="#cbd5e1" />
+              <rect x="45" y="40" width="10" height="80" fill="#cbd5e1" />
+              <rect x="65" y="40" width="10" height="80" fill="#cbd5e1" />
+            </svg>
+          </div>
+          <div class="building-wrapper" id="b-comms" onclick="upgradeBuilding('comms')">
+            <div class="building-label" id="lbl-comms">Post Office</div>
+            <svg class="svg-icon" id="svg-comms" viewBox="0 0 100 80" fill="none" stroke="#94a3b8" stroke-width="4">
+              <rect x="20" y="30" width="60" height="50" fill="#f1f5f9" />
+              <rect x="10" y="20" width="80" height="10" fill="#cbd5e1" />
+              <circle cx="50" cy="55" r="12" fill="#cbd5e1" />
+            </svg>
+          </div>
+        </div>
+        <div class="ground"></div>
+      </div>
+
+      <!-- SIMULATION 2: Assembly Automation -->
+      <div class="sim-container" id="sim-2">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Data & Automation</h2>
+        <div class="factory-area" id="factory">
+          <div class="score-display">Processed: <span id="box-score" style="color: var(--accent);">0</span></div>
+          <div class="conveyor"></div>
+          <div class="scanner" id="scanner"><div class="laser"></div><div style="margin-top:10px;font-weight:700;color:var(--accent);">AI SCANNER</div></div>
+        </div>
+        <div class="factory-controls">
+          <button class="btn-action btn-trad" id="btn-trad-mode" onclick="setMode('manual')">Manual Mode</button>
+          <button class="btn-action btn-digi" id="btn-digi-mode" onclick="setMode('auto')">Deploy AI Automation</button>
+        </div>
+      </div>
+
+      <!-- SIMULATION 3: Market Disruption -->
+      <div class="sim-container" id="sim-3">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Market Share Disruption</h2>
+        <div class="market-arena">
+          <div class="pie-chart" id="pie">
+            <div class="pie-label label-trad" id="l-trad">Traditional 100%</div>
+            <div class="pie-label label-digi" id="l-digi">Digital 0%</div>
+          </div>
+        </div>
+        <div class="disrupt-controls">
+          <button class="btn-action btn-digi" onclick="disrupt(10)">Launch App (+10%)</button>
+          <button class="btn-action btn-digi" onclick="disrupt(20)">Viral Marketing (+20%)</button>
+          <button class="btn-action btn-digi" onclick="disrupt(30)">Platform Network Effect (+30%)</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const levelsData = {
+      1: {
+        title: "Cityscape Evolution",
+        desc: "<p>Industries are being digitized one by one.</p><p>Retail turns into E-commerce. Banking turns into Fintech. Mail turns into Cloud Comms.</p><p><em>Click the interactive buildings to digitize the economy.</em></p>"
+      },
+      2: {
+        title: "Assembly Automation",
+        desc: "<p>In traditional business models, tasks require manual intervention.</p><p><strong>Try clicking the boxes</strong> as they pass by to process them manually.</p><p>Then, click <strong>Deploy AI Automation</strong>. Digital systems process data streams exponentially faster than humans.</p>"
+      },
+      3: {
+        title: "Market Disruption",
+        desc: "<p>Digital businesses scale differently. Traditional businesses grow linearly by opening new stores.</p><p>Digital businesses grow exponentially through <strong>Network Effects</strong>.</p><p><em>Click the disruption buttons to capture market share from traditional incumbents.</em></p>"
+      }
+    };
+
+    function loadLevel(level) {
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-lvl-' + level).classList.add('active');
+      
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+      
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+      
+      if(level === 2) initSim2();
+      if(level === 3) initSim3();
+    }
+
+    // --- SIMULATION 1: Cityscape ---
+    let bState = { retail: false, finance: false, comms: false };
+    function upgradeBuilding(id) {
+      if(bState[id]) return;
+      
+      const order = ['retail', 'finance', 'comms'];
+      const currentIndex = order.indexOf(id);
+      if(currentIndex > 0 && !bState[order[currentIndex-1]]) return;
+
+      const wrapper = document.getElementById('b-' + id);
+      const rect = wrapper.getBoundingClientRect();
+      createParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+      
+      wrapper.classList.remove('interactive');
+      wrapper.classList.add('upgraded');
+      bState[id] = true;
+
+      const svg = document.getElementById('svg-' + id);
+      const label = document.getElementById('lbl-' + id);
+      
+      if (id === 'retail') {
+        label.innerText = 'Global E-Commerce';
+        svg.innerHTML = '<rect x="10" y="20" width="80" height="60" rx="10" fill="#fecaca" stroke="#ef4444"/><path d="M30 40 L50 60 L70 30" stroke="#ef4444" fill="none" stroke-width="6" stroke-linecap="round"/>';
+        document.getElementById('b-finance').classList.add('interactive');
+        document.getElementById('sim-1').style.background = "linear-gradient(180deg, #fca5a5 0%, #ffffff 100%)";
+        document.getElementById('sun').style.top = "30%";
+        document.getElementById('sun').style.background = "#f87171";
+      } else if (id === 'finance') {
+        label.innerText = 'Fintech Platform';
+        svg.innerHTML = '<circle cx="50" cy="60" r="40" fill="#fecaca" stroke="#ef4444"/><text x="50" y="75" font-size="40" fill="#ef4444" text-anchor="middle" font-family="Inter" font-weight="900">$</text>';
+        document.getElementById('b-comms').classList.add('interactive');
+        document.getElementById('sim-1').style.background = "linear-gradient(180deg, #f87171 0%, #fee2e2 100%)";
+        document.getElementById('sun').style.top = "50%";
+        document.getElementById('sun').style.background = "#ef4444";
+      } else if (id === 'comms') {
+        label.innerText = 'Cloud Comms';
+        svg.innerHTML = '<path d="M20 60 Q50 10 80 60" stroke="#ef4444" fill="none" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="35" r="12" fill="#ef4444"/>';
+        document.getElementById('sim-1').style.background = "linear-gradient(180deg, #dc2626 0%, #fef2f2 100%)";
+        document.getElementById('sun').style.top = "70%";
+        document.getElementById('instruction-1').innerText = "Economy Digitized!";
+        document.getElementById('instruction-1').style.color = "#ef4444";
+      }
+    }
+
+    function createParticles(x, y) {
+      const container = document.getElementById('sim-1');
+      for(let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 8 + 4;
+        p.style.width = size + 'px'; p.style.height = size + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 100 + 50;
+        p.style.left = x + 'px'; p.style.top = y + 'px';
+        p.style.setProperty('--tx', (Math.cos(angle) * velocity) + 'px');
+        p.style.setProperty('--ty', (Math.sin(angle) * velocity) + 'px');
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 800);
+      }
+    }
+
+    // --- SIMULATION 2: Assembly Automation ---
+    let factoryInterval;
+    let boxes = [];
+    let processedCount = 0;
+    let factoryMode = 'manual'; // manual or auto
+
+    function initSim2() {
+      clearInterval(factoryInterval);
+      document.querySelectorAll('.box').forEach(b => b.remove());
+      boxes = [];
+      processedCount = 0;
+      document.getElementById('box-score').innerText = processedCount;
+      setMode('manual');
+      spawnBox();
+    }
+
+    function spawnBox() {
+      if(document.getElementById('sim-2').classList.contains('active')) {
+        const f = document.getElementById('factory');
+        const b = document.createElement('div');
+        b.className = 'box';
+        b.innerHTML = 'DATA';
+        b.style.left = '-100px';
+        b.dataset.processed = "false";
+        
+        b.onclick = () => {
+          if(factoryMode === 'manual' && b.dataset.processed === "false") {
+            processBox(b);
+          }
+        };
+
+        f.appendChild(b);
+        boxes.push(b);
+      }
+      
+      const speed = factoryMode === 'auto' ? 400 : 1500;
+      factoryInterval = setTimeout(spawnBox, speed);
+    }
+
+    function processBox(b) {
+      b.dataset.processed = "true";
+      b.classList.add('processed');
+      b.innerHTML = '✔';
+      processedCount++;
+      document.getElementById('box-score').innerText = processedCount;
+    }
+
+    function setMode(mode) {
+      factoryMode = mode;
+      if(mode === 'auto') {
+        document.getElementById('scanner').classList.add('active');
+        document.getElementById('btn-digi-mode').style.transform = 'scale(1.05)';
+        document.getElementById('btn-trad-mode').style.transform = 'none';
+      } else {
+        document.getElementById('scanner').classList.remove('active');
+        document.getElementById('btn-trad-mode').style.transform = 'scale(1.05)';
+        document.getElementById('btn-digi-mode').style.transform = 'none';
+      }
+    }
+
+    // Game loop for boxes
+    setInterval(() => {
+      if(!document.getElementById('sim-2').classList.contains('active')) return;
+      
+      const speed = factoryMode === 'auto' ? 8 : 3;
+      boxes.forEach((b, idx) => {
+        let left = parseFloat(b.style.left);
+        left += speed;
+        b.style.left = left + 'px';
+        
+        // Auto process if under scanner
+        if(factoryMode === 'auto' && left > 300 && left < 400 && b.dataset.processed === "false") {
+          processBox(b);
+        }
+
+        if(left > 1000) {
+          b.remove();
+          boxes.splice(idx, 1);
+        }
+      });
+    }, 30);
+
+    // --- SIMULATION 3: Market Disruption ---
+    let digitalShare = 0;
+    function initSim3() {
+      digitalShare = 0;
+      updatePie();
+    }
+
+    function disrupt(amount) {
+      digitalShare += amount;
+      if(digitalShare > 100) digitalShare = 100;
+      updatePie();
+    }
+
+    function updatePie() {
+      const pie = document.getElementById('pie');
+      // Conic gradient: Traditional (Purple) from 0 to (100-digitalShare)%, Digital (Red) the rest.
+      const trad = 100 - digitalShare;
+      pie.style.background = `conic-gradient(#8b5cf6 0% ${trad}%, var(--accent) ${trad}% 100%)`;
+      
+      document.getElementById('l-trad').innerText = `Traditional ${trad}%`;
+      const lDigi = document.getElementById('l-digi');
+      lDigi.innerText = `Digital ${digitalShare}%`;
+      
+      if(digitalShare > 0) lDigi.style.opacity = 1;
+      
+      // Move labels dynamically
+      if(digitalShare > 50) {
+         document.getElementById('l-trad').style.top = '10%';
+         document.getElementById('l-trad').style.left = '10%';
+         lDigi.style.bottom = '40%';
+         lDigi.style.right = '40%';
+      }
+    }
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+</html>
