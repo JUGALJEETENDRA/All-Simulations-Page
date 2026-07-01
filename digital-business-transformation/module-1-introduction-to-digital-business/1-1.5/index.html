@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>1.5 Drivers of Adoption - Digital Business</title>
+  <title>1.5 Drivers and Barriers to E-Business Adoption - Digital Business</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -108,8 +108,10 @@
     
     .tug-labels { position: absolute; top: -50px; width: 100%; display: flex; justify-content: space-between; padding: 0 10%; font-weight: 800; font-size: 1.2rem; }
     
-    .btn-mash { padding: 1.5rem 3rem; font-size: 1.5rem; background: var(--accent); color: white; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; transition: transform 0.1s; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); margin-top: 3rem; text-transform: uppercase; }
-    .btn-mash:active { transform: scale(0.95); box-shadow: 0 5px 10px rgba(239, 68, 68, 0.3); }
+    /* Educational Feedback Card */
+    .sim-feedback-card { background: #fff; border: 2px solid var(--border-color); border-radius: 12px; padding: 1.2rem; margin-top: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-family: 'Inter', sans-serif; text-align: left; }
+    .sim-feedback-title { font-weight: 800; font-size: 1rem; color: var(--accent); margin-bottom: 0.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.4rem; text-transform: uppercase; }
+    .sim-feedback-body { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
 
   </style>
 </head>
@@ -121,12 +123,17 @@
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
           Back to Hub
         </a>
-        <h2>1.5 Drivers of Adoption</h2>
+        <h2>1.5 Drivers and Barriers to E-Business Adoption</h2>
       </div>
       <div class="levels">
         <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: Infrastructure & Cost</button>
         <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: The Trust Bridge</button>
         <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: Resistance to Change</button>
+        
+        <div class="nav-buttons" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button class="level-btn" id="btn-prev-sim" onclick="changeSim(-1)" style="flex: 1; text-align: center; justify-content: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">← Prev</button>
+          <button class="level-btn" id="btn-next-sim" onclick="changeSim(1)" style="flex: 1; text-align: center; justify-content: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">Next →</button>
+        </div>
       </div>
       <div class="explanation-box" id="explanation"></div>
     </aside>
@@ -149,18 +156,34 @@
           </svg>
           <div class="flame-container"><div class="flame"></div></div>
         </div>
-        <div class="controls-panel" id="controls">
-          <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--text-main);">Adoption Parameters</h3>
-          <div class="slider-group">
+        <div class="controls-panel" id="controls" style="width: 380px;">
+          <h3 style="margin-bottom: 1rem; text-align: center; color: var(--text-main); font-size: 1.1rem;">Adoption Parameters</h3>
+          <div class="slider-group" style="margin-bottom: 0.8rem;">
             <label>Infrastructure Readiness <span id="val-infra" style="color:var(--c-infra)">20%</span></label>
             <input type="range" id="sl-infra" class="slider" min="0" max="100" value="20" oninput="updateSl('infra', this.value, 'var(--c-infra)')">
           </div>
-          <div class="slider-group">
+          <div class="slider-group" style="margin-bottom: 0.8rem;">
             <label>Implementation Cost <span id="val-cost" style="color:var(--c-cost)">80%</span></label>
             <input type="range" id="sl-cost" class="slider" min="0" max="100" value="80" oninput="updateSl('cost', this.value, 'var(--c-cost)')">
           </div>
+          <div class="slider-group" style="margin-bottom: 0.8rem;">
+            <label>Management Support <span id="val-mgmt" style="color:var(--c-use)">30%</span></label>
+            <input type="range" id="sl-mgmt" class="slider" min="0" max="100" value="30" oninput="updateSl('mgmt', this.value, 'var(--c-use)')">
+          </div>
+          <div class="slider-group" style="margin-bottom: 0.8rem;">
+            <label>Security Confidence <span id="val-sec" style="color:var(--c-sec)">40%</span></label>
+            <input type="range" id="sl-sec" class="slider" min="0" max="100" value="40" oninput="updateSl('sec', this.value, 'var(--c-sec)')">
+          </div>
           <button class="btn-action" id="launch-btn" onclick="launchRocket()">Initiate Launch</button>
-          <div id="launch-feedback"></div>
+          <div id="launch-feedback" style="margin-top: 0.5rem; font-size: 0.85rem; line-height: 1.4; min-height: 38px;"></div>
+        </div>
+
+        <!-- Educational Feedback Card -->
+        <div class="sim-feedback-card" id="sim1-feedback" style="display: none; width: 350px; position: absolute; bottom: 20px; right: 20px; z-index: 20;">
+          <div class="sim-feedback-title">Key Learning: E-Business Adoption Factors</div>
+          <div class="sim-feedback-body" id="sim1-feedback-body">
+            Successful e-business adoption depends upon multiple organizational, technological, and business factors (such as Management Support, Competitive Pressure, and Customer Demand) rather than one single condition. Favorable infrastructure and manageable cost set a strong foundation for lift-off.
+          </div>
         </div>
       </div>
 
@@ -169,11 +192,20 @@
         <h2 style="margin-bottom: 2rem; color: var(--text-main); position: absolute; top: 20px;">Bridge the Trust Gap</h2>
         
         <div class="bridge-inventory" id="bridge-inv" ondragover="allowDrop(event)" ondrop="drop(event, 'inventory')">
-          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-1" data-trust="true">Data Encryption</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-1" data-trust="true">Secure Transactions</div>
           <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-2" data-trust="false">Fancy Logo</div>
-          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-3" data-trust="true">Reliable Uptime</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-3" data-trust="true">Service Reliability</div>
           <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-4" data-trust="false">Low Prices</div>
-          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-5" data-trust="true">Compliance Audits</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-5" data-trust="true">Privacy Protection</div>
+          <div class="bridge-block" draggable="true" ondragstart="drag(event)" id="blk-6" data-trust="true">Organizational Reputation</div>
+        </div>
+
+        <!-- Educational Feedback Card -->
+        <div class="sim-feedback-card" id="sim2-feedback" style="display: none; width: 600px; position: absolute; top: 140px; z-index: 20;">
+          <div class="sim-feedback-title">Key Learning: Trust in E-Business</div>
+          <div class="sim-feedback-body" id="sim2-feedback-body">
+            Customer trust is a key requirement for successful e-business adoption. Trust depends on multidimensional factors (Security, Privacy, Reliability, Organizational Reputation) rather than a single feature like low pricing or website logos.
+          </div>
         </div>
 
         <div class="bridge-scene">
@@ -181,28 +213,29 @@
           <div class="cliff cliff-left"></div>
           <div class="cliff cliff-right"></div>
           
-          <div class="bridge-slots">
+          <div class="bridge-slots" style="left: 250px; right: 250px;">
             <div class="b-slot" id="bslot-1" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-1')"></div>
             <div class="b-slot" id="bslot-2" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-2')"></div>
             <div class="b-slot" id="bslot-3" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-3')"></div>
+            <div class="b-slot" id="bslot-4" ondragover="allowDrop(event)" ondrop="drop(event, 'bslot-4')"></div>
           </div>
           
           <div class="user-sprite" id="user-sprite">🏃</div>
         </div>
         
-        <div style="position: absolute; bottom: 30px;">
+        <div style="position: absolute; bottom: 30px; z-index: 20;">
           <button class="btn-action" onclick="testBridge()">Test Adoption</button>
-          <div id="bridge-feedback" style="text-align: center; font-weight: 700; margin-top: 1rem;"></div>
+          <div id="bridge-feedback" style="text-align: center; font-weight: 700; margin-top: 1rem; min-height: 24px;"></div>
         </div>
       </div>
 
       <!-- SIMULATION 3: TUG OF WAR -->
-      <div class="sim-container" id="sim-3">
-        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Overcoming Resistance</h2>
-        <div class="tug-scene">
+      <div class="sim-container" id="sim-3" style="padding: 2rem; justify-content: flex-start; overflow-y: auto;">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Overcoming Resistance to Change</h2>
+        <div class="tug-scene" style="margin-top: 3rem;">
           <div class="tug-labels">
-            <span style="color: #10b981;">Change Management</span>
-            <span style="color: #ef4444;">Legacy Habits</span>
+            <span style="color: #10b981;">Driving Forces for Change</span>
+            <span style="color: #ef4444;">Resistance to Change</span>
           </div>
           <div class="rope"></div>
           <div class="knot" id="knot"></div>
@@ -210,8 +243,22 @@
           <div class="tug-team team-right">🏢</div>
         </div>
         
-        <button class="btn-mash" onclick="pullRope()">Invest in Training (Pull!)</button>
-        <div id="tug-feedback" style="margin-top: 2rem; font-weight: 800; font-size: 1.5rem;"></div>
+        <div class="strategic-change-panel" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 600px; margin-top: 2rem; z-index: 20;">
+          <button class="btn-action" id="btn-change-leadership" onclick="deployActivity('leadership', 14, 4000)" style="margin: 0; font-size: 0.85rem; padding: 0.8rem 1rem;">1. Secure Leadership Support<br><span id="cd-leadership" style="font-size: 0.75rem; font-weight: normal; opacity: 0.8;">Cooldown: 4s</span></button>
+          <button class="btn-action" id="btn-change-training" onclick="deployActivity('training', 8, 2000)" style="margin: 0; font-size: 0.85rem; padding: 0.8rem 1rem;">2. Deliver Employee Training<br><span id="cd-training" style="font-size: 0.75rem; font-weight: normal; opacity: 0.8;">Cooldown: 2s</span></button>
+          <button class="btn-action" id="btn-change-comm" onclick="deployActivity('comm', 6, 1500)" style="margin: 0; font-size: 0.85rem; padding: 0.8rem 1rem;">3. Enhance Communication<br><span id="cd-comm" style="font-size: 0.75rem; font-weight: normal; opacity: 0.8;">Cooldown: 1.5s</span></button>
+          <button class="btn-action" id="btn-change-involve" onclick="deployActivity('involve', 10, 3000)" style="margin: 0; font-size: 0.85rem; padding: 0.8rem 1rem;">4. Secure Employee Involvement<br><span id="cd-involve" style="font-size: 0.75rem; font-weight: normal; opacity: 0.8;">Cooldown: 3s</span></button>
+        </div>
+        <div id="tug-activity-log" style="font-size: 0.95rem; font-weight: 700; color: var(--accent); min-height: 24px; margin-top: 1.5rem; text-align: center;"></div>
+        <div id="tug-feedback" style="margin-top: 1rem; font-weight: 800; font-size: 1.2rem; min-height: 24px; text-align: center;"></div>
+
+        <!-- Educational Feedback Card -->
+        <div class="sim-feedback-card" id="sim3-feedback" style="display: none; width: 600px; margin-top: 1rem;">
+          <div class="sim-feedback-title">Key Learning: E-Business Change Management</div>
+          <div class="sim-feedback-body" id="sim3-feedback-body">
+            Successful organizational change depends upon a structured change-management process involving leadership support, active communication, employee involvement, and training rather than technology deployment alone.
+          </div>
+        </div>
       </div>
 
     </main>
@@ -220,20 +267,22 @@
   <script>
     const levelsData = {
       1: {
-        title: "Infrastructure & Cost",
-        desc: "<p>Before any technology is adopted, the fundamentals must be in place.</p><p><strong>Task:</strong> Ensure Infrastructure Readiness > 70% and lower Costs < 50% to achieve lift-off.</p>"
+        title: "Drivers and Barriers to E-Business Adoption",
+        desc: "<p>E-business adoption is influenced by multiple factors, including infrastructure readiness, implementation costs, organizational readiness, customer demand, security confidence, competitive pressure, and management support.</p><p><strong>Task:</strong> Adjust the sliders to create favorable conditions (high infrastructure readiness and manageable costs) to initiate a successful e-business launch.</p>"
       },
       2: {
-        title: "The Trust Gap",
-        desc: "<p>Users will not cross over to your digital platform if they don't trust it.</p><p>Superficial features (like logos or low prices) won't hold their weight when it comes to sensitive data.</p><p><strong>Task:</strong> Build a bridge using only the core pillars of Digital Trust.</p>"
+        title: "Trust in E-Business",
+        desc: "<p>Customer trust is a key requirement for successful e-business adoption. Trust is multidimensional, built on security, privacy, reliability, organizational reputation, customer confidence, and secure transactions.</p><p>While branding and competitive pricing encourage customers to visit, they cannot replace core trust mechanisms.</p><p><strong>Task:</strong> Build a bridge using only the core pillars of e-business trust to allow customers to adopt the platform.</p>"
       },
       3: {
         title: "Resistance to Change",
-        desc: "<p>Even if the tech is perfect, human habits are hard to break. Legacy systems and fear of change actively pull users backward.</p><p><strong>Task:</strong> Overpower legacy resistance by actively investing in change management and training. Click the button to pull the rope to your side!</p>"
+        desc: "<p>Successful e-business adoption is a strategic organizational process rather than simply a technology deployment. Resistance to change can prevent successful implementation unless managed effectively.</p><p><strong>Task:</strong> Overcome resistance by implementing change management activities (leadership support, communication, employee involvement, and training) to pull the rope to the adoption side!</p>"
       }
     };
 
+    let currentLevel = 1;
     function loadLevel(level) {
+      currentLevel = level;
       document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
       document.getElementById('btn-lvl-' + level).classList.add('active');
       document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
@@ -241,11 +290,22 @@
       
       const exp = document.getElementById('explanation');
       exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+
+      // Update sidebar prev/next buttons
+      document.getElementById('btn-prev-sim').disabled = (level === 1);
+      document.getElementById('btn-next-sim').disabled = (level === 3);
       
       if(level === 1) initSim1();
       if(level === 2) initSim2();
       if(level === 3) initSim3();
     }
+
+    window.changeSim = function(dir) {
+      let target = currentLevel + dir;
+      if (target >= 1 && target <= 3) {
+        loadLevel(target);
+      }
+    };
 
     // --- SIMULATION 1: ROCKET ---
     window.updateSl = function(id, val, color) {
@@ -262,16 +322,23 @@
       isFlying = false;
       document.getElementById('launch-btn').disabled = false;
       document.getElementById('launch-feedback').innerText = '';
+      document.getElementById('sim1-feedback').style.display = 'none';
       
       updateSl('infra', document.getElementById('sl-infra').value, 'var(--c-infra)');
       updateSl('cost', document.getElementById('sl-cost').value, 'var(--c-cost)');
+      updateSl('mgmt', document.getElementById('sl-mgmt').value, 'var(--c-use)');
+      updateSl('sec', document.getElementById('sl-sec').value, 'var(--c-sec)');
     }
 
     function launchRocket() {
       if(isFlying) return;
       const infra = parseInt(document.getElementById('sl-infra').value);
       const cost = parseInt(document.getElementById('sl-cost').value);
-      const success = infra > 70 && cost < 50;
+      const mgmt = parseInt(document.getElementById('sl-mgmt').value);
+      const sec = parseInt(document.getElementById('sl-sec').value);
+      
+      // Tougher multi-parameter threshold validation
+      const success = infra > 75 && cost < 40 && mgmt > 70 && sec > 65;
       
       const rocket = document.getElementById('rocket');
       const btn = document.getElementById('launch-btn');
@@ -280,21 +347,30 @@
       const feedback = document.getElementById('launch-feedback');
       
       if(success) {
-        feedback.innerText = "Liftoff Successful! Fundamentals met.";
+        feedback.innerText = "Favorable Conditions Met!";
         feedback.style.color = "#10b981";
         rocket.style.bottom = "120%";
+        document.getElementById('sim1-feedback-body').innerHTML = "<strong>What happened:</strong> Strong infrastructure together with manageable costs created a favourable environment for adopting e-business technologies.<br><br><strong>Textbook Connection:</strong> Dave Chaffey explains that e-business adoption depends on multiple organizational, technological, and business factors (e.g. Infrastructure, cost, management support, organizational readiness) working in combination rather than a single condition.";
+        document.getElementById('sim1-feedback').style.display = 'block';
         setTimeout(() => {
           isFlying = false; rocket.classList.remove('flying');
           feedback.innerHTML = '<button onclick="loadLevel(2)" class="btn-action" style="margin-top:0">Proceed to Level 2</button>';
         }, 3000);
       } else {
-        feedback.innerText = "Launch aborted! Improve infra and reduce costs.";
+        // Detailed feedback identifying the specific bottleneck
+        let bottleneck = "";
+        if (infra <= 75) bottleneck = "Adoption Delayed: Insufficient technological infrastructure to support digital services.";
+        else if (cost >= 40) bottleneck = "Adoption Delayed: Implementation costs exceed the organization's budget constraints.";
+        else if (mgmt <= 70) bottleneck = "Adoption Delayed: Lack of senior management support prevents strategic resource allocation.";
+        else if (sec <= 65) bottleneck = "Adoption Delayed: Low security confidence prevents customer and organizational trust.";
+        
+        feedback.innerText = bottleneck;
         feedback.style.color = "#ef4444";
         document.getElementById('main-area').classList.add('shake');
         setTimeout(() => {
           document.getElementById('main-area').classList.remove('shake');
           isFlying = false; rocket.classList.remove('flying'); btn.disabled = false;
-        }, 800);
+        }, 1200);
       }
     }
 
@@ -304,6 +380,7 @@
       user.className = 'user-sprite';
       user.style.left = '100px';
       document.getElementById('bridge-feedback').innerText = '';
+      document.getElementById('sim2-feedback').style.display = 'none';
     }
 
     function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
@@ -324,7 +401,7 @@
       let isTrustworthy = true;
       let slotsFilled = 0;
       
-      for(let i=1; i<=3; i++) {
+      for(let i=1; i<=4; i++) {
         const slot = document.getElementById('bslot-' + i);
         if(slot.children.length > 0) {
           slotsFilled++;
@@ -336,68 +413,125 @@
       const user = document.getElementById('user-sprite');
       user.className = 'user-sprite'; // reset
       user.style.left = '100px';
+      document.getElementById('sim2-feedback').style.display = 'none';
 
-      if(slotsFilled < 3) {
-        fb.innerText = "The bridge is incomplete. Users won't cross.";
+      if(slotsFilled < 4) {
+        fb.innerText = "The bridge is incomplete. Customers won't cross.";
         fb.style.color = "#ef4444";
         return;
       }
 
-      fb.innerText = "Users are attempting to cross...";
+      fb.innerText = "Customers are attempting to cross...";
       fb.style.color = "var(--text-main)";
       
-      // Animate crossing
       setTimeout(() => { user.style.left = '450px'; }, 100);
 
       setTimeout(() => {
         if(!isTrustworthy) {
           user.classList.add('fall');
-          fb.innerText = "Bridge collapsed! Superficial features cannot support trust.";
+          fb.innerText = "Customers may be attracted by price or branding, but they are unlikely to complete electronic transactions unless they trust the organization.";
           fb.style.color = "#ef4444";
         } else {
           user.style.left = '800px';
-          fb.innerText = "Success! Trust established. Users adopted the platform.";
+          fb.innerText = "Trust has been established through secure, reliable, and trustworthy e-business practices, encouraging customer adoption.";
           fb.style.color = "#10b981";
+          document.getElementById('sim2-feedback').style.display = 'block';
           setTimeout(() => {
              fb.innerHTML += '<br><button onclick="loadLevel(3)" class="btn-action" style="margin-top:1rem; width:auto;">Proceed to Level 3</button>';
           }, 1000);
         }
-      }, 1500); // Wait for user to reach middle
+      }, 1500);
     }
 
     // --- SIMULATION 3: TUG OF WAR ---
     let knotPos = 50; // 0 to 100
     let tugInterval;
     let tugActive = false;
+    let cooldowns = {
+      leadership: false,
+      training: false,
+      comm: false,
+      involve: false
+    };
 
     function initSim3() {
       knotPos = 50;
       updateKnot();
       document.getElementById('tug-feedback').innerText = '';
+      document.getElementById('tug-activity-log').innerText = '';
+      document.getElementById('sim3-feedback').style.display = 'none';
+      
+      // Reset cooldown flags
+      cooldowns = { leadership: false, training: false, comm: false, involve: false };
+      
+      // Re-enable and reset button labels
+      const cdLabels = { leadership: "Cooldown: 4s", training: "Cooldown: 2s", comm: "Cooldown: 1.5s", involve: "Cooldown: 3s" };
+      for (const id in cdLabels) {
+        const btn = document.getElementById('btn-change-' + id);
+        if (btn) {
+          btn.disabled = false;
+          document.getElementById('cd-' + id).innerText = cdLabels[id];
+        }
+      }
+      
       tugActive = true;
       clearInterval(tugInterval);
       
       tugInterval = setInterval(() => {
         if(!tugActive || !document.getElementById('sim-3').classList.contains('active')) return;
         
-        // Legacy resistance randomly pulls right (adds to pos)
-        knotPos += (Math.random() * 3 + 1);
+        // Resistance pulls right continuously (tougher rate: 4.5% every 600ms)
+        knotPos += 4.5;
         
         if(knotPos >= 90) {
           endTug(false);
         }
         updateKnot();
-      }, 500);
+      }, 600);
     }
 
-    function pullRope() {
-      if(!tugActive) return;
-      knotPos -= 6; // User pulls left
+    window.deployActivity = function(id, strength, duration) {
+      if (cooldowns[id] || !tugActive) return;
+      cooldowns[id] = true;
+      
+      // Pull rope left
+      knotPos -= strength;
       if(knotPos <= 10) {
         endTug(true);
       }
       updateKnot();
-    }
+      
+      // Log current activity
+      const log = document.getElementById('tug-activity-log');
+      const actionNames = {
+        leadership: "Leadership Support secured",
+        training: "Employee Training implemented",
+        comm: "Active Internal Communication established",
+        involve: "Employee Involvement enabled"
+      };
+      log.innerText = `${actionNames[id]} (Pulled +${strength}%)!`;
+      
+      // Disable button
+      const btn = document.getElementById('btn-change-' + id);
+      if (btn) btn.disabled = true;
+      
+      // Start cooldown countdown
+      let remaining = duration / 1000;
+      const cdLabel = document.getElementById('cd-' + id);
+      if (cdLabel) cdLabel.innerText = `Cooldown: ${remaining.toFixed(1)}s`;
+      
+      let timer = setInterval(() => {
+        remaining -= 0.1;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          cooldowns[id] = false;
+          if (btn) btn.disabled = false;
+          if (cdLabel) cdLabel.innerText = `Ready!`;
+        } else {
+          if (cdLabel) cdLabel.innerText = `Cooldown: ${remaining.toFixed(1)}s`;
+        }
+      }, 100);
+    };
 
     function updateKnot() {
       document.getElementById('knot').style.left = knotPos + '%';
@@ -406,14 +540,22 @@
     function endTug(win) {
       tugActive = false;
       clearInterval(tugInterval);
+      
+      // Disable all change-management buttons
+      for (const id in cooldowns) {
+        const btn = document.getElementById('btn-change-' + id);
+        if (btn) btn.disabled = true;
+      }
+      
       const fb = document.getElementById('tug-feedback');
       if(win) {
-        fb.innerText = "You successfully drove change management!";
+        fb.innerText = "Effective leadership, communication, employee involvement, and training helped the organization successfully adopt e-business.";
         fb.style.color = "#10b981";
+        document.getElementById('sim3-feedback').style.display = 'block';
       } else {
-        fb.innerText = "Legacy habits won. The digital initiative failed.";
+        fb.innerText = "Resistance to organizational change can delay or prevent successful e-business implementation unless it is managed effectively.";
         fb.style.color = "#ef4444";
-        setTimeout(initSim3, 3000); // Restart
+        setTimeout(initSim3, 4000); // Restart after 4 seconds
       }
     }
 
@@ -421,3 +563,4 @@
   </script>
 </body>
 </html>
+
