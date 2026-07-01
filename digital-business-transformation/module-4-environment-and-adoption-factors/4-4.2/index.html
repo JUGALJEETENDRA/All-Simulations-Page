@@ -1437,6 +1437,133 @@
         .analysis-card.improvements li::marker {
             color: #E65100;
         }
+
+        /* ===== LEVEL 1 CLASSIFICATION BUTTONS ===== */
+        .l1-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--ink);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .l1-btn:hover {
+            border-color: var(--red-light);
+            background: var(--red-bg);
+            color: var(--red-dark);
+        }
+        .l1-btn.active {
+            border-color: var(--red-primary);
+            background: var(--red-primary);
+            color: var(--white);
+        }
+
+        /* ===== LEVEL 3 STRATEGY CARDS ===== */
+        .l3-option-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .l3-option-card:hover {
+            border-color: var(--red-light);
+            background: var(--red-bg);
+        }
+        .l3-option-card.selected {
+            border-color: var(--red-primary);
+            background: var(--red-bg);
+            box-shadow: 0 2px 8px rgba(198, 40, 40, 0.05);
+        }
+        .l3-option-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-mid);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .l3-option-card.selected .l3-option-radio {
+            border-color: var(--red-primary);
+        }
+        .l3-option-card.selected .l3-option-radio::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--red-primary);
+        }
+
+        /* ===== GENERAL FEEDBACK BOX ===== */
+        .feedback-box {
+            background: var(--gray-light);
+            border-left: 4px solid var(--gray-mid);
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--ink);
+        }
+        .feedback-box.correct {
+            background: var(--success-bg);
+            border-left-color: var(--success);
+            color: #1b5e20;
+        }
+        .feedback-box.wrong {
+            background: #ffebee;
+            border-left-color: var(--danger);
+            color: #b71c1c;
+        }
+        .feedback-box.show {
+            background: var(--red-bg);
+            border-left-color: var(--red-primary);
+            color: var(--red-dark);
+        }
+
+        /* ===== COMPLETION BOX & REINFORCEMENT ===== */
+        .completion-box {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Persistent Footer Navigation */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -1454,30 +1581,25 @@
 
         <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
         <section id="theory-dashboard-card" class="card"
-            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            style="border-left: 4px solid var(--red-primary); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
             <div
                 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
                 <h3
-                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--red-primary); display: flex; align-items: center; gap: 8px;">
                     📘 Strategic Reference Board: Consumer Adoption Behavior (Module 4.2)
                 </h3>
                 <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
                     style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
             </div>
             <div id="theory-content"
-                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-dark);">
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--ink);">
                 <div>
-                    <p style="margin-bottom: 10px;"><strong>1. Rogers' Adopter Cohorts:</strong> Innovation diffusion
-                        maps consumer groups: Innovators, Early Adopters, Early Majority, Late Majority, and Laggards.
-                        Winning mainstream segments requires crossing the Chasm.</p>
-                    <p><strong>2. Adoption Stages:</strong> Customers navigate through stages from first learning about
-                        an app (Awareness) to final integration (Adoption).</p>
+                    <p style="margin-bottom: 10px;"><strong>1. Rogers' Adopter Categories:</strong> Innovators (2.5%), Early Adopters (13.5%), Early Majority (34.0%), Late Majority (34.0%), and Laggards (16.0%). Winning the mainstream requires crossing the chasm.</p>
+                    <p><strong>2. Perceived Innovation Attributes:</strong> Rates of technology diffusion are driven by: Relative Advantage, Compatibility, Complexity, Trialability, and Observability.</p>
                 </div>
                 <div>
-                    <p style="margin-bottom: 10px;"><strong>3. Key Innovation Factors:</strong> Diffusion rates depend
-                        on Relative Advantage, Compatibility, Complexity, Trialability, and Observability.</p>
-                    <p><strong>4. Friction Barriers:</strong> Strategists scale launch campaigns to lower complexity and
-                        raise relative compatibility to speed up adoption rates.</p>
+                    <p style="margin-bottom: 10px;"><strong>3. Key Adoption Barriers:</strong> Consumer friction arises from barriers like Cost, Complexity, Lack of awareness, Security concerns/perceived risk, Lack of trust, and Resistance to change.</p>
+                    <p><strong>4. Strategic Interventions:</strong> Organizations reduce adoption friction by offering trials, providing clear onboarding tutorials, publishing security assurances, and simplifying interface complexity.</p>
                 </div>
             </div>
         </section>
@@ -1488,8 +1610,6 @@
                 <div class="nav-pill active" id="nav-l1" onclick="navigateToLevel(1)">Level 1</div>
                 <div class="nav-pill" id="nav-l2" onclick="navigateToLevel(2)">Level 2</div>
                 <div class="nav-pill" id="nav-l3" onclick="navigateToLevel(3)">Level 3</div>
-                <div class="nav-pill" id="nav-l4" onclick="navigateToLevel(4)">Level 4</div>
-                <div class="nav-pill" id="nav-l5" onclick="navigateToLevel(5)">Level 5</div>
             </div>
             <div class="bar-container">
                 <div class="bar-fill" id="overall-progress-bar"></div>
@@ -1501,62 +1621,53 @@
             <div class="card">
                 <div class="welcome-hero">
                     <div class="welcome-content">
-                        <h2>Lead SmartLife to Success</h2>
-                        <p>Welcome, Growth Strategist! You have been recruited to manage the launch of
-                            <strong>SmartLife</strong>, a revolutionary digital app designed to coordinate home
-                            automation, power savings, and daily schedules using predictive machine learning.</p>
-                        <p>To win this simulation and establish SmartLife in the market, your ultimate goal is to guide
-                            <strong>10,000 potential users</strong> along the consumer behavior lifecycle and achieve
-                            mainstream adoption.</p>
-                        <div class="objective-box">
-                            <strong>Objective Summary</strong>
-                            Optimize customer experience parameters, address friction concerns, deploy lifecycle
-                            campaigns, repair drop-offs, and steer the app through a 30-day simulator. Maintain adoption
-                            and customer trust.
+                        <h2>Optimize Consumer Adoption Behavior</h2>
+                        <p>Welcome, Growth Strategist! You are responsible for launching <strong>SmartLife</strong>, a machine learning app that coordinates home automation and energy savings. To establish SmartLife, you must understand consumer adoption and technology diffusion concepts.</p>
+                        <p>Learn how to target different adopter categories, design innovations for ease of adoption, and implement strategies that reduce adoption barriers.</p>
+                        
+                        <div class="objective-box" style="margin-bottom: 25px;">
+                            <strong>Simulation Learning Journey</strong>
+                            <ul style="padding-left: 20px; margin-top: 8px;">
+                                <li style="margin-bottom: 5px;"><strong>Level 1: Consumer Adoption Explorer</strong> - Classify customer profiles into Rogers adopter categories and identify their primary adoption barriers.</li>
+                                <li style="margin-bottom: 5px;"><strong>Level 2: Innovation Adoption Laboratory</strong> - Tune innovation attributes (Relative Advantage, Compatibility, Complexity, Trialability, Observability) to optimize adoption rates.</li>
+                                <li><strong>Level 3: Consumer Adoption Strategy Simulator</strong> - Deploy digital strategies to resolve real-world consumer resistance scenarios.</li>
+                            </ul>
                         </div>
                         <button class="btn" onclick="startSimulation()">Begin Simulation Journey</button>
                     </div>
                     <div class="welcome-art">
-                        <!-- Clean HTML SVG Mockup of SmartLife Ecosystem -->
                         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="100" cy="100" r="85" fill="#FFF5F5" stroke="#C62828" stroke-width="4" />
                             <circle cx="100" cy="100" r="45" fill="#C62828" />
                             <text x="100" y="96" font-family="'Outfit', sans-serif" font-weight="bold" font-size="12"
                                 fill="white" text-anchor="middle">SmartLife</text>
                             <text x="100" y="112" font-family="'Outfit', sans-serif" font-size="8" fill="#FFF5F5"
-                                text-anchor="middle">ECOSYSTEM</text>
-                            <!-- Surrounding nodes representing elements of life -->
+                                text-anchor="middle">ADOPTION LAB</text>
                             <circle cx="50" cy="50" r="14" fill="white" stroke="#E53935" stroke-width="2" />
-                            <text x="50" y="53" font-size="10" text-anchor="middle">🏠</text>
+                            <text x="50" y="53" font-size="10" text-anchor="middle">💡</text>
                             <circle cx="150" cy="50" r="14" fill="white" stroke="#E53935" stroke-width="2" />
-                            <text x="150" y="53" font-size="10" text-anchor="middle">⚡</text>
+                            <text x="150" y="53" font-size="10" text-anchor="middle">⚙️</text>
                             <circle cx="50" cy="150" r="14" fill="white" stroke="#E53935" stroke-width="2" />
-                            <text x="50" y="153" font-size="10" text-anchor="middle">📱</text>
+                            <text x="50" y="153" font-size="10" text-anchor="middle">📊</text>
                             <circle cx="150" cy="150" r="14" fill="white" stroke="#E53935" stroke-width="2" />
-                            <text x="150" y="153" font-size="10" text-anchor="middle">⚙️</text>
-                            <!-- Connection lines -->
-                            <line x1="78" y1="78" x2="62" y2="62" stroke="#EF5350" stroke-width="2"
-                                stroke-dasharray="2 2" />
-                            <line x1="122" y1="78" x2="138" y2="62" stroke="#EF5350" stroke-width="2"
-                                stroke-dasharray="2 2" />
-                            <line x1="78" y1="122" x2="62" y2="138" stroke="#EF5350" stroke-width="2"
-                                stroke-dasharray="2 2" />
-                            <line x1="122" y1="122" x2="138" y2="138" stroke="#EF5350" stroke-width="2"
-                                stroke-dasharray="2 2" />
+                            <text x="150" y="153" font-size="10" text-anchor="middle">🔒</text>
+                            <line x1="78" y1="78" x2="62" y2="62" stroke="#EF5350" stroke-width="2" stroke-dasharray="2 2" />
+                            <line x1="122" y1="78" x2="138" y2="62" stroke="#EF5350" stroke-width="2" stroke-dasharray="2 2" />
+                            <line x1="78" y1="122" x2="62" y2="138" stroke="#EF5350" stroke-width="2" stroke-dasharray="2 2" />
+                            <line x1="122" y1="122" x2="138" y2="138" stroke="#EF5350" stroke-width="2" stroke-dasharray="2 2" />
                         </svg>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ==================== LEVEL 1: CONSUMER MIND READER ==================== -->
+        <!-- ==================== LEVEL 1: CONSUMER ADOPTION EXPLORER ==================== -->
         <section id="screen-l1" class="screen">
-            <div class="card">
-                <h2>Level 1: Consumer Mind Reader</h2>
+            <div class="card" id="l1-main-card">
+                <h2>Level 1: Consumer Adoption Explorer</h2>
                 <div class="objective-box">
                     <strong>Objective</strong>
-                    Identify and overcome adoption barriers. Analyze comments from 5 different potential customers and
-                    assign each consumer to their primary friction category.
+                    Analyze 5 distinct customer profiles. Assign each consumer to their correct adopter category (Innovator, Early Adopter, etc.) and identify their primary adoption barrier to gain deep customer insights.
                 </div>
 
                 <div class="l1-split">
@@ -1567,460 +1678,375 @@
                         </div>
                     </div>
 
-                    <!-- Right: Drag targets/Category zones -->
-                    <div class="l1-zones" id="l1-zones-container">
-                        <!-- Injected by JavaScript -->
+                    <!-- Right: Classification zones -->
+                    <div style="background: var(--white); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--gray-dark); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Select Classifications</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--ink-muted); display: block; margin-bottom: 8px;">1. Adopter Category</span>
+                            <div class="mobile-sort-buttons" id="l1-adopter-btn-group" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Adopter Buttons -->
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--ink-muted); display: block; margin-bottom: 8px;">2. Primary Adoption Barrier</span>
+                            <div class="mobile-sort-buttons" id="l1-barrier-btn-group" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Barrier Buttons -->
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button class="btn" id="btn-submit-l1-classification" onclick="submitL1Classification()">Confirm Classification</button>
+                            <button class="btn" id="btn-next-l1-profile" style="display: none;" onclick="nextL1Profile()">Next Profile</button>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Live feedback panel for classification -->
+                <div class="feedback-box" id="l1-classification-feedback" style="display: none; margin-top: 20px; padding: 15px; border-radius: 6px;">
+                    <!-- Feedback content injected dynamically -->
+                </div>
+            </div>
+
+            <!-- Level 1 Completion Summary -->
+            <div class="completion-box card" id="l1-completion-box" style="display: none; border-top: 4px solid var(--success);">
+                <h3 style="color: var(--success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    🎉 Level 1 Complete: Adopters & Barriers Decoded
+                </h3>
+                <p style="margin-bottom: 20px;">You have successfully classified all 5 customer profiles into their correct adopter categories and identified their primary technology adoption barriers. Organizations must understand these categories to custom-tailor their messaging and reduce market entry barriers.</p>
+                
+                <div class="reinforcement-grid" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Key Learning Points</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li>Rogers' Diffusion of Innovation divides consumers into 5 clear categories based on their willingness to try new systems.</li>
+                            <li>Innovators and Early Adopters are tech-enthusiastic and value usefulness, while Majority segments require proven utility and social proof.</li>
+                            <li>Adoption barriers (cost, complexity, risk) act as psychological frictions that block technology diffusion.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Common Mistakes</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li>Treating all consumers as one single cohort, which leads to general marketing that fails to address specific barriers.</li>
+                            <li>Ignoring Laggards' resistance to change or trying to force them to adopt without offering heavily simplified solutions.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Real Business Application</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;">Fintech applications launch by targeting young innovators first, then offer security certificates to reassure the Late Majority, and finally offer massive onboarding guides and simple telephone support to reach Laggards.</p>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Textbook Concept Link</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;"><strong>Chaffey (4th Ed):</strong> Adoption of e-commerce services depends on consumer traits. Identifying cohorts helps companies position relative advantages and design compatibility programs to cross the chasm.</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="navigateToLevel(2)">Proceed to Level 2</button>
             </div>
         </section>
 
-        <!-- ==================== LEVEL 2: USER EXPERIENCE LABORATORY ==================== -->
+        <!-- ==================== LEVEL 2: INNOVATION ADOPTION LABORATORY ==================== -->
         <section id="screen-l2" class="screen">
-            <div class="card">
-                <h2>Level 2: User Experience Laboratory</h2>
+            <div class="card" id="l2-main-card">
+                <h2>Level 2: Innovation Adoption Laboratory</h2>
                 <div class="objective-box">
                     <strong>Objective</strong>
-                    Adjust the product experience sliders to optimize product attributes. You must tune settings until
-                    you achieve: <strong>Adoption Rate &gt; 80%</strong> and <strong>User Satisfaction &gt;
-                        75%</strong>.
+                    Evaluate SmartLife as a new digital product. Adjust the sliders for the five key innovation characteristics from Rogers' diffusion of innovation to achieve: <strong>Predicted Adoption Rate &gt;= 80%</strong> and <strong>Ease of Adoption &gt;= 75%</strong>.
                 </div>
 
                 <div class="l2-grid">
                     <!-- Sliders controls -->
                     <div class="sliders-panel">
-                        <h3>SmartLife Product Configuration</h3>
-                        <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--ink-muted);">Modify the core
-                            attributes. Adjusting these values simulates changes in pricing structure, back-end
-                            improvements, interface clarity, speed performance, and customer targeting.</p>
+                        <h3>Innovation Characteristics Configuration</h3>
+                        <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--ink-muted);">Tune the product attributes to influence consumer willingness to adopt. Observe how relative advantage and complexity alter risk metrics.</p>
 
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <label for="slider-simplicity">Simplicity (Interface Layout & Onboarding)</label>
-                                <span id="val-simplicity">50%</span>
+                        <div class="slider-group" style="margin-bottom: 20px;">
+                            <div class="slider-header" style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;">
+                                <label for="slider-advantage">Relative Advantage (Perceived Value vs. Alternatives)</label>
+                                <span id="val-advantage">50%</span>
                             </div>
-                            <div class="slider-control">
-                                <span class="slider-icon">✨</span>
-                                <input type="range" id="slider-simplicity" min="10" max="100" value="50"
-                                    oninput="updateUXLaboratory()">
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <span class="slider-icon" style="font-size: 1.2rem;">🚀</span>
+                                <input type="range" id="slider-advantage" min="10" max="100" value="50" style="flex: 1; cursor: pointer;" oninput="updateLabMetrics()">
                             </div>
                         </div>
 
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <label for="slider-security">Security (Data Cryptography & Safety)</label>
-                                <span id="val-security">50%</span>
+                        <div class="slider-group" style="margin-bottom: 20px;">
+                            <div class="slider-header" style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;">
+                                <label for="slider-compatibility">Compatibility (Alignment with Consumer Values & Habits)</label>
+                                <span id="val-compatibility">50%</span>
                             </div>
-                            <div class="slider-control">
-                                <span class="slider-icon">🔒</span>
-                                <input type="range" id="slider-security" min="10" max="100" value="50"
-                                    oninput="updateUXLaboratory()">
-                            </div>
-                        </div>
-
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <label for="slider-price">Price (Monthly Subscription Cost)</label>
-                                <span id="val-price">$50/mo</span>
-                            </div>
-                            <div class="slider-control">
-                                <span class="slider-icon">💰</span>
-                                <input type="range" id="slider-price" min="5" max="100" value="50"
-                                    oninput="updateUXLaboratory()">
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <span class="slider-icon" style="font-size: 1.2rem;">🤝</span>
+                                <input type="range" id="slider-compatibility" min="10" max="100" value="50" style="flex: 1; cursor: pointer;" oninput="updateLabMetrics()">
                             </div>
                         </div>
 
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <label for="slider-speed">Speed (Response Latency & Sync Rate)</label>
-                                <span id="val-speed">50%</span>
+                        <div class="slider-group" style="margin-bottom: 20px;">
+                            <div class="slider-header" style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;">
+                                <label for="slider-complexity">Complexity (Perceived Difficulty to Use & Learn)</label>
+                                <span id="val-complexity">50%</span>
                             </div>
-                            <div class="slider-control">
-                                <span class="slider-icon">⚡</span>
-                                <input type="range" id="slider-speed" min="10" max="100" value="50"
-                                    oninput="updateUXLaboratory()">
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <span class="slider-icon" style="font-size: 1.2rem;">⚙️</span>
+                                <input type="range" id="slider-complexity" min="10" max="100" value="50" style="flex: 1; cursor: pointer;" oninput="updateLabMetrics()">
                             </div>
                         </div>
 
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <label for="slider-personalization">Personalization (Custom AI Automation Rules)</label>
-                                <span id="val-personalization">50%</span>
+                        <div class="slider-group" style="margin-bottom: 20px;">
+                            <div class="slider-header" style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;">
+                                <label for="slider-trialability">Trialability (Ability to Test-Run Before Committing)</label>
+                                <span id="val-trialability">50%</span>
                             </div>
-                            <div class="slider-control">
-                                <span class="slider-icon">⚙️</span>
-                                <input type="range" id="slider-personalization" min="10" max="100" value="50"
-                                    oninput="updateUXLaboratory()">
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <span class="slider-icon" style="font-size: 1.2rem;">🆓</span>
+                                <input type="range" id="slider-trialability" min="10" max="100" value="50" style="flex: 1; cursor: pointer;" oninput="updateLabMetrics()">
+                            </div>
+                        </div>
+
+                        <div class="slider-group" style="margin-bottom: 20px;">
+                            <div class="slider-header" style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem;">
+                                <label for="slider-observability">Observability (Visibility of App Benefits to Others)</label>
+                                <span id="val-observability">50%</span>
+                            </div>
+                            <div class="slider-control" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                                <span class="slider-icon" style="font-size: 1.2rem;">👁️</span>
+                                <input type="range" id="slider-observability" min="10" max="100" value="50" style="flex: 1; cursor: pointer;" oninput="updateLabMetrics()">
                             </div>
                         </div>
                     </div>
 
                     <!-- Realtime Dashboard -->
                     <div class="l2-dashboard">
-                        <h3>Live Performance Dashboard</h3>
+                        <h3>Laboratory Analytics</h3>
 
                         <div class="dash-metric">
                             <div class="metric-info">
-                                <h5>Adoption Rate</h5>
-                                <div class="metric-target-indicator" id="ind-adoption">Target: &gt; 80%</div>
+                                <h5>Predicted Adoption Rate</h5>
+                                <div class="metric-target-indicator" id="ind-adoption">Target: &gt;= 80%</div>
                             </div>
                             <div class="metric-value" id="lbl-adoption">0%</div>
                         </div>
 
                         <div class="dash-metric">
                             <div class="metric-info">
-                                <h5>User Satisfaction</h5>
-                                <div class="metric-target-indicator" id="ind-satisfaction">Target: &gt; 75%</div>
+                                <h5>Ease of Adoption</h5>
+                                <div class="metric-target-indicator" id="ind-ease">Target: &gt;= 75%</div>
                             </div>
-                            <div class="metric-value" id="lbl-satisfaction">0%</div>
+                            <div class="metric-value" id="lbl-ease">0%</div>
                         </div>
 
                         <div class="dash-metric">
                             <div class="metric-info">
-                                <h5>Simulated Downloads</h5>
-                                <div class="metric-target-indicator">Total Market: 10k</div>
+                                <h5>Consumer Interest</h5>
+                                <div class="metric-target-indicator">Initial Base: 10%</div>
                             </div>
-                            <div class="metric-value" id="lbl-downloads">0</div>
+                            <div class="metric-value" id="lbl-interest">0%</div>
                         </div>
 
-                        <div class="dash-advisor" id="lbl-advisor">
+                        <div class="dash-metric">
+                            <div class="metric-info">
+                                <h5>Perceived Risk</h5>
+                                <div class="metric-target-indicator">Threat Level</div>
+                            </div>
+                            <div class="metric-value" id="lbl-risk">0%</div>
+                        </div>
+
+                        <div class="dash-advisor" id="lbl-advisor" style="background: var(--red-bg); padding: 12px; border-radius: 6px; font-size: 0.85rem; line-height: 1.4; color: var(--red-dark); font-weight: 500;">
                             Adjust the sliders to simulate the launch configuration.
                         </div>
 
-                        <button class="btn" id="btn-submit-l2" disabled onclick="completeLevel2()">Apply
-                            Configurations</button>
+                        <button class="btn" id="btn-submit-l2" disabled onclick="submitLevel2Config()" style="margin-top: 15px; width: 100%;">Apply Configurations</button>
                     </div>
                 </div>
             </div>
+
+            <!-- Level 2 Completion Summary -->
+            <div class="completion-box card" id="l2-completion-box" style="display: none; border-top: 4px solid var(--success); margin-top: 30px; padding: 20px;">
+                    <h3 style="color: var(--success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        🎉 Level 2 Complete: Product Attributes Optimized
+                    </h3>
+                    <p style="margin-bottom: 20px;">You have balanced the innovation characteristics of SmartLife. In digital business, adoption rates depend heavily on how prospective users perceive the core characteristics of the technology.</p>
+                    
+                    <div class="reinforcement-grid" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px;">
+                        <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Key Learning Points</h4>
+                            <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                                <li><strong>Relative Advantage</strong> is the primary driver of adoption: users must see why the innovation outperforms legacy solutions.</li>
+                                <li><strong>Complexity</strong> has an inverse relation with adoption: reducing user effort directly maximizes onboarding speeds.</li>
+                                <li><strong>Trialability</strong> decreases user risk perception by letting them test configurations before buy-in.</li>
+                            </ul>
+                        </div>
+                        <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Common Mistakes</h4>
+                            <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                                <li>Focusing solely on adding features (which raises Complexity) rather than improving integration standards (Compatibility).</li>
+                                <li>Failing to provide visible proofs (Observability) which stalls organic word-of-mouth diffusion in social networks.</li>
+                            </ul>
+                        </div>
+                        <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Real Business Application</h4>
+                            <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;">SaaS companies like Slack maximize <strong>Trialability</strong> by offering free tiers, ensure high <strong>Compatibility</strong> by building integrations with third-party software, and maintain low <strong>Complexity</strong> through streamlined messaging layouts.</p>
+                        </div>
+                        <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                            <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Textbook Concept Link</h4>
+                            <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;"><strong>Chaffey (4th Ed):</strong> Perceived attributes directly determine the speed at which e-business platforms diffuse. High compatibility and low complexity are primary strategic targets for home and office solutions.</p>
+                        </div>
+                    </div>
+
+                    <!-- Level 2 Configured Results Dashboard -->
+                    <h4 style="margin-bottom: 15px; font-family: var(--font-display); text-align: center;">Configured Results Dashboard</h4>
+                    <div id="l2-result-metric-grid" style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;">
+                        <!-- Injected dynamically by JS -->
+                    </div>
+
+                    <button class="btn" onclick="navigateToLevel(3)">Proceed to Level 3</button>
+                </div>
         </section>
 
-        <!-- ==================== LEVEL 3: ADOPTION RACE ==================== -->
+        <!-- ==================== LEVEL 3: CONSUMER ADOPTION STRATEGY SIMULATOR ==================== -->
         <section id="screen-l3" class="screen">
-            <div class="card">
-                <h2>Level 3: Adoption Race</h2>
+            <div class="card" id="l3-main-card">
+                <h2>Level 3: Consumer Adoption Strategy Simulator</h2>
                 <div class="objective-box">
                     <strong>Objective</strong>
-                    Deploy the correct target campaigns to all five lifecycle adopter groups at the same time. Select a
-                    strategy card at the bottom, then click a lane's slot to assign it. Align all correct campaigns to
-                    accelerate all groups to 100% adoption.
+                    Deploy target strategies as Chief Digital Officer to overcome adoption barriers in 5 critical digital scenarios. Achieve final metrics of: <strong>Adoption &gt;= 50%</strong>, <strong>Trust &gt;= 50%</strong>, <strong>Satisfaction &gt;= 50%</strong>, and <strong>Risk &lt;= 50%</strong>.
                 </div>
 
-                <div class="l3-container">
-                    <div class="race-tracks">
-                        <!-- Race track lanes -->
-                        <div class="race-lane" id="lane-innovators">
-                            <div class="lane-info">
-                                <h4>Innovators</h4>
-                                <p>Tech enthusiasts (2.5%)</p>
-                            </div>
-                            <div class="lane-slot" id="slot-innovators" onclick="assignL3StrategyToLane('innovators')">
-                                <span class="slot-placeholder">Deploy Campaign</span>
-                            </div>
-                            <div class="lane-track-bg">
-                                <div class="lane-progress-bar" id="pb-innovators"></div>
-                                <div class="lane-checkerboard"></div>
-                            </div>
-                            <div class="lane-status" id="status-innovators">⚪</div>
-                        </div>
-
-                        <div class="race-lane" id="lane-early-adopters">
-                            <div class="lane-info">
-                                <h4>Early Adopters</h4>
-                                <p>Visionaries (13.5%)</p>
-                            </div>
-                            <div class="lane-slot" id="slot-early-adopters"
-                                onclick="assignL3StrategyToLane('early-adopters')">
-                                <span class="slot-placeholder">Deploy Campaign</span>
-                            </div>
-                            <div class="lane-track-bg">
-                                <div class="lane-progress-bar" id="pb-early-adopters"></div>
-                                <div class="lane-checkerboard"></div>
-                            </div>
-                            <div class="lane-status" id="status-early-adopters">⚪</div>
-                        </div>
-
-                        <div class="race-lane" id="lane-early-majority">
-                            <div class="lane-info">
-                                <h4>Early Majority</h4>
-                                <p>Pragmatists (34.0%)</p>
-                            </div>
-                            <div class="lane-slot" id="slot-early-majority"
-                                onclick="assignL3StrategyToLane('early-majority')">
-                                <span class="slot-placeholder">Deploy Campaign</span>
-                            </div>
-                            <div class="lane-track-bg">
-                                <div class="lane-progress-bar" id="pb-early-majority"></div>
-                                <div class="lane-checkerboard"></div>
-                            </div>
-                            <div class="lane-status" id="status-early-majority">⚪</div>
-                        </div>
-
-                        <div class="race-lane" id="lane-late-majority">
-                            <div class="lane-info">
-                                <h4>Late Majority</h4>
-                                <p>Skeptics (34.0%)</p>
-                            </div>
-                            <div class="lane-slot" id="slot-late-majority"
-                                onclick="assignL3StrategyToLane('late-majority')">
-                                <span class="slot-placeholder">Deploy Campaign</span>
-                            </div>
-                            <div class="lane-track-bg">
-                                <div class="lane-progress-bar" id="pb-late-majority"></div>
-                                <div class="lane-checkerboard"></div>
-                            </div>
-                            <div class="lane-status" id="status-late-majority">⚪</div>
-                        </div>
-
-                        <div class="race-lane" id="lane-laggards">
-                            <div class="lane-info">
-                                <h4>Laggards</h4>
-                                <p>Traditionalists (16.0%)</p>
-                            </div>
-                            <div class="lane-slot" id="slot-laggards" onclick="assignL3StrategyToLane('laggards')">
-                                <span class="slot-placeholder">Deploy Campaign</span>
-                            </div>
-                            <div class="lane-track-bg">
-                                <div class="lane-progress-bar" id="pb-laggards"></div>
-                                <div class="lane-checkerboard"></div>
-                            </div>
-                            <div class="lane-status" id="status-laggards">⚪</div>
-                        </div>
-                    </div>
-
-                    <div style="background: #FDFDFD; border: 1px solid var(--border-color); padding: 18px; border-radius: 8px; font-size: 0.9rem; text-align: center;"
-                        id="l3-feedback-box">
-                        Select a campaign card below first, then click on a lifecycle group lane slot above to deploy
-                        it.
-                    </div>
-
-                    <div class="l3-strategies" id="l3-strategies-container">
-                        <!-- Strategy options injected by JavaScript -->
-                    </div>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn" id="btn-submit-l3" disabled onclick="completeLevel3()">Confirm Strategy
-                            Deployment</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== LEVEL 4: CUSTOMER JOURNEY BUILDER ==================== -->
-        <section id="screen-l4" class="screen">
-            <div class="card">
-                <h2>Level 4: Customer Journey Builder</h2>
-                <div class="objective-box">
-                    <strong>Objective</strong>
-                    Build a logical digital customer acquisition and retention journey map by matching specific business
-                    actions to the correct developmental stages (Awareness &rarr; Interest &rarr; Trial &rarr; Adoption
-                    &rarr; Retention &rarr; Loyalty).
-                </div>
-
-                <div class="l4-grid">
-                    <!-- Actions Pool -->
-                    <div style="margin-bottom: 10px;">
-                        <h3
-                            style="font-size: 1rem; margin-bottom: 10px; color: var(--red-primary); text-transform: uppercase;">
-                            Available Marketing Actions</h3>
-                        <p style="font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 15px;">Drag these action
-                            cards into the journey slots below, or click an action card and then click a stage zone to
-                            place it.</p>
-                        <div class="l4-pool" id="l4-actions-pool">
-                            <!-- Injected by JavaScript -->
-                        </div>
-                    </div>
-
-                    <!-- Journey Columns -->
-                    <div>
-                        <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--gray-dark);">Customer Journey
-                            Roadmap</h3>
-                        <div class="journey-board" id="journey-board-container">
-                            <!-- 6 stages injected by JavaScript -->
-                        </div>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 15px;">
-                        <button class="btn" onclick="verifyCustomerJourney()">Verify Journey Map</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== LEVEL 5: VIRAL GROWTH SIMULATOR ==================== -->
-        <section id="screen-l5" class="screen">
-            <div class="card">
-                <h2>Level 5: Viral Growth Simulator</h2>
-                <div class="objective-box">
-                    <strong>Objective</strong>
-                    Steer SmartLife through 30 days of real-world launch operations. Survive market disruptions, privacy
-                    crises, and viral spikes. Win criteria at Day 30: <strong>Adoption &gt; 80% (8,000+ adopted
-                        users)</strong>, <strong>Satisfaction &gt; 75%</strong>, and <strong>Trust &gt; 80%</strong>.
-                </div>
-
-                <div class="l5-layout">
-                    <!-- Left: Interactive City Map SVG -->
-                    <div class="map-section">
-                        <div class="map-header">
-                            <h3>SmartLife City Map (10,000 Users)</h3>
-                            <div class="map-legend">
-                                <div class="legend-item">
-                                    <div class="legend-color legend-unadopted"></div>
-                                    <span>Unadopted</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-color legend-adopted"></div>
-                                    <span>Adopted</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="svg-container" id="city-map-container">
-                            <!-- 10x10 Grid SVG injected by JavaScript -->
-                        </div>
-                        <p
-                            style="font-size: 0.75rem; color: var(--ink-muted); margin-top: 10px; font-style: italic; text-align: center;">
-                            Each square represent 100 potential consumers. Nodes turn green as total user adoption
-                            grows.</p>
-                    </div>
-
-                    <!-- Right: Sim Dashboard & Incident Panel -->
-                    <div class="sim-control-panel">
-                        <div class="sim-status-card">
-                            <div class="sim-day-indicator">
-                                <span>Day <span id="sim-day-lbl">1</span>/30</span>
-                                <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--ink-muted);"
-                                    id="sim-speed-indicator">Realtime Mode</span>
-                            </div>
-                            <div class="sim-day-bar">
-                                <div class="sim-day-bar-fill" id="sim-day-progress"></div>
-                            </div>
-
-                            <div class="sim-dashboard-grid">
-                                <div class="sim-metric-box">
-                                    <h6>Total Users</h6>
-                                    <div class="sim-metric-val" id="sim-val-users">500</div>
-                                </div>
-                                <div class="sim-metric-box">
-                                    <h6>Adoption Rate</h6>
-                                    <div class="sim-metric-val" id="sim-val-rate">5.0%</div>
-                                </div>
-                                <div class="sim-metric-box">
-                                    <h6>Satisfaction</h6>
-                                    <div class="sim-metric-val" id="sim-val-sat">50%</div>
-                                </div>
-                                <div class="sim-metric-box">
-                                    <h6>Trust Level</h6>
-                                    <div class="sim-metric-val" id="sim-val-trust">50%</div>
-                                </div>
-                            </div>
-                            <div style="margin-top: 15px; text-align: center;" id="sim-engine-controls">
-                                <button class="btn" id="btn-start-sim" onclick="startL5Engine()">Start Daily
-                                    Simulation</button>
-                            </div>
-                        </div>
-
-                        <div class="event-card-container">
-                            <div class="event-body" id="event-narrative-container">
-                                <h4>📊 Status: Ready to Launch</h4>
-                                <p>Click the button above to begin the 30-day simulator. Critical business events will
-                                    require your prompt strategic intervention.</p>
-                            </div>
-                            <div class="mobile-sort-buttons" id="event-options-container" style="margin-top: 10px;">
-                                <!-- Choices options will be injected here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ==================== GENERAL MODALS SYSTEM ==================== -->
-        <div class="overlay" id="learning-modal">
-            <div class="modal-box">
-                <span class="summary-icon" id="modal-icon">🏆</span>
-                <h3 id="modal-title">Level Completed</h3>
-                <p id="modal-desc">You've successfully finished this stage of learning.</p>
-                <div class="modal-learnings-list" id="modal-learnings-body">
-                    <!-- Point lists injected dynamically -->
-                </div>
-                <button class="btn" id="modal-next-btn" onclick="modalCloseAndAdvance()">Next Level</button>
-            </div>
-        </div>
-
-        <!-- ==================== FINAL RESULTS SCREEN ==================== -->
-        <section id="screen-results" class="screen">
-            <div class="card results-box">
-                <div class="results-badge" id="results-icon">🏆</div>
-                <h2 class="results-title" id="results-heading">Widespread Adoption Achieved!</h2>
-                <div class="results-summary-text" id="results-subheading">Your product successfully achieved widespread
-                    adoption.</div>
-
-                <!-- Metrics layout -->
+                <!-- Simulation Dashboard Metrics -->
                 <div style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;">
-                    <div
-                        style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
-                        <span
-                            style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Final
-                            Users</span>
-                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);"
-                            id="res-val-users">0</strong>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px; text-align: center;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Adoption Rate</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="l3-val-adoption">50%</strong>
+                        <div class="bar-container" style="height: 6px; margin-top: 8px;">
+                            <div class="bar-fill" id="l3-bar-adoption" style="width: 50%;"></div>
+                        </div>
                     </div>
-                    <div
-                        style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
-                        <span
-                            style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Adoption
-                            Rate</span>
-                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);"
-                            id="res-val-rate">0%</strong>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px; text-align: center;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Consumer Trust</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="l3-val-trust">50%</strong>
+                        <div class="bar-container" style="height: 6px; margin-top: 8px;">
+                            <div class="bar-fill" id="l3-bar-trust" style="width: 50%;"></div>
+                        </div>
                     </div>
-                    <div
-                        style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
-                        <span
-                            style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Satisfaction</span>
-                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);"
-                            id="res-val-sat">0%</strong>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px; text-align: center;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Customer Satisfaction</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="l3-val-satisfaction">50%</strong>
+                        <div class="bar-container" style="height: 6px; margin-top: 8px;">
+                            <div class="bar-fill" id="l3-bar-satisfaction" style="width: 50%;"></div>
+                        </div>
                     </div>
-                    <div
-                        style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
-                        <span
-                            style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Trust
-                            Level</span>
-                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);"
-                            id="res-val-trust">0%</strong>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px; text-align: center;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Perceived Risk</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="l3-val-risk">50%</strong>
+                        <div class="bar-container" style="height: 6px; margin-top: 8px;">
+                            <div class="bar-fill" id="l3-bar-risk" style="width: 50%; background: var(--warning);"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Analysis cards -->
-                <div class="analysis-grid">
-                    <div class="analysis-card strengths">
-                        <h4>🟢 Strengths</h4>
-                        <ul id="res-strengths">
-                            <!-- Bullet points injected -->
+                <!-- Scenario Section -->
+                <div id="l3-scenario-box" style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                        <h3 id="l3-scenario-number" style="font-size: 1.15rem; color: var(--red-primary);">Scenario 1 of 5</h3>
+                        <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: var(--ink-muted);">Simulation Active</span>
+                    </div>
+                    <p id="l3-scenario-text" style="font-size: 1.05rem; margin-bottom: 20px; font-weight: 500; color: var(--gray-dark);">Loading scenario details...</p>
+                    
+                    <!-- Choice list as cards -->
+                    <div id="l3-options-list" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;">
+                        <!-- Injected by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Decision Feedback Panel -->
+                <div class="feedback-box" id="l3-decision-feedback" style="display: none; margin-bottom: 20px; padding: 15px; border-radius: 6px;">
+                    <!-- Feedback content injected dynamically -->
+                </div>
+
+                <!-- Simulation controls -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" id="btn-submit-decision" onclick="submitL3Decision()">Confirm Strategy</button>
+                    <button class="btn" id="btn-next-scenario" style="display: none;" onclick="nextL3Scenario()">Next Scenario</button>
+                </div>
+            </div>
+
+            <!-- Level 3 Results / Completion Summary -->
+            <div class="completion-box card" id="l3-completion-box" style="display: none; border-top: 4px solid var(--success); padding: 24px;">
+                <span class="summary-icon" id="l3-result-icon" style="font-size: 2.5rem; text-align: center; display: block; margin-bottom: 10px;">🏆</span>
+                <h3 id="l3-result-heading" style="color: var(--success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                    Simulation Completed
+                </h3>
+                <p id="l3-completion-summary-text" style="margin-bottom: 20px; font-size: 0.95rem; text-align: center;">SmartLife consumer launch results are being calculated...</p>
+
+                <!-- Results Metrics breakdown -->
+                <div id="l3-result-metric-grid" style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;">
+                    <!-- Injected dynamically by JS -->
+                </div>
+
+                <!-- Strengths and Weaknesses -->
+                <div class="analysis-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div class="analysis-card strengths" style="background: var(--success-bg); border: 1px solid #C8E6C9; border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--success); margin-bottom: 10px;">🟢 Strengths</h4>
+                        <ul id="l3-res-strengths" style="padding-left: 20px; font-size: 0.85rem; color: var(--ink-muted);">
+                            <!-- Dynamic bullet points -->
                         </ul>
                     </div>
-                    <div class="analysis-card improvements">
-                        <h4>🟠 Areas for Improvement</h4>
-                        <ul id="res-improvements">
-                            <!-- Bullet points injected -->
+                    <div class="analysis-card improvements" style="background: #FFF3E0; border: 1px solid #FFE0B2; border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--warning); margin-bottom: 10px;">🟠 Areas for Improvement</h4>
+                        <ul id="l3-res-improvements" style="padding-left: 20px; font-size: 0.85rem; color: var(--ink-muted);">
+                            <!-- Dynamic bullet points -->
                         </ul>
+                    </div>
+                </div>
+
+                <!-- Reinforcement Grid -->
+                <div class="reinforcement-grid" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Key Learning Points</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li>Reducing consumer adoption barriers (such as Perceived Risk or Complexity) is key to establishing digital business innovations.</li>
+                            <li>Offering demonstrations and free trials lowers cost/trialability friction, while customer reviews and testimonials boost trust.</li>
+                            <li>Balanced strategic interventions align the relative advantages of the product with current customer lifestyles.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Common Mistakes</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li>Relying strictly on price cuts to incentivize laggards when complexity remains high.</li>
+                            <li>Ignoring security concerns, which raises customer risk perceptions and crashes trust rates.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Textbook Concept Link</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;"><strong>Chaffey (4th Ed):</strong> Organizations must reduce adoption barriers by tailoring support to segments. Designing clear risk mitigation and value communication strategies is crucial for digital operations.</p>
                     </div>
                 </div>
 
                 <!-- Replay Controls -->
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <button class="btn btn-outline" onclick="restartLevel5()">Restart Level 5 Only</button>
+                    <button class="btn btn-outline" onclick="restartLevel3Only()">Restart Level 3 Only</button>
                     <button class="btn" onclick="restartEntireSimulation()">Restart Full Simulation</button>
                 </div>
+    <!-- Persistent Bottom Nav Bar (No Lock Level Navigation) -->
+    <div class="nav-footer" id="navigationFooter" style="display: none;">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Level</button>
+            <div style="font-family: var(--font-display); font-weight: 700; color: var(--red-primary); font-size: 0.95rem;"
+                id="footerLevelText">
+                Level 1 of 3
             </div>
-        </section>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
 
     </main>
 
     <script>
         /* ==================== GLOBAL STATES ==================== */
         let currentScreen = 'intro';
-        let levelsUnlocked = [true, true, true, true, true];
-        let levelsCompleted = [false, false, false, false, false];
+        let levelsUnlocked = [true, true, true];
+        let levelsCompleted = [false, false, false];
         let currentActiveLevel = 1;
 
         // Custom Toast Indicator
@@ -2046,13 +2072,37 @@
                 currentScreen = screenId;
                 window.scrollTo(0, 0);
             }
+
+            const footer = document.getElementById('navigationFooter');
+            if (footer) {
+                if (screenId === 'intro') {
+                    footer.style.display = 'none';
+                } else {
+                    footer.style.display = 'flex';
+                    // Derive level number from screenId e.g. 'l1', 'l2', 'l3'
+                    let levelNum = screenId.replace('l', '');
+                    document.getElementById('footerLevelText').innerText = `Level ${levelNum} of 3`;
+                }
+            }
         }
+
+        window.prevLevel = function() {
+            if (currentActiveLevel > 1) {
+                navigateToLevel(currentActiveLevel - 1);
+            }
+        };
+
+        window.nextLevel = function() {
+            if (currentActiveLevel < 3) {
+                navigateToLevel(currentActiveLevel + 1);
+            }
+        };
 
         // Level Pill navigation
         function navigateToLevel(levelNum) {
-            if (typeof l3TickInterval !== 'undefined' && l3TickInterval) {
-                clearInterval(l3TickInterval);
-                l3TickInterval = null;
+            if (!levelsUnlocked[levelNum - 1]) {
+                showToast(`Level ${levelNum} is locked. Complete the previous level first!`, 'warning');
+                return;
             }
             currentActiveLevel = levelNum;
             updatePills();
@@ -2061,13 +2111,16 @@
         }
 
         function updatePills() {
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 3; i++) {
                 const pill = document.getElementById(`nav-l${i}`);
                 if (pill) {
                     pill.className = 'nav-pill';
                     if (levelsCompleted[i - 1]) {
                         pill.classList.add('completed');
                         pill.innerHTML = `✓ Level ${i}`;
+                    } else if (!levelsUnlocked[i - 1]) {
+                        pill.classList.add('locked');
+                        pill.innerHTML = `🔒 Level ${i}`;
                     } else {
                         pill.innerHTML = `Level ${i}`;
                         if (i === currentActiveLevel) {
@@ -2081,17 +2134,17 @@
             let totalProgress = 0;
             if (currentScreen === 'intro') {
                 totalProgress = 0;
-            } else if (currentScreen === 'results') {
+            } else if (levelsCompleted[2]) {
                 totalProgress = 100;
             } else {
-                // levels: 1 = 10%, 2 = 30%, 3 = 50%, 4 = 70%, 5 = 90%
-                totalProgress = (currentActiveLevel - 1) * 20 + 10;
+                totalProgress = (currentActiveLevel - 1) * 35 + 15;
             }
             document.getElementById('overall-progress-bar').style.width = `${totalProgress}%`;
         }
 
         function startSimulation() {
             document.getElementById('theory-dashboard-card').style.display = 'block';
+            levelsUnlocked[0] = true;
             navigateToLevel(1);
         }
 
@@ -2112,1241 +2165,791 @@
             if (levelNum === 1) initLevel1();
             if (levelNum === 2) initLevel2();
             if (levelNum === 3) initLevel3();
-            if (levelNum === 4) initLevel4();
-            if (levelNum === 5) initLevel5();
         }
 
-        /* ==================== MODAL HELPERS ==================== */
-        let activeModalCallback = null;
+        /* ==================== LEVEL 1: CONSUMER ADOPTION EXPLORER ==================== */
+        const L1_ADOPTER_CATEGORIES = {
+            'innovator': { title: 'Innovator', desc: 'Tech enthusiast (2.5%) eager to test new apps.' },
+            'early-adopter': { title: 'Early Adopter', desc: 'Visionary (13.5%) who recommends products.' },
+            'early-majority': { title: 'Early Majority', desc: 'Pragmatist (34.0%) waiting for mainstream proof.' },
+            'late-majority': { title: 'Late Majority', desc: 'Skeptic (34.0%) who adopts when standard.' },
+            'laggard': { title: 'Laggard', desc: 'Traditionalist (16.0%) highly resistant to change.' }
+        };
 
-        function showLearningModal(title, desc, pointsList, nextBtnText, callback) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-desc').innerHTML = desc;
+        const L1_BARRIERS = {
+            'awareness': { title: 'Lack of Awareness', icon: '📢' },
+            'risk': { title: 'Perceived Risk', icon: '⚠️' },
+            'complexity': { title: 'Complexity', icon: '⚙️' },
+            'cost': { title: 'Cost', icon: '💰' },
+            'trust': { title: 'Lack of Trust', icon: '🔒' },
+            'change': { title: 'Resistance to Change', icon: '🔄' }
+        };
 
-            const listContainer = document.getElementById('modal-learnings-body');
-            listContainer.innerHTML = '';
-            pointsList.forEach(pt => {
-                const li = document.createElement('li');
-                li.textContent = pt;
-                listContainer.appendChild(li);
-            });
-
-            document.getElementById('modal-next-btn').textContent = nextBtnText;
-            activeModalCallback = callback;
-
-            document.getElementById('learning-modal').classList.add('active');
-        }
-
-        function modalCloseAndAdvance() {
-            document.getElementById('learning-modal').classList.remove('active');
-            if (activeModalCallback) {
-                activeModalCallback();
-                activeModalCallback = null;
-            }
-        }
-
-
-        /* ==================== LEVEL 1: CONSUMER MIND READER ==================== */
         const L1_PERSONAS = [
             {
                 id: 'p1',
-                name: 'Elena R. (Aged 64)',
-                quote: "I don't trust entering my credit card online. What if someone steals my card information and makes illegal purchases?",
-                barrier: 'trust'
+                name: 'Liam S. (Aged 20) - University Student',
+                quote: "I am always eager to try every new app the day it launches. I even write custom scripts. But I haven't heard of SmartLife at all—no one in my circles has mentioned it yet.",
+                correctCategory: 'innovator',
+                correctBarrier: 'awareness',
+                feedback: {
+                    category: "Liam is an <strong>Innovator</strong> because he is eager to test new apps on Day 1, tolerates early bugs, and seeks out novelty before the mainstream.",
+                    barrier: "The primary barrier is a <strong>Lack of Awareness</strong>. Despite his high readiness to adopt, he cannot do so simply because he does not know the app exists.",
+                    strategy: "Organizations can reduce this barrier through content marketing, search engine optimization (SEO), and targeted social media ads showing immediate utility."
+                }
             },
             {
                 id: 'p2',
-                name: 'Rajesh K. (Aged 42)',
-                quote: "This app looks too complicated. It has dozens of submenus, settings, and complex smart links. I just don't have the time to learn this.",
-                barrier: 'complexity'
+                name: 'Chloe V. (Aged 28) - Technology Enthusiast',
+                quote: "I love recommending new productivity tools to my friends once I verify they work. But SmartLife has no security certificates or cloud reviews yet, so I am worried about the security of linking it to my smart thermostat.",
+                correctCategory: 'early-adopter',
+                correctBarrier: 'risk',
+                feedback: {
+                    category: "Chloe is an <strong>Early Adopter</strong>. She acts as an opinion leader who adopts early to gain a strategic advantage and recommends tools to friends.",
+                    barrier: "Her primary barrier is <strong>Perceived Risk</strong>. She is hesitant because of security and data privacy concerns associated with the smart thermostat.",
+                    strategy: "Organizations can reduce this barrier by offering transparent terms of service, third-party security badges, and publishing data-minimization practices."
+                }
             },
             {
                 id: 'p3',
-                name: 'Samuel T. (Aged 28)',
-                quote: "I think it is too expensive. $15 per month for scheduling routines? I can just use my free native phone calendar app.",
-                barrier: 'cost'
+                name: 'Rajesh K. (Aged 45) - Office Worker',
+                quote: "I wait until apps become common and standard in the office. I am willing to try it, but the setup manual is 50 pages long and has dozens of complex smart link options. It's just too complicated for daily use.",
+                correctCategory: 'early-majority',
+                correctBarrier: 'complexity',
+                feedback: {
+                    category: "Rajesh is in the <strong>Early Majority</strong>. He is a pragmatist who waits until a product is proven and common before adopting.",
+                    barrier: "His barrier is <strong>Complexity</strong>. The 50-page setup manual and steep learning curve create high cognitive friction.",
+                    strategy: "Organizations can reduce this barrier by simplifying onboarding tutorials, providing default settings templates, and streamlining user interface actions."
+                }
             },
             {
                 id: 'p4',
-                name: 'Aisha M. (Aged 35)',
-                quote: "I don't see why I need this app. My home works perfectly fine. Why would I want an app to turn off my lamps automatically?",
-                barrier: 'awareness'
+                name: 'Elena R. (Aged 65) - Older Customer',
+                quote: "I'm very reluctant to use mobile banking or smart home automation. I'm afraid hackers will steal my account info or access my locks. I don't trust these new tech companies.",
+                correctCategory: 'late-majority',
+                correctBarrier: 'trust',
+                feedback: {
+                    category: "Elena belongs to the <strong>Late Majority</strong>. She is highly skeptical, adopts technology later than the average, and only when pressured by peers or standard practices.",
+                    barrier: "Her barrier is a <strong>Lack of Trust</strong>. She is highly suspicious of the technology brand and security assurances.",
+                    strategy: "Organizations can reduce this barrier by utilizing customer service hotlines, verified social testimonials, and risk-free money-back guarantees."
+                }
             },
             {
                 id: 'p5',
-                name: 'Chloe V. (Aged 22)',
-                quote: "I am worried about my personal data. Why does this app need 24/7 access to my GPS history and smart locks? Who owns this data?",
-                barrier: 'privacy'
+                name: 'Arthur W. (Aged 72) - Small Business Owner',
+                quote: "I have managed my smart home power usage and business heating using simple paper logs and mechanical dials for 30 years. Why change? I have no desire to switch to digital dashboards.",
+                correctCategory: 'laggard',
+                correctBarrier: 'change',
+                feedback: {
+                    category: "Arthur is a <strong>Laggard</strong>. He is a traditionalist who is highly suspicious of innovations and prefers legacy methods.",
+                    barrier: "His primary barrier is <strong>Resistance to Change</strong>, deeply rooted in satisfaction with legacy habits.",
+                    strategy: "Organizations can reduce this barrier by keeping mechanical fallback support, demonstrating clear cost benefits, and designing interfaces that feel highly familiar."
+                }
             }
         ];
 
-        const L1_BARRIERS = {
-            'trust': { title: 'Trust Issue', icon: '🔒', desc: 'Skepticism about the brand reliability, transactions, or security.' },
-            'complexity': { title: 'Complexity Issue', icon: '⚙️', desc: 'Perceived high cognitive load, steep learning curve, or cluttered interface.' },
-            'cost': { title: 'Cost Concern', icon: '💰', desc: 'Friction surrounding immediate financial outlay versus perceived value.' },
-            'privacy': { title: 'Privacy Concern', icon: '👁️', desc: 'Apprehension regarding personal data tracking, aggregation, or security leaks.' },
-            'awareness': { title: 'Lack of Awareness', icon: '📢', desc: 'No recognized need, or zero understanding of how the digital tool solves a practical problem.' }
-        };
-
         let l1CurrentIndex = 0;
+        let l1SelectedCategory = null;
         let l1SelectedBarrier = null;
+        let l1ScrambledPersonas = [];
 
         function initLevel1() {
             l1CurrentIndex = 0;
+            l1SelectedCategory = null;
             l1SelectedBarrier = null;
-            renderLevel1Profile();
-            renderLevel1Zones();
+            
+            // Jumble personas list for dynamic matching
+            l1ScrambledPersonas = shuffleArray(L1_PERSONAS);
+            
+            document.getElementById('l1-main-card').style.display = 'block';
+            document.getElementById('l1-completion-box').style.display = 'none';
+            document.getElementById('l1-classification-feedback').style.display = 'none';
+            document.getElementById('btn-submit-l1-classification').style.display = 'inline-block';
+            document.getElementById('btn-submit-l1-classification').disabled = true;
+            document.getElementById('btn-next-l1-profile').style.display = 'none';
+
+            renderL1Profile();
+            renderL1Buttons();
         }
 
-        function renderLevel1Profile() {
+        function renderL1Profile() {
             const container = document.getElementById('l1-profile-container');
-            if (l1CurrentIndex >= L1_PERSONAS.length) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <h4 style="color: var(--success);">🟢 Classification Finished!</h4>
-                        <p style="font-size: 0.95rem; font-style: normal; margin: 15px 0;">All consumers have been successfully matched. Check the categories and confirm your learnings.</p>
-                        <button class="btn" onclick="completeLevel1()">Proceed to Feedback</button>
-                    </div>
-                `;
-                return;
-            }
+            const persona = l1ScrambledPersonas[l1CurrentIndex];
 
-            const persona = L1_PERSONAS[l1CurrentIndex];
-
-            // Build the card with Drag/Touch capability
             container.innerHTML = `
-                <div class="profile-card" id="active-persona-card" draggable="true">
+                <div class="profile-card">
                     <span class="profile-nav-text">Profile ${l1CurrentIndex + 1} of 5</span>
-                    <h4>👤 ${persona.name}</h4>
-                    <p>"${persona.quote}"</p>
-                    <div style="font-size: 0.75rem; color: var(--ink-muted); margin-bottom: 12px; font-style: italic;">
-                        Desktop: Drag this card to a zone on the right. <br>Mobile: Click a barrier category below.
-                    </div>
-                    <div class="mobile-sort-buttons">
-                        ${Object.entries(L1_BARRIERS).map(([key, info]) => `
-                            <button class="mobile-sort-btn" onclick="assignL1Persona('${key}')">
-                                <span>${info.icon}</span> <strong>${info.title}</strong>
-                            </button>
-                        `).join('')}
-                    </div>
+                    <h4 style="margin: 10px 0;">👤 ${persona.name}</h4>
+                    <p style="font-size: 1rem; line-height: 1.5; color: var(--ink); font-style: italic;">"${persona.quote}"</p>
                 </div>
             `;
-
-            // HTML5 Drag and Drop events
-            const card = document.getElementById('active-persona-card');
-            card.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', persona.barrier);
-                card.classList.add('dragging');
-            });
-            card.addEventListener('dragend', () => {
-                card.classList.remove('dragging');
-            });
         }
 
-        function renderLevel1Zones() {
-            const container = document.getElementById('l1-zones-container');
-            container.innerHTML = Object.entries(L1_BARRIERS).map(([key, info]) => `
-                <div class="zone-target" id="zone-${key}" data-barrier="${key}">
-                    <div>
-                        <h4>${info.icon} ${info.title}</h4>
-                        <p style="font-size: 0.75rem; color: var(--ink-muted); margin-top: 4px;">${info.desc}</p>
-                    </div>
-                    <span class="zone-badge" id="badge-${key}">Empty</span>
-                </div>
-            `).join('');
+        function renderL1Buttons() {
+            const adopterGroup = document.getElementById('l1-adopter-btn-group');
+            const barrierGroup = document.getElementById('l1-barrier-btn-group');
 
-            // Add drop listeners
-            Object.keys(L1_BARRIERS).forEach(key => {
-                const zone = document.getElementById(`zone-${key}`);
-                zone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    zone.classList.add('dragover');
-                });
-                zone.addEventListener('dragleave', () => {
-                    zone.classList.remove('dragover');
-                });
-                zone.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    zone.classList.remove('dragover');
-                    const expectedBarrier = e.dataTransfer.getData('text/plain');
-                    if (expectedBarrier === key) {
-                        handleL1MatchSuccess(key);
-                    } else {
-                        showToast(`❌ Incorrect match! That consumer's main friction is not a ${L1_BARRIERS[key].title}.`, 'warning');
-                    }
-                });
-            });
+            // Jumble buttons list for adopter categories
+            const categoryKeys = shuffleArray(Object.keys(L1_ADOPTER_CATEGORIES));
+            adopterGroup.innerHTML = categoryKeys.map(key => {
+                const info = L1_ADOPTER_CATEGORIES[key];
+                return `
+                    <button class="l1-btn" id="btn-adopter-${key}" onclick="selectL1Category('${key}')">
+                        <strong>${info.title}</strong> - <span style="font-size:0.78rem; opacity:0.85;">${info.desc}</span>
+                    </button>
+                `;
+            }).join('');
+
+            // Jumble buttons list for barriers
+            const barrierKeys = shuffleArray(Object.keys(L1_BARRIERS));
+            barrierGroup.innerHTML = barrierKeys.map(key => {
+                const info = L1_BARRIERS[key];
+                return `
+                    <button class="l1-btn" id="btn-barrier-${key}" onclick="selectL1Barrier('${key}')">
+                        <span>${info.icon}</span> <strong>${info.title}</strong>
+                    </button>
+                `;
+            }).join('');
         }
 
-        function assignL1Persona(barrierKey) {
-            const persona = L1_PERSONAS[l1CurrentIndex];
-            if (persona.barrier === barrierKey) {
-                handleL1MatchSuccess(barrierKey);
+        function selectL1Category(categoryKey) {
+            if (document.getElementById('btn-submit-l1-classification').style.display === 'none') return;
+            l1SelectedCategory = categoryKey;
+            
+            document.querySelectorAll('#l1-adopter-btn-group .l1-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-adopter-${categoryKey}`).classList.add('active');
+            
+            checkL1Submittable();
+        }
+
+        function selectL1Barrier(barrierKey) {
+            if (document.getElementById('btn-submit-l1-classification').style.display === 'none') return;
+            l1SelectedBarrier = barrierKey;
+
+            document.querySelectorAll('#l1-barrier-btn-group .l1-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-barrier-${barrierKey}`).classList.add('active');
+
+            checkL1Submittable();
+        }
+
+        function checkL1Submittable() {
+            const btn = document.getElementById('btn-submit-l1-classification');
+            btn.disabled = !(l1SelectedCategory && l1SelectedBarrier);
+        }
+
+        function submitL1Classification() {
+            const persona = l1ScrambledPersonas[l1CurrentIndex];
+            const feedbackPanel = document.getElementById('l1-classification-feedback');
+            
+            const categoryCorrect = (l1SelectedCategory === persona.correctCategory);
+            const barrierCorrect = (l1SelectedBarrier === persona.correctBarrier);
+
+            feedbackPanel.style.display = 'block';
+            feedbackPanel.className = 'feedback-box';
+
+            if (categoryCorrect && barrierCorrect) {
+                feedbackPanel.classList.add('correct');
+                feedbackPanel.innerHTML = `
+                    <h4 style="margin-bottom: 6px;">🎉 Correct Classification!</h4>
+                    <p style="margin-bottom: 8px;">${persona.feedback.category}</p>
+                    <p style="margin-bottom: 8px;">${persona.feedback.barrier}</p>
+                    <p><strong>Strategic Action:</strong> ${persona.feedback.strategy}</p>
+                `;
+                
+                document.getElementById('btn-submit-l1-classification').style.display = 'none';
+                document.getElementById('btn-next-l1-profile').style.display = 'inline-block';
+                showToast("🎉 Perfect match!", "success");
             } else {
-                showToast(`❌ Incorrect! Rajesh or Elena's concern does not match "${L1_BARRIERS[barrierKey].title}". Check their comment again.`, 'warning');
+                feedbackPanel.classList.add('wrong');
+                let mismatchText = "Not quite. Check your selections:<br>";
+                if (!categoryCorrect) {
+                    mismatchText += `• The adopter category <strong>${L1_ADOPTER_CATEGORIES[l1SelectedCategory].title}</strong> is incorrect for this user's profile.<br>`;
+                }
+                if (!barrierCorrect) {
+                    mismatchText += `• The barrier <strong>${L1_BARRIERS[l1SelectedBarrier].title}</strong> is incorrect for their specific quote.`;
+                }
+                feedbackPanel.innerHTML = `
+                    <h4 style="margin-bottom: 6px;">⚠️ Mismatched Characteristics</h4>
+                    <p style="font-size:0.88rem;">${mismatchText}</p>
+                    <p style="margin-top: 10px; font-weight:600; font-size:0.85rem; color:#b71c1c;">Read the quote closely and adjust your choices above to try again.</p>
+                `;
+                showToast("❌ Mismatch—please try again.", "warning");
             }
         }
 
-        function handleL1MatchSuccess(barrierKey) {
-            const zone = document.getElementById(`zone-${barrierKey}`);
-            const badge = document.getElementById(`badge-${barrierKey}`);
-
-            zone.classList.add('correct');
-            badge.textContent = 'Matched';
-
-            showToast(`🎉 Correct! Assigned to ${L1_BARRIERS[barrierKey].title}.`, 'success');
-
+        function nextL1Profile() {
             l1CurrentIndex++;
-            renderLevel1Profile();
+            document.getElementById('l1-classification-feedback').style.display = 'none';
+            
+            if (l1CurrentIndex < l1ScrambledPersonas.length) {
+                l1SelectedCategory = null;
+                l1SelectedBarrier = null;
+                document.getElementById('btn-submit-l1-classification').style.display = 'inline-block';
+                document.getElementById('btn-submit-l1-classification').disabled = true;
+                document.getElementById('btn-next-l1-profile').style.display = 'none';
+                
+                renderL1Profile();
+                renderL1Buttons();
+            } else {
+                // Show completion summary
+                document.getElementById('l1-main-card').style.display = 'none';
+                document.getElementById('l1-completion-box').style.display = 'block';
+                levelsCompleted[0] = true;
+                levelsUnlocked[1] = true;
+                updatePills();
+            }
         }
 
-        function completeLevel1() {
-            levelsCompleted[0] = true;
-            levelsUnlocked[1] = true;
-            updatePills();
-
-            showLearningModal(
-                "Level 1 Completed: Barriers Decoded",
-                "You successfully identified why consumers drop off before adopting new apps. Here is how digital managers resolve these major consumer frictions:",
-                [
-                    "Trust Barriers are solved by providing third-party verification symbols, clear security declarations, and transparent refund policies.",
-                    "Complexity Barriers are eliminated by streamlining user experience layouts, providing clear onboarding tutorials, and minimizing early actions.",
-                    "Cost Concerns are managed by offering freemium tiers, showing calculated ROI, or offering lower entry price trials.",
-                    "Privacy Concerns are mitigated by clarifying data minimization practices, providing flexible opt-in permissions, and robust security guarantees.",
-                    "Lack of Awareness is resolved through content marketing, educational landing pages, and targeted search ads showing tangible benefits."
-                ],
-                "Unlock Level 2: UX Lab",
-                () => {
-                    navigateToLevel(2);
-                }
-            );
-        }
-
-
-        /* ==================== LEVEL 2: USER EXPERIENCE LABORATORY ==================== */
+        /* ==================== LEVEL 2: INNOVATION ADOPTION LABORATORY ==================== */
         function initLevel2() {
-            updateUXLaboratory();
+            // Reset sliders to 50
+            document.getElementById('slider-advantage').value = 50;
+            document.getElementById('slider-compatibility').value = 50;
+            document.getElementById('slider-complexity').value = 50;
+            document.getElementById('slider-trialability').value = 50;
+            document.getElementById('slider-observability').value = 50;
+
+            document.getElementById('l2-main-card').style.display = 'block';
+            document.getElementById('l2-completion-box').style.display = 'none';
+            updateLabMetrics();
         }
 
-        function updateUXLaboratory() {
-            const simplicity = parseInt(document.getElementById('slider-simplicity').value);
-            const security = parseInt(document.getElementById('slider-security').value);
-            const price = parseInt(document.getElementById('slider-price').value);
-            const speed = parseInt(document.getElementById('slider-speed').value);
-            const personalization = parseInt(document.getElementById('slider-personalization').value);
+        function updateLabMetrics() {
+            const adv = parseInt(document.getElementById('slider-advantage').value);
+            const comp = parseInt(document.getElementById('slider-compatibility').value);
+            const cmplx = parseInt(document.getElementById('slider-complexity').value);
+            const trial = parseInt(document.getElementById('slider-trialability').value);
+            const obs = parseInt(document.getElementById('slider-observability').value);
 
-            // Update UI Labels
-            document.getElementById('val-simplicity').textContent = `${simplicity}%`;
-            document.getElementById('val-security').textContent = `${security}%`;
-            document.getElementById('val-price').textContent = `$${price}/mo`;
-            document.getElementById('val-speed').textContent = `${speed}%`;
-            document.getElementById('val-personalization').textContent = `${personalization}%`;
+            // Update UI value indicators
+            document.getElementById('val-advantage').textContent = `${adv}%`;
+            document.getElementById('val-compatibility').textContent = `${comp}%`;
+            document.getElementById('val-complexity').textContent = `${cmplx}%`;
+            document.getElementById('val-trialability').textContent = `${trial}%`;
+            document.getElementById('val-observability').textContent = `${obs}%`;
 
-            // Live Calculations
-            // Satisfaction = (Simplicity * 0.3) + (Security * 0.25) + (Speed * 0.25) + (Personalization * 0.20)
-            const satisfaction = Math.round(
-                (simplicity * 0.3) +
-                (security * 0.25) +
-                (speed * 0.25) +
-                (personalization * 0.2)
-            );
+            // Core Metrics Formula (Textbook conceptual factors mapped values)
+            const adoptionRate = Math.round(adv * 0.35 + comp * 0.25 + (100 - cmplx) * 0.20 + trial * 0.10 + obs * 0.10);
+            const interest = Math.round(adv * 0.40 + comp * 0.30 + obs * 0.30);
+            const risk = Math.round(cmplx * 0.40 + (100 - trial) * 0.30 + (100 - comp) * 0.30);
+            const easeOfAdoption = Math.round((100 - cmplx) * 0.50 + comp * 0.30 + trial * 0.20);
 
-            // Adoption Rate = (Simplicity * 0.25) + (Security * 0.20) + (Speed * 0.20) + ((100 - Price) * 0.25) + (Personalization * 0.10)
-            const adoptionRate = Math.round(
-                (simplicity * 0.25) +
-                (security * 0.20) +
-                (speed * 0.20) +
-                ((100 - price) * 0.25) +
-                (personalization * 0.10)
-            );
-
-            const downloads = Math.round(adoptionRate * 100);
-
-            // Update DOM Dashboard
+            // Update dashboard
             document.getElementById('lbl-adoption').textContent = `${adoptionRate}%`;
-            document.getElementById('lbl-satisfaction').textContent = `${satisfaction}%`;
-            document.getElementById('lbl-downloads').textContent = downloads.toLocaleString();
+            document.getElementById('lbl-ease').textContent = `${easeOfAdoption}%`;
+            document.getElementById('lbl-interest').textContent = `${interest}%`;
+            document.getElementById('lbl-risk').textContent = `${risk}%`;
 
-            // Check targets
-            const adoptionMet = adoptionRate > 80;
-            const satisfactionMet = satisfaction > 75;
+            // Target check
+            const adoptionMet = (adoptionRate >= 80);
+            const easeMet = (easeOfAdoption >= 75);
 
             const indAdoption = document.getElementById('ind-adoption');
-            const indSatisfaction = document.getElementById('ind-satisfaction');
+            const indEase = document.getElementById('ind-ease');
 
             if (adoptionMet) {
                 indAdoption.classList.add('met');
-                indAdoption.textContent = 'Target met! (>80%)';
+                indAdoption.textContent = 'Target met! (>=80%)';
             } else {
                 indAdoption.classList.remove('met');
-                indAdoption.textContent = 'Target: >80%';
+                indAdoption.textContent = 'Target: >=80%';
             }
 
-            if (satisfactionMet) {
-                indSatisfaction.classList.add('met');
-                indSatisfaction.textContent = 'Target met! (>75%)';
+            if (easeMet) {
+                indEase.classList.add('met');
+                indEase.textContent = 'Target met! (>=75%)';
             } else {
-                indSatisfaction.classList.remove('met');
-                indSatisfaction.textContent = 'Target: >75%';
+                indEase.classList.remove('met');
+                indEase.textContent = 'Target: >=75%';
             }
 
-            // Real-time Advisor Notes
+            // Conceptual Feedback updates
             const advisor = document.getElementById('lbl-advisor');
-            let advisorText = "📊 Current Launch Status: ";
-            if (price > 60) {
-                advisorText += "⚠️ Pricing is too high. Budget-conscious users are refusing to download. Try lowering the monthly subscription rate.";
-            } else if (simplicity < 50) {
-                advisorText += "⚠️ Interface layout is too complex. User satisfaction is low due to UI navigation friction. Increase Simplicity.";
-            } else if (security < 60) {
-                advisorText += "⚠️ Security standards are sub-par. Users are afraid of security threats and privacy leaks. Boost security.";
-            } else if (speed < 55) {
-                advisorText += "⚠️ High latency or lag reported. App performance is affecting satisfaction. Boost speed.";
-            } else if (adoptionMet && satisfactionMet) {
-                advisorText = "🟢 Excellent setup! Adoption and Satisfaction thresholds are balanced. Your app configuration is ready to launch.";
-            } else {
-                advisorText += "Parameters are stable but did not reach the threshold. Fine-tune your adjustments to balance value, price, and ease-of-use.";
-            }
-            advisor.textContent = advisorText;
+            let feedbackText = "";
 
-            // Enable or disable Submit Button
-            const submitBtn = document.getElementById('btn-submit-l2');
-            submitBtn.disabled = !(adoptionMet && satisfactionMet);
+            if (cmplx > 40) {
+                feedbackText = "⚠️ <strong>High Complexity Alert:</strong> The interface is perceived as difficult. Move the Complexity slider down to reduce user learning curves and increase Ease of Adoption.";
+            } else if (adv < 75) {
+                feedbackText = "⚠️ <strong>Low Relative Advantage:</strong> Customers do not see clear advantages over standard home controls. Increase the Relative Advantage slider to build value.";
+            } else if (comp < 70) {
+                feedbackText = "⚠️ <strong>Compatibility Barrier:</strong> The app does not fit naturally into households' habits. Boost Compatibility to align features with home routines.";
+            } else if (trial < 60) {
+                feedbackText = "⚠️ <strong>Risk Hesitation:</strong> Consumers feel locked in. Increase Trialability by adding a free-tier trial model so users can test configurations safely.";
+            } else if (obs < 50) {
+                feedbackText = "⚠️ <strong>Observability Friction:</strong> SmartLife results are invisible to peers. Boost Observability to trigger word-of-mouth diffusion.";
+            } else if (adoptionMet && easeMet) {
+                feedbackText = "🟢 <strong>Perfect Configuration:</strong> Sliders are beautifully balanced. Perceived attributes are optimized for mass consumer diffusion. Click 'Apply Configurations' below.";
+            } else {
+                feedbackText = "Configuration is stable but below targeted thresholds. Balance advantage, compatibility, and simplicity to boost rates.";
+            }
+
+            advisor.innerHTML = feedbackText;
+            document.getElementById('btn-submit-l2').disabled = !(adoptionMet && easeMet);
         }
 
-        function completeLevel2() {
+        function submitLevel2Config() {
             levelsCompleted[1] = true;
             levelsUnlocked[2] = true;
             updatePills();
 
-            showLearningModal(
-                "Level 2 Completed: Product Attributes Balanced",
-                "You configured a high-performing digital product. Rogers' perceived attributes of innovations directly explain how features affect consumer adoption:",
-                [
-                    "Relative Advantage: How much better the innovation is perceived to be than the option it replaces. Managed by adjusting Speed, Price, and Personalization.",
-                    "Compatibility: Consistency with existing values and needs. Addressed by aligning features with customer daily routines.",
-                    "Complexity: The degree to which an innovation is perceived as difficult to understand and use. Represented by the Simplicity slider.",
-                    "Trialability: The degree to which an innovation may be experimented with before adoption. Low price thresholds lower barriers to trial.",
-                    "Observability: The visibility of results of the innovation to other prospective consumers, accelerating viral metrics."
-                ],
-                "Unlock Level 3: Adoption Race",
-                () => {
-                    navigateToLevel(3);
-                }
-            );
+            // Extract configured slider values
+            const adv = parseInt(document.getElementById('slider-advantage').value);
+            const comp = parseInt(document.getElementById('slider-compatibility').value);
+            const cmplx = parseInt(document.getElementById('slider-complexity').value);
+            const trial = parseInt(document.getElementById('slider-trialability').value);
+            const obs = parseInt(document.getElementById('slider-observability').value);
+
+            // Re-calculate the metrics to display on the results dashboard
+            const adoptionRate = Math.round(adv * 0.35 + comp * 0.25 + (100 - cmplx) * 0.20 + trial * 0.10 + obs * 0.10);
+            const easeOfAdoption = Math.round((100 - cmplx) * 0.50 + comp * 0.30 + trial * 0.20);
+            const interest = Math.round(adv * 0.40 + comp * 0.30 + obs * 0.30);
+            const risk = Math.round(cmplx * 0.40 + (100 - trial) * 0.30 + (100 - comp) * 0.30);
+
+            document.getElementById('l2-result-metric-grid').innerHTML = `
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Adoption Rate</span>
+                    <strong style="font-size:1.3rem; color:${adoptionRate >= 80 ? 'var(--success)' : 'var(--danger)'};">${adoptionRate}%</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Ease of Adoption</span>
+                    <strong style="font-size:1.3rem; color:${easeOfAdoption >= 75 ? 'var(--success)' : 'var(--danger)'};">${easeOfAdoption}%</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Consumer Interest</span>
+                    <strong style="font-size:1.3rem; color:var(--red-primary);">${interest}%</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Perceived Risk</span>
+                    <strong style="font-size:1.3rem; color:${risk <= 50 ? 'var(--success)' : 'var(--danger)'};">${risk}%</strong>
+                </div>
+            `;
+
+            document.getElementById('l2-main-card').style.display = 'none';
+            document.getElementById('l2-completion-box').style.display = 'block';
         }
 
-
-        /* ==================== LEVEL 3: ADOPTION RACE ==================== */
-        const L3_GROUPS = [
-            { id: 'innovators', label: 'Innovators', pct: '2.5%', correctStrategy: 'strat-influencer', title: 'Influencer Campaign' },
-            { id: 'early-adopters', label: 'Early Adopters', pct: '13.5%', correctStrategy: 'strat-free-trial', title: 'Free Trial' },
-            { id: 'early-majority', label: 'Early Majority', pct: '34.0%', correctStrategy: 'strat-testimonials', title: 'Testimonials' },
-            { id: 'late-majority', label: 'Late Majority', pct: '34.0%', correctStrategy: 'strat-tutorials', title: 'Tutorials' },
-            { id: 'laggards', label: 'Laggards', pct: '16.0%', correctStrategy: 'strat-discounts', title: 'Discount Offers' }
+        /* ==================== LEVEL 3: CONSUMER ADOPTION STRATEGY SIMULATOR ==================== */
+        const L3_SCENARIOS = [
+            {
+                id: 's1',
+                title: "Elderly hesitant to adopt mobile banking",
+                desc: "An elderly population is hesitant to adopt mobile banking. They are highly comfortable with physical branch tellers and express anxiety about security and making transaction mistakes.",
+                choices: [
+                    {
+                        text: "Provide step-by-step onboarding tutorials and telephone help desk lines.",
+                        effect: { rate: 20, trust: 15, sat: 20, risk: -20 },
+                        feedback: "Excellent choice! Guided phone assistance and simple printed guides address both the Complexity and Lack of Trust barriers for the elderly."
+                    },
+                    {
+                        text: "Simplify the user interface (large text, fewer options).",
+                        effect: { rate: 15, trust: 10, sat: 15, risk: -15 },
+                        feedback: "Good strategy. Streamlining interface layouts directly reduces the Complexity barrier and increases accessibility."
+                    },
+                    {
+                        text: "Offer cash incentives and interest bonuses for online account creation.",
+                        effect: { rate: 10, trust: 5, sat: 5, risk: 5 },
+                        feedback: "Low effectiveness. Financial rewards do not resolve the primary barriers of Complexity and Perceived Risk for this cohort."
+                    },
+                    {
+                        text: "Terminate face-to-face teller lines to force app download.",
+                        effect: { rate: -15, trust: -25, sat: -30, risk: 25 },
+                        feedback: "Highly negative impact. Forcing traditionalists onto digital systems destroys brand trust and customer satisfaction."
+                    }
+                ]
+            },
+            {
+                id: 's2',
+                title: "Digital wallet security fears",
+                desc: "Potential customers avoid downloading a new digital wallet app because of recent security scare reports and fears of personal financial data exposure.",
+                choices: [
+                    {
+                        text: "Publish a third-party audit, clear privacy guarantees, and a fraud liability policy.",
+                        effect: { rate: 20, trust: 25, sat: 15, risk: -25 },
+                        feedback: "Superb. Publishing verified security assurances and limiting user liability directly mitigates Perceived Risk and builds Consumer Trust."
+                    },
+                    {
+                        text: "Deploy testimonials highlighting verified user transactions.",
+                        effect: { rate: 15, trust: 15, sat: 10, risk: -10 },
+                        feedback: "Positive move. Social proof from early adopters helps build trust and lower risk anxiety."
+                    },
+                    {
+                        text: "Provide a detailed demonstration video of how data is encrypted.",
+                        effect: { rate: 10, trust: 10, sat: 10, risk: -10 },
+                        feedback: "Moderate help. Useful for tech-savvy groups, but may be too complex for average users."
+                    },
+                    {
+                        text: "Launch aggressive pricing cashback campaigns for every transaction.",
+                        effect: { rate: 5, trust: -5, sat: 5, risk: 10 },
+                        feedback: "Ineffective. Price promotions do not address fundamental security anxieties and can trigger suspicious risk concerns."
+                    }
+                ]
+            },
+            {
+                id: 's3',
+                title: "Online learning platform skepticism",
+                desc: "Students are reluctant to adopt a new online learning platform because they find it boring, doubt its utility, and resist changing their studying habits.",
+                choices: [
+                    {
+                        text: "Partner with student influencers to share testimonials demonstrating academic grade improvements.",
+                        effect: { rate: 25, trust: 20, sat: 20, risk: -15 },
+                        feedback: "Excellent. Early adopter testimonials address the Lack of Awareness and help show the Relative Advantage of the platform."
+                    },
+                    {
+                        text: "Offer a 14-day free trial containing premium study materials.",
+                        effect: { rate: 20, trust: 10, sat: 15, risk: -10 },
+                        feedback: "Great. High trialability allows students to evaluate usefulness and advantage first-hand before committing."
+                    },
+                    {
+                        text: "Simplify the UI design and remove complex menu choices.",
+                        effect: { rate: 10, trust: 5, sat: 10, risk: -5 },
+                        feedback: "Minor help. Simplifying navigation helps, but the main issue is doubt about the tool's relative utility."
+                    },
+                    {
+                        text: "Provide a 100-page user manual explaining all system mechanics.",
+                        effect: { rate: -10, trust: 0, sat: -15, risk: 10 },
+                        feedback: "Ineffective. Massive documentation increases the Complexity barrier and drives users away."
+                    }
+                ]
+            },
+            {
+                id: 's4',
+                title: "Cloud accounting software resistance",
+                desc: "Small business owners resist switching from paper records to cloud accounting software due to fears of losing control over sensitive client files and high complexity.",
+                choices: [
+                    {
+                        text: "Provide live interactive demonstrations and one-on-one virtual setup support.",
+                        effect: { rate: 25, trust: 20, sat: 20, risk: -20 },
+                        feedback: "Perfect. Tailored demonstrations and setup assistance target both the Complexity and Resistance to Change barriers."
+                    },
+                    {
+                        text: "Offer a risk-free 30-day trial with local data backup support.",
+                        effect: { rate: 20, trust: 15, sat: 15, risk: -15 },
+                        feedback: "Excellent. Combining trialability with data security backup reassures owners about their file controls."
+                    },
+                    {
+                        text: "Reduce monthly subscription pricing by 25%.",
+                        effect: { rate: 10, trust: 5, sat: 10, risk: 0 },
+                        feedback: "Low effectiveness. The primary barrier is not Cost; owners are worried about complexity and safety."
+                    },
+                    {
+                        text: "Criticize manual accounting as slow and obsolete in campaigns.",
+                        effect: { rate: -10, trust: -15, sat: -10, risk: 15 },
+                        feedback: "Negative. Insulting legacy methods creates defensive resistance and damages initial trust."
+                    }
+                ]
+            },
+            {
+                id: 's5',
+                title: "AI healthcare application hesitation",
+                desc: "Patients hesitate to use an AI-powered healthcare diagnostics app because they feel insecure sharing personal symptom histories with an algorithm.",
+                choices: [
+                    {
+                        text: "Highlight data minimization, anonymized storage protocols, and local processing.",
+                        effect: { rate: 25, trust: 25, sat: 15, risk: -25 },
+                        feedback: "Superb. Reassuring patients about data privacy and minimization removes the primary Perceived Risk barrier."
+                    },
+                    {
+                        text: "Use testimonials from early adopters and verified doctors.",
+                        effect: { rate: 15, trust: 20, sat: 15, risk: -15 },
+                        feedback: "Excellent choice. Expert recommendations and positive peer feedback significantly raise Consumer Trust."
+                    },
+                    {
+                        text: "Offer a free trial diagnostics tier.",
+                        effect: { rate: 10, trust: 5, sat: 10, risk: -5 },
+                        feedback: "Moderate. Useful to demonstrate relative advantage, but privacy is still the main source of friction."
+                    },
+                    {
+                        text: "Simplify the app layout by removing diagnostic text.",
+                        effect: { rate: 5, trust: 0, sat: 5, risk: 0 },
+                        feedback: "Ineffective. Simplifying text layout does not address the underlying privacy and data sharing fears."
+                    }
+                ]
+            }
         ];
 
-        const L3_STRATEGIES = [
-            { id: 'strat-influencer', icon: '📢', label: 'Influencer Campaign', desc: 'Engage tech reviewers and early trendsetters.' },
-            { id: 'strat-free-trial', icon: '🆓', label: 'Free Trial Option', desc: 'Hands-on testing of premium features with zero risk.' },
-            { id: 'strat-testimonials', icon: '💬', label: 'Testimonials & Reviews', desc: 'Verified user reviews highlighting benefits.' },
-            { id: 'strat-tutorials', icon: '📚', label: 'Interactive Tutorials', desc: 'Step-by-step guides to reduce complexity.' },
-            { id: 'strat-discounts', icon: '🏷️', label: 'Discount Offers', desc: 'Provide localized discounts for price-sensitive groups.' },
-            { id: 'strat-support', icon: '🤝', label: 'Customer Support', desc: 'Dedicate a support desk for immediate troubleshooting.' }
-        ];
+        let l3CurrentIndex = 0;
+        let l3Adoption = 50;
+        let l3Trust = 50;
+        let l3Satisfaction = 50;
+        let l3Risk = 50;
+        
+        let l3SelectedOptionIndex = null;
+        let l3ConfirmedOptionIndex = null; // Stores index for rollback adjustments
+        let l3Scenarios = []; // Holds cloned structures with jumbled options
 
-        let l3Placements = {}; // Key: groupId, Value: strategyId
-        let l3Progress = {};   // Key: groupId, Value: progressValue (0-100)
-        let l3SelectedStrategy = null;
-        let l3TickInterval = null;
+        function shuffleArray(array) {
+            let cur = [...array];
+            for (let i = cur.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cur[i], cur[j]] = [cur[j], cur[i]];
+            }
+            return cur;
+        }
 
         function initLevel3() {
-            l3Placements = {
-                innovators: null,
-                'early-adopters': null,
-                'early-majority': null,
-                'late-majority': null,
-                'laggards': null
-            };
+            l3CurrentIndex = 0;
+            l3Adoption = 50;
+            l3Trust = 50;
+            l3Satisfaction = 50;
+            l3Risk = 50;
 
-            l3Progress = {
-                innovators: 0,
-                'early-adopters': 0,
-                'early-majority': 0,
-                'late-majority': 0,
-                'laggards': 0
-            };
-
-            l3SelectedStrategy = null;
-
-            // Reset progress bars and status elements
-            L3_GROUPS.forEach(g => {
-                const pb = document.getElementById(`pb-${g.id}`);
-                if (pb) pb.style.width = '0%';
-                const status = document.getElementById(`status-${g.id}`);
-                if (status) status.textContent = '⚪';
-                const lane = document.getElementById(`lane-${g.id}`);
-                if (lane) lane.className = 'race-lane';
+            // Generate scrambled scenarios
+            l3Scenarios = L3_SCENARIOS.map(sc => {
+                return {
+                    ...sc,
+                    shuffledChoices: shuffleArray(sc.choices)
+                };
             });
 
-            renderL3Strategies();
-            updateL3LanesUI();
+            document.getElementById('l3-main-card').style.display = 'block';
+            document.getElementById('l3-completion-box').style.display = 'none';
+            document.getElementById('btn-submit-decision').style.display = 'inline-block';
+            document.getElementById('btn-submit-decision').disabled = true;
+            document.getElementById('btn-next-scenario').style.display = 'none';
+            document.getElementById('l3-decision-feedback').style.display = 'none';
 
-            document.getElementById('l3-feedback-box').innerHTML =
-                `Select a campaign card below first (it will be highlighted), then click on a lifecycle group's <strong>Deploy Campaign</strong> slot above to assign it.`;
-
-            // Reset submit button
-            const confirmBtn = document.getElementById('btn-submit-l3');
-            if (confirmBtn) confirmBtn.disabled = true;
-
-            // Start loop
-            if (l3TickInterval) clearInterval(l3TickInterval);
-            l3TickInterval = setInterval(tickL3Progress, 50);
+            updateL3Dashboard();
+            renderL3Scenario();
         }
 
-        function renderL3Strategies() {
-            const container = document.getElementById('l3-strategies-container');
-            if (!container) return;
+        function updateL3Dashboard() {
+            // Clamp metrics
+            l3Adoption = Math.max(0, Math.min(100, l3Adoption));
+            l3Trust = Math.max(0, Math.min(100, l3Trust));
+            l3Satisfaction = Math.max(0, Math.min(100, l3Satisfaction));
+            l3Risk = Math.max(0, Math.min(100, l3Risk));
 
-            container.innerHTML = L3_STRATEGIES.map(strat => {
-                const isPlaced = Object.values(l3Placements).includes(strat.id);
-                const isSelected = l3SelectedStrategy === strat.id;
-                return `
-                    <div class="strategy-card ${isPlaced ? 'placed' : ''} ${isSelected ? 'selected' : ''}" 
-                         id="${strat.id}" 
-                         onclick="selectL3Strategy('${strat.id}')">
-                        <span class="strategy-icon">${strat.icon}</span>
-                        <h5>${strat.label}</h5>
-                        <p>${strat.desc}</p>
-                        ${isPlaced ? `<div style="font-size: 0.65rem; color: var(--success); font-weight: 700; margin-top: 4px;">Deployed</div>` : ''}
-                    </div>
+            document.getElementById('l3-val-adoption').textContent = `${l3Adoption}%`;
+            document.getElementById('l3-bar-adoption').style.width = `${l3Adoption}%`;
+
+            document.getElementById('l3-val-trust').textContent = `${l3Trust}%`;
+            document.getElementById('l3-bar-trust').style.width = `${l3Trust}%`;
+
+            document.getElementById('l3-val-satisfaction').textContent = `${l3Satisfaction}%`;
+            document.getElementById('l3-bar-satisfaction').style.width = `${l3Satisfaction}%`;
+
+            document.getElementById('l3-val-risk').textContent = `${l3Risk}%`;
+            document.getElementById('l3-bar-risk').style.width = `${l3Risk}%`;
+        }
+
+        function renderL3Scenario() {
+            const scenario = l3Scenarios[l3CurrentIndex];
+            document.getElementById('l3-scenario-number').textContent = `Scenario ${l3CurrentIndex + 1} of 5`;
+            document.getElementById('l3-scenario-text').textContent = scenario.desc;
+
+            const list = document.getElementById('l3-options-list');
+            list.innerHTML = '';
+            l3SelectedOptionIndex = null;
+            l3ConfirmedOptionIndex = null;
+
+            scenario.shuffledChoices.forEach((choice, idx) => {
+                const card = document.createElement('div');
+                card.className = 'l3-option-card';
+                const letter = String.fromCharCode(65 + idx); // A, B, C, D
+                card.innerHTML = `
+                    <div class="l3-option-radio"></div>
+                    <span style="font-size:0.92rem; text-align:left;"><strong>Option ${letter}:</strong> ${choice.text}</span>
                 `;
-            }).join('');
+
+                card.addEventListener('click', () => {
+                    if (l3SelectedOptionIndex === idx) return;
+
+                    // Answer alteration rollback logic
+                    if (l3ConfirmedOptionIndex !== null) {
+                        const prevChoice = scenario.shuffledChoices[l3ConfirmedOptionIndex];
+                        l3Adoption -= prevChoice.effect.rate;
+                        l3Trust -= prevChoice.effect.trust;
+                        l3Satisfaction -= prevChoice.effect.sat;
+                        l3Risk -= prevChoice.effect.risk;
+                        
+                        l3ConfirmedOptionIndex = null;
+                        
+                        document.getElementById('btn-submit-decision').style.display = 'inline-block';
+                        document.getElementById('btn-submit-decision').disabled = false;
+                        document.getElementById('btn-next-scenario').style.display = 'none';
+                        document.getElementById('l3-decision-feedback').style.display = 'none';
+                        
+                        updateL3Dashboard();
+                    }
+
+                    document.querySelectorAll('.l3-option-card').forEach(el => el.classList.remove('selected'));
+                    card.classList.add('selected');
+                    l3SelectedOptionIndex = idx;
+                    document.getElementById('btn-submit-decision').disabled = false;
+                });
+
+                list.appendChild(card);
+            });
         }
 
-        function selectL3Strategy(stratId) {
-            // Toggle selection
-            if (l3SelectedStrategy === stratId) {
-                l3SelectedStrategy = null;
-                showToast("Deselected strategy.", "warning");
+        function submitL3Decision() {
+            if (l3SelectedOptionIndex === null) return;
+            const scenario = l3Scenarios[l3CurrentIndex];
+            const choice = scenario.shuffledChoices[l3SelectedOptionIndex];
+
+            // Apply offsets
+            l3Adoption += choice.effect.rate;
+            l3Trust += choice.effect.trust;
+            l3Satisfaction += choice.effect.sat;
+            l3Risk += choice.effect.risk;
+
+            l3ConfirmedOptionIndex = l3SelectedOptionIndex;
+            updateL3Dashboard();
+
+            // Display Feedback Box
+            const feedback = document.getElementById('l3-decision-feedback');
+            feedback.style.display = 'block';
+            feedback.className = 'feedback-box';
+
+            const sumEffects = choice.effect.rate + choice.effect.trust + choice.effect.sat - choice.effect.risk;
+            if (sumEffects >= 20) {
+                feedback.classList.add('correct');
+            } else if (sumEffects < 0) {
+                feedback.classList.add('wrong');
             } else {
-                l3SelectedStrategy = stratId;
-                const strat = L3_STRATEGIES.find(s => s.id === stratId);
-                showToast(`Selected "${strat.label}". Now click a "Deploy Campaign" slot on any group lane.`, "success");
-            }
-            renderL3Strategies();
-        }
-
-        function assignL3StrategyToLane(groupId) {
-            const currentAssigned = l3Placements[groupId];
-
-            if (l3SelectedStrategy) {
-                // Check if this strategy is already placed in another lane, and clear it there if so (1-to-1 matching constraint)
-                for (let gid in l3Placements) {
-                    if (l3Placements[gid] === l3SelectedStrategy) {
-                        l3Placements[gid] = null;
-                        l3Progress[gid] = 0; // Reset progress of previous lane
-                        const pb = document.getElementById(`pb-${gid}`);
-                        if (pb) pb.style.width = '0%';
-                    }
-                }
-
-                // Place it
-                l3Placements[groupId] = l3SelectedStrategy;
-                const strat = L3_STRATEGIES.find(s => s.id === l3SelectedStrategy);
-                showToast(`Deployed ${strat.label} to ${groupId.toUpperCase()} lane.`, "success");
-
-                l3SelectedStrategy = null;
-                renderL3Strategies();
-                updateL3LanesUI();
-            } else {
-                // If clicked a slot and no strategy is selected:
-                if (currentAssigned) {
-                    l3Placements[groupId] = null;
-                    l3Progress[groupId] = 0; // Reset progress
-                    const pb = document.getElementById(`pb-${groupId}`);
-                    if (pb) pb.style.width = '0%';
-
-                    showToast(`Cleared campaign from ${groupId.toUpperCase()} lane.`, "warning");
-                    updateL3LanesUI();
-                    renderL3Strategies();
-                } else {
-                    showToast("Select a campaign card below first, then click here to deploy it!", "warning");
-                }
-            }
-        }
-
-        function updateL3LanesUI() {
-            L3_GROUPS.forEach(group => {
-                const slot = document.getElementById(`slot-${group.id}`);
-                if (slot) {
-                    const assignedId = l3Placements[group.id];
-                    if (assignedId) {
-                        const strat = L3_STRATEGIES.find(s => s.id === assignedId);
-                        slot.innerHTML = `
-                            <div class="assigned-badge">
-                                <strong>${strat.icon} ${strat.label}</strong>
-                                <span class="slot-clear-hint">(Click to clear)</span>
-                            </div>
-                        `;
-                        slot.classList.add('filled');
-                    } else {
-                        slot.innerHTML = `<span class="slot-placeholder">Deploy Campaign</span>`;
-                        slot.classList.remove('filled');
-                    }
-                }
-            });
-        }
-
-        function tickL3Progress() {
-            L3_GROUPS.forEach(group => {
-                const assigned = l3Placements[group.id];
-                const pb = document.getElementById(`pb-${group.id}`);
-                const status = document.getElementById(`status-${group.id}`);
-                const lane = document.getElementById(`lane-${group.id}`);
-
-                let targetVal = 0;
-                let step = 0;
-
-                if (!assigned) {
-                    targetVal = 0;
-                    status.textContent = '⚪';
-                } else if (assigned === group.correctStrategy) {
-                    targetVal = 100;
-                    step = 2.5; // Fast acceleration
-                    status.textContent = '✅';
-                } else {
-                    targetVal = 15; // Stuck at 15% adoption rate
-                    step = 0.5;
-                    status.textContent = '⚠️';
-                }
-
-                let currentVal = l3Progress[group.id];
-                if (currentVal < targetVal) {
-                    currentVal = Math.min(targetVal, currentVal + step);
-                    l3Progress[group.id] = currentVal;
-                    if (pb) pb.style.width = `${currentVal}%`;
-                } else if (currentVal > targetVal) {
-                    currentVal = Math.max(targetVal, currentVal - 5.0);
-                    l3Progress[group.id] = currentVal;
-                    if (pb) pb.style.width = `${currentVal}%`;
-                }
-
-                // UI visual classes
-                if (lane) {
-                    lane.classList.remove('active', 'stalled', 'success-lane');
-                    if (!assigned) {
-                        // normal default
-                    } else if (assigned === group.correctStrategy) {
-                        if (currentVal >= 100) {
-                            lane.classList.add('success-lane');
-                        } else {
-                            lane.classList.add('active');
-                        }
-                    } else {
-                        lane.classList.add('stalled');
-                    }
-                }
-            });
-
-            // Update explanation feedback if stalling exists
-            let feedbackHTML = "";
-            let errors = [];
-            let solvedCount = 0;
-
-            L3_GROUPS.forEach(group => {
-                const assigned = l3Placements[group.id];
-                if (assigned) {
-                    if (assigned === group.correctStrategy) {
-                        if (l3Progress[group.id] >= 100) {
-                            solvedCount++;
-                        }
-                    } else {
-                        errors.push(group);
-                    }
-                }
-            });
-
-            if (errors.length > 0) {
-                const firstErr = errors[0];
-                const assignedId = l3Placements[firstErr.id];
-                const strat = L3_STRATEGIES.find(s => s.id === assignedId);
-
-                let explanation = "";
-                if (firstErr.id === 'innovators') {
-                    explanation = "Innovators are driven by pure tech reviews and cutting-edge features. Testimonials or discounts are ineffective.";
-                } else if (firstErr.id === 'early-adopters') {
-                    explanation = "Early Adopters want to validate product utility first-hand. They need free hands-on trials to get convinced.";
-                } else if (firstErr.id === 'early-majority') {
-                    explanation = "Early Majority pragmatists avoid risk and seek peer evidence. Testimonials and reviews build their trust.";
-                } else if (firstErr.id === 'late-majority') {
-                    explanation = "Late Majority are highly skeptical and adopt only when standard is proven. Simplified walkthrough tutorials ease their doubts.";
-                } else if (firstErr.id === 'laggards') {
-                    explanation = "Laggards resist any digital tools. They only join due to unavoidable incentives or heavy discounts.";
-                }
-
-                feedbackHTML = `<span style="color: var(--danger); font-weight:700;">⚠️ Stalled Diffusion:</span> Ineffective strategy for <strong>${firstErr.label}</strong>. ${explanation}`;
-            } else if (solvedCount === L3_GROUPS.length) {
-                feedbackHTML = `<span style="color: var(--success); font-weight:700;">🟢 Perfect Deployment!</span> All adopter categories have reached 100% adoption. Click 'Confirm Strategy Deployment' below to proceed.`;
-            } else {
-                feedbackHTML = `Deploy correct campaigns to all groups. Currently <strong>${solvedCount} / 5</strong> groups fully adopted.`;
+                feedback.classList.add('show');
             }
 
-            const feedbackBox = document.getElementById('l3-feedback-box');
-            if (feedbackBox) feedbackBox.innerHTML = feedbackHTML;
-
-            // Enable submit button when all are complete
-            const submitBtn = document.getElementById('btn-submit-l3');
-            if (submitBtn) {
-                submitBtn.disabled = !(solvedCount === L3_GROUPS.length);
-            }
-        }
-
-        function completeLevel3() {
-            if (l3TickInterval) clearInterval(l3TickInterval);
-            levelsCompleted[2] = true;
-            levelsUnlocked[3] = true;
-            updatePills();
-
-            showLearningModal(
-                "Level 3 Completed: Lifecycle Decoded",
-                "You successfully crossed the chasm! In Digital Transformation, products must be supported by different campaigns at different phases of the lifecycle:",
-                [
-                    "Innovators: Technology enthusiasts. Driven by novelty and technical parameters. Reached via direct reviews and influencer previews.",
-                    "Early Adopters: Visionaries who identify utility and product advantage. Convinced by low-risk Free Trials.",
-                    "Early Majority: Pragmatists who avoid risk. They wait for peer reviews. Convinced by reviews, case studies, and social testimonials.",
-                    "Late Majority: Skeptics who adopt only when it becomes a standard. Reached by simple tutorials, customer support, and user assurances.",
-                    "Laggards: Traditionalists suspicious of digital tools. Adopt only when forced or when price drops to rock-bottom levels."
-                ],
-                "Unlock Level 4: Customer Journey Builder",
-                () => {
-                    navigateToLevel(4);
-                }
-            );
-        }
-
-
-        /* ==================== LEVEL 4: CUSTOMER JOURNEY BUILDER ==================== */
-        const L4_STAGES = [
-            { id: 'awareness', title: 'Awareness', subtitle: 'Discovers App existence', correctAction: 'act-ads' },
-            { id: 'interest', title: 'Interest', subtitle: 'Learns how it works', correctAction: 'act-demo' },
-            { id: 'trial', title: 'Trial', subtitle: 'First-hand testing', correctAction: 'act-trial' },
-            { id: 'adoption', title: 'Adoption', subtitle: 'Integrates into lifestyle', correctAction: 'act-onboard' },
-            { id: 'retention', title: 'Retention', subtitle: 'Continues using application', correctAction: 'act-support' },
-            { id: 'loyalty', title: 'Loyalty', subtitle: 'Advocates to colleagues', correctAction: 'act-rewards' }
-        ];
-
-        const L4_ACTIONS = [
-            { id: 'act-ads', label: 'Social Media Advertisements', desc: 'Promote visibility in user feeds.' },
-            { id: 'act-demo', label: 'Product Demonstrations', desc: 'Interactive step guides explaining features.' },
-            { id: 'act-trial', label: 'Free Trial Offer', desc: 'Remove price barrier for testing.' },
-            { id: 'act-onboard', label: 'User Onboarding Flows', desc: 'Simplify first-run interface steps.' },
-            { id: 'act-support', label: 'Dedicated Customer Support', desc: 'Prompt solutions to initial bugs.' },
-            { id: 'act-rewards', label: 'Loyalty Referral Rewards', desc: 'Encourage users to share with friends.' }
-        ];
-
-        let l4Placements = {}; // Key: stageId, Value: actionId
-
-        function initLevel4() {
-            l4Placements = {};
-            renderLevel4Pool();
-            renderLevel4Board();
-        }
-
-        function renderLevel4Pool() {
-            const container = document.getElementById('l4-actions-pool');
-            container.innerHTML = '';
-
-            L4_ACTIONS.forEach(act => {
-                // If action is already placed in a column, don't show in pool
-                const isPlaced = Object.values(l4Placements).includes(act.id);
-                if (!isPlaced) {
-                    const card = document.createElement('div');
-                    card.className = 'journey-card';
-                    card.id = act.id;
-                    card.draggable = true;
-                    card.textContent = act.label;
-
-                    // Click selection for touch screens
-                    card.addEventListener('click', () => {
-                        document.querySelectorAll('.journey-card').forEach(c => c.classList.remove('selected'));
-                        card.classList.add('selected');
-                        showToast(`Selected "${act.label}". Now click a Stage column slot below to assign.`, 'success');
-                    });
-
-                    card.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', act.id);
-                    });
-
-                    container.appendChild(card);
-                }
-            });
-
-            if (container.children.length === 0) {
-                container.innerHTML = `<p style="font-size: 0.85rem; color: var(--success); font-weight: 600;">All actions have been placed on the journey board. Press Verify below!</p>`;
-            }
-        }
-
-        function renderLevel4Board() {
-            const container = document.getElementById('journey-board-container');
-            container.innerHTML = L4_STAGES.map(stage => {
-                const placedActionId = l4Placements[stage.id];
-                const action = L4_ACTIONS.find(a => a.id === placedActionId);
-                const isCorrect = levelsCompleted[3]; // if already completed the level
-
-                return `
-                    <div class="journey-column ${isCorrect ? 'correct' : ''}" id="col-${stage.id}" data-stage="${stage.id}">
-                        <h4>${stage.title}</h4>
-                        <span class="stage-subtitle">${stage.subtitle}</span>
-                        <div class="journey-dropzone" id="dz-${stage.id}">
-                            ${action ? `
-                                <div class="journey-card" style="width: 100%; text-align: center;" onclick="returnActionToPool('${stage.id}')">
-                                    ${action.label}
-                                    <div style="font-size: 0.65rem; color: var(--red-primary); margin-top: 4px; font-weight: normal;">(Click to remove)</div>
-                                </div>
-                            ` : `<span style="font-size: 0.72rem; color: #999;">Empty Slot</span>`}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Add drag events
-            L4_STAGES.forEach(stage => {
-                const col = document.getElementById(`col-${stage.id}`);
-
-                col.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    col.classList.add('dragover');
-                });
-
-                col.addEventListener('dragleave', () => {
-                    col.classList.remove('dragover');
-                });
-
-                col.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    col.classList.remove('dragover');
-                    const actionId = e.dataTransfer.getData('text/plain');
-                    if (actionId) {
-                        assignL4Action(stage.id, actionId);
-                    }
-                });
-
-                // Mobile/Click assignment
-                col.addEventListener('click', () => {
-                    const selected = document.querySelector('.journey-card.selected');
-                    if (selected) {
-                        const actionId = selected.id;
-                        assignL4Action(stage.id, actionId);
-                        selected.classList.remove('selected');
-                    }
-                });
-            });
-        }
-
-        function assignL4Action(stageId, actionId) {
-            // Remove previous placement of this action if it was somewhere else
-            for (let stg in l4Placements) {
-                if (l4Placements[stg] === actionId) {
-                    delete l4Placements[stg];
-                }
-            }
-
-            // Assign
-            l4Placements[stageId] = actionId;
-            renderLevel4Pool();
-            renderLevel4Board();
-            showToast(`Placed card in ${stageId.toUpperCase()} slot.`, 'success');
-        }
-
-        function returnActionToPool(stageId) {
-            delete l4Placements[stageId];
-            renderLevel4Pool();
-            renderLevel4Board();
-            showToast(`Removed card from ${stageId.toUpperCase()} slot.`, 'warning');
-        }
-
-        function verifyCustomerJourney() {
-            let allCorrect = true;
-            let missing = false;
-
-            L4_STAGES.forEach(stage => {
-                const placed = l4Placements[stage.id];
-                if (!placed) {
-                    missing = true;
-                } else if (placed !== stage.correctAction) {
-                    allCorrect = false;
-                }
-            });
-
-            if (missing) {
-                showToast("⚠️ Journey incomplete! Drag/place all marketing actions into the correct columns.", "warning");
-                return;
-            }
-
-            if (!allCorrect) {
-                showToast("❌ Incorrect alignment! Some marketing tactics are in the wrong stage of the consumer adoption journey.", "warning");
-                // Highlight incorrect ones
-                L4_STAGES.forEach(stage => {
-                    const col = document.getElementById(`col-${stage.id}`);
-                    if (l4Placements[stage.id] !== stage.correctAction) {
-                        col.style.borderColor = 'var(--danger)';
-                        col.style.background = 'var(--danger-bg)';
-                        setTimeout(() => {
-                            col.style.borderColor = '';
-                            col.style.background = '';
-                        }, 2500);
-                    }
-                });
-            } else {
-                completeLevel4();
-            }
-        }
-
-        function completeLevel4() {
-            levelsCompleted[3] = true;
-            levelsUnlocked[4] = true;
-            updatePills();
-            renderLevel4Board(); // update styling with green border
-
-            showLearningModal(
-                "Level 4 Completed: Journey Verified",
-                "You successfully mapped the consumer adoption path. Guiding consumers sequentially through these levels secures high-quality customer relationships:",
-                [
-                    "Awareness: Customers learn about the app. Reached via social advertisements.",
-                    "Interest: Customers evaluate the product concept. Stimulated by explainer product demos.",
-                    "Trial: First hands-on test. Assisted by risk-free free trial periods.",
-                    "Adoption: App becomes part of their regular lifestyle. Facilitated by smooth onboarding flows.",
-                    "Retention: Ensuring users remain engaged long-term. Maintained through dedicated customer support.",
-                    "Loyalty: Customers advocate for the brand. Driven by referral perks and loyalty rewards."
-                ],
-                "Unlock Level 5: Viral Growth Simulator",
-                () => {
-                    navigateToLevel(5);
-                }
-            );
-        }
-
-
-        /* ==================== LEVEL 5: VIRAL GROWTH SIMULATOR ==================== */
-        let simDay = 1;
-        let simUsers = 500;
-        let simSatisfaction = 50;
-        let simTrust = 50;
-        let simAdoptionRate = 5;
-        let simActive = false;
-        let simInterval = null;
-
-        const SIM_EVENTS = {
-            5: {
-                title: "⚠️ Competitor Clone Launches",
-                desc: "A rival product company launches 'LifeSync', offering similar automation features at a cheaper subscription fee.",
-                choices: [
-                    {
-                        text: "Option A: Match their low pricing scheme to secure market share.",
-                        effect: { rate: 12, sat: 10, trust: 5 },
-                        feedback: "Pricing matched. High downloads, but margins are highly squeezed."
-                    },
-                    {
-                        text: "Option B: Highlight SmartLife's superior customization tools.",
-                        effect: { rate: 5, sat: 18, trust: 15 },
-                        feedback: "Premium personalization pitch successfully defended your brand."
-                    },
-                    {
-                        text: "Option C: Ignore competitor and launch more marketing campaigns.",
-                        effect: { rate: -10, sat: -5, trust: 0 },
-                        feedback: "Loss of market share. Price-sensitive users migrated to the rival clone."
-                    }
-                ]
-            },
-            10: {
-                title: "🔒 Security & Location Concerns",
-                desc: "A prominent tech security blog reports that SmartLife requests excessive locations permissions.",
-                choices: [
-                    {
-                        text: "Option A: Publish a privacy report and introduce location opt-out options.",
-                        effect: { rate: 5, sat: 15, trust: 25 },
-                        feedback: "Transparency report validated consumer concerns. Trust levels rose sharply."
-                    },
-                    {
-                        text: "Option B: Declare standard practice and dismiss the tech bloggers.",
-                        effect: { rate: -12, sat: -10, trust: -20 },
-                        feedback: "Consumers felt ignored. Skepticism and churn increased."
-                    },
-                    {
-                        text: "Option C: Hide permission settings under dark patterns.",
-                        effect: { rate: -5, sat: -15, trust: -35 },
-                        feedback: "Severe backlash when power-users detected the dark patterns. Trust crashed."
-                    }
-                ]
-            },
-            15: {
-                title: "📢 Viral Influencer Endorsement",
-                desc: "A tech YouTuber with 3 million followers creates a video praises SmartLife for saving their electricity bill.",
-                choices: [
-                    {
-                        text: "Option A: Launch targeted search ads to capture the search traffic.",
-                        effect: { rate: 25, sat: 0, trust: 10 },
-                        feedback: "Viral surge converted! Downloads and adoption grew dramatically."
-                    },
-                    {
-                        text: "Option B: Offer a limited-time 14-day free trial on your landing page.",
-                        effect: { rate: 20, sat: 15, trust: 0 },
-                        feedback: "A flood of trial users downloaded the app, boosting adoption."
-                    },
-                    {
-                        text: "Option C: Do nothing and let the video traffic flow organically.",
-                        effect: { rate: 5, sat: 0, trust: 0 },
-                        feedback: "Missed marketing opportunity. Traffic slowly decayed."
-                    }
-                ]
-            },
-            20: {
-                title: "⚙️ User Friction & Onboarding Lag",
-                desc: "Feedback logs show users are deleting the app on day one, citing complex automation rule setups.",
-                choices: [
-                    {
-                        text: "Option A: Launch simplified setup templates and step-by-step UI guides.",
-                        effect: { rate: 15, sat: 20, trust: 0 },
-                        feedback: "Cognitive complexity reduced. Onboarding drop-off declined."
-                    },
-                    {
-                        text: "Option B: Integrate 24/7 live-chat support inside the application.",
-                        effect: { rate: 5, sat: 15, trust: 10 },
-                        feedback: "Support resolved setup concerns, though onboarding is still sluggish."
-                    },
-                    {
-                        text: "Option C: Offer price discounts instead of simplifying software UI.",
-                        effect: { rate: 5, sat: -5, trust: 0 },
-                        feedback: "Discounts didn't help users understand how to configure the complex dashboard."
-                    }
-                ]
-            },
-            25: {
-                title: "💻 Web Version Requests",
-                desc: "Early Majority users request a synchronized desktop version for office automation control.",
-                choices: [
-                    {
-                        text: "Option A: Fast-track a clean browser web app client.",
-                        effect: { rate: 18, sat: 18, trust: 5 },
-                        feedback: "Cross-platform accessibility unlocked. High satisfaction and user expansion."
-                    },
-                    {
-                        text: "Option B: Focus exclusively on optimizing iOS & Android app performance.",
-                        effect: { rate: 0, sat: 5, trust: 0 },
-                        feedback: "Mobile app stability improved, but desktop users remain unsatisfied."
-                    }
-                ]
-            },
-            28: {
-                title: "💰 Subscription Price Decision",
-                desc: "Your finance managers recommend raising subscription fees to improve servers infrastructure.",
-                choices: [
-                    {
-                        text: "Option A: Introduce grandfathered plans for existing users and raise fees for new signups.",
-                        effect: { rate: -5, sat: 5, trust: 10 },
-                        feedback: "Protected current customers while capturing margins from new subscribers."
-                    },
-                    {
-                        text: "Option B: Apply immediate pricing hike to all active subscribers.",
-                        effect: { rate: -20, sat: -15, trust: -15 },
-                        feedback: "Massive subscriber churn. Users felt cheated by the sudden rate hike."
-                    },
-                    {
-                        text: "Option C: Retain pricing same and introduce a premium tier for smart meters integration.",
-                        effect: { rate: 10, sat: 15, trust: 10 },
-                        feedback: "Fair tier structuring. Power users happily opted for the smart meters features."
-                    }
-                ]
-            }
-        };
-
-        function initLevel5() {
-            simDay = 1;
-            simUsers = 500;
-            simSatisfaction = 50;
-            simTrust = 50;
-            simAdoptionRate = 5;
-            simActive = false;
-            clearInterval(simInterval);
-
-            // Update UI
-            updateSimDashboard();
-            renderCityMap();
-            resetEventPanel();
-        }
-
-        function resetEventPanel() {
-            document.getElementById('sim-engine-controls').style.display = 'block';
-            document.getElementById('btn-start-sim').disabled = false;
-
-            document.getElementById('event-narrative-container').innerHTML = `
-                <h4>📊 Status: Ready to Launch</h4>
-                <p>Click the button below to start the 30-day simulation. Every choice you make impacts adoption rate, trust levels, and customer satisfaction.</p>
-            `;
-            document.getElementById('event-options-container').innerHTML = '';
-        }
-
-        function renderCityMap() {
-            const container = document.getElementById('city-map-container');
-            container.innerHTML = '';
-
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.setAttribute("viewBox", "0 0 100 100");
-
-            // We render a 10x10 grid. Total 100 squares. Each square represents 100 users.
-            // Active users count: simUsers. Active squares to color green: Math.floor(simUsers / 100).
-            const greenSquaresCount = Math.min(100, Math.floor(simUsers / 100));
-
-            for (let y = 0; y < 10; y++) {
-                for (let x = 0; x < 10; x++) {
-                    const idx = y * 10 + x;
-                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    rect.setAttribute("x", x * 10 + 1);
-                    rect.setAttribute("y", y * 10 + 1);
-                    rect.setAttribute("width", 8);
-                    rect.setAttribute("height", 8);
-                    rect.setAttribute("class", "map-grid-rect");
-
-                    if (idx < greenSquaresCount) {
-                        rect.setAttribute("fill", "#2E7D32"); // Green Adopted
-                        rect.setAttribute("stroke", "#1B5E20");
-                        rect.setAttribute("stroke-width", "0.5");
-                    } else {
-                        rect.setAttribute("fill", "#ECEFF1"); // Gray Unadopted
-                        rect.setAttribute("stroke", "#CFD8DC");
-                        rect.setAttribute("stroke-width", "0.5");
-                    }
-
-                    // Hover title/tooltip
-                    const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-                    title.textContent = `Zone ${String.fromCharCode(65 + y)}-${x + 1}: ${idx < greenSquaresCount ? '100 Adopted Users' : '0 / 100 Adopted'}`;
-                    rect.appendChild(title);
-
-                    svg.appendChild(rect);
-                }
-            }
-
-            container.appendChild(svg);
-        }
-
-        function updateSimDashboard() {
-            document.getElementById('sim-day-lbl').textContent = simDay;
-            document.getElementById('sim-day-progress').style.width = `${(simDay / 30) * 100}%`;
-
-            document.getElementById('sim-val-users').textContent = simUsers.toLocaleString();
-            document.getElementById('sim-val-rate').textContent = `${simAdoptionRate.toFixed(1)}%`;
-            document.getElementById('sim-val-sat').textContent = `${simSatisfaction}%`;
-            document.getElementById('sim-val-trust').textContent = `${simTrust}%`;
-        }
-
-        function startL5Engine() {
-            document.getElementById('btn-start-sim').disabled = true;
-            document.getElementById('sim-engine-controls').style.display = 'none';
-            document.getElementById('sim-speed-indicator').textContent = "Simulating...";
-
-            simActive = true;
-            runSimDay();
-        }
-
-        function runSimDay() {
-            if (simDay > 30) {
-                simActive = false;
-                clearInterval(simInterval);
-                evaluateL5Results();
-                return;
-            }
-
-            updateSimDashboard();
-            renderCityMap();
-
-            // Check if day matches event
-            if (SIM_EVENTS[simDay]) {
-                simActive = false;
-                triggerL5Event(simDay);
-                return;
-            }
-
-            // Normal growth iteration
-            // Growth rate is influenced slightly by satisfaction and trust
-            const baseGrowthFactor = (simSatisfaction * 0.4) + (simTrust * 0.4);
-            const growthRate = (baseGrowthFactor / 100) * 2.0; // max 2% per day organic expansion
-
-            simAdoptionRate += growthRate;
-            if (simAdoptionRate < 1) simAdoptionRate = 1;
-            if (simAdoptionRate > 100) simAdoptionRate = 100;
-
-            simUsers = Math.round((simAdoptionRate / 100) * 10000);
-            if (simUsers > 10000) simUsers = 10000;
-
-            simDay++;
-            setTimeout(runSimDay, 300);
-        }
-
-        function triggerL5Event(dayNum) {
-            const eventData = SIM_EVENTS[dayNum];
-            document.getElementById('sim-speed-indicator').textContent = "⚠️ EVENT PAUSE";
-
-            const narrative = document.getElementById('event-narrative-container');
-            narrative.innerHTML = `
-                <h4>${eventData.title} (Day ${dayNum})</h4>
-                <p>${eventData.desc}</p>
-            `;
-
-            const choicesContainer = document.getElementById('event-options-container');
-            choicesContainer.innerHTML = '';
-
-            eventData.choices.forEach((choice, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.textContent = choice.text;
-                btn.onclick = () => selectEventChoice(dayNum, idx);
-                choicesContainer.appendChild(btn);
-            });
-        }
-
-        function selectEventChoice(dayNum, choiceIdx) {
-            const eventData = SIM_EVENTS[dayNum];
-            const choice = eventData.choices[choiceIdx];
-
-            // Apply metrics effects
-            simAdoptionRate += choice.effect.rate;
-            simSatisfaction += choice.effect.sat;
-            simTrust += choice.effect.trust;
-
-            // Bounds checks
-            if (simAdoptionRate < 0.5) simAdoptionRate = 0.5;
-            if (simAdoptionRate > 100) simAdoptionRate = 100;
-            if (simSatisfaction < 0) simSatisfaction = 0;
-            if (simSatisfaction > 100) simSatisfaction = 100;
-            if (simTrust < 0) simTrust = 0;
-            if (simTrust > 100) simTrust = 100;
-
-            simUsers = Math.round((simAdoptionRate / 100) * 10000);
-            if (simUsers > 10000) simUsers = 10000;
-
-            // Show feedback in narrative box
-            document.getElementById('event-options-container').innerHTML = '';
-            const narrative = document.getElementById('event-narrative-container');
-
-            // Build the effects text
-            const rateStr = choice.effect.rate >= 0 ? `+${choice.effect.rate}%` : `${choice.effect.rate}%`;
-            const satStr = choice.effect.sat >= 0 ? `+${choice.effect.sat}%` : `${choice.effect.sat}%`;
-            const trustStr = choice.effect.trust >= 0 ? `+${choice.effect.trust}%` : `${choice.effect.trust}%`;
-
-            narrative.innerHTML = `
-                <h4 style="color: var(--success);">✔ Action Chosen</h4>
-                <p><em>"${choice.feedback}"</em></p>
-                <div style="background: var(--gray-light); padding: 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid var(--border-color); margin-bottom: 12px;">
-                    <strong>Immediate Impacts:</strong><br>
-                    Adoption Rate: <span style="color: ${choice.effect.rate >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${rateStr}</span> | 
-                    Satisfaction: <span style="color: ${choice.effect.sat >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${satStr}</span> | 
-                    Trust: <span style="color: ${choice.effect.trust >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:700;">${trustStr}</span>
+            const rStr = choice.effect.rate >= 0 ? `+${choice.effect.rate}%` : `${choice.effect.rate}%`;
+            const tStr = choice.effect.trust >= 0 ? `+${choice.effect.trust}%` : `${choice.effect.trust}%`;
+            const sStr = choice.effect.sat >= 0 ? `+${choice.effect.sat}%` : `${choice.effect.sat}%`;
+            const rkStr = choice.effect.risk >= 0 ? `+${choice.effect.risk}%` : `${choice.effect.risk}%`;
+
+            feedback.innerHTML = `
+                <h4 style="margin-bottom: 6px; font-family: var(--font-display);">Strategy Applied Summary</h4>
+                <p style="margin-bottom: 8px;">${choice.feedback}</p>
+                <div style="font-size:0.8rem; background: rgba(0,0,0,0.03); padding:8px; border-radius:4px; font-weight:600; color:var(--ink-muted);">
+                    Impacts: Adoption ${rStr} | Trust ${tStr} | Satisfaction ${sStr} | Perceived Risk ${rkStr}
                 </div>
-                <button class="btn btn-outline" style="padding: 6px 14px; font-size: 0.8rem;" onclick="resumeL5Simulation()">Resume Simulator</button>
+                <p style="font-size:0.75rem; color:var(--ink-muted); margin-top:8px; font-style:italic;">Note: You can click a different option card above if you wish to adjust your strategy for this scenario.</p>
             `;
 
-            updateSimDashboard();
-            renderCityMap();
+            document.getElementById('btn-submit-decision').style.display = 'none';
+            document.getElementById('btn-next-scenario').style.display = 'inline-block';
+            
+            if (l3CurrentIndex === 4) {
+                document.getElementById('btn-next-scenario').textContent = "Calculate Final Results";
+            } else {
+                document.getElementById('btn-next-scenario').textContent = "Next Scenario";
+            }
         }
 
-        function resumeL5Simulation() {
-            simDay++;
-            document.getElementById('sim-speed-indicator').textContent = "Simulating...";
+        function nextL3Scenario() {
+            l3CurrentIndex++;
+            document.getElementById('l3-decision-feedback').style.display = 'none';
+            document.getElementById('btn-next-scenario').style.display = 'none';
+            document.getElementById('btn-submit-decision').style.display = 'inline-block';
+            document.getElementById('btn-submit-decision').disabled = true;
 
-            // Clear current choice explanation and restore waiting state
-            document.getElementById('event-narrative-container').innerHTML = `
-                <h4>📊 Running Simulator...</h4>
-                <p>Simulation active. Waiting for next day iteration.</p>
-            `;
-            document.getElementById('event-options-container').innerHTML = '';
-
-            simActive = true;
-            runSimDay();
+            if (l3CurrentIndex < 5) {
+                renderL3Scenario();
+            } else {
+                evaluateL3Results();
+            }
         }
 
-        function evaluateL5Results() {
-            levelsCompleted[4] = true;
+        function evaluateL3Results() {
+            levelsCompleted[2] = true;
             updatePills();
 
-            // Win condition checks: Adoption > 80% (8000+ users), Sat > 75%, Trust > 80%
-            const won = (simAdoptionRate > 80) && (simSatisfaction > 75) && (simTrust > 80);
+            document.getElementById('l3-main-card').style.display = 'none';
+            
+            const box = document.getElementById('l3-completion-box');
+            box.style.display = 'block';
 
-            // Populate Results screen
-            document.getElementById('res-val-users').textContent = simUsers.toLocaleString();
-            document.getElementById('res-val-rate').textContent = `${simAdoptionRate.toFixed(1)}%`;
-            document.getElementById('res-val-sat').textContent = `${simSatisfaction}%`;
-            document.getElementById('res-val-trust').textContent = `${simTrust}%`;
+            // Win condition checks: Adoption >= 50, Trust >= 50, Sat >= 50, Risk <= 50
+            const won = (l3Adoption >= 50 && l3Trust >= 50 && l3Satisfaction >= 50 && l3Risk <= 50);
 
-            const icon = document.getElementById('results-icon');
-            const title = document.getElementById('results-heading');
-            const sub = document.getElementById('results-subheading');
-
-            const strengthsContainer = document.getElementById('res-strengths');
-            const improvementsContainer = document.getElementById('res-improvements');
-
-            strengthsContainer.innerHTML = '';
-            improvementsContainer.innerHTML = '';
+            const rIcon = document.getElementById('l3-result-icon');
+            const rHeading = document.getElementById('l3-result-heading');
+            const rSummary = document.getElementById('l3-completion-summary-text');
 
             if (won) {
-                icon.textContent = '🏆';
-                title.textContent = 'Successful Consumer Adoption';
-                sub.textContent = 'Your product successfully achieved widespread mainstream adoption across the market!';
-
-                // Strengths
-                addStrengthItem("Optimized UX sliders to minimize cognitive complexity and price friction.");
-                addStrengthItem("Correctly targeted Innovators, Early Adopters, and Majorities during the rollouts.");
-                addStrengthItem("Maintained high transparency levels to secure permanent consumer trust.");
+                rIcon.textContent = "🏆";
+                rHeading.textContent = "Successful Consumer Adoption!";
+                rHeading.style.color = "var(--success)";
+                rSummary.textContent = "Congratulations! Your digital strategies successfully minimized customer frictions, crossed the adoption chasm, and achieved mainstream adoption.";
             } else {
-                icon.textContent = '⚠️';
-                title.textContent = 'Needs Improvement';
-                sub.textContent = 'Your strategies were insufficient to sustain long-term digital adoption.';
-
-                // Improvements
-                if (simAdoptionRate <= 80) {
-                    addImprovementItem("Pricing limits or slow speed settings resulted in market adoption dropping below 80%.");
-                }
-                if (simSatisfaction <= 75) {
-                    addImprovementItem("Failing to fix interface friction or onboarding complexity kept consumer satisfaction levels low.");
-                }
-                if (simTrust <= 80) {
-                    addImprovementItem("Attempting to hide tracking permissions or ignoring consumer feedback caused severe damage to user trust.");
-                }
-                addImprovementItem("Rethink the alignment of lifecycle strategies to accelerate diffusion stages faster.");
+                rIcon.textContent = "⚠️";
+                rHeading.textContent = "Redesign Needed";
+                rHeading.style.color = "var(--danger)";
+                rSummary.textContent = "Your digital business strategies did not meet the required threshold metrics. Review the improvements panel and restart to try again.";
             }
 
-            // Always add general feedback points
-            if (simSatisfaction > 75) {
-                addStrengthItem("Outstanding user satisfaction (>75%) maintained throughout the competitor launches.");
-            }
-            if (simTrust > 80) {
-                addStrengthItem("Excellent incident handling during privacy alerts protected brand reliability.");
+            // Results grid
+            const grid = document.getElementById('l3-result-metric-grid');
+            grid.innerHTML = `
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Adoption</span>
+                    <strong style="font-size:1.3rem; color:${l3Adoption >= 50 ? 'var(--success)' : 'var(--danger)'};">${l3Adoption}%</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Trust</span>
+                    <strong style="font-size:1.3rem; color:${l3Trust >= 50 ? 'var(--success)' : 'var(--danger)'};">${l3Trust}%</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Satisfaction</span>
+                    <strong style="font-size:1.3rem; color:${l3Satisfaction >= 50 ? 'var(--success)' : 'var(--danger)'};">${l3Satisfaction}%</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Perceived Risk</span>
+                    <strong style="font-size:1.3rem; color:${l3Risk <= 50 ? 'var(--success)' : 'var(--danger)'};">${l3Risk}%</strong>
+                </div>
+            `;
+
+            // Strengths and Improvements lists
+            const strengths = document.getElementById('l3-res-strengths');
+            const improvements = document.getElementById('l3-res-improvements');
+
+            strengths.innerHTML = '';
+            improvements.innerHTML = '';
+
+            if (l3Adoption >= 50) {
+                addL3Strength("Successfully minimized awareness and cost barriers to achieve high adoption rates.");
+            } else {
+                addL3Improvement("Failed to lower barriers for late-adopters, leaving the adoption rate below the 50% target.");
             }
 
-            showScreen('results');
+            if (l3Trust >= 50) {
+                addL3Strength("Maintained high transparency and security declarations to protect consumer trust.");
+            } else {
+                addL3Improvement("Security fears and data permissions were poorly handled, damaging consumer trust.");
+            }
+
+            if (l3Satisfaction >= 50) {
+                addL3Strength("Focused on onboarding tutorials and user interface simplicity to maintain satisfaction.");
+            } else {
+                addL3Improvement("Excessive cognitive load and setup complexity decreased customer satisfaction.");
+            }
+
+            if (l3Risk <= 50) {
+                addL3Strength("Effectively used trials and risk-free audits to lower perceived risk below 50%.");
+            } else {
+                addL3Improvement("High perceived risk remained a massive barrier because of a lack of safety declarations.");
+            }
         }
 
-        function addStrengthItem(text) {
+        function addL3Strength(txt) {
             const li = document.createElement('li');
-            li.textContent = text;
-            document.getElementById('res-strengths').appendChild(li);
+            li.textContent = txt;
+            document.getElementById('l3-res-strengths').appendChild(li);
         }
 
-        function addImprovementItem(text) {
+        function addL3Improvement(txt) {
             const li = document.createElement('li');
-            li.textContent = text;
-            document.getElementById('res-improvements').appendChild(li);
+            li.textContent = txt;
+            document.getElementById('l3-res-improvements').appendChild(li);
         }
 
-        function restartLevel5() {
-            showScreen('l5');
-            initLevel5();
+        function restartLevel3Only() {
+            initLevel3();
         }
 
         function restartEntireSimulation() {
-            levelsUnlocked = [true, true, true, true, true];
-            levelsCompleted = [false, false, false, false, false];
+            levelsUnlocked = [true, true, true];
+            levelsCompleted = [false, false, false];
             currentActiveLevel = 1;
-
+            
             updatePills();
             showScreen('intro');
         }
