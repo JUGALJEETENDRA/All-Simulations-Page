@@ -1,1 +1,1792 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3.1 – Digital Technology Platforms Laboratory</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+        :root {
+            color-scheme: light;
+            --primary: #E63946;
+            --primary-hover: #D62828;
+            --primary-light: rgba(230, 57, 70, 0.08);
+            --secondary: #FF4D6D;
+            --bg-page: #F8F9FA;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: #FFFFFF;
+            --text-main: #1D1D1F;
+            --text-muted: #6E6E73;
+            --border-light: rgba(0, 0, 0, 0.08);
+            --code-bg: #1E1E24;
+            --code-text: #F8F9FA;
+            --code-ok: #2A9D8F;
+            --code-warn: #E9C46A;
+            --code-err: #E63946;
+            --vendor-bg: #e5e5e5;
+            --user-bg: #E63946;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* ─── NAVIGATION ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 1000;
+            padding: 0 2rem;
+        }
+
+        .nav-brand {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-right: auto;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-brand span {
+            color: var(--primary);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-md);
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ─── COMPACT HERO ─── */
+        .hero {
+            margin-top: 64px;
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+            background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 99px;
+            margin-bottom: 0.6rem;
+        }
+
+        .hero h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            max-width: 600px;
+            margin: 0 auto 1.2rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .hero-stat span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* ─── LAYOUT & SECTIONS ─── */
+        .section {
+            padding: 3rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+            background: var(--bg-card);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .section-num {
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ─── LEVEL PILLS & CARDS ─── */
+        .level-pills {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+        }
+
+        .level-pill.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+        }
+
+        .level-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .level-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card h3 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        /* ─── CALLOUT BOXES ─── */
+        .info-box,
+        .tip-box,
+        .warn-box,
+        .challenge-box {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            margin: 1.2rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box {
+            background: rgba(42, 157, 143, 0.08);
+            border-color: var(--code-ok);
+        }
+
+        .tip-box {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .warn-box {
+            background: rgba(233, 196, 106, 0.15);
+            border-color: var(--code-warn);
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+        }
+
+        .challenge-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-main);
+        }
+
+        /* ─── QUIZZES ─── */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: var(--bg-page);
+            border: 1px solid var(--border-light);
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-md);
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-option:hover {
+            background: #fff;
+            border-color: var(--primary);
+        }
+
+        .quiz-feedback {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 1.2rem;
+        }
+
+        /* ─── INTERACTIVE ELEMENTS ─── */
+        .run-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .run-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        }
+
+        .tk-entry {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .tk-entry:focus {
+            border-color: var(--primary);
+        }
+
+        .tk-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .gauge-wrap {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .gauge-num {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .gauge-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .meter-bar {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .meter-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* ─── TERMINALS & PLAYGROUNDS ─── */
+        .playground {
+            background: var(--code-bg);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 1.2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .playground-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-r {
+            background: #FF5F56;
+        }
+
+        .dot-y {
+            background: #FFBD2E;
+        }
+
+        .dot-g {
+            background: #27C93F;
+        }
+
+        .playground-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 0.5rem;
+        }
+
+        .playground-output {
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--code-text);
+            white-space: pre-wrap;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .out-info {
+            color: #61AFEF;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-brand">DB<span>/</span>MOD3</div>
+        <a href="3-3.1.html" class="active">3.1 Platforms</a>
+    </nav>
+
+    <!-- COMPACT HERO BANNER -->
+    <div class="hero">
+        <div class="hero-badge">Module 3.1 · Digital Technology Platforms</div>
+        <h1>Digital Technology Platforms Laboratory</h1>
+        <p>Learn Digital Business Infrastructure through progressive challenges. Act as a consultant to configure,
+            select, and integrate platform topologies.</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
+            <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
+            <div class="hero-stat"><strong>Live</strong><span>Laboratory</span></div>
+        </div>
+    </div>
+
+    <!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
+    <div class="section" id="theory-board">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">📖</div>
+                <div>
+                    <h2>Dave Chaffey's Reference Board</h2>
+                    <p>Concise digital technology platform and infrastructure rules</p>
+                </div>
+                <span class="section-num">Ref</span>
+            </div>
+
+            <div class="card">
+                <h3>Digital Technology Platforms</h3>
+                <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 0.8rem; font-size: 0.85rem;">
+                    <div><strong>Desktop:</strong> High processing power, OS-specific. Best for employee spreadsheets.
+                    </div>
+                    <div><strong>Mobile:</strong> Portable handheld channels using device sensors, alerts, and push.
+                    </div>
+                    <div><strong>Web:</strong> Universal browser client access, instant URL reach, zero-install.</div>
+                    <div><strong>Enterprise:</strong> Centralized transactional systems (ERP/CRM) protecting database
+                        integrity.</div>
+                    <div><strong>Cloud:</strong> Remote virtualized servers executing dynamic compute loads.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Platform Characteristics</h3>
+                <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-muted);">
+                    <div>• <strong>Accessibility:</strong> Web platforms maximize reach with zero-installation
+                        onboarding links.</div>
+                    <div>• <strong>Portability:</strong> Mobile smartphone apps run natively outside physical offices.
+                    </div>
+                    <div>• <strong>Scalability:</strong> Cloud compute nodes absorb traffic spikes without system
+                        crashes.</div>
+                    <div>• <strong>Compatibility:</strong> Web pages operate across multiple OS versions instantly.
+                    </div>
+                    <div>• <strong>Business Suitability:</strong> Match platform strengths to the specific constraints
+                        of the client.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Platform Integration Strategy</h3>
+                <p style="font-size:0.85rem; line-height:1.5;">
+                    Organizations combine multiple platforms into a unified digital business infrastructure layer.
+                    Clients browse frictionless storefront channels (Web/Mobile), staff register logistics (Desktop),
+                    and transactions persist elastically (Cloud/Enterprise database).
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIMULATION TASKS -->
+    <div class="section" id="sec31">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">📱</div>
+                <div>
+                    <h2>3.1 – Digital Technology Platforms</h2>
+                    <p>Interactive Business Decision Simulation Game</p>
+                </div>
+                <span class="section-num">3.1</span>
+            </div>
+
+            <!-- LEVEL PILLS -->
+            <div class="level-pills" id="lp31">
+                <button class="level-pill active" onclick="switchLevel('31',1)">L1 Platform Detective</button>
+                <button class="level-pill" onclick="switchLevel('31',2)">L2 Consultant Studio</button>
+                <button class="level-pill" onclick="switchLevel('31',3)">L3 Architect Boss</button>
+            </div>
+
+            <!-- PROGRESS TRACKER -->
+            <div class="progress-wrap">
+                <div class="progress-label"><span id="prog31-label">Level 1 of 3</span><span id="prog31-pct">33%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="prog31" style="width:33%"></div>
+                </div>
+            </div>
+
+            <!-- LEVEL 1: DIGITAL PLATFORM DETECTIVE -->
+            <div class="level-content active" id="lc31-1">
+                <!-- MISSION BRIEF -->
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span class="hero-badge">Level 1 Mission Brief</span>
+                            <h3>Digital Platform Detective</h3>
+                            <p style="color: var(--text-muted); margin-top: 0.5rem; max-width: 600px;">
+                                Analyse organizational parameters and recommend the most suitable digital technology
+                                platforms. Learn platform strengths and limitations dynamically.
+                            </p>
+                        </div>
+                        <div
+                            style="background: rgba(0,0,0,0.02); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 600;">
+                            <div>⏱️ Est. Time: <span style="color:var(--primary);">3 Mins</span></div>
+                            <div style="margin-top: 0.3rem;">🎯 Goal: <span style="color:var(--primary);">Solve 5
+                                    Rounds</span></div>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem; margin-bottom: 0;">
+                        <strong>Key Concept:</strong> Platforms dictate how clients access storefront operations
+                        (frictionless Web vs. contextual Mobile) and how staff manage inventory data (Desktop
+                        performance vs. Cloud scalability).
+                    </div>
+                </div>
+
+                <!-- CHALLENGE CARD -->
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 id="l1-round-title">Round 1 of 5</h3>
+                        <!-- Timer for Round 5 -->
+                        <div id="l1-timer-container"
+                            style="display:none; font-family:'JetBrains Mono', monospace; font-size:0.9rem; font-weight:700; color:var(--code-err);">
+                            ⚡ Timer: <span id="l1-timer">15</span>s
+                        </div>
+                    </div>
+
+                    <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
+                        <h4 id="l1-case-title">Loading case...</h4>
+                        <p id="l1-case-text"
+                            style="color: var(--text-muted); margin: 0.5rem 0 1.2rem; font-size: 0.95rem;"></p>
+
+                        <div id="l1-selectors" style="display:flex; flex-direction:column; gap:1rem;">
+                            <!-- Dropdowns or selectors injected by JS -->
+                        </div>
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Submit
+                                Recommendation</button>
+                            <button class="run-btn"
+                                style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                                onclick="toggleHint(1)">💡 Need Help?</button>
+                        </div>
+
+                        <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;">
+                            <!-- Hints injected by JS -->
+                        </div>
+
+                        <div class="quiz-feedback" id="qf-l1" style="margin-top: 1.2rem;"></div>
+
+                        <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1rem;"
+                            onclick="nextL1Round()">Next Challenge ➔</button>
+                    </div>
+
+                    <!-- LEVEL NAVIGATION -->
+                    <div
+                        style="display:flex; justify-content:flex-end; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('31', 2)">Go
+                            to Level 2 ➔</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 2: BUSINESS TECHNOLOGY CONSULTANT -->
+            <div class="level-content" id="lc31-2">
+                <!-- MISSION BRIEF -->
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span class="hero-badge">Level 2 Mission Brief</span>
+                            <h3>Business Technology Consultant</h3>
+                            <p style="color: var(--text-muted); margin-top: 0.5rem; max-width: 600px;">
+                                Advise complex businesses facing operational trade-offs and dynamic constraints. Respond
+                                to sudden real-time event triggers.
+                            </p>
+                        </div>
+                        <div
+                            style="background: rgba(0,0,0,0.02); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 600;">
+                            <div>⏱️ Est. Time: <span style="color:var(--primary);">4 Mins</span></div>
+                            <div style="margin-top: 0.3rem;">🎯 Goal: <span style="color:var(--primary);">Manage
+                                    Constraints</span></div>
+                        </div>
+                    </div>
+                    <div class="info-box" style="margin-top: 1rem; margin-bottom: 0;">
+                        <strong>Key Concept:</strong> E-business managers rarely find single-platform solutions.
+                        Trade-offs (accessibility vs. custom security controls) require layered platform structures.
+                    </div>
+                </div>
+
+                <!-- CHALLENGE CARD -->
+                <div class="card">
+                    <span class="tk-label">Select Business Case:</span>
+                    <select id="l2CaseSelect" class="tk-entry" style="width: 100%; margin-bottom: 1.2rem;"
+                        onchange="changeL2Case()">
+                        <option value="delivery">Food Delivery Startup (Budget Constraints)</option>
+                        <option value="hospital">Hospital EHR Integration (Strict Security)</option>
+                        <option value="university">University LMS System (Scale Spikes)</option>
+                    </select>
+
+                    <div class="challenge-box" style="margin-top:0;">
+                        <h4 id="l2-title">Loading...</h4>
+                        <p id="l2-desc" style="color: var(--text-muted); margin-top:0.4rem; font-size:0.95rem;"></p>
+
+                        <div
+                            style="display:flex; justify-content:space-between; margin-top:1rem; font-size:0.8rem; font-weight:700; color:var(--text-muted); flex-wrap:wrap; gap:1rem;">
+                            <div>💰 Budget: <span id="l2-stat-budget">-</span></div>
+                            <div>👥 Users: <span id="l2-stat-users">-</span></div>
+                            <div>⚡ Scaling requirement: <span id="l2-stat-scale">-</span></div>
+                            <div>🛡️ Security: <span id="l2-stat-security">-</span></div>
+                        </div>
+                    </div>
+
+                    <!-- DYNAMIC EVENT TRIGGER WINDOW -->
+                    <div class="warn-box" id="l2-event-alert" style="display:none; animation: fadeIn 0.3s ease;">
+                        <strong id="l2-event-title">🚨 DYNAMIC EVENT DETECTED</strong>
+                        <p id="l2-event-text" style="font-size:0.85rem; margin-top:0.3rem;"></p>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+                        <div>
+                            <span class="tk-label">Primary Client Touchpoint</span>
+                            <select id="l2-primary" class="tk-entry" style="width: 100%;">
+                                <option value="web">Web Platform (Zero Install)</option>
+                                <option value="mobile">Mobile Platform (Context GPS/Push)</option>
+                                <option value="desktop">Desktop Platform (Heavy Interface)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="tk-label">Back-End Hosting Tier</span>
+                            <select id="l2-secondary" class="tk-entry" style="width: 100%;">
+                                <option value="cloud">Cloud Platform (Elastic instances)</option>
+                                <option value="enterprise">Enterprise Platform (Central relational DBMS)</option>
+                                <option value="desktop">Desktop Platform (Localized branch PC)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="tk-label">Database Model</span>
+                            <select id="l2-db" class="tk-entry" style="width: 100%;">
+                                <option value="relational">Enterprise Relational DB (High integrity)</option>
+                                <option value="cloud_storage">Cloud Object Storage (Highly scalable)</option>
+                                <option value="local">Local Flat File (Zero cost)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="tk-label">Client Deployment Channel</span>
+                            <select id="l2-deploy" class="tk-entry" style="width: 100%;">
+                                <option value="universal">Universal Web Link (Max reach)</option>
+                                <option value="stores">Apple &amp; Google App Stores (Friction onboarding)</option>
+                                <option value="intranet">Internal Intranet Package (Private access)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" id="l2-evaluate-btn" onclick="submitL2Evaluation()">▶ Evaluate Platform
+                            Strategy</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(2)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;">
+                        <!-- Injected L2 hints -->
+                    </div>
+
+                    <div class="quiz-feedback" id="qf-l2" style="margin-top: 1.2rem;"></div>
+
+                    <!-- METRICS -->
+                    <div class="gauge-wrap" style="margin-top: 1.5rem;">
+                        <div>
+                            <div class="gauge-num" id="l2-metric-fit">0%</div>
+                            <div class="gauge-sub">Business Fit</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-metric-scale">0%</div>
+                            <div class="gauge-sub">Scalability</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-metric-access">0%</div>
+                            <div class="gauge-sub">Accessibility</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-metric-cx">0%</div>
+                            <div class="gauge-sub">Customer Experience</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-metric-readiness">-</div>
+                            <div class="gauge-sub">Digital Readiness</div>
+                        </div>
+                    </div>
+
+                    <div class="meter-bar" style="margin-top: 1.5rem;">
+                        <div class="meter-fill" id="l2Meter" style="width:0%; background:var(--code-ok);"></div>
+                    </div>
+
+                    <div id="l2-reinforcement" style="display:none; margin-top: 1.5rem;"></div>
+
+                    <!-- LEVEL NAVIGATION -->
+                    <div
+                        style="display:flex; justify-content:space-between; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('31', 1)">⬅
+                            Go to Level 1</button>
+                        <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('31', 3)">Go
+                            to Level 3 ➔</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 3: DIGITAL BUSINESS INFRASTRUCTURE SIMULATOR -->
+            <div class="level-content" id="lc31-3">
+                <!-- MISSION BRIEF -->
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span class="hero-badge" id="l3-phase-badge">Phase 1: Startup Launch</span>
+                            <h3>Digital Business Infrastructure Simulator</h3>
+                            <p style="color: var(--text-muted); margin-top: 0.5rem; max-width: 600px;"
+                                id="l3-brief-text">
+                                Launch a startup and scale it into a global enterprise. Learn how platform combinations
+                                directly support transactional growth, availability, and continuity.
+                            </p>
+                        </div>
+                        <div
+                            style="background: rgba(0,0,0,0.02); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 600;">
+                            <div>⏱ shrink level: <span style="color:var(--primary);" id="l3-scale-level">Small
+                                    Startup</span></div>
+                            <div style="margin-top: 0.3rem;">🎯 Load: <span style="color:var(--primary);"
+                                    id="l3-load-users">5,000 Users</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIMULATION CONTROL BOX -->
+                <div class="card">
+                    <div class="challenge-box" style="margin-top: 0; margin-bottom: 1.5rem;" id="l3-challenge-box">
+                        <h4 id="l3-phase-title">Startup Launch Scenario</h4>
+                        <p id="l3-phase-desc" style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.4rem;">
+                            Configure your initial storefront platform and web deployment channels to kick off online
+                            operations.
+                        </p>
+                    </div>
+
+                    <!-- FORM INTERACTIVE SELECTIONS -->
+                    <div id="l3-selectors-container"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <!-- Dynamically populated fields -->
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Deploy
+                            Architecture</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(3)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;">
+                        <!-- Injected L3 hints -->
+                    </div>
+
+                    <div class="quiz-feedback" id="qf-l3" style="margin-top: 1.2rem;"></div>
+
+                    <!-- NEXT PHASE BUTTON -->
+                    <button class="run-btn" id="nextL3Btn" style="display:none; margin-top: 1rem;"
+                        onclick="proceedL3NextPhase()">Proceed to Next Phase ➔</button>
+
+                    <!-- BUSINESS INFRASTRUCTURE HUD -->
+                    <div class="gauge-wrap"
+                        style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+                        <div>
+                            <div class="gauge-num" id="l3-hud-access">0%</div>
+                            <div class="gauge-sub">Accessibility</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-scale">0%</div>
+                            <div class="gauge-sub">Scalability</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-continuity">0%</div>
+                            <div class="gauge-sub">Continuity</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-readiness">0%</div>
+                            <div class="gauge-sub">Digital Readiness</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-integration">0%</div>
+                            <div class="gauge-sub">Platform Integration</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-cx">0%</div>
+                            <div class="gauge-sub">Customer Experience</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-availability">0%</div>
+                            <div class="gauge-sub">Availability</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAYGROUND OUTPUT (Blueprints) -->
+                <div class="playground" id="l3Playground" style="display:none;">
+                    <div class="playground-header">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div><span
+                            class="playground-title">digital_business_infrastructure.yaml</span>
+                    </div>
+                    <div class="playground-output" id="l3Out"></div>
+                </div>
+
+                <!-- CONSULTING REPORT OUTPUT -->
+                <div class="card" id="l3-report-card" style="display:none;">
+                    <!-- Filled on final challenge submission -->
+                </div>
+
+                <!-- LEVEL NAVIGATION -->
+                <div class="card" style="margin-top:1.5rem;">
+                    <div style="display:flex; justify-content:flex-start;">
+                        <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('31', 2)">⬅
+                            Go to Level 2</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Digital Business Simulation Series · <strong>Module 3.1 — Digital Technology Platforms</strong>
+    </footer>
+
+    <script>
+        /* ─── GENERAL UI & NAVIGATION ─── */
+        function switchLevel(secId, targetLevel) {
+            document.querySelectorAll(`#lp${secId} .level-pill`).forEach((pill, idx) => pill.classList.toggle('active', (idx + 1) === targetLevel));
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`lc${secId}-${i}`);
+                if (el) el.classList.toggle('active', i === targetLevel);
+            }
+            const pct = Math.round((targetLevel / 3) * 100);
+            const label = document.getElementById(`prog${secId}-label`);
+            const pctEl = document.getElementById(`prog${secId}-pct`);
+            const bar = document.getElementById(`prog${secId}`);
+            if (label) label.textContent = `Level ${targetLevel} of 3`;
+            if (pctEl) pctEl.textContent = `${pct}%`;
+            if (bar) bar.style.width = `${pct}%`;
+        }
+
+        /* ─── HINTS SYSTEM ─── */
+        const hints = {
+            1: {
+                1: "Mobile platforms provide native push notifications and portability for shoppers on-the-go. Web platforms can act as secondary touchpoints to increase reach.",
+                2: "Desktop platforms provide localized computing speed, physical keyboards, and multi-threading capabilities for staff operations.",
+                3: "Web platforms offer immediate zero-install access via browsers, minimizing barriers to customer acquisition.",
+                4: "Enterprise systems (ERPs) preserve centralized inventory relational security and database integrity.",
+                5: "Cloud platforms offer elastic dynamic compute scaling. Desktop hosts cannot scale elastically to traffic spikes."
+            },
+            2: {
+                delivery: "Food delivery riders require portable GPS tracking (Mobile Platform). Customers require rapid menu loading with minimal friction (Web storefront). Use cloud hosting to manage real-time updates.",
+                hospital: "Patients require simple universal logins to view records (Web). Doctors need relational integrity, auditing log trails, and access security (Enterprise Database).",
+                university: "50,000 students require elastic scaling nodes to handle heavy portal access clicks during exams (Cloud Platform)."
+            },
+            3: "Startup Launch requires universal access and cheap hosts. Growth requires elastic scaling auto-provisioners. International targets fast local CDN delivery hubs."
+        };
+
+        function toggleHint(level) {
+            let box = null;
+            let text = "";
+
+            if (level === 1) {
+                box = document.getElementById('l1-hint-box');
+                text = hints[1][l1Round];
+            } else if (level === 2) {
+                box = document.getElementById('l2-hint-box');
+                const caseKey = document.getElementById('l2CaseSelect').value;
+                text = hints[2][caseKey];
+            } else {
+                box = document.getElementById('l3-hint-box');
+                text = hints[3];
+            }
+
+            if (box) {
+                if (box.style.display === 'none') {
+                    box.innerHTML = `<strong>💡 Consulting Hint:</strong><br>${text}`;
+                    box.style.display = 'block';
+                } else {
+                    box.style.display = 'none';
+                }
+            }
+        }
+
+        /* ─── LEVEL 1 GAMEPLAY: DIGITAL PLATFORM DETECTIVE ─── */
+        const l1Cases = {
+            1: {
+                title: "Round 1: Retail E-Commerce",
+                text: "Customers need to browse products, check order status, and receive location-based discount alerts while travelling.",
+                type: "double",
+                hint: "Think about user portability and location tracking.",
+                correctPrimary: "mobile",
+                correctSecondary: "web",
+                justification: "Universal web access handles catalog searches, while mobile apps capture GPS-driven repeat consumer actions."
+            },
+            2: {
+                title: "Round 2: Corporate Accounting",
+                text: "Employees perform heavy corporate data audits, spreadsheet accounting, and report generation.",
+                type: "single",
+                correct: "desktop",
+                justification: "Desktop platforms provide native hardware processing speed and keyboard efficiency for office workers."
+            },
+            3: {
+                title: "Round 3: Zero-Install Onboarding",
+                text: "A startup wants to launch a viral product catalog accessible to anyone immediately without any software download.",
+                type: "single",
+                correct: "web",
+                justification: "Web platforms utilize standard URLs to render pages instantly inside local client web browsers."
+            },
+            4: {
+                title: "Round 4: Relational Inventory Core",
+                text: "A global warehouse company requires synchronized inventory tracking across all international depots.",
+                type: "single",
+                correct: "enterprise",
+                justification: "Enterprise platforms protect data consistency and security audits across relational database ledgers."
+            },
+            5: {
+                title: "Round 5: High-Traffic Scaling (Time Pressure!)",
+                text: "A media website experiences a fivefold surge in traffic during breaking news events and requires server node adjustments.",
+                type: "single",
+                correct: "cloud",
+                justification: "Cloud platforms execute elastic auto-scaling algorithms, provisioning virtual servers on-demand.",
+                timed: true
+            }
+        };
+
+        let l1Round = 1;
+        let l1Score = 0;
+        let l1Timer = null;
+
+        function renderL1Round() {
+            const c = l1Cases[l1Round];
+            document.getElementById('l1-round-title').textContent = `Round ${l1Round} of 5`;
+            document.getElementById('l1-case-title').textContent = c.title;
+            document.getElementById('l1-case-text').textContent = c.text;
+            document.getElementById('qf-l1').innerHTML = "";
+            document.getElementById('l1-hint-box').style.display = 'none';
+            document.getElementById('nextL1Btn').style.display = 'none';
+            document.getElementById('l1-submit-btn').disabled = false;
+
+            const selectors = document.getElementById('l1-selectors');
+            selectors.innerHTML = "";
+
+            if (c.type === "double") {
+                selectors.innerHTML = `
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <div style="flex:1;">
+          <span class="tk-label">Primary Platform (Customer focus)</span>
+          <select id="l1-sel-primary" class="tk-entry" style="width:100%;">
+            <option value="web">Web Platform</option>
+            <option value="mobile">Mobile Platform</option>
+            <option value="desktop">Desktop Platform</option>
+            <option value="enterprise">Enterprise Platform</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <span class="tk-label">Secondary Platform (Operations)</span>
+          <select id="l1-sel-secondary" class="tk-entry" style="width:100%;">
+            <option value="web">Web Platform</option>
+            <option value="mobile">Mobile Platform</option>
+            <option value="desktop">Desktop Platform</option>
+            <option value="enterprise">Enterprise Platform</option>
+          </select>
+        </div>
+      </div>
+    `;
+            } else {
+                selectors.innerHTML = `
+      <div>
+        <span class="tk-label">Recommend Technology Platform Strategy</span>
+        <select id="l1-sel-single" class="tk-entry" style="width:100%;">
+          <option value="web">Web Platform</option>
+          <option value="mobile">Mobile Platform</option>
+          <option value="desktop">Desktop Platform</option>
+          <option value="enterprise">Enterprise Platform</option>
+          <option value="cloud">Cloud Platform</option>
+        </select>
+      </div>
+    `;
+            }
+
+            // Timer handling for Round 5
+            const timerContainer = document.getElementById('l1-timer-container');
+            if (c.timed) {
+                timerContainer.style.display = 'block';
+                let secondsLeft = 15;
+                document.getElementById('l1-timer').textContent = secondsLeft;
+                clearInterval(l1Timer);
+                l1Timer = setInterval(() => {
+                    secondsLeft--;
+                    document.getElementById('l1-timer').textContent = secondsLeft;
+                    if (secondsLeft <= 0) {
+                        clearInterval(l1Timer);
+                        handleL1Timeout();
+                    }
+                }, 1000);
+            } else {
+                timerContainer.style.display = 'none';
+                clearInterval(l1Timer);
+            }
+        }
+
+        function handleL1Timeout() {
+            document.getElementById('l1-submit-btn').disabled = true;
+            const feedback = document.getElementById('qf-l1');
+            feedback.style.color = 'var(--code-err)';
+            feedback.innerHTML = `<strong>🚨 Out of Time!</strong> Cloud computing scale spikes require immediate actions to prevent site crashes. Click Next to continue.`;
+            document.getElementById('nextL1Btn').style.display = 'inline-flex';
+        }
+
+        function submitL1Answer() {
+            clearInterval(l1Timer);
+            const c = l1Cases[l1Round];
+            const feedback = document.getElementById('qf-l1');
+            let isCorrect = false;
+
+            if (c.type === "double") {
+                const primary = document.getElementById('l1-sel-primary').value;
+                const secondary = document.getElementById('l1-sel-secondary').value;
+                if (primary === c.correctPrimary && secondary === c.correctSecondary) {
+                    isCorrect = true;
+                }
+            } else {
+                const single = document.getElementById('l1-sel-single').value;
+                if (single === c.correct) {
+                    isCorrect = true;
+                }
+            }
+
+            if (isCorrect) {
+                l1Score++;
+                feedback.style.color = 'var(--code-ok)';
+                feedback.innerHTML = `<strong>✓ Recommendation Approved!</strong><br>${c.justification}`;
+                document.getElementById('l1-submit-btn').disabled = true;
+                document.getElementById('nextL1Btn').style.display = 'inline-flex';
+            } else {
+                feedback.style.color = 'var(--code-err)';
+                if (c.type === "double") {
+                    feedback.innerHTML = `<strong>✗ Strategic Mismatch!</strong> Desktop or core Enterprise platforms restrict consumer reach. customers require Web access combined with portable Mobile devices. Try another solution.`;
+                } else {
+                    feedback.innerHTML = `<strong>✗ Sub-Optimal Platform</strong><br>The recommended option creates operational bottlenecks. Desktop platforms drive office computers, Web offers zero-install link reach, and Enterprise manages secure databases. Try another solution.`;
+                }
+                document.getElementById('l1-submit-btn').disabled = false;
+            }
+
+            updateRatings(1);
+        }
+
+        function nextL1Round() {
+            l1Round++;
+            if (l1Round <= 5) {
+                renderL1Round();
+            } else {
+                clearInterval(l1Timer);
+                unlockBadge('badge-expert', '🏆 Platform Expert');
+                promoteConsultant(2);
+
+                const container = document.getElementById('l1-game-box');
+                if (container) {
+                    container.innerHTML = `
+        <div class="info-box" style="background: rgba(42, 157, 143, 0.08); border-color: var(--code-ok); margin-top:0;">
+          <h4>🎉 Level 1 Completed! Platform Expert Badge Unlocked 🏆</h4>
+          <p style="margin-top:0.5rem;">Debrief Summary:</p>
+          <ul style="font-size:0.85rem; margin-top:0.5rem; padding-left:1.2rem; color:var(--text-muted);">
+            <li><strong>Desktop:</strong> Provides keyboard productivity for branch office desks.</li>
+            <li><strong>Mobile:</strong> Targets portable customer notifications on-the-go.</li>
+            <li><strong>Web:</strong> Delivers instant zero-install browser reach.</li>
+            <li><strong>Enterprise:</strong> Governs core transactional business databases.</li>
+            <li><strong>Cloud:</strong> Scales server processing nodes dynamically.</li>
+          </ul>
+        </div>
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button class="run-btn" onclick="switchLevel('31', 2)">Proceed to Level 2: Consultant Studio ➔</button>
+        </div>
+      `;
+                }
+            }
+        }
+
+        /* ─── LEVEL 2 GAMEPLAY: BUSINESS TECHNOLOGY CONSULTANT ─── */
+        const l2CasesData = {
+            delivery: {
+                title: "Case 1: Food Delivery Startup",
+                desc: "Launch an on-demand food delivery dispatch marketplace. Drivers require active location tracking, notifications, and offline resilience, while consumers require quick browser menus.",
+                budget: "Medium (₹40k MVP)",
+                users: "95% mobile phone clients",
+                scale: "Fast scale required",
+                security: "Medium",
+                eventText: "Budgets cut by 30%! Apple/Google developers fees exceed limits. Customer operations demand web browser access storefront to save cash.",
+                correctPrimary: "web",
+                correctSecondary: "cloud",
+                correctDB: "cloud_storage",
+                correctDeploy: "universal"
+            },
+            hospital: {
+                title: "Case 2: Hospital EHR Integration",
+                desc: "Hospital EHR patient health charts. Patients view diagnostic records in standard browsers. Doctors demand highly secure relational audit trails.",
+                budget: "High",
+                users: "Doctors & Web patients",
+                scale: "Stable performance",
+                security: "HIPAA Compliant Relational",
+                eventText: "E-Health cyber security threat detected! Patients report database leak concerns. You must prioritize relational encryption checks.",
+                correctPrimary: "web",
+                correctSecondary: "enterprise",
+                correctDB: "relational",
+                correctDeploy: "intranet"
+            },
+            university: {
+                title: "Case 3: University LMS System",
+                desc: "Online course management supporting 50,000 students. Heavy load spikes occur during exam weeks, while database structures store records of grades.",
+                budget: "Medium",
+                users: "Students & Instructors",
+                scale: "Extreme exam spikes",
+                security: "Relational records integrity",
+                eventText: "LMS server traffic doubles! Exam week clicks crash local systems. Scale the hosting infrastructure to virtual tiers immediately.",
+                correctPrimary: "web",
+                correctSecondary: "cloud",
+                correctDB: "relational",
+                correctDeploy: "universal"
+            }
+        };
+
+        let l2Attempt = 1;
+        let l2CompletedCount = 0;
+
+        function changeL2Case() {
+            l2Attempt = 1;
+            document.getElementById('l2-event-alert').style.display = 'none';
+            document.getElementById('qf-l2').innerHTML = "";
+            document.getElementById('l2-hint-box').style.display = 'none';
+            document.getElementById('l2-reinforcement').style.display = 'none';
+
+            const caseKey = document.getElementById('l2CaseSelect').value;
+            const c = l2CasesData[caseKey];
+
+            document.getElementById('l2-title').textContent = c.title;
+            document.getElementById('l2-desc').textContent = c.desc;
+            document.getElementById('l2-stat-budget').textContent = c.budget;
+            document.getElementById('l2-stat-users').textContent = c.users;
+            document.getElementById('l2-stat-scale').textContent = c.scale;
+            document.getElementById('l2-stat-security').textContent = c.security;
+
+            resetL2Gauges();
+        }
+
+        function resetL2Gauges() {
+            document.getElementById('l2-metric-fit').textContent = "0%";
+            document.getElementById('l2-metric-scale').textContent = "0%";
+            document.getElementById('l2-metric-access').textContent = "0%";
+            document.getElementById('l2-metric-cx').textContent = "0%";
+            document.getElementById('l2-metric-readiness').textContent = "-";
+            const meter = document.getElementById('l2Meter');
+            if (meter) meter.style.width = "0%";
+        }
+
+        function submitL2Evaluation() {
+            const caseKey = document.getElementById('l2CaseSelect').value;
+            const c = l2CasesData[caseKey];
+
+            const primary = document.getElementById('l2-primary').value;
+            const secondary = document.getElementById('l2-secondary').value;
+            const db = document.getElementById('l2-db').value;
+            const deploy = document.getElementById('l2-deploy').value;
+
+            const feedback = document.getElementById('qf-l2');
+
+            if (l2Attempt === 1) {
+                l2Attempt = 2;
+                document.getElementById('l2-event-alert').style.display = 'block';
+                document.getElementById('l2-event-text').textContent = c.eventText;
+                feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Constraints changed. Modify platform recommendations below to match the crisis!`;
+                feedback.style.color = 'var(--code-warn)';
+                return;
+            }
+
+            const primaryCorrect = (primary === c.correctPrimary);
+            const secondaryCorrect = (secondary === c.correctSecondary);
+            const dbCorrect = (db === c.correctDB);
+            const deployCorrect = (deploy === c.correctDeploy);
+
+            let score = 0;
+            if (primaryCorrect) score += 25;
+            if (secondaryCorrect) score += 25;
+            if (dbCorrect) score += 25;
+            if (deployCorrect) score += 25;
+
+            let fit = score;
+            let scale = secondaryCorrect ? 100 : 30;
+            let access = primaryCorrect && deployCorrect ? 100 : 40;
+            let cx = primaryCorrect ? 100 : 50;
+            let readiness = score >= 75 ? 'Optimal' : (score >= 50 ? 'Medium' : 'Low');
+
+            // Update gauges
+            document.getElementById('l2-metric-fit').textContent = `${fit}%`;
+            document.getElementById('l2-metric-scale').textContent = `${scale}%`;
+            document.getElementById('l2-metric-access').textContent = `${access}%`;
+            document.getElementById('l2-metric-cx').textContent = `${cx}%`;
+            document.getElementById('l2-metric-readiness').textContent = readiness;
+
+            const meter = document.getElementById('l2Meter');
+            if (meter) {
+                meter.style.width = `${score}%`;
+                meter.style.background = score === 100 ? 'var(--code-ok)' : (score >= 50 ? 'var(--code-warn)' : 'var(--code-err)');
+            }
+
+            if (score === 100) {
+                l2CompletedCount++;
+                feedback.innerHTML = `<strong>✓ Constraint Solved!</strong> Strategy successfully protects e-business scaling guidelines under dynamic crisis changes.`;
+                feedback.style.color = 'var(--code-ok)';
+
+                if (l2CompletedCount >= 2) {
+                    unlockBadge('badge-consultant', '🏆 Business Consultant');
+                    unlockBadge('badge-scalability', '🏆 Scalability Specialist');
+                    promoteConsultant(3);
+                }
+
+                const reinf = document.getElementById('l2-reinforcement');
+                if (reinf) {
+                    reinf.style.display = 'block';
+                    reinf.innerHTML = `
+        <h3>Level 2 Completed! Business Consultant Badge Unlocked 🏆</h3>
+        <div class="tip-box" style="margin-top:0.5rem;">
+          <strong>Chaffey's Rule of Platform Adaptation:</strong> E-business managers must dynamically monitor user workloads and operational budgets, routing traffic via browser channels during cash-flow crises.
+        </div>
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button class="run-btn" onclick="switchLevel('31', 3)">Proceed to Level 3: Boss Architect Mission ➔</button>
+        </div>
+      `;
+                }
+            } else {
+                feedback.style.color = 'var(--code-err)';
+                let errorDetail = "";
+                if (!primaryCorrect) errorDetail += "• Primary client platform mismatch. ";
+                if (!secondaryCorrect) errorDetail += "• Secondary database hosting is sub-optimal. ";
+                if (!dbCorrect) errorDetail += "• DB relational/object model lacks integrity. ";
+                if (!deployCorrect) errorDetail += "• App Store fees overload budget limits. ";
+                feedback.innerHTML = `<strong>✗ Sub-optimal Strategy</strong><br>${errorDetail}Adjust options and submit evaluation again.`;
+            }
+            updateRatings(2);
+        }
+
+        /* ─── LEVEL 3: DIGITAL BUSINESS INFRASTRUCTURE SIMULATOR ─── */
+        let l3Phase = 1;
+        let l3EventKey = "";
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        const l3PhasesData = {
+            1: {
+                title: "Phase 1: Startup Launch",
+                desc: "Deploy a basic e-commerce channel supporting 5,000 local users with mobile needs on a tight bootstrap budget.",
+                scale: "Small Startup",
+                load: "5,000 Users",
+                selectors: [
+                    {
+                        id: "l3-sel-primary", label: "Primary Platform Focus", options: [
+                            { val: "web", text: "Web Platform (Universal reach, low friction)" },
+                            { val: "desktop", text: "Desktop Platform (Local client installer)" },
+                            { val: "enterprise", text: "Enterprise Platform (Complex CRM/ERP)" }
+                        ]
+                    },
+                    {
+                        id: "l3-sel-access", label: "Customer Onboarding Channel", options: [
+                            { val: "browser", text: "Browser URL Onboarding (Instant access)" },
+                            { val: "native_app", text: "Native App Store (Requires install download)" }
+                        ]
+                    },
+                    {
+                        id: "l3-sel-cloud", label: "Basic Hosting Infrastructure", options: [
+                            { val: "vps", text: "Single Cloud VPS node (Cost-effective)" },
+                            { val: "cluster", text: "Multi-region distributed cluster (Expensive)" }
+                        ]
+                    }
+                ]
+            },
+            2: {
+                title: "Phase 2: Rapid Growth",
+                desc: "Your platform succeeds! Demand climbs to 100,000 active users. Mobile traffic doubles and database writes lock up during surges.",
+                scale: "National Business",
+                load: "100,000 Users",
+                selectors: [
+                    {
+                        id: "l3-sel-elastic", label: "Scaling Architecture", options: [
+                            { val: "elastic", text: "Cloud Elastic Auto-Scaling (Dynamic servers)" },
+                            { val: "static", text: "Static Dedicated Server (Fixed resource limit)" }
+                        ]
+                    },
+                    {
+                        id: "l3-sel-mobile", label: "Mobile Optimisation Strategy", options: [
+                            { val: "pwa", text: "Progressive Web App (Responsive touch client)" },
+                            { val: "desktop_only", text: "Desktop-Optimised Core Interface" }
+                        ]
+                    },
+                    {
+                        id: "l3-sel-db", label: "Database Model", options: [
+                            { val: "document", text: "Cloud Object/Document Store (Highly concurrent)" },
+                            { val: "flat_file", text: "Local Flat Files (Writes lock the processor)" }
+                        ]
+                    }
+                ]
+            },
+            3: {
+                title: "Phase 3: International Expansion",
+                desc: "Scale your e-business to Europe and Asia. Support multiple languages, localized low latency, and remote operations teams.",
+                scale: "International Enterprise",
+                load: "500,000 Users",
+                selectors: [
+                    {
+                        id: "l3-sel-topology", label: "Global Hosting Topology", options: [
+                            { val: "cdn", text: "Edge CDN Content Caching (Low local latency)" },
+                            { val: "origin", text: "Single Central Origin Server (High distance latency)" }
+                        ]
+                    },
+                    {
+                        id: "l3-sel-ops", label: "Employee Operations platform", options: [
+                            { val: "saas", text: "Cloud SaaS Suite (Access from anywhere)" },
+                            { val: "intranet", text: "Local Intranet Desktop system (Requires VPN links)" }
+                        ]
+                    },
+                    {
+                        id: "l3-sel-integration", label: "System Integration Strategy", options: [
+                            { val: "apis", text: "REST APIs Layer (Standardized data interchange)" },
+                            { val: "batch", text: "Manual daily CSV batch imports" }
+                        ]
+                    }
+                ]
+            },
+            4: {
+                title: "Phase 4: Unexpected Business Events",
+                desc: "An unexpected event occurs. Pick your emergency policy configuration immediately to protect business availability.",
+                scale: "Global Digital Platform",
+                load: "1,000,000+ Users"
+            }
+        };
+
+        const l3Events = {
+            festival: {
+                text: "🚨 Traffic Spikes: Global holiday festival triggers a 5x increase in request rates! Core databases report thread exhaust warnings.",
+                label: "Emergency Traffic Response Strategy",
+                options: [
+                    { val: "scale_edge", text: "Deploy serverless CDN edge cache and trigger auto-scaler (Optimal)" },
+                    { val: "queue", text: "Activate load-balancer queue to restrict concurrent users (Acceptable)" },
+                    { val: "none", text: "Keep current servers online and wait out the traffic surge (Needs Improvement)" }
+                ],
+                correct: "scale_edge"
+            },
+            mobile_shift: {
+                text: "🚨 Mobile Surge: Shoppers shift almost entirely to smartphones; desktop portal traffic drops to 2%. Users report layout shifts.",
+                label: "Mobile Interface Policy",
+                options: [
+                    { val: "pwa_bundle", text: "Publish lightweight PWA web assets to edge servers (Optimal)" },
+                    { val: "responsive", text: "Apply standard CSS responsive grids (Good)" },
+                    { val: "native_lock", text: "Force users to download a native App from Stores (Acceptable)" }
+                ],
+                correct: "pwa_bundle"
+            },
+            cloud_outage: {
+                text: "🚨 Provider Failure: Your central cloud database cluster experiences a primary hardware lock, dropping the site offline.",
+                label: "Availability Recovery Action",
+                options: [
+                    { val: "failover", text: "Trigger multi-zone DNS failover replication backup (Optimal)" },
+                    { val: "readonly", text: "Redirect users to a read-only cached page (Acceptable)" },
+                    { val: "queue_db", text: "Enable offline checkout storage sync queues (Good)" }
+                ],
+                correct: "failover"
+            },
+            acquisition: {
+                text: "🚨 Corporate Merger: The board acquires a logistics provider running legacy local desktop database ledgers.",
+                label: "System Consolidation Strategy",
+                options: [
+                    { val: "api_layer", text: "Integrate database databases via a REST API layer (Optimal)" },
+                    { val: "csv", text: "Export daily data manually via CSV transfers (Needs Improvement)" },
+                    { val: "rebuild", text: "Discard the logistics DBMS and rebuild ledger tables (Acceptable)" }
+                ],
+                correct: "api_layer"
+            }
+        };
+
+        function renderL3Selectors() {
+            const container = document.getElementById('l3-selectors-container');
+            container.innerHTML = "";
+
+            if (l3Phase === 1 || l3Phase === 2 || l3Phase === 3) {
+                const data = l3PhasesData[l3Phase];
+                document.getElementById('l3-phase-badge').textContent = data.title;
+                document.getElementById('l3-brief-text').textContent = data.desc;
+                document.getElementById('l3-scale-level').textContent = data.scale;
+                document.getElementById('l3-load-users').textContent = data.load;
+                document.getElementById('l3-phase-title').textContent = `${data.title} Scenario`;
+                document.getElementById('l3-phase-desc').textContent = "Configure your infrastructure nodes:";
+
+                data.selectors.forEach(sel => {
+                    let jumbledOptions = shuffleArray(sel.options);
+                    let optionsHtml = jumbledOptions.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+                    container.innerHTML += `
+        <div>
+          <span class="tk-label">${sel.label}</span>
+          <select id="${sel.id}" class="tk-entry" style="width:100%;">
+            ${optionsHtml}
+          </select>
+        </div>
+      `;
+                });
+            } else if (l3Phase === 4) {
+                if (!l3EventKey) {
+                    const keys = Object.keys(l3Events);
+                    l3EventKey = keys[Math.floor(Math.random() * keys.length)];
+                }
+                const ev = l3Events[l3EventKey];
+                const data = l3PhasesData[4];
+
+                document.getElementById('l3-phase-badge').textContent = data.title;
+                document.getElementById('l3-brief-text').textContent = data.desc;
+                document.getElementById('l3-scale-level').textContent = data.scale;
+                document.getElementById('l3-load-users').textContent = data.load;
+                document.getElementById('l3-phase-title').textContent = "Crisis Mitigation";
+                document.getElementById('l3-phase-desc').textContent = "Select your emergency policy strategy:";
+
+                document.getElementById('l3-challenge-box').className = "warn-box";
+                document.getElementById('l3-challenge-box').innerHTML = `<h4>🚨 EVENT: ${l3EventKey.toUpperCase()}</h4><p>${ev.text}</p>`;
+
+                let jumbledOptions = shuffleArray(ev.options);
+                let optionsHtml = jumbledOptions.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+                container.innerHTML = `
+      <div style="grid-column: 1 / -1;">
+        <span class="tk-label">${ev.label}</span>
+        <select id="l3-sel-crisis" class="tk-entry" style="width:100%; border-color:var(--primary);">
+          ${optionsHtml}
+        </select>
+      </div>
+    `;
+            }
+        }
+
+        function submitL3Phase() {
+            const feedback = document.getElementById('qf-l3');
+            let rating = "Needs Improvement";
+
+            let access = 0;
+            let scale = 0;
+            let continuity = 0;
+            let readiness = 0;
+            let integration = 0;
+            let cx = 0;
+            let availability = 0;
+
+            if (l3Phase === 1) {
+                const primary = document.getElementById('l3-sel-primary').value;
+                const accessChannel = document.getElementById('l3-sel-access').value;
+                const cloud = document.getElementById('l3-sel-cloud').value;
+
+                if (primary === "web" && accessChannel === "browser" && cloud === "vps") {
+                    rating = "Excellent";
+                    access = 95; scale = 40; continuity = 40; readiness = 90; integration = 80; cx = 90; availability = 85;
+                    feedback.innerHTML = `<strong>✓ Startup Launch Successful!</strong> Universal web links keep cost low and customer onboarding frictionless. Dave Chaffey recommends minimizing access barriers at launch.`;
+                } else if (primary === "desktop" || accessChannel === "native_app") {
+                    rating = "Needs Improvement";
+                    access = 30; scale = 20; continuity = 30; readiness = 40; integration = 50; cx = 40; availability = 50;
+                    feedback.innerHTML = `<strong>✗ High Onboarding Friction!</strong> Forcing users to download local desktop installers or app stores blocks startup client reach. Try Web/Browser options.`;
+                } else {
+                    rating = "Good";
+                    access = 70; scale = 50; continuity = 50; readiness = 70; integration = 70; cx = 70; availability = 70;
+                    feedback.innerHTML = `<strong>Acceptable Configuration.</strong> Multi-region hosting spikes budget burn. Basic Cloud VPS is better for 5k local users. Try again for Excellent.`;
+                }
+            }
+            else if (l3Phase === 2) {
+                const scaling = document.getElementById('l3-sel-elastic').value;
+                const mobile = document.getElementById('l3-sel-mobile').value;
+                const db = document.getElementById('l3-sel-db').value;
+
+                if (scaling === "elastic" && mobile === "pwa" && db === "document") {
+                    rating = "Excellent";
+                    access = 90; scale = 95; continuity = 70; readiness = 95; integration = 90; cx = 95; availability = 90;
+                    feedback.innerHTML = `<strong>✓ Growth Scaled Successfully!</strong> Elastic scaling handles traffic click surges, PWAs retain mobile clients, and document databases avoid transaction read/write lockouts.`;
+                } else if (scaling === "static" || db === "flat_file") {
+                    rating = "Needs Improvement";
+                    access = 60; scale = 20; continuity = 20; readiness = 30; integration = 40; cx = 30; availability = 30;
+                    feedback.innerHTML = `<strong>✗ Platform Crashed!</strong> Static server locks and local flat-files block multiple database writes during user scaling. Use Elastic scaling & Document database models.`;
+                } else {
+                    rating = "Good";
+                    access = 80; scale = 70; continuity = 60; readiness = 80; integration = 70; cx = 80; availability = 80;
+                    feedback.innerHTML = `<strong>Good, but sub-optimal.</strong> A desktop-only core interface locks out mobile drivers. Choose PWA mobile options.`;
+                }
+            }
+            else if (l3Phase === 3) {
+                const topology = document.getElementById('l3-sel-topology').value;
+                const ops = document.getElementById('l3-sel-ops').value;
+                const integrationVal = document.getElementById('l3-sel-integration').value;
+
+                if (topology === "cdn" && ops === "saas" && integrationVal === "apis") {
+                    rating = "Excellent";
+                    access = 95; scale = 95; continuity = 90; readiness = 95; integration = 95; cx = 95; availability = 95;
+                    feedback.innerHTML = `<strong>✓ Global Expansion Blueprints Active!</strong> Distributed Edge CDNs cut network latency across continents, Cloud SaaS enables global remote operations, and REST APIs standardise records sync.`;
+                } else if (topology === "origin" || integrationVal === "batch") {
+                    rating = "Needs Improvement";
+                    access = 50; scale = 50; continuity = 40; readiness = 50; integration = 30; cx = 50; availability = 45;
+                    feedback.innerHTML = `<strong>✗ Network Latency Issues!</strong> Single-node servers increase distance RTT latency, causing global timeouts. Manual CSV batch imports fail real-time inventory checks. Use CDN and API structures.`;
+                } else {
+                    rating = "Good";
+                    access = 80; scale = 80; continuity = 80; readiness = 80; integration = 70; cx = 80; availability = 80;
+                    feedback.innerHTML = `<strong>Acceptable.</strong> Local Intranet desktop systems lock remote operators out without private VPN packages. Choose Cloud SaaS.`;
+                }
+            }
+            else if (l3Phase === 4) {
+                const crisis = document.getElementById('l3-sel-crisis').value;
+                const ev = l3Events[l3EventKey];
+
+                if (crisis === ev.correct) {
+                    rating = "Excellent";
+                    access = 95; scale = 95; continuity = 95; readiness = 95; integration = 95; cx = 95; availability = 95;
+                    feedback.innerHTML = `<strong>✓ Crisis Solved!</strong> Emergency response policy correctly restores platform availability. Digital Business continuity guaranteed.`;
+
+                    unlockBadge('badge-continuity', '🏆 Business Continuity Champion');
+                    unlockBadge('badge-architect', '🏆 Digital Business Architect');
+                    promoteConsultant(4);
+
+                    // Render consulting report
+                    const reportCard = document.getElementById('l3-report-card');
+                    reportCard.style.display = "block";
+                    reportCard.innerHTML = `
+        <h3>Digital Infrastructure Consulting Report</h3>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 1.2rem;">Simulation Status: <strong>Completed</strong></p>
+        
+        <div class="info-box" style="background:#fff; border-color:var(--code-ok);">
+          <strong>💪 Strengths</strong>
+          <ul style="font-size:0.85rem; margin-top:0.4rem; padding-left:1.2rem; line-height:1.5;">
+            <li>✔ Excellent customer accessibility via web storefront browser channels.</li>
+            <li>✔ Elastic cloud scalability dynamically handling user scaling demands.</li>
+            <li>✔ Strong business continuity controls protecting platform availability during crisis events.</li>
+          </ul>
+        </div>
+
+        <div class="tip-box" style="background:#fff; border-color:var(--code-warn);">
+          <strong>💡 Recommendations</strong>
+          <ul style="font-size:0.85rem; margin-top:0.4rem; padding-left:1.2rem; line-height:1.5;">
+            <li>Promote multi-platform configuration templates to global deployment pipelines.</li>
+            <li>Maintain periodic automated database replication checks to protect data integrity.</li>
+          </ul>
+        </div>
+      `;
+
+                    // Render blueprint block
+                    const playground = document.getElementById('l3Playground');
+                    const out = document.getElementById('l3Out');
+                    playground.style.display = "block";
+                    out.innerHTML = `digital_business_infrastructure:
+  target: Startup to Global Platform
+  status: Completed
+  phases_survived: 4/4
+  mitigation_strategy: ${crisis}
+  consulting_rating: Excellent`;
+                } else {
+                    rating = "Needs Improvement";
+                    access = 40; scale = 40; continuity = 30; readiness = 40; integration = 50; cx = 40; availability = 30;
+                    feedback.innerHTML = `<strong>✗ Outage Alert!</strong> The selected strategy failed to mitigate the event, causing database timeouts and client disconnects. Choose a more resilient recovery/failover policy.`;
+                }
+            }
+
+            // Update HUD
+            document.getElementById('l3-hud-access').textContent = `${access}%`;
+            document.getElementById('l3-hud-scale').textContent = `${scale}%`;
+            document.getElementById('l3-hud-continuity').textContent = `${continuity}%`;
+            document.getElementById('l3-hud-readiness').textContent = `${readiness}%`;
+            document.getElementById('l3-hud-integration').textContent = `${integration}%`;
+            document.getElementById('l3-hud-cx').textContent = `${cx}%`;
+            document.getElementById('l3-hud-availability').textContent = `${availability}%`;
+
+            if (rating === "Excellent") {
+                feedback.style.color = 'var(--code-ok)';
+                document.getElementById('l3-submit-btn').disabled = true;
+
+                if (l3Phase < 4) {
+                    document.getElementById('nextL3Btn').style.display = 'inline-flex';
+                }
+            } else {
+                feedback.style.color = 'var(--code-err)';
+                document.getElementById('l3-submit-btn').disabled = false;
+            }
+        }
+
+        function proceedL3NextPhase() {
+            document.getElementById('nextL3Btn').style.display = 'none';
+            document.getElementById('qf-l3').innerHTML = "";
+            document.getElementById('l3-submit-btn').disabled = false;
+
+            const cb = document.getElementById('l3-challenge-box');
+            if (cb) {
+                cb.className = "challenge-box";
+            }
+
+            if (l3Phase === 1) {
+                l3Phase = 2;
+                renderL3Selectors();
+            } else if (l3Phase === 2) {
+                l3Phase = 3;
+                unlockBadge('badge-scalability', '🏆 Scalability Specialist');
+                renderL3Selectors();
+            } else if (l3Phase === 3) {
+                l3Phase = 4;
+                unlockBadge('badge-planner', '🏆 Infrastructure Planner');
+                renderL3Selectors();
+            }
+        }
+
+        /* ─── GAMIFIED RATINGS CONTROLLER ─── */
+        const rankTitle = {
+            1: "Junior Detective",
+            2: "Platform Detective",
+            3: "Business Consultant",
+            4: "Chief Architect"
+        };
+
+        function promoteConsultant(level) {
+            const starsEl = document.getElementById('consultant-stars');
+            const rankEl = document.getElementById('consultant-rank');
+
+            if (starsEl) {
+                if (level === 2) {
+                    starsEl.textContent = "⭐⭐⭐";
+                } else if (level === 3) {
+                    starsEl.textContent = "⭐⭐⭐⭐";
+                } else if (level === 4) {
+                    starsEl.textContent = "⭐⭐⭐⭐⭐";
+                }
+            }
+            if (rankEl) {
+                rankEl.textContent = rankTitle[level];
+            }
+        }
+
+        function unlockBadge(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.background = 'var(--primary-light)';
+                el.style.color = 'var(--primary)';
+                el.style.borderColor = 'var(--primary)';
+                el.style.fontWeight = '700';
+                el.textContent = text;
+            }
+        }
+
+        function updateRatings(level) {
+            const sel = document.getElementById('stat-sel');
+            const strat = document.getElementById('stat-strat');
+            const fit = document.getElementById('stat-fit');
+            const acc = document.getElementById('stat-acc');
+            const des = document.getElementById('stat-des');
+            const read = document.getElementById('stat-read');
+
+            if (level === 1) {
+                const accuracy = Math.round((l1Score / l1Round) * 100);
+                if (sel) sel.textContent = accuracy >= 80 ? 'A' : (accuracy >= 50 ? 'B' : 'C');
+                if (strat) strat.textContent = l1Round >= 4 ? 'A' : 'B';
+            } else if (level === 2) {
+                if (fit) fit.textContent = 'A';
+                if (acc) acc.textContent = 'A';
+            } else if (level === 3) {
+                if (des) des.textContent = 'A+';
+                if (read) read.textContent = 'A+';
+            }
+        }
+
+        // Initialise defaults on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderL1Round();
+            changeL2Case();
+            renderL3Selectors();
+        });
+    </script>
+</body>
+
+</html>
