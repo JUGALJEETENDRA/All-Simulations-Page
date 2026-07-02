@@ -1,1105 +1,550 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Module 3.2 – Internet Technologies &amp; Networking</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
-
-        :root {
-            color-scheme: light;
-            --primary: #E63946;
-            --primary-hover: #D62828;
-            --primary-light: rgba(230, 57, 70, 0.08);
-            --secondary: #FF4D6D;
-            --bg-page: #F8F9FA;
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --bg-card-hover: #FFFFFF;
-            --text-main: #1D1D1F;
-            --text-muted: #6E6E73;
-            --border-light: rgba(0, 0, 0, 0.08);
-            --code-bg: #1E1E24;
-            --code-text: #F8F9FA;
-            --code-ok: #2A9D8F;
-            --code-warn: #E9C46A;
-            --code-err: #E63946;
-            --vendor-bg: #e5e5e5;
-            --user-bg: #E63946;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
-            --radius-lg: 16px;
-            --radius-md: 10px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-page);
-            color: var(--text-main);
-            line-height: 1.6;
-            scroll-behavior: smooth;
-        }
-
-        /* ─── NAVIGATION ─── */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 64px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            z-index: 1000;
-            padding: 0 2rem;
-        }
-
-        .nav-brand {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 1.1rem;
-            color: var(--text-main);
-            margin-right: auto;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-brand span {
-            color: var(--primary);
-        }
-
-        nav a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            padding: 0.4rem 0.8rem;
-            border-radius: var(--radius-md);
-        }
-
-        nav a:hover,
-        nav a.active {
-            color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        /* ─── COMPACT HERO ─── */
-        .hero {
-            margin-top: 64px;
-            padding: 2rem 2rem 1.5rem;
-            text-align: center;
-            background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%);
-        }
-
-        .hero-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            background: var(--primary-light);
-            color: var(--primary);
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 99px;
-            margin-bottom: 0.6rem;
-        }
-
-        .hero h1 {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            line-height: 1.2;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero p {
-            max-width: 600px;
-            margin: 0 auto 1.2rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .hero-stat strong {
-            display: block;
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 1.3rem;
-            color: var(--primary);
-        }
-
-        .hero-stat span {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-
-        /* ─── LAYOUT & SECTIONS ─── */
-        .section {
-            padding: 3rem 1.5rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 2rem;
-        }
-
-        .section-icon {
-            font-size: 2.5rem;
-            background: var(--bg-card);
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-        }
-
-        .section-header h2 {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 1.8rem;
-            letter-spacing: -0.5px;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .section-num {
-            margin-left: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
-            font-weight: 700;
-            color: rgba(0, 0, 0, 0.08);
-        }
-
-        /* ─── LEVEL PILLS & CARDS ─── */
-        .level-pills {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .level-pill {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .level-pill:hover {
-            border-color: var(--primary);
-        }
-
-        .level-pill.active {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
-        }
-
-        .level-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .level-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .card h3 {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-        }
-
-        /* ─── CALLOUT BOXES ─── */
-        .info-box,
-        .tip-box,
-        .warn-box,
-        .challenge-box {
-            padding: 1rem 1.2rem;
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            margin: 1.2rem 0;
-            border-left: 4px solid;
-        }
-
-        .info-box {
-            background: rgba(42, 157, 143, 0.08);
-            border-color: var(--code-ok);
-        }
-
-        .tip-box {
-            background: var(--primary-light);
-            border-color: var(--primary);
-        }
-
-        .warn-box {
-            background: rgba(233, 196, 106, 0.15);
-            border-color: var(--code-warn);
-        }
-
-        .challenge-box {
-            background: #fff;
-            border: 1px solid var(--border-light);
-            padding: 1.5rem;
-        }
-
-        .challenge-box h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.6rem;
-            color: var(--text-main);
-        }
-
-        /* ─── QUIZZES ─── */
-        .quiz-option {
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: var(--bg-page);
-            border: 1px solid var(--border-light);
-            padding: 0.8rem 1.2rem;
-            border-radius: var(--radius-md);
-            margin: 0.5rem 0;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quiz-option:hover {
-            background: #fff;
-            border-color: var(--primary);
-        }
-
-        .quiz-feedback {
-            margin-top: 0.8rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            min-height: 1.2rem;
-        }
-
-        /* ─── INTERACTIVE ELEMENTS ─── */
-        .run-btn {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 0.8rem 1.6rem;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .run-btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
-        }
-
-        .tk-entry {
-            background: #fff;
-            border: 1px solid var(--border-light);
-            padding: 0.7rem 1rem;
-            border-radius: var(--radius-md);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .tk-entry:focus {
-            border-color: var(--primary);
-        }
-
-        .tk-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            display: block;
-        }
-
-        .gauge-wrap {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1.2rem;
-            flex-wrap: wrap;
-        }
-
-        .gauge-num {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 2rem;
-            color: var(--primary);
-        }
-
-        .gauge-sub {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-        }
-
-        .meter-bar {
-            height: 10px;
-            background: rgba(0, 0, 0, 0.06);
-            border-radius: 99px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-        }
-
-        .meter-fill {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        /* ─── PACKET TRACER ANIMATION ─── */
-        .net-visual-track {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 2rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-light);
-            position: relative;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .net-node {
-            text-align: center;
-            z-index: 2;
-            position: relative;
-        }
-
-        .net-node .icon {
-            font-size: 2.5rem;
-            background: #fff;
-            border-radius: 50%;
-            padding: 0.5rem;
-            border: 2px solid var(--border-light);
-        }
-
-        .net-node h4 {
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-        }
-
-        .net-line {
-            position: absolute;
-            top: 50%;
-            left: 10%;
-            right: 10%;
-            height: 2px;
-            background: var(--border-light);
-            z-index: 1;
-            transform: translateY(-50%);
-        }
-
-        .net-packet {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background: var(--primary);
-            border-radius: 50%;
-            top: 50%;
-            left: 10%;
-            transform: translate(-50%, -50%);
-            z-index: 3;
-            opacity: 0;
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        /* ─── TERMINALS & PLAYGROUNDS ─── */
-        .playground {
-            background: var(--code-bg);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            margin-top: 1.2rem;
-            box-shadow: var(--shadow-md);
-        }
-
-        .playground-header {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.6rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .dot-r {
-            background: #FF5F56;
-        }
-
-        .dot-y {
-            background: #FFBD2E;
-        }
-
-        .dot-g {
-            background: #27C93F;
-        }
-
-        .playground-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-left: 0.5rem;
-        }
-
-        .playground-output {
-            padding: 1.2rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--code-text);
-            white-space: pre-wrap;
-            max-height: 320px;
-            overflow-y: auto;
-        }
-
-        .out-info {
-            color: #61AFEF;
-        }
-
-        .out-ok {
-            color: var(--code-ok);
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 1rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border-light);
-            margin-top: 2rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3.2 – Internet Technologies &amp; Networking</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+  :root {
+    color-scheme: light;
+    --primary: #E63946;
+    --primary-hover: #D62828;
+    --primary-light: rgba(230, 57, 70, 0.08);
+    --secondary: #FF4D6D;
+    --bg-page: #F8F9FA;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-card-hover: #FFFFFF;
+    --text-main: #1D1D1F;
+    --text-muted: #6E6E73;
+    --border-light: rgba(0, 0, 0, 0.08);
+    --code-bg: #1E1E24;
+    --code-text: #F8F9FA;
+    --code-ok: #2A9D8F;
+    --code-warn: #E9C46A;
+    --code-err: #E63946;
+    --vendor-bg: #e5e5e5;
+    --user-bg: #E63946;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+    --radius-lg: 16px;
+    --radius-md: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-page); color: var(--text-main); line-height: 1.6; scroll-behavior: smooth; }
+
+  /* ─── NAVIGATION ─── */
+  nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; gap: 1.5rem; z-index: 1000; padding: 0 2rem; }
+  .nav-brand { font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; color: var(--text-main); margin-right: auto; letter-spacing: -0.5px; }
+  .nav-brand span { color: var(--primary); }
+  nav a { text-decoration: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; transition: all 0.2s; padding: 0.4rem 0.8rem; border-radius: var(--radius-md); }
+  nav a:hover, nav a.active { color: var(--primary); background: var(--primary-light); }
+
+  /* ─── COMPACT HERO ─── */
+  .hero { margin-top: 64px; padding: 2rem 2rem 1.5rem; text-align: center; background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%); }
+  .hero-badge { display: inline-block; padding: 0.3rem 0.8rem; background: var(--primary-light); color: var(--primary); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-radius: 99px; margin-bottom: 0.6rem; }
+  .hero h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.2; letter-spacing: -1px; margin-bottom: 0.5rem; }
+  .hero p { max-width: 600px; margin: 0 auto 1.2rem; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+  .hero-stats { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+  .hero-stat strong { display: block; font-family: 'Archivo Black', sans-serif; font-size: 1.3rem; color: var(--primary); }
+  .hero-stat span { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+
+  /* ─── LAYOUT & SECTIONS ─── */
+  .section { padding: 3rem 1.5rem; border-bottom: 1px solid var(--border-light); }
+  .container { max-width: 960px; margin: 0 auto; }
+  .section-header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem; }
+  .section-icon { font-size: 2.5rem; background: var(--bg-card); width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
+  .section-header h2 { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; letter-spacing: -0.5px; }
+  .section-header p { color: var(--text-muted); font-size: 0.95rem; }
+  .section-num { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: rgba(0, 0, 0, 0.08); }
+
+  /* ─── LEVEL PILLS & CARDS ─── */
+  .level-pills { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .level-pill { background: var(--bg-card); border: 1px solid var(--border-light); padding: 0.6rem 1.2rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+  .level-pill:hover { border-color: var(--primary); }
+  .level-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25); }
+  
+  .level-content { display: none; animation: fadeIn 0.3s ease; }
+  .level-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); }
+  .card h3 { font-family: 'Archivo Black', sans-serif; font-size: 1.3rem; margin-bottom: 1rem; color: var(--text-main); }
+  
+  /* ─── CALLOUT BOXES ─── */
+  .info-box, .tip-box, .warn-box, .challenge-box { padding: 1rem 1.2rem; border-radius: var(--radius-md); font-size: 0.9rem; margin: 1.2rem 0; border-left: 4px solid; }
+  .info-box { background: rgba(42, 157, 143, 0.08); border-color: var(--code-ok); }
+  .tip-box { background: var(--primary-light); border-color: var(--primary); }
+  .warn-box { background: rgba(233, 196, 106, 0.15); border-color: var(--code-warn); }
+  
+  .challenge-box { background: #fff; border: 1px solid var(--border-light); padding: 1.5rem; }
+  .challenge-box h4 { font-size: 1.1rem; margin-bottom: 0.6rem; color: var(--text-main); }
+  
+  /* ─── QUIZZES ─── */
+  .quiz-option { display: block; width: 100%; text-align: left; background: var(--bg-page); border: 1px solid var(--border-light); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); margin: 0.5rem 0; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .quiz-option:hover { background: #fff; border-color: var(--primary); }
+  .quiz-feedback { margin-top: 0.8rem; font-size: 0.85rem; font-weight: 600; min-height: 1.2rem; }
+
+  /* ─── INTERACTIVE ELEMENTS ─── */
+  .run-btn { background: var(--primary); color: #fff; border: none; padding: 0.8rem 1.6rem; border-radius: var(--radius-md); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .run-btn:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3); }
+  .tk-entry { background: #fff; border: 1px solid var(--border-light); padding: 0.7rem 1rem; border-radius: var(--radius-md); font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; }
+  .tk-entry:focus { border-color: var(--primary); }
+  .tk-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; display: block; }
+  
+  .gauge-wrap { display: flex; gap: 2rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .gauge-num { font-family: 'Archivo Black', sans-serif; font-size: 2rem; color: var(--primary); }
+  .gauge-sub { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+  .meter-bar { height: 10px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow: hidden; margin-top: 0.5rem; }
+  .meter-fill { height: 100%; transition: width 0.3s ease; }
+
+  /* ─── PACKET TRACER ANIMATION ─── */
+  .net-visual-track { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 2rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); position: relative; margin-bottom: 1.5rem; overflow: hidden; }
+  .net-node { text-align: center; z-index: 2; position: relative; }
+  .net-node .icon { font-size: 2.5rem; background: #fff; border-radius: 50%; padding: 0.5rem; border: 2px solid var(--border-light); }
+  .net-node h4 { font-size: 0.85rem; margin-top: 0.5rem; }
+  .net-line { position: absolute; top: 50%; left: 10%; right: 10%; height: 2px; background: var(--border-light); z-index: 1; transform: translateY(-50%); }
+  .net-packet { position: absolute; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; top: 50%; left: 10%; transform: translate(-50%, -50%); z-index: 3; opacity: 0; box-shadow: 0 0 10px var(--primary); }
+
+  /* ─── TERMINALS & PLAYGROUNDS ─── */
+  .playground { background: var(--code-bg); border-radius: var(--radius-lg); overflow: hidden; margin-top: 1.2rem; box-shadow: var(--shadow-md); }
+  .playground-header { background: rgba(255, 255, 255, 0.05); padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #FF5F56; } .dot-y { background: #FFBD2E; } .dot-g { background: #27C93F; }
+  .playground-title { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); margin-left: 0.5rem; }
+  .playground-output { padding: 1.2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--code-text); white-space: pre-wrap; max-height: 320px; overflow-y: auto; }
+  .out-info { color: #61AFEF; } .out-ok { color: var(--code-ok); }
+
+  footer { text-align: center; padding: 3rem 1rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-light); margin-top: 2rem; }
+</style>
 </head>
-
 <body>
 
-    <nav>
-        <div class="nav-brand">DB<span>/</span>MOD3</div>
-        <a href="3-3.2.html" class="active">3.2 Infra</a>
-    </nav>
+<nav>
+  <div class="nav-brand">DB<span>/</span>MOD3</div>
+  <a href="3-3.2.html" class="active">3.2 Infra</a>
+</nav>
 
-    <!-- COMPACT HERO BANNER -->
-    <div class="hero">
-        <div class="hero-badge">Module 3.2 · Internet Technologies &amp; Networking</div>
-        <h1>Internet Technologies &amp; Networking</h1>
-        <p>Learn Internet technologies by diagnosing issues, designing architectures under constraints, and managing
-            crises across quarters.</p>
-        <div class="hero-stats">
-            <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
-            <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
-            <div class="hero-stat"><strong>Live</strong><span>Simulator</span></div>
-        </div>
+<!-- COMPACT HERO BANNER -->
+<div class="hero">
+  <div class="hero-badge">Module 3.2 · Internet Technologies &amp; Networking</div>
+  <h1>Internet Technologies &amp; Networking</h1>
+  <p>Learn Internet technologies by diagnosing issues, designing architectures under constraints, and managing crises across quarters.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
+    <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
+    <div class="hero-stat"><strong>Live</strong><span>Simulator</span></div>
+  </div>
+</div>
+
+<!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
+<div class="section" id="theory-board">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-icon">📖</div>
+      <div>
+        <h2>Dave Chaffey's Reference Board</h2>
+        <p>Concise e-business networking infrastructure definitions</p>
+      </div>
+      <span class="section-num">Ref</span>
     </div>
 
-    <!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
-    <div class="section" id="theory-board">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-icon">📖</div>
-                <div>
-                    <h2>Dave Chaffey's Reference Board</h2>
-                    <p>Concise e-business networking infrastructure definitions</p>
-                </div>
-                <span class="section-num">Ref</span>
-            </div>
+    <div class="card">
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+        <div><strong>Internet:</strong> Public global network connecting clients, maximizing customer discovery.</div>
+        <div><strong>Intranet:</strong> Private internal network restricted to corporate employees, securing records.</div>
+        <div><strong>Extranet:</strong> Restricted portal extending intranet databases to authorized suppliers.</div>
+        <div><strong>DNS:</strong> Distributed directory service translating human URLs into machine IPs.</div>
+        <div><strong>HTTP &amp; HTTPS:</strong> HTTP sends clear text; HTTPS mandates TLS encryption to secure buyer cash flows.</div>
+        <div><strong>TCP/IP:</strong> Protocol suite formatting data into packets and guaranteeing error-free transport.</div>
+        <div><strong>Cloud Hosting:</strong> Remote virtualized server instances replacing physical local hardware.</div>
+        <div><strong>Edge CDN:</strong> Global edge node network serving cached static web pages locally, cutting latency.</div>
+        <div><strong>Client-Server:</strong> Browsers (clients) request and present pages, while backend servers run database ledgers.</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-            <div class="card">
-                <div
-                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
-                    <div><strong>Internet:</strong> Public global network connecting clients, maximizing customer
-                        discovery.</div>
-                    <div><strong>Intranet:</strong> Private internal network restricted to corporate employees, securing
-                        records.</div>
-                    <div><strong>Extranet:</strong> Restricted portal extending intranet databases to authorized
-                        suppliers.</div>
-                    <div><strong>DNS:</strong> Distributed directory service translating human URLs into machine IPs.
-                    </div>
-                    <div><strong>HTTP &amp; HTTPS:</strong> HTTP sends clear text; HTTPS mandates TLS encryption to
-                        secure buyer cash flows.</div>
-                    <div><strong>TCP/IP:</strong> Protocol suite formatting data into packets and guaranteeing
-                        error-free transport.</div>
-                    <div><strong>Cloud Hosting:</strong> Remote virtualized server instances replacing physical local
-                        hardware.</div>
-                    <div><strong>Edge CDN:</strong> Global edge node network serving cached static web pages locally,
-                        cutting latency.</div>
-                    <div><strong>Client-Server:</strong> Browsers (clients) request and present pages, while backend
-                        servers run database ledgers.</div>
-                </div>
-            </div>
-        </div>
+<!-- SIMULATION TASKS -->
+<div class="section" id="sec32">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-icon">🌐</div>
+      <div>
+        <h2>3.2 – Internet Infrastructure Strategy</h2>
+        <p>Interactive Network Strategy Simulation Game</p>
+      </div>
+      <span class="section-num">3.2</span>
     </div>
 
-    <!-- SIMULATION TASKS -->
-    <div class="section" id="sec32">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-icon">🌐</div>
-                <div>
-                    <h2>3.2 – Internet Infrastructure Strategy</h2>
-                    <p>Interactive Network Strategy Simulation Game</p>
-                </div>
-                <span class="section-num">3.2</span>
-            </div>
-
-            <!-- LEVEL PILLS -->
-            <div class="level-pills" id="lp32">
-                <button class="level-pill active" onclick="switchLevel('32',1)">L1 Infrastructure Investigator</button>
-                <button class="level-pill" onclick="switchLevel('32',2)">L2 Digital Architect</button>
-                <button class="level-pill" onclick="switchLevel('32',3)">L3 Command Challenge</button>
-            </div>
-
-            <!-- PROGRESS TRACKER -->
-            <div class="progress-wrap">
-                <div class="progress-label"><span id="prog32-label">Level 1 of 3</span><span id="prog32-pct">33%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="prog32" style="width:33%"></div>
-                </div>
-            </div>
-
-            <!-- LEVEL 1: INFRASTRUCTURE INVESTIGATION LAB -->
-            <div class="level-content active" id="lc32-1">
-                <div class="card"
-                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-                    <span class="hero-badge">Level 1 Mission Brief</span>
-                    <h3>Infrastructure Investigation Lab</h3>
-                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-                        Role: Junior Digital Infrastructure Analyst. Several digital businesses are experiencing
-                        operational problems. Investigate symptoms and deduce the root cause.
-                    </p>
-                </div>
-
-                <div class="card">
-                    <h3 id="l1-round-title">Round 1 of 3</h3>
-                    <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
-                        <h4 id="l1-case-title">Loading case...</h4>
-                        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;"
-                            id="l1-case-meta">
-                            <!-- Metadata details -->
-                        </div>
-
-                        <!-- Dynamic selections -->
-                        <div id="l1-selectors"
-                            style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
-                            <!-- Dropdowns loaded dynamically -->
-                        </div>
-
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-                            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Diagnose
-                                Issue</button>
-                            <button class="run-btn"
-                                style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
-                                onclick="toggleHint(1)">💡 Need Help?</button>
-                        </div>
-
-                        <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
-                        <div class="quiz-feedback" id="qf-l1" style="margin-top:1.2rem;"></div>
-
-                        <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1rem;"
-                            onclick="nextL1Round()">Next Challenge ➔</button>
-                    </div>
-
-                    <!-- LEVEL HUD -->
-                    <div class="gauge-wrap"
-                        style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-                        <div>
-                            <div class="gauge-num" id="l1-hud-accuracy">0%</div>
-                            <div class="gauge-sub">Diagnostic Accuracy</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l1-hud-impact">0%</div>
-                            <div class="gauge-sub">Impact Analysis</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l1-hud-cx">0%</div>
-                            <div class="gauge-sub">Customer Experience</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l1-hud-knowledge">0%</div>
-                            <div class="gauge-sub">Infra Knowledge</div>
-                        </div>
-                    </div>
-
-                    <!-- LEVEL NAVIGATION -->
-                    <div
-                        style="display:flex; justify-content:flex-end; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-                        <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('32', 2)">Go
-                            to Level 2 ➔</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LEVEL 2: DIGITAL INFRASTRUCTURE ARCHITECT -->
-            <div class="level-content" id="lc32-2">
-                <div class="card"
-                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-                    <span class="hero-badge">Level 2 Mission Brief</span>
-                    <h3>Digital Infrastructure Architect</h3>
-                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-                        Role: Digital Infrastructure Consultant. Design Internet infrastructure for different
-                        organizations while balancing tight budget and performance constraints.
-                    </p>
-                </div>
-
-                <div class="card">
-                    <span class="tk-label">Select Active Scenario:</span>
-                    <select id="l2CaseSelect" class="tk-entry" style="width: 100%; margin-bottom: 1.2rem;"
-                        onchange="changeL2Case()">
-                        <option value="streaming">Global Streaming Platform (High Uptime/Scale)</option>
-                        <option value="hospital">Hospital E-Health Portal (Strict Confidentiality)</option>
-                    </select>
-
-                    <div class="challenge-box" style="margin-top:0;">
-                        <h4 id="l2-title">Global Streaming Platform</h4>
-                        <p id="l2-desc" style="color: var(--text-muted); margin-top:0.4rem; font-size:0.95rem;"></p>
-                        <div style="margin-top:1rem; font-weight:700; font-size:0.95rem; color:var(--primary);">
-                            Available Budget: <span id="l2-budget-count">₹80,000</span>
-                        </div>
-                    </div>
-
-                    <!-- DYNAMIC CRISIS EVENT -->
-                    <div class="warn-box" id="l2-event-alert" style="display:none;">
-                        <strong>🚨 DYNAMIC BUSINESS EVENT</strong>
-                        <p id="l2-event-text" style="font-size:0.85rem; margin-top:0.3rem;"></p>
-                    </div>
-
-                    <!-- TECH SELECTION CHECKLIST -->
-                    <div style="margin-top:1.5rem;">
-                        <span class="tk-label">Select Technologies to Deploy:</span>
-                        <div id="l2-tech-list"
-                            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-                            <!-- Checkbox cards injected dynamically by JS -->
-                        </div>
-                    </div>
-
-                    <div
-                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-                        <button class="run-btn" id="l2-submit-btn" onclick="submitL2Evaluation()">▶ Compile
-                            Architecture</button>
-                        <button class="run-btn"
-                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
-                            onclick="toggleHint(2)">💡 Need Help?</button>
-                    </div>
-
-                    <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
-                    <div class="quiz-feedback" id="qf-l2" style="margin-top:1.2rem;"></div>
-
-                    <!-- LEVEL HUD -->
-                    <div class="gauge-wrap"
-                        style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-                        <div>
-                            <div class="gauge-num" id="l2-hud-suitability">0%</div>
-                            <div class="gauge-sub">Suitability</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l2-hud-integration">0%</div>
-                            <div class="gauge-sub">Integration</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l2-hud-cx">0%</div>
-                            <div class="gauge-sub">Customer Experience</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l2-hud-security">0%</div>
-                            <div class="gauge-sub">Security</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l2-hud-scale">0%</div>
-                            <div class="gauge-sub">Scalability</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l2-hud-continuity">0%</div>
-                            <div class="gauge-sub">Continuity</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l2-hud-budget">0%</div>
-                            <div class="gauge-sub">Budget Efficiency</div>
-                        </div>
-                    </div>
-
-                    <div id="l2-reinforcement" style="display:none; margin-top: 1.5rem;"></div>
-
-                    <!-- LEVEL NAVIGATION -->
-                    <div
-                        style="display:flex; justify-content:space-between; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-                        <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('32', 1)">⬅
-                            Go to Level 1</button>
-                        <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('32', 3)">Go
-                            to Level 3 ➔</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LEVEL 3: DIGITAL INFRASTRUCTURE COMMAND CHALLENGE -->
-            <div class="level-content" id="lc32-3">
-                <div class="card"
-                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-                    <span class="hero-badge" id="l3-phase-badge">Quarter 1 of 10</span>
-                    <h3>Digital Infrastructure Command Challenge</h3>
-                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-                        Role: Chief Digital Infrastructure Strategist. Guide a multinational digital business through 10
-                        consecutive quarters of growth, crises, and platform mergers.
-                    </p>
-                </div>
-
-                <div class="card">
-                    <div class="challenge-box" style="margin-top:0;" id="l3-challenge-box">
-                        <h4 id="l3-phase-title">Quarter 1: Startup launches</h4>
-                        <p id="l3-phase-text" style="color: var(--text-muted); margin-top:0.5rem; font-size:0.95rem;">
-                        </p>
-                    </div>
-
-                    <div id="l3-selectors"
-                        style="display:grid; grid-template-columns:1fr; gap:1rem; margin-top:1.5rem;">
-                        <!-- Dropdowns populated by JS -->
-                    </div>
-
-                    <div
-                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-                        <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Deploy Strategy</button>
-                        <button class="run-btn"
-                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
-                            onclick="toggleHint(3)">💡 Need Help?</button>
-                    </div>
-
-                    <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
-                    <div class="quiz-feedback" id="qf-l3" style="margin-top:1.2rem;"></div>
-
-                    <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1rem;"
-                        onclick="proceedL3NextPhase()">Proceed to Next Quarter ➔</button>
-
-                    <!-- COMMAND DASHBOARD HUD -->
-                    <div class="gauge-wrap"
-                        style="margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-                        <div>
-                            <div class="gauge-num" id="l3-hud-score">0%</div>
-                            <div class="gauge-sub">Infra Score</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-cx">0%</div>
-                            <div class="gauge-sub">CX Score</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-continuity">0%</div>
-                            <div class="gauge-sub">Continuity</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-security">0%</div>
-                            <div class="gauge-sub">Security</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-availability">0%</div>
-                            <div class="gauge-sub">Availability</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-scale">0%</div>
-                            <div class="gauge-sub">Scalability</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-integration">0%</div>
-                            <div class="gauge-sub">Integration</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-readiness">0%</div>
-                            <div class="gauge-sub">Readiness</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-strategic">0%</div>
-                            <div class="gauge-sub">Strategy</div>
-                        </div>
-                        <div>
-                            <div class="gauge-num" id="l3-hud-budget">0%</div>
-                            <div class="gauge-sub">Budget</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PLAYGROUND OUTPUT (Blueprints) -->
-                <div class="playground" id="l3Playground" style="display:none;">
-                    <div class="playground-header">
-                        <div class="dot dot-r"></div>
-                        <div class="dot dot-y"></div>
-                        <div class="dot dot-g"></div><span class="playground-title">command_architecture.yaml</span>
-                    </div>
-                    <div class="playground-output" id="l3Out"></div>
-                </div>
-
-                <!-- CONSULTING REPORT OUTPUT -->
-                <div class="card" id="l3-report-card" style="display:none;">
-                    <!-- Filled on Q10 completion -->
-                </div>
-
-                <!-- LEVEL NAVIGATION -->
-                <div
-                    style="display:flex; justify-content:flex-start; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-                    <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('32', 2)">⬅ Go to
-                        Level 2</button>
-                </div>
-            </div>
-        </div>
+    <!-- LEVEL PILLS -->
+    <div class="level-pills" id="lp32">
+      <button class="level-pill active" onclick="switchLevel('32',1)">L1 Infrastructure Investigator</button>
+      <button class="level-pill" onclick="switchLevel('32',2)">L2 Digital Architect</button>
+      <button class="level-pill" onclick="switchLevel('32',3)">L3 Command Challenge</button>
     </div>
 
-    <footer>
-        Digital Business Simulation Series · <strong>Module 3.2 — Internet Technologies &amp; Networking</strong>
-    </footer>
+    <!-- PROGRESS TRACKER -->
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="prog32-label">Level 1 of 3</span><span id="prog32-pct">33%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog32" style="width:33%"></div></div>
+    </div>
 
-    <script>
-        /* ─── GENERAL UI & NAVIGATION ─── */
-        function switchLevel(secId, targetLevel) {
-            document.querySelectorAll(`#lp${secId} .level-pill`).forEach((pill, idx) => pill.classList.toggle('active', (idx + 1) === targetLevel));
-            for (let i = 1; i <= 3; i++) {
-                const el = document.getElementById(`lc${secId}-${i}`);
-                if (el) el.classList.toggle('active', i === targetLevel);
-            }
-            const pct = Math.round((targetLevel / 3) * 100);
-            const label = document.getElementById(`prog${secId}-label`);
-            const pctEl = document.getElementById(`prog${secId}-pct`);
-            const bar = document.getElementById(`prog${secId}`);
-            if (label) label.textContent = `Level ${targetLevel} of 3`;
-            if (pctEl) pctEl.textContent = `${pct}%`;
-            if (bar) bar.style.width = `${pct}%`;
-        }
+    <!-- LEVEL 1: INFRASTRUCTURE INVESTIGATION LAB -->
+    <div class="level-content active" id="lc32-1">
+      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+        <span class="hero-badge">Level 1 Mission Brief</span>
+        <h3>Infrastructure Investigation Lab</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+          Role: Junior Digital Infrastructure Analyst. Several digital businesses are experiencing operational problems. Investigate symptoms and deduce the root cause.
+        </p>
+      </div>
 
-        /* ─── HINTS SYSTEM ─── */
-        const hints = {
-            1: {
-                1: "Latency is caused by geographical distance. Serving files locally from closer POP hubs resolves loading times.",
-                2: "HTTP sends credentials in plaintext. Mandating TLS (HTTPS) redirects encrypts the login payloads.",
-                3: "Intranets isolate grade access internally, Extranets share data with partners, and the Internet accesses portals."
-            },
-            2: {
-                streaming: "Streaming platforms require high load-handling and delivery speed. Ensure you purchase: Public Internet, DNS, HTTPS encryption, Cloud hosting, CDN content caches, Caching headers, and Load Balancers. Avoid VPNs or internal Intranets as they are for employees, not public video streaming.",
-                hospital: "Hospitals prioritize patient confidentiality and employee records. Ensure you purchase: Patient Internet portal, Confidential Staff Intranet, Partner Labs Extranet, DNS directory mapping, HTTPS encryption, Remote Doctor VPN, and automated Backup systems. Avoid expensive public CDNs or streaming Load Balancers."
-            },
-            3: "Q2 requires Cloud scaling. Q3 needs CDNs. Q5 requires supplier Extranets. Q7 requires database failover replicas."
-        };
+      <div class="card">
+        <h3 id="l1-round-title">Round 1 of 3</h3>
+        <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
+          <h4 id="l1-case-title">Loading case...</h4>
+          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;" id="l1-case-meta">
+            <!-- Metadata details -->
+          </div>
 
-        function toggleHint(level) {
-            let box = null;
-            let text = "";
+          <!-- Dynamic selections -->
+          <div id="l1-selectors" style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+            <!-- Dropdowns loaded dynamically -->
+          </div>
 
-            if (level === 1) {
-                box = document.getElementById('l1-hint-box');
-                text = hints[1][l1Round];
-            } else if (level === 2) {
-                box = document.getElementById('l2-hint-box');
-                const caseKey = document.getElementById('l2CaseSelect').value;
-                text = hints[2][caseKey];
-            } else {
-                box = document.getElementById('l3-hint-box');
-                text = hints[3];
-            }
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Diagnose Issue</button>
+            <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(1)">💡 Need Help?</button>
+          </div>
 
-            if (box) {
-                box.style.display = box.style.display === 'none' ? 'block' : 'none';
-                box.innerHTML = `<strong>💡 Consulting Hint:</strong><br>${text}`;
-            }
-        }
+          <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
+          <div class="quiz-feedback" id="qf-l1" style="margin-top:1.2rem;"></div>
 
-        function shuffleArray(array) {
-            let arr = [...array];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
+          <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1rem;" onclick="nextL1Round()">Next Challenge ➔</button>
+        </div>
 
-        /* ─── LEVEL 1: INFRASTRUCTURE INVESTIGATION LAB ─── */
-        const l1Cases = {
-            1: {
-                title: "Investigation 1: Global Retail Brand",
-                type: "Global Online Store",
-                symptoms: "International customers experience 9-second page load times. Checkout abandonments are rising dramatically, and mobile shoppers report poor responsiveness.",
-                infra: "HTTP, Local Datacenter Origin, No CDN, Internet only.",
-                selectors: [
-                    {
-                        id: "l1-sel-cause", label: "Identify Root Cause", options: [
-                            { val: "latency_dist", text: "High latency caused by single central server distance" },
-                            { val: "unencrypted", text: "Unsecured HTTP protocols blocking access paths" },
-                            { val: "db_index", text: "Database locking errors during write spikes" }
-                        ]
-                    },
-                    {
-                        id: "l1-sel-impact", label: "Identify Business Impact", options: [
-                            { val: "conversion_loss", text: "Friction-driven drop-off and conversion losses" },
-                            { val: "data_leak", text: "Unauthorized account logins and credentials leak" },
-                            { val: "portability", text: "Desktop browser OS compatibility issues" }
-                        ]
-                    },
-                    {
-                        id: "l1-sel-remedy", label: "Recommended Improvement", options: [
-                            { val: "cdn_cache", text: "Deploy global Edge CDN caching nodes" },
-                            { val: "https_tls", text: "Install a secure SSL/TLS connection key" },
-                            { val: "intranet_vpn", text: "Lock data access behind private VPN lines" }
-                        ]
-                    }
-                ],
-                correct: { "l1-sel-cause": "latency_dist", "l1-sel-impact": "conversion_loss", "l1-sel-remedy": "cdn_cache" },
-                correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Caching static layout code close to buyers reduces fiber routing distances.<br>• <strong>Agility:</strong> Edge POP caches serve files within milliseconds.<br>• <strong>Scalability:</strong> Prevents origin database overloads.<br>• <strong>Customer Experience:</strong> Restores sub-second loading, decreasing cart drops.<br>• <strong>Textbook Concept:</strong> <em>Edge Content Delivery Networks (CDNs)</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Keeping central servers without caching or using private VPNs fails to reduce distance delays.<br>• <strong>Consequences:</strong> RTT remains high, causing shopping cart abandonments.<br>• <strong>Better Strategy:</strong> Deploy global CDN caching nodes.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Site Availability and Acceleration</em>."
-            },
-            2: {
-                title: "Investigation 2: Online Bank Secure Login",
-                type: "Cryptographic Banking Portal",
-                symptoms: "Browser warnings flag the login portal as 'Not Secure'. Payment completions fall, and security audits report high risk of packet interception.",
-                infra: "HTTP protocol, single local server host.",
-                selectors: [
-                    {
-                        id: "l1-sel-cause", label: "Identify Root Cause", options: [
-                            { val: "no_encryption", text: "Unencrypted HTTP communication channel" },
-                            { val: "no_cdn", text: "Missing Edge CDN node routing maps" },
-                            { val: "no_intranet", text: "Wrong Intranet employee portal configuration" }
-                        ]
-                    },
-                    {
-                        id: "l1-sel-impact", label: "Identify Business Impact", options: [
-                            { val: "loss_trust", text: "Plummeting customer trust and threat of session sniffing" },
-                            { val: "scale_crash", text: "Total network server processing collapse" },
-                            { val: "supplier_silo", text: "Supplier inventory scheduling failures" }
-                        ]
-                    },
-                    {
-                        id: "l1-sel-remedy", label: "Recommended Improvement", options: [
-                            { val: "https_tls", text: "Deploy HTTPS protocol redirection with TLS keys" },
-                            { val: "anycast_dns", text: "Configure Anycast domain name servers" },
-                            { val: "extranet_sync", text: "Deploy an inventory Extranet portal" }
-                        ]
-                    }
-                ],
-                correct: { "l1-sel-cause": "no_encryption", "l1-sel-impact": "loss_trust", "l1-sel-remedy": "https_tls" },
-                correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> HTTPS redirects force browsers to encrypt customer session paths.<br>• <strong>Agility:</strong> Ensures banking portal compliance standards.<br>• <strong>Security:</strong> Eliminates session sniffing on clear networks.<br>• <strong>Customer Experience:</strong> Eliminates browser 'Not Secure' warnings.<br>• <strong>Textbook Concept:</strong> <em>Symmetric/Asymmetric TLS Tunnel Encryption</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Standard HTTP sends password text in clear text format.<br>• <strong>Consequences:</strong> Security audits fail, and customer payment completions collapse.<br>• <strong>Better Strategy:</strong> Install TLS certificates and redirect to HTTPS links.<br>• <strong>Dave Chaffey Principle:</strong> <em>Data confidentiality and buyer security guarantees</em>."
-            },
-            3: {
-                title: "Investigation 3: University Grade Portal",
-                type: "Educational System",
-                symptoms: "Confidential faculty grade sheets are indexed on public search sites, while external research partners report total lockouts when attempting to share data logs.",
-                infra: "Internet public links with no intranet/extranet siloing.",
-                selectors: [
-                    {
-                        id: "l1-sel-cause", label: "Identify Root Cause", options: [
-                            { val: "wrong_net", text: "Use of public Internet for internal/partner communications" },
-                            { val: "bad_cdn", text: "Incorrect CDN edge server replication configurations" },
-                            { val: "dns_failure", text: "DNS domain name resolution errors" }
-                        ]
-                    },
-                    {
-                        id: "l1-sel-impact", label: "Identify Business Impact", options: [
-                            { val: "leak_confidential", text: "Data privacy leaks and complete external partner lockout" },
-                            { val: "slow_loading", text: "Excessive packet RTT delays globally" },
-                            { val: "budget_waste", text: "Excessive cloud hosting compute costs" }
-                        ]
-                    },
-                    {
-                        id: "l1-sel-remedy", label: "Recommended Improvement", options: [
-                            { val: "net_types", text: "Re-architect network layout using Internet, Intranet, and Extranet" },
-                            { val: "load_balancer", text: "Install a hardware Load Balancer node" },
-                            { val: "vps_upgrade", text: "Upgrade single cloud VPS core parameters" }
-                        ]
-                    }
-                ],
-                correct: { "l1-sel-cause": "wrong_net", "l1-sel-impact": "leak_confidential", "l1-sel-remedy": "net_types" },
-                correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Segregates communications: Intranets protect staff records, while Extranets share data logs with research partners.<br>• <strong>Agility:</strong> Restricts employee systems from public visibility indexes.<br>• <strong>Security:</strong> Prevents administrative information leaks.<br>• <strong>Customer Experience:</strong> Public internet portals remain open for students.<br>• <strong>Textbook Concept:</strong> <em>Networking Access Siloing</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Hosting confidential ledgers on open internet portals exposes them to search engines.<br>• <strong>Consequences:</strong> Student grade leakages and partner lockouts.<br>• <strong>Better Strategy:</strong> Re-architect pages using Intranet and Extranet models.<br>• <strong>Dave Chaffey Principle:</strong> <em>Information security boundary siloing</em>."
-            }
-        };
+        <!-- LEVEL HUD -->
+        <div class="gauge-wrap" style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+          <div><div class="gauge-num" id="l1-hud-accuracy">0%</div><div class="gauge-sub">Diagnostic Accuracy</div></div>
+          <div><div class="gauge-num" id="l1-hud-impact">0%</div><div class="gauge-sub">Impact Analysis</div></div>
+          <div><div class="gauge-num" id="l1-hud-cx">0%</div><div class="gauge-sub">Customer Experience</div></div>
+          <div><div class="gauge-num" id="l1-hud-knowledge">0%</div><div class="gauge-sub">Infra Knowledge</div></div>
+        </div>
 
-        let l1Round = 1;
-        let l1Score = 0;
+        <!-- LEVEL NAVIGATION -->
+        <div style="display:flex; justify-content:flex-end; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+          <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('32', 2)">Go to Level 2 ➔</button>
+        </div>
+      </div>
+    </div>
 
-        function renderL1Round() {
-            const c = l1Cases[l1Round];
-            document.getElementById('l1-round-title').textContent = `Round ${l1Round} of 3`;
-            document.getElementById('l1-case-title').textContent = c.title;
-            document.getElementById('l1-case-meta').innerHTML = `
+    <!-- LEVEL 2: DIGITAL INFRASTRUCTURE ARCHITECT -->
+    <div class="level-content" id="lc32-2">
+      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+        <span class="hero-badge">Level 2 Mission Brief</span>
+        <h3>Digital Infrastructure Architect</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+          Role: Digital Infrastructure Consultant. Design Internet infrastructure for different organizations while balancing tight budget and performance constraints.
+        </p>
+      </div>
+
+      <div class="card">
+        <span class="tk-label">Select Active Scenario:</span>
+        <select id="l2CaseSelect" class="tk-entry" style="width: 100%; margin-bottom: 1.2rem;" onchange="changeL2Case()">
+          <option value="streaming">Global Streaming Platform (High Uptime/Scale)</option>
+          <option value="hospital">Hospital E-Health Portal (Strict Confidentiality)</option>
+        </select>
+
+        <div class="challenge-box" style="margin-top:0;">
+          <h4 id="l2-title">Global Streaming Platform</h4>
+          <p id="l2-desc" style="color: var(--text-muted); margin-top:0.4rem; font-size:0.95rem;"></p>
+          <div style="margin-top:1rem; font-weight:700; font-size:0.95rem; color:var(--primary);">
+            Available Budget: <span id="l2-budget-count">₹80,000</span>
+          </div>
+        </div>
+
+        <!-- DYNAMIC CRISIS EVENT -->
+        <div class="warn-box" id="l2-event-alert" style="display:none;">
+          <strong>🚨 DYNAMIC BUSINESS EVENT</strong>
+          <p id="l2-event-text" style="font-size:0.85rem; margin-top:0.3rem;"></p>
+        </div>
+
+        <!-- TECH SELECTION CHECKLIST -->
+        <div style="margin-top:1.5rem;">
+          <span class="tk-label">Select Technologies to Deploy:</span>
+          <div id="l2-tech-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+            <!-- Checkbox cards injected dynamically by JS -->
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+          <button class="run-btn" id="l2-submit-btn" onclick="submitL2Evaluation()">▶ Compile Architecture</button>
+          <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(2)">💡 Need Help?</button>
+        </div>
+
+        <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
+        <div class="quiz-feedback" id="qf-l2" style="margin-top:1.2rem;"></div>
+
+        <!-- LEVEL HUD -->
+        <div class="gauge-wrap" style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+          <div><div class="gauge-num" id="l2-hud-suitability">0%</div><div class="gauge-sub">Suitability</div></div>
+          <div><div class="gauge-num" id="l2-hud-integration">0%</div><div class="gauge-sub">Integration</div></div>
+          <div><div class="gauge-num" id="l2-hud-cx">0%</div><div class="gauge-sub">Customer Experience</div></div>
+          <div><div class="gauge-num" id="l2-hud-security">0%</div><div class="gauge-sub">Security</div></div>
+          <div><div class="gauge-num" id="l2-hud-scale">0%</div><div class="gauge-sub">Scalability</div></div>
+          <div><div class="gauge-num" id="l2-hud-continuity">0%</div><div class="gauge-sub">Continuity</div></div>
+          <div><div class="gauge-num" id="l2-hud-budget">0%</div><div class="gauge-sub">Budget Efficiency</div></div>
+        </div>
+
+        <div id="l2-reinforcement" style="display:none; margin-top: 1.5rem;"></div>
+
+        <!-- LEVEL NAVIGATION -->
+        <div style="display:flex; justify-content:space-between; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+          <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('32', 1)">⬅ Go to Level 1</button>
+          <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('32', 3)">Go to Level 3 ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEVEL 3: DIGITAL INFRASTRUCTURE COMMAND CHALLENGE -->
+    <div class="level-content" id="lc32-3">
+      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+        <span class="hero-badge" id="l3-phase-badge">Quarter 1 of 10</span>
+        <h3>Digital Infrastructure Command Challenge</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+          Role: Chief Digital Infrastructure Strategist. Guide a multinational digital business through 10 consecutive quarters of growth, crises, and platform mergers.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="challenge-box" style="margin-top:0;" id="l3-challenge-box">
+          <h4 id="l3-phase-title">Quarter 1: Startup launches</h4>
+          <p id="l3-phase-text" style="color: var(--text-muted); margin-top:0.5rem; font-size:0.95rem;"></p>
+        </div>
+
+        <div id="l3-selectors" style="display:grid; grid-template-columns:1fr; gap:1rem; margin-top:1.5rem;">
+          <!-- Dropdowns populated by JS -->
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+          <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Deploy Strategy</button>
+          <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(3)">💡 Need Help?</button>
+        </div>
+
+        <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
+        <div class="quiz-feedback" id="qf-l3" style="margin-top:1.2rem;"></div>
+
+        <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1rem;" onclick="proceedL3NextPhase()">Proceed to Next Quarter ➔</button>
+
+        <!-- COMMAND DASHBOARD HUD -->
+        <div class="gauge-wrap" style="margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+          <div><div class="gauge-num" id="l3-hud-score">0%</div><div class="gauge-sub">Infra Score</div></div>
+          <div><div class="gauge-num" id="l3-hud-cx">0%</div><div class="gauge-sub">CX Score</div></div>
+          <div><div class="gauge-num" id="l3-hud-continuity">0%</div><div class="gauge-sub">Continuity</div></div>
+          <div><div class="gauge-num" id="l3-hud-security">0%</div><div class="gauge-sub">Security</div></div>
+          <div><div class="gauge-num" id="l3-hud-availability">0%</div><div class="gauge-sub">Availability</div></div>
+          <div><div class="gauge-num" id="l3-hud-scale">0%</div><div class="gauge-sub">Scalability</div></div>
+          <div><div class="gauge-num" id="l3-hud-integration">0%</div><div class="gauge-sub">Integration</div></div>
+          <div><div class="gauge-num" id="l3-hud-readiness">0%</div><div class="gauge-sub">Readiness</div></div>
+          <div><div class="gauge-num" id="l3-hud-strategic">0%</div><div class="gauge-sub">Strategy</div></div>
+          <div><div class="gauge-num" id="l3-hud-budget">0%</div><div class="gauge-sub">Budget</div></div>
+        </div>
+      </div>
+
+      <!-- PLAYGROUND OUTPUT (Blueprints) -->
+      <div class="playground" id="l3Playground" style="display:none;">
+        <div class="playground-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="playground-title">command_architecture.yaml</span></div>
+        <div class="playground-output" id="l3Out"></div>
+      </div>
+
+      <!-- CONSULTING REPORT OUTPUT -->
+      <div class="card" id="l3-report-card" style="display:none;">
+        <!-- Filled on Q10 completion -->
+      </div>
+
+      <!-- LEVEL NAVIGATION -->
+      <div style="display:flex; justify-content:flex-start; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+        <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('32', 2)">⬅ Go to Level 2</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Digital Business Simulation Series · <strong>Module 3.2 — Internet Technologies &amp; Networking</strong>
+</footer>
+
+<script>
+/* ─── GENERAL UI & NAVIGATION ─── */
+function switchLevel(secId, targetLevel) {
+  document.querySelectorAll(`#lp${secId} .level-pill`).forEach((pill, idx) => pill.classList.toggle('active', (idx + 1) === targetLevel));
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`lc${secId}-${i}`);
+    if (el) el.classList.toggle('active', i === targetLevel);
+  }
+  const pct = Math.round((targetLevel / 3) * 100);
+  const label = document.getElementById(`prog${secId}-label`);
+  const pctEl = document.getElementById(`prog${secId}-pct`);
+  const bar = document.getElementById(`prog${secId}`);
+  if (label) label.textContent = `Level ${targetLevel} of 3`;
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  if (bar) bar.style.width = `${pct}%`;
+}
+
+/* ─── HINTS SYSTEM ─── */
+const hints = {
+  1: {
+    1: "Latency is caused by geographical distance. Serving files locally from closer POP hubs resolves loading times.",
+    2: "HTTP sends credentials in plaintext. Mandating TLS (HTTPS) redirects encrypts the login payloads.",
+    3: "Intranets isolate grade access internally, Extranets share data with partners, and the Internet accesses portals."
+  },
+  2: {
+    streaming: "Streaming platforms require high load-handling and delivery speed. Ensure you purchase: Public Internet, DNS, HTTPS encryption, Cloud hosting, CDN content caches, Caching headers, and Load Balancers. Avoid VPNs or internal Intranets as they are for employees, not public video streaming.",
+    hospital: "Hospitals prioritize patient confidentiality and employee records. Ensure you purchase: Patient Internet portal, Confidential Staff Intranet, Partner Labs Extranet, DNS directory mapping, HTTPS encryption, Remote Doctor VPN, and automated Backup systems. Avoid expensive public CDNs or streaming Load Balancers."
+  },
+  3: "Q2 requires Cloud scaling. Q3 needs CDNs. Q5 requires supplier Extranets. Q7 requires database failover replicas."
+};
+
+function toggleHint(level) {
+  let box = null;
+  let text = "";
+
+  if (level === 1) {
+    box = document.getElementById('l1-hint-box');
+    text = hints[1][l1Round];
+  } else if (level === 2) {
+    box = document.getElementById('l2-hint-box');
+    const caseKey = document.getElementById('l2CaseSelect').value;
+    text = hints[2][caseKey];
+  } else {
+    box = document.getElementById('l3-hint-box');
+    text = hints[3];
+  }
+
+  if (box) {
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    box.innerHTML = `<strong>💡 Consulting Hint:</strong><br>${text}`;
+  }
+}
+
+function shuffleArray(array) {
+  let arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* ─── LEVEL 1: INFRASTRUCTURE INVESTIGATION LAB ─── */
+const l1Cases = {
+  1: {
+    title: "Investigation 1: Global Retail Brand",
+    type: "Global Online Store",
+    symptoms: "International customers experience 9-second page load times. Checkout abandonments are rising dramatically, and mobile shoppers report poor responsiveness.",
+    infra: "HTTP, Local Datacenter Origin, No CDN, Internet only.",
+    selectors: [
+      { id: "l1-sel-cause", label: "Identify Root Cause", options: [
+        { val: "latency_dist", text: "High latency caused by single central server distance" },
+        { val: "unencrypted", text: "Unsecured HTTP protocols blocking access paths" },
+        { val: "db_index", text: "Database locking errors during write spikes" }
+      ]},
+      { id: "l1-sel-impact", label: "Identify Business Impact", options: [
+        { val: "conversion_loss", text: "Friction-driven drop-off and conversion losses" },
+        { val: "data_leak", text: "Unauthorized account logins and credentials leak" },
+        { val: "portability", text: "Desktop browser OS compatibility issues" }
+      ]},
+      { id: "l1-sel-remedy", label: "Recommended Improvement", options: [
+        { val: "cdn_cache", text: "Deploy global Edge CDN caching nodes" },
+        { val: "https_tls", text: "Install a secure SSL/TLS connection key" },
+        { val: "intranet_vpn", text: "Lock data access behind private VPN lines" }
+      ]}
+    ],
+    correct: { "l1-sel-cause": "latency_dist", "l1-sel-impact": "conversion_loss", "l1-sel-remedy": "cdn_cache" },
+    correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Caching static layout code close to buyers reduces fiber routing distances.<br>• <strong>Agility:</strong> Edge POP caches serve files within milliseconds.<br>• <strong>Scalability:</strong> Prevents origin database overloads.<br>• <strong>Customer Experience:</strong> Restores sub-second loading, decreasing cart drops.<br>• <strong>Textbook Concept:</strong> <em>Edge Content Delivery Networks (CDNs)</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Keeping central servers without caching or using private VPNs fails to reduce distance delays.<br>• <strong>Consequences:</strong> RTT remains high, causing shopping cart abandonments.<br>• <strong>Better Strategy:</strong> Deploy global CDN caching nodes.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Site Availability and Acceleration</em>."
+  },
+  2: {
+    title: "Investigation 2: Online Bank Secure Login",
+    type: "Cryptographic Banking Portal",
+    symptoms: "Browser warnings flag the login portal as 'Not Secure'. Payment completions fall, and security audits report high risk of packet interception.",
+    infra: "HTTP protocol, single local server host.",
+    selectors: [
+      { id: "l1-sel-cause", label: "Identify Root Cause", options: [
+        { val: "no_encryption", text: "Unencrypted HTTP communication channel" },
+        { val: "no_cdn", text: "Missing Edge CDN node routing maps" },
+        { val: "no_intranet", text: "Wrong Intranet employee portal configuration" }
+      ]},
+      { id: "l1-sel-impact", label: "Identify Business Impact", options: [
+        { val: "loss_trust", text: "Plummeting customer trust and threat of session sniffing" },
+        { val: "scale_crash", text: "Total network server processing collapse" },
+        { val: "supplier_silo", text: "Supplier inventory scheduling failures" }
+      ]},
+      { id: "l1-sel-remedy", label: "Recommended Improvement", options: [
+        { val: "https_tls", text: "Deploy HTTPS protocol redirection with TLS keys" },
+        { val: "anycast_dns", text: "Configure Anycast domain name servers" },
+        { val: "extranet_sync", text: "Deploy an inventory Extranet portal" }
+      ]}
+    ],
+    correct: { "l1-sel-cause": "no_encryption", "l1-sel-impact": "loss_trust", "l1-sel-remedy": "https_tls" },
+    correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> HTTPS redirects force browsers to encrypt customer session paths.<br>• <strong>Agility:</strong> Ensures banking portal compliance standards.<br>• <strong>Security:</strong> Eliminates session sniffing on clear networks.<br>• <strong>Customer Experience:</strong> Eliminates browser 'Not Secure' warnings.<br>• <strong>Textbook Concept:</strong> <em>Symmetric/Asymmetric TLS Tunnel Encryption</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Standard HTTP sends password text in clear text format.<br>• <strong>Consequences:</strong> Security audits fail, and customer payment completions collapse.<br>• <strong>Better Strategy:</strong> Install TLS certificates and redirect to HTTPS links.<br>• <strong>Dave Chaffey Principle:</strong> <em>Data confidentiality and buyer security guarantees</em>."
+  },
+  3: {
+    title: "Investigation 3: University Grade Portal",
+    type: "Educational System",
+    symptoms: "Confidential faculty grade sheets are indexed on public search sites, while external research partners report total lockouts when attempting to share data logs.",
+    infra: "Internet public links with no intranet/extranet siloing.",
+    selectors: [
+      { id: "l1-sel-cause", label: "Identify Root Cause", options: [
+        { val: "wrong_net", text: "Use of public Internet for internal/partner communications" },
+        { val: "bad_cdn", text: "Incorrect CDN edge server replication configurations" },
+        { val: "dns_failure", text: "DNS domain name resolution errors" }
+      ]},
+      { id: "l1-sel-impact", label: "Identify Business Impact", options: [
+        { val: "leak_confidential", text: "Data privacy leaks and complete external partner lockout" },
+        { val: "slow_loading", text: "Excessive packet RTT delays globally" },
+        { val: "budget_waste", text: "Excessive cloud hosting compute costs" }
+      ]},
+      { id: "l1-sel-remedy", label: "Recommended Improvement", options: [
+        { val: "net_types", text: "Re-architect network layout using Internet, Intranet, and Extranet" },
+        { val: "load_balancer", text: "Install a hardware Load Balancer node" },
+        { val: "vps_upgrade", text: "Upgrade single cloud VPS core parameters" }
+      ]}
+    ],
+    correct: { "l1-sel-cause": "wrong_net", "l1-sel-impact": "leak_confidential", "l1-sel-remedy": "net_types" },
+    correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Segregates communications: Intranets protect staff records, while Extranets share data logs with research partners.<br>• <strong>Agility:</strong> Restricts employee systems from public visibility indexes.<br>• <strong>Security:</strong> Prevents administrative information leaks.<br>• <strong>Customer Experience:</strong> Public internet portals remain open for students.<br>• <strong>Textbook Concept:</strong> <em>Networking Access Siloing</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Hosting confidential ledgers on open internet portals exposes them to search engines.<br>• <strong>Consequences:</strong> Student grade leakages and partner lockouts.<br>• <strong>Better Strategy:</strong> Re-architect pages using Intranet and Extranet models.<br>• <strong>Dave Chaffey Principle:</strong> <em>Information security boundary siloing</em>."
+  }
+};
+
+let l1Round = 1;
+let l1Score = 0;
+
+function renderL1Round() {
+  const c = l1Cases[l1Round];
+  document.getElementById('l1-round-title').textContent = `Round ${l1Round} of 3`;
+  document.getElementById('l1-case-title').textContent = c.title;
+  document.getElementById('l1-case-meta').innerHTML = `
     <div><strong>Business Type:</strong> ${c.type}</div>
     <div><strong>Current Infrastructure:</strong> ${c.infra}</div>
     <div style="grid-column:1/-1;"><strong>Symptoms:</strong> ${c.symptoms}</div>
   `;
-            document.getElementById('qf-l1').innerHTML = "";
-            document.getElementById('nextL1Btn').style.display = "none";
-            document.getElementById('l1-hint-box').style.display = "none";
-            document.getElementById('l1-submit-btn').disabled = false;
+  document.getElementById('qf-l1').innerHTML = "";
+  document.getElementById('nextL1Btn').style.display = "none";
+  document.getElementById('l1-hint-box').style.display = "none";
+  document.getElementById('l1-submit-btn').disabled = false;
 
-            const selectors = document.getElementById('l1-selectors');
-            selectors.innerHTML = "";
+  const selectors = document.getElementById('l1-selectors');
+  selectors.innerHTML = "";
 
-            c.selectors.forEach(sel => {
-                let jumbled = shuffleArray(sel.options);
-                let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
-                selectors.innerHTML += `
+  c.selectors.forEach(sel => {
+    let jumbled = shuffleArray(sel.options);
+    let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+    selectors.innerHTML += `
       <div>
         <span class="tk-label">${sel.label}</span>
         <select id="${sel.id}" class="tk-entry" style="width:100%;">
@@ -1107,46 +552,46 @@
         </select>
       </div>
     `;
-            });
-        }
+  });
+}
 
-        function submitL1Answer() {
-            const c = l1Cases[l1Round];
-            const feedback = document.getElementById('qf-l1');
+function submitL1Answer() {
+  const c = l1Cases[l1Round];
+  const feedback = document.getElementById('qf-l1');
 
-            const cause = document.getElementById('l1-sel-cause').value;
-            const impact = document.getElementById('l1-sel-impact').value;
-            const remedy = document.getElementById('l1-sel-remedy').value;
+  const cause = document.getElementById('l1-sel-cause').value;
+  const impact = document.getElementById('l1-sel-impact').value;
+  const remedy = document.getElementById('l1-sel-remedy').value;
 
-            const isCorrect = (cause === c.correct["l1-sel-cause"] && impact === c.correct["l1-sel-impact"] && remedy === c.correct["l1-sel-remedy"]);
+  const isCorrect = (cause === c.correct["l1-sel-cause"] && impact === c.correct["l1-sel-impact"] && remedy === c.correct["l1-sel-remedy"]);
 
-            if (isCorrect) {
-                l1Score++;
-                feedback.style.color = "var(--code-ok)";
-                feedback.innerHTML = c.correctFeedback;
-                document.getElementById('l1-submit-btn').disabled = true;
-                document.getElementById('nextL1Btn').style.display = "inline-flex";
-            } else {
-                feedback.style.color = "var(--code-err)";
-                feedback.innerHTML = c.incorrectFeedback;
-            }
+  if (isCorrect) {
+    l1Score++;
+    feedback.style.color = "var(--code-ok)";
+    feedback.innerHTML = c.correctFeedback;
+    document.getElementById('l1-submit-btn').disabled = true;
+    document.getElementById('nextL1Btn').style.display = "inline-flex";
+  } else {
+    feedback.style.color = "var(--code-err)";
+    feedback.innerHTML = c.incorrectFeedback;
+  }
 
-            // Update HUD
-            const accuracy = Math.round((l1Score / l1Round) * 100);
-            document.getElementById('l1-hud-accuracy').textContent = `${accuracy}%`;
-            document.getElementById('l1-hud-impact').textContent = isCorrect ? "100%" : "30%";
-            document.getElementById('l1-hud-cx').textContent = isCorrect ? "95%" : "40%";
-            document.getElementById('l1-hud-knowledge').textContent = `${l1Score * 33}%`;
-        }
+  // Update HUD
+  const accuracy = Math.round((l1Score / l1Round) * 100);
+  document.getElementById('l1-hud-accuracy').textContent = `${accuracy}%`;
+  document.getElementById('l1-hud-impact').textContent = isCorrect ? "100%" : "30%";
+  document.getElementById('l1-hud-cx').textContent = isCorrect ? "95%" : "40%";
+  document.getElementById('l1-hud-knowledge').textContent = `${l1Score * 33}%`;
+}
 
-        function nextL1Round() {
-            l1Round++;
-            if (l1Round <= 3) {
-                renderL1Round();
-            } else {
-                unlockBadge('badge-expert', '🏆 Infrastructure Investigator');
-                const container = document.getElementById('l1-game-box');
-                container.innerHTML = `
+function nextL1Round() {
+  l1Round++;
+  if (l1Round <= 3) {
+    renderL1Round();
+  } else {
+    unlockBadge('badge-expert', '🏆 Infrastructure Investigator');
+    const container = document.getElementById('l1-game-box');
+    container.innerHTML = `
       <div class="info-box" style="margin-top:0;">
         <h4>🎉 Level 1 Completed! Infrastructure Investigator Badge Unlocked 🏆</h4>
         <p style="margin-top:0.4rem;">You have diagnosed client symptoms and identified underlying infrastructure blocks:</p>
@@ -1160,83 +605,83 @@
         <button class="run-btn" onclick="switchLevel('32', 2)">Proceed to Level 2: Digital Architect ➔</button>
       </div>
     `;
-            }
-        }
+  }
+}
 
-        /* ─── LEVEL 2: DIGITAL INFRASTRUCTURE ARCHITECT ─── */
-        const l2Cases = {
-            streaming: {
-                title: "Global Video Streaming Platform",
-                desc: "Requirements: 8 million global users, 99.99% service uptime target. Limited budget constraint.",
-                budget: 80000,
-                technologies: [
-                    { id: "dns", text: "Anycast DNS Directory Mapping", cost: 5000 },
-                    { id: "https", text: "HTTPS SSL/TLS Security Encryption", cost: 5000 },
-                    { id: "cdn", text: "Edge CDN Video POP Caching", cost: 20000 },
-                    { id: "cloud", text: "Elastic Cloud Clusters Hosting", cost: 30000 },
-                    { id: "balancer", text: "Compute Load Balancers", cost: 10000 },
-                    { id: "vpn", text: "Remote Office Encrypted VPN", cost: 10000 },
-                    { id: "internet", text: "Public Internet storefront web link", cost: 5000 },
-                    { id: "intranet", text: "Internal Staff Intranet Portal", cost: 10000 },
-                    { id: "extranet", text: "Partner Distributor Extranet Link", cost: 15000 },
-                    { id: "caching", text: "Web Browser Caching headers", cost: 5000 },
-                    { id: "backup", text: "Automated Backup Infrastructure", cost: 15000 },
-                    { id: "redundancy", text: "Redundant Database Servers", cost: 20000 }
-                ],
-                correct: ["dns", "https", "cdn", "cloud", "balancer", "internet", "caching"], // Total: ₹80,000 exactly
-                eventText: "Traffic suddenly doubles! Competitors launch lower latency video channels.",
-                eventCorrect: ["dns", "https", "cdn", "cloud", "balancer", "internet", "caching"],
-                correctFeedback: "<strong>✓ Strategy Approved!</strong><br>• <strong>Why it works:</strong> Auto-scaling cloud servers balance peaks while edge CDNs deliver high video data locally.<br>• <strong>Agility/Scalability/CX:</strong> Eliminates video buffer times for international markets.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler infrastructure caching scaling</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Limiting video streaming to single local servers thrashes database cores during peaks.<br>• <strong>Consequences:</strong> Spikes latency, driving video conversion drop-offs.<br>• <strong>Better Strategy:</strong> Configure Anycast DNS, public Cloud hosting, CDNs, and Load Balancers.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Client-Server Capacity Orchestration</em>."
-            },
-            hospital: {
-                title: "Hospital E-Health Portal",
-                desc: "Requirements: Secure patient records portal, staff database intranet, external lab extranet, remote VPN, confidentiality focus.",
-                budget: 70000,
-                technologies: [
-                    { id: "dns", text: "DNS Directory Mapping", cost: 5000 },
-                    { id: "https", text: "HTTPS SSL/TLS Security Encryption", cost: 5000 },
-                    { id: "cdn", text: "Edge CDN Caching POPs", cost: 20000 },
-                    { id: "cloud", text: "Elastic Cloud Clusters Hosting", cost: 30000 },
-                    { id: "balancer", text: "Compute Load Balancers", cost: 10000 },
-                    { id: "vpn", text: "Remote Doctor Encrypted VPN", cost: 10000 },
-                    { id: "internet", text: "Public Patient Internet portal", cost: 5000 },
-                    { id: "intranet", text: "Confidential Staff Intranet", cost: 10000 },
-                    { id: "extranet", text: "Partner Labs Extranet Link", cost: 15000 },
-                    { id: "caching", text: "Web Browser Caching headers", cost: 5000 },
-                    { id: "backup", text: "Automated Backup Infrastructure", cost: 15000 },
-                    { id: "redundancy", text: "Redundant Database Servers", cost: 20000 }
-                ],
-                correct: ["dns", "https", "vpn", "internet", "intranet", "extranet", "backup"], // Total: ₹65,000
-                eventText: "Cybersecurity alert! Remote hacker attempts to sniff staff transaction queries.",
-                eventCorrect: ["dns", "https", "vpn", "internet", "intranet", "extranet", "backup"],
-                correctFeedback: "<strong>✓ Strategy Approved!</strong><br>• <strong>Why it works:</strong> VPN tunnels secure remote doctors while Intranet silos protect clinical staff records.<br>• <strong>Agility/Scalability/CX:</strong> Backup infrastructure protects systems during zone failures.<br>• <strong>Textbook Concept:</strong> <em>Integrated security portal siloing</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Exposing staff files to standard open public routes triggers data compliance failure.<br>• <strong>Consequences:</strong> Large confidentiality breaches and compliance auditing fines.<br>• <strong>Better Strategy:</strong> Mandate Private Intranet routes combined with remote VPN tunnels.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Information Security Management</em>."
-            }
-        };
+/* ─── LEVEL 2: DIGITAL INFRASTRUCTURE ARCHITECT ─── */
+const l2Cases = {
+  streaming: {
+    title: "Global Video Streaming Platform",
+    desc: "Requirements: 8 million global users, 99.99% service uptime target. Limited budget constraint.",
+    budget: 80000,
+    technologies: [
+      { id: "dns", text: "Anycast DNS Directory Mapping", cost: 5000 },
+      { id: "https", text: "HTTPS SSL/TLS Security Encryption", cost: 5000 },
+      { id: "cdn", text: "Edge CDN Video POP Caching", cost: 20000 },
+      { id: "cloud", text: "Elastic Cloud Clusters Hosting", cost: 30000 },
+      { id: "balancer", text: "Compute Load Balancers", cost: 10000 },
+      { id: "vpn", text: "Remote Office Encrypted VPN", cost: 10000 },
+      { id: "internet", text: "Public Internet storefront web link", cost: 5000 },
+      { id: "intranet", text: "Internal Staff Intranet Portal", cost: 10000 },
+      { id: "extranet", text: "Partner Distributor Extranet Link", cost: 15000 },
+      { id: "caching", text: "Web Browser Caching headers", cost: 5000 },
+      { id: "backup", text: "Automated Backup Infrastructure", cost: 15000 },
+      { id: "redundancy", text: "Redundant Database Servers", cost: 20000 }
+    ],
+    correct: ["dns", "https", "cdn", "cloud", "balancer", "internet", "caching"], // Total: ₹80,000 exactly
+    eventText: "Traffic suddenly doubles! Competitors launch lower latency video channels.",
+    eventCorrect: ["dns", "https", "cdn", "cloud", "balancer", "internet", "caching"],
+    correctFeedback: "<strong>✓ Strategy Approved!</strong><br>• <strong>Why it works:</strong> Auto-scaling cloud servers balance peaks while edge CDNs deliver high video data locally.<br>• <strong>Agility/Scalability/CX:</strong> Eliminates video buffer times for international markets.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler infrastructure caching scaling</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Limiting video streaming to single local servers thrashes database cores during peaks.<br>• <strong>Consequences:</strong> Spikes latency, driving video conversion drop-offs.<br>• <strong>Better Strategy:</strong> Configure Anycast DNS, public Cloud hosting, CDNs, and Load Balancers.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Client-Server Capacity Orchestration</em>."
+  },
+  hospital: {
+    title: "Hospital E-Health Portal",
+    desc: "Requirements: Secure patient records portal, staff database intranet, external lab extranet, remote VPN, confidentiality focus.",
+    budget: 70000,
+    technologies: [
+      { id: "dns", text: "DNS Directory Mapping", cost: 5000 },
+      { id: "https", text: "HTTPS SSL/TLS Security Encryption", cost: 5000 },
+      { id: "cdn", text: "Edge CDN Caching POPs", cost: 20000 },
+      { id: "cloud", text: "Elastic Cloud Clusters Hosting", cost: 30000 },
+      { id: "balancer", text: "Compute Load Balancers", cost: 10000 },
+      { id: "vpn", text: "Remote Doctor Encrypted VPN", cost: 10000 },
+      { id: "internet", text: "Public Patient Internet portal", cost: 5000 },
+      { id: "intranet", text: "Confidential Staff Intranet", cost: 10000 },
+      { id: "extranet", text: "Partner Labs Extranet Link", cost: 15000 },
+      { id: "caching", text: "Web Browser Caching headers", cost: 5000 },
+      { id: "backup", text: "Automated Backup Infrastructure", cost: 15000 },
+      { id: "redundancy", text: "Redundant Database Servers", cost: 20000 }
+    ],
+    correct: ["dns", "https", "vpn", "internet", "intranet", "extranet", "backup"], // Total: ₹65,000
+    eventText: "Cybersecurity alert! Remote hacker attempts to sniff staff transaction queries.",
+    eventCorrect: ["dns", "https", "vpn", "internet", "intranet", "extranet", "backup"],
+    correctFeedback: "<strong>✓ Strategy Approved!</strong><br>• <strong>Why it works:</strong> VPN tunnels secure remote doctors while Intranet silos protect clinical staff records.<br>• <strong>Agility/Scalability/CX:</strong> Backup infrastructure protects systems during zone failures.<br>• <strong>Textbook Concept:</strong> <em>Integrated security portal siloing</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Exposing staff files to standard open public routes triggers data compliance failure.<br>• <strong>Consequences:</strong> Large confidentiality breaches and compliance auditing fines.<br>• <strong>Better Strategy:</strong> Mandate Private Intranet routes combined with remote VPN tunnels.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Information Security Management</em>."
+  }
+};
 
-        let l2ActiveAttempt = 1;
+let l2ActiveAttempt = 1;
 
-        function changeL2Case() {
-            l2ActiveAttempt = 1;
-            document.getElementById('l2-event-alert').style.display = "none";
-            document.getElementById('qf-l2').innerHTML = "";
-            document.getElementById('l2-reinforcement').style.display = "none";
+function changeL2Case() {
+  l2ActiveAttempt = 1;
+  document.getElementById('l2-event-alert').style.display = "none";
+  document.getElementById('qf-l2').innerHTML = "";
+  document.getElementById('l2-reinforcement').style.display = "none";
 
-            const key = document.getElementById('l2CaseSelect').value;
-            const c = l2Cases[key];
+  const key = document.getElementById('l2CaseSelect').value;
+  const c = l2Cases[key];
 
-            document.getElementById('l2-title').textContent = c.title;
-            document.getElementById('l2-desc').textContent = c.desc;
-            document.getElementById('l2-budget-count').textContent = `₹${c.budget.toLocaleString()}`;
+  document.getElementById('l2-title').textContent = c.title;
+  document.getElementById('l2-desc').textContent = c.desc;
+  document.getElementById('l2-budget-count').textContent = `₹${c.budget.toLocaleString()}`;
 
-            // Render checkbox list
-            const container = document.getElementById('l2-tech-list');
-            container.innerHTML = "";
+  // Render checkbox list
+  const container = document.getElementById('l2-tech-list');
+  container.innerHTML = "";
 
-            let jumbled = shuffleArray(c.technologies);
-            jumbled.forEach(tech => {
-                container.innerHTML += `
+  let jumbled = shuffleArray(c.technologies);
+  jumbled.forEach(tech => {
+    container.innerHTML += `
       <div class="concept-card" id="l2-card-${tech.id}" style="display:flex; align-items:center; gap:0.8rem; padding: 0.8rem 1.2rem; cursor:pointer; border: 1px solid var(--border-light); border-radius: var(--radius-md); transition: all 0.2s;" onclick="toggleL2Checkbox('${tech.id}')">
         <input type="checkbox" id="l2-chk-${tech.id}" value="${tech.id}" style="pointer-events:none;" onchange="updateL2BudgetLive()">
         <div style="flex-grow:1;">
@@ -1245,116 +690,116 @@
         </div>
       </div>
     `;
-            });
+  });
 
-            resetL2HUD();
-        }
+  resetL2HUD();
+}
 
-        function toggleL2Checkbox(id) {
-            const chk = document.getElementById(`l2-chk-${id}`);
-            if (chk) {
-                chk.checked = !chk.checked;
-                const card = document.getElementById(`l2-card-${id}`);
-                if (card) {
-                    card.style.borderColor = chk.checked ? "var(--code-ok)" : "var(--border-light)";
-                    card.style.background = chk.checked ? "rgba(42, 157, 143, 0.04)" : "#fff";
-                }
-                updateL2BudgetLive();
-            }
-        }
+function toggleL2Checkbox(id) {
+  const chk = document.getElementById(`l2-chk-${id}`);
+  if (chk) {
+    chk.checked = !chk.checked;
+    const card = document.getElementById(`l2-card-${id}`);
+    if (card) {
+      card.style.borderColor = chk.checked ? "var(--code-ok)" : "var(--border-light)";
+      card.style.background = chk.checked ? "rgba(42, 157, 143, 0.04)" : "#fff";
+    }
+    updateL2BudgetLive();
+  }
+}
 
-        function updateL2BudgetLive() {
-            const key = document.getElementById('l2CaseSelect').value;
-            const c = l2Cases[key];
+function updateL2BudgetLive() {
+  const key = document.getElementById('l2CaseSelect').value;
+  const c = l2Cases[key];
 
-            let currentSpend = 0;
-            c.technologies.forEach(tech => {
-                const chk = document.getElementById(`l2-chk-${tech.id}`);
-                if (chk && chk.checked) {
-                    currentSpend += tech.cost;
-                }
-            });
+  let currentSpend = 0;
+  c.technologies.forEach(tech => {
+    const chk = document.getElementById(`l2-chk-${tech.id}`);
+    if (chk && chk.checked) {
+      currentSpend += tech.cost;
+    }
+  });
 
-            const remaining = c.budget - currentSpend;
-            const counter = document.getElementById('l2-budget-count');
-            counter.textContent = `₹${remaining.toLocaleString()}`;
-            counter.style.color = remaining < 0 ? 'var(--code-err)' : 'var(--primary)';
-        }
+  const remaining = c.budget - currentSpend;
+  const counter = document.getElementById('l2-budget-count');
+  counter.textContent = `₹${remaining.toLocaleString()}`;
+  counter.style.color = remaining < 0 ? 'var(--code-err)' : 'var(--primary)';
+}
 
-        function resetL2HUD() {
-            document.getElementById('l2-hud-suitability').textContent = "0%";
-            document.getElementById('l2-hud-integration').textContent = "0%";
-            document.getElementById('l2-hud-cx').textContent = "0%";
-            document.getElementById('l2-hud-security').textContent = "0%";
-            document.getElementById('l2-hud-scale').textContent = "0%";
-            document.getElementById('l2-hud-continuity').textContent = "0%";
-            document.getElementById('l2-hud-budget').textContent = "0%";
-        }
+function resetL2HUD() {
+  document.getElementById('l2-hud-suitability').textContent = "0%";
+  document.getElementById('l2-hud-integration').textContent = "0%";
+  document.getElementById('l2-hud-cx').textContent = "0%";
+  document.getElementById('l2-hud-security').textContent = "0%";
+  document.getElementById('l2-hud-scale').textContent = "0%";
+  document.getElementById('l2-hud-continuity').textContent = "0%";
+  document.getElementById('l2-hud-budget').textContent = "0%";
+}
 
-        function submitL2Evaluation() {
-            const key = document.getElementById('l2CaseSelect').value;
-            const c = l2Cases[key];
-            const feedback = document.getElementById('qf-l2');
+function submitL2Evaluation() {
+  const key = document.getElementById('l2CaseSelect').value;
+  const c = l2Cases[key];
+  const feedback = document.getElementById('qf-l2');
 
-            let selected = [];
-            let spend = 0;
-            c.technologies.forEach(tech => {
-                const chk = document.getElementById(`l2-chk-${tech.id}`);
-                if (chk && chk.checked) {
-                    selected.push(tech.id);
-                    spend += tech.cost;
-                }
-            });
+  let selected = [];
+  let spend = 0;
+  c.technologies.forEach(tech => {
+    const chk = document.getElementById(`l2-chk-${tech.id}`);
+    if (chk && chk.checked) {
+      selected.push(tech.id);
+      spend += tech.cost;
+    }
+  });
 
-            if (spend > c.budget) {
-                feedback.style.color = "var(--code-err)";
-                feedback.innerHTML = `<strong>✗ Over Budget!</strong> Spend exceeds available funding limit. Remove some nodes.`;
-                return;
-            }
+  if (spend > c.budget) {
+    feedback.style.color = "var(--code-err)";
+    feedback.innerHTML = `<strong>✗ Over Budget!</strong> Spend exceeds available funding limit. Remove some nodes.`;
+    return;
+  }
 
-            if (l2ActiveAttempt === 1) {
-                l2ActiveAttempt = 2;
-                document.getElementById('l2-event-alert').style.display = "block";
-                document.getElementById('l2-event-text').textContent = c.eventText;
-                feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Business priorities changed. Redesign infrastructure adjustments without resetting!`;
-                feedback.style.color = "var(--code-warn)";
-                return;
-            }
+  if (l2ActiveAttempt === 1) {
+    l2ActiveAttempt = 2;
+    document.getElementById('l2-event-alert').style.display = "block";
+    document.getElementById('l2-event-text').textContent = c.eventText;
+    feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Business priorities changed. Redesign infrastructure adjustments without resetting!`;
+    feedback.style.color = "var(--code-warn)";
+    return;
+  }
 
-            // Calculate scores
-            let correctCount = 0;
-            const targetCorrect = c.eventCorrect;
-            targetCorrect.forEach(id => {
-                if (selected.includes(id)) correctCount++;
-            });
+  // Calculate scores
+  let correctCount = 0;
+  const targetCorrect = c.eventCorrect;
+  targetCorrect.forEach(id => {
+    if (selected.includes(id)) correctCount++;
+  });
 
-            let fitScore = Math.round((correctCount / targetCorrect.length) * 100);
-            let budgetScore = Math.round(((c.budget - spend) / c.budget) * 100);
-            if (budgetScore < 0) budgetScore = 0;
+  let fitScore = Math.round((correctCount / targetCorrect.length) * 100);
+  let budgetScore = Math.round(((c.budget - spend) / c.budget) * 100);
+  if (budgetScore < 0) budgetScore = 0;
 
-            let integration = fitScore;
-            let cx = selected.includes('cdn') ? 95 : 40;
-            let security = selected.includes('https') && selected.includes('vpn') ? 98 : 45;
-            let scale = selected.includes('cloud') ? 95 : 30;
-            let continuity = selected.includes('backup') || selected.includes('redundancy') ? 90 : 30;
+  let integration = fitScore;
+  let cx = selected.includes('cdn') ? 95 : 40;
+  let security = selected.includes('https') && selected.includes('vpn') ? 98 : 45;
+  let scale = selected.includes('cloud') ? 95 : 30;
+  let continuity = selected.includes('backup') || selected.includes('redundancy') ? 90 : 30;
 
-            // Update HUD
-            document.getElementById('l2-hud-suitability').textContent = `${fitScore}%`;
-            document.getElementById('l2-hud-integration').textContent = `${integration}%`;
-            document.getElementById('l2-hud-cx').textContent = `${cx}%`;
-            document.getElementById('l2-hud-security').textContent = `${security}%`;
-            document.getElementById('l2-hud-scale').textContent = `${scale}%`;
-            document.getElementById('l2-hud-continuity').textContent = `${continuity}%`;
-            document.getElementById('l2-hud-budget').textContent = `${100 - budgetScore}%`;
+  // Update HUD
+  document.getElementById('l2-hud-suitability').textContent = `${fitScore}%`;
+  document.getElementById('l2-hud-integration').textContent = `${integration}%`;
+  document.getElementById('l2-hud-cx').textContent = `${cx}%`;
+  document.getElementById('l2-hud-security').textContent = `${security}%`;
+  document.getElementById('l2-hud-scale').textContent = `${scale}%`;
+  document.getElementById('l2-hud-continuity').textContent = `${continuity}%`;
+  document.getElementById('l2-hud-budget').textContent = `${100 - budgetScore}%`;
 
-            if (fitScore >= 85) {
-                feedback.style.color = "var(--code-ok)";
-                feedback.innerHTML = c.correctFeedback;
-                unlockBadge('badge-consultant', '🏆 Infrastructure Architect');
+  if (fitScore >= 85) {
+    feedback.style.color = "var(--code-ok)";
+    feedback.innerHTML = c.correctFeedback;
+    unlockBadge('badge-consultant', '🏆 Infrastructure Architect');
 
-                const reinf = document.getElementById('l2-reinforcement');
-                reinf.style.display = "block";
-                reinf.innerHTML = `
+    const reinf = document.getElementById('l2-reinforcement');
+    reinf.style.display = "block";
+    reinf.innerHTML = `
       <h3>Level 2 Completed! Infrastructure Architect Badge Unlocked 🏆</h3>
       <div class="tip-box" style="margin-top:0.5rem;">
         <strong>Chaffey's Concept of Infrastructure Balance:</strong> Strategy requires balancing hardware expenditures (Budget Efficiency) against security targets (HTTPS/VPN) and delivery limits (Edge CDNs).
@@ -1363,154 +808,154 @@
         <button class="run-btn" onclick="switchLevel('32', 3)">Proceed to Level 3: Command Challenge ➔</button>
       </div>
     `;
-            } else {
-                feedback.style.color = "var(--code-err)";
-                feedback.innerHTML = c.incorrectFeedback;
-            }
-        }
+  } else {
+    feedback.style.color = "var(--code-err)";
+    feedback.innerHTML = c.incorrectFeedback;
+  }
+}
 
-        /* ─── LEVEL 3: COMMAND CHALLENGE ─── */
-        let l3Quarter = 1;
-        const l3EventsList = {
-            1: {
-                title: "Quarter 1: Startup Launches",
-                text: "Your startup launches its primary online storefront. Establish your initial platform access protocol.",
-                options: [
-                    { val: "http_only", text: "Deploy public storefront with plain HTTP (Unencrypted)" },
-                    { val: "https_dns", text: "Mandate HTTPS redirect with TLS mapping and DNS name registration (Optimal)" },
-                    { val: "vpn_only", text: "Restrict access behind private VPN lines (Needs Improvement - Blocks buyers)" }
-                ],
-                correct: "https_dns",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> HTTPS secures the initial payment routes, and DNS maps domains to public IP targets.<br>• <strong>CX/Agility:</strong> Bypasses browser alerts and connects clients directly.<br>• <strong>Textbook Concept:</strong> <em>Onboarding security and directory systems</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Standard HTTP allows packet sniffing, while VPN links block buyer access.<br>• <strong>Consequences:</strong> Zero client acquisition and security compliance failures.<br>• <strong>Better Strategy:</strong> Deploy HTTPS with dynamic DNS mapping."
-            },
-            2: {
-                title: "Quarter 2: Traffic Spike",
-                text: "E-Commerce traffic surges by 400%. CPU thrashes and customers report timed-out pages.",
-                options: [
-                    { val: "cloud_lb", text: "Deploy Elastic Cloud host nodes and Load Balancers (Optimal)" },
-                    { val: "local_box", text: "Manually install local motherboard RAM in branch offices (Needs Improvement)" },
-                    { val: "limit_conn", text: "Limit connections and queue clients (Acceptable)" }
-                ],
-                correct: "cloud_lb",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Cloud platforms allocate virtual server nodes on demand, while Load Balancers split workloads.<br>• <strong>Scalability:</strong> Prevents transaction crashes during spikes.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler infrastructure orchestration</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Upgrading local branch RAM takes weeks, while limiting connections drives conversion drops.<br>• <strong>Consequences:</strong> System outages and lost retail revenue during sales.<br>• <strong>Better Strategy:</strong> Autoscale nodes via Cloud and Load Balancer layers."
-            },
-            3: {
-                title: "Quarter 3: Latency Complaints",
-                text: "Customers report 8-second page latency when browsing heavy product catalogs.",
-                options: [
-                    { val: "cdn_cache", text: "Configure Edge CDN caches and compress image files (Optimal)" },
-                    { val: "dns_any", text: "Re-index database catalog tables (Acceptable)" },
-                    { val: "no_action", text: "Ignore latency and ask customers to clear cache (Needs Improvement)" }
-                ],
-                correct: "cdn_cache",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> CDN edge servers cache heavy assets near clients, bypassing distant routes.<br>• <strong>CX/Latency:</strong> Cuts load time from 8s to sub-second.<br>• <strong>Textbook Concept:</strong> <em>Edge Caching Acceleration</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Re-indexing database catalog tables fails to reduce physical fiber transport delay.<br>• <strong>Consequences:</strong> 8-second latencies continue, driving catalog checkout drops.<br>• <strong>Better Strategy:</strong> Deploy Edge CDN caching POPs."
-            },
-            4: {
-                title: "Quarter 4: International Expansion",
-                text: "Platform expands to European and Asian buyers. Long distance routes increase connection delays.",
-                options: [
-                    { val: "multi_region", text: "Deploy Multi-region Cloud replicas & Anycast DNS routing (Optimal)" },
-                    { val: "single_origin", text: "Keep single origin host and instruct remote offices to wait (Needs Improvement)" },
-                    { val: "browser_ttl", text: "Set basic browser cache TTL tags (Acceptable)" }
-                ],
-                correct: "multi_region",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Regional replicas process transaction queries locally, keeping routing times low.<br>• <strong>Scalability:</strong> Supports worldwide expansion without bottlenecking.<br>• <strong>Textbook Concept:</strong> <em>Multi-region e-business deployment</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Restricting hosting to home country nodes forces international clients to experience fiber delay limits.<br>• <strong>Consequences:</strong> Poor global experience and massive cart drops.<br>• <strong>Better Strategy:</strong> Deploy regional cloud replicas and CDNs."
-            },
-            5: {
-                title: "Quarter 5: Supplier inventory sync",
-                text: "Suppliers demand automated access to inventory records to schedule factory replenishments.",
-                options: [
-                    { val: "extranet_sync", text: "Deploy secure Supplier Extranet portals with restricted credentials (Optimal)" },
-                    { val: "intranet_leak", text: "Allow suppliers access to internal Intranet servers (Needs Improvement)" },
-                    { val: "open_web", text: "Post inventory CSV sheets on public open URLs (Needs Improvement)" }
-                ],
-                correct: "extranet_sync",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Extranets securely expose inventory databases to partners without leaking intranet files.<br>• <strong>Collaboration:</strong> Synchronizes parts supply chains automatically.<br>• <strong>Textbook Concept:</strong> <em>Partner Extranet Portal Management</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Exposing databases on public links allows competitors to steal pricing, while Intranets leak employee files.<br>• <strong>Consequences:</strong> Massive security breaches and trade data exposure.<br>• <strong>Better Strategy:</strong> Deploy secure supplier Extranets."
-            },
-            6: {
-                title: "Quarter 6: Remote Employee Workforces",
-                text: "Staff transition to remote work operations. Core ledger security must be maintained.",
-                options: [
-                    { val: "vpn_infra", text: "Configure Encrypted VPN tunnels to Private Intranets (Optimal)" },
-                    { val: "open_portal", text: "Open employee accounting files on public browser pages (Needs Improvement)" },
-                    { val: "restrict_office", text: "Lock data to local branch desktops only (Needs Improvement)" }
-                ],
-                correct: "vpn_infra",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> VPN tunnels encrypt remote employee connections to corporate files.<br>• <strong>Security:</strong> Eliminates session intercept risks on home WiFi networks.<br>• <strong>Textbook Concept:</strong> <em>Remote Access Cryptographic Siloing</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Exposing internal ledger ports to public URLs allows unauthorized hacker logins.<br>• <strong>Consequences:</strong> Loss of sensitive accounting data and corporate records leakages.<br>• <strong>Better Strategy:</strong> Implement private VPN connections."
-            },
-            7: {
-                title: "Quarter 7: Hardware Outage Crisis",
-                text: "Your primary web hosting cloud zone experiences a power failure, dropping the site offline.",
-                options: [
-                    { val: "dns_failover", text: "Trigger DNS Failover to multi-zone replica database backups (Optimal)" },
-                    { val: "wait_reboot", text: "Wait for provider to manually reboot servers (Needs Improvement)" },
-                    { val: "local_backup", text: "Restore database from offline tape backups (Acceptable)" }
-                ],
-                correct: "dns_failover",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> DNS failovers dynamically switch traffic to standby zones during hardware power crashes.<br>• <strong>Business Continuity:</strong> Minimizes recovery time to under a minute.<br>• <strong>Textbook Concept:</strong> <em>Active Standby Infrastructure Redundancy</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Waiting for server reboots or manually restoring daily tape backups creates multi-hour outages.<br>• <strong>Consequences:</strong> Zero website availability and high conversion losses.<br>• <strong>Better Strategy:</strong> Multi-zone active failover replica backups."
-            },
-            8: {
-                title: "Quarter 8: Budget cut 20%",
-                text: "Budgets cut by 20%. Scale back compute expenditures without collapsing platform operations.",
-                options: [
-                    { val: "optimize_edge", text: "Increase edge CDN caching thresholds to offload server traffic (Optimal)" },
-                    { val: "disable_https", text: "Disable HTTPS certificate encryptions (Needs Improvement)" },
-                    { val: "shut_balancer", text: "Shut down load-balancing instances (Needs Improvement)" }
-                ],
-                correct: "optimize_edge",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> CDNs handle static page requests, dramatically reducing origin server compute workloads.<br>• <strong>Cost Efficiency:</strong> Lowers VM hosting expenses without risking downtime.<br>• <strong>Textbook Concept:</strong> <em>Static Asset Offloading Optimization</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Disabling HTTPS or shutting down active Load Balancers collapses checkout security or site stability.<br>• <strong>Consequences:</strong> Site crashes, legal compliance audits fail.<br>• <strong>Better Strategy:</strong> Increase CDN caching ratios to offload VM workloads."
-            },
-            9: {
-                title: "Quarter 9: Speed Expectations Spike",
-                text: "Competitors deploy sub-second loading storefronts. Customer conversion expectations rise.",
-                options: [
-                    { val: "cache_policy", text: "Optimize CDN caching rules and use browser session caching (Optimal)" },
-                    { val: "recompile", text: "Re-compile database SQL transaction scripts (Acceptable)" },
-                    { val: "none", text: "Rely on current platform speeds (Needs Improvement)" }
-                ],
-                correct: "cache_policy",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Static cache rules serve page files instantly without querying origin SQL databases.<br>• <strong>CX/Speed:</strong> Increases page speed to sub-second targets.<br>• <strong>Textbook Concept:</strong> <em>Browser and Edge Session Caching</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Re-compilation of database scripts fails to bypass routing delays.<br>• <strong>Consequences:</strong> Slow storefront rendering speeds drive buyers to competitors.<br>• <strong>Better Strategy:</strong> Configure Edge CDN static caching."
-            },
-            10: {
-                title: "Quarter 10: Logistics Company Merger",
-                text: "Your company acquires a legacy logistics firm running local flat database spreadsheets.",
-                options: [
-                    { val: "api_layer", text: "Deploy REST API interchange abstraction layers between ledgers (Optimal)" },
-                    { val: "manual_csv", text: "Schedule daily manual CSV data transfers (Needs Improvement)" },
-                    { val: "scrap_db", text: "Scrap acquired records and re-enter them from scratch (Acceptable)" }
-                ],
-                correct: "api_layer",
-                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> APIs create secure data gateways, connecting legacy databases with core ledgers.<br>• <strong>Integration:</strong> Integrates acquired distributor databases without custom rewrites.<br>• <strong>Textbook Concept:</strong> <em>Middleware Integration Abstractions</em>.",
-                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Scheduling daily CSV transfers manually invites duplicate items or out-of-sync inventory logs.<br>• <strong>Consequences:</strong> Delivery delays, stock-out errors, and data corruption.<br>• <strong>Better Strategy:</strong> Deploy REST API interchange middleware."
-            }
-        };
+/* ─── LEVEL 3: COMMAND CHALLENGE ─── */
+let l3Quarter = 1;
+const l3EventsList = {
+  1: {
+    title: "Quarter 1: Startup Launches",
+    text: "Your startup launches its primary online storefront. Establish your initial platform access protocol.",
+    options: [
+      { val: "http_only", text: "Deploy public storefront with plain HTTP (Unencrypted)" },
+      { val: "https_dns", text: "Mandate HTTPS redirect with TLS mapping and DNS name registration (Optimal)" },
+      { val: "vpn_only", text: "Restrict access behind private VPN lines (Needs Improvement - Blocks buyers)" }
+    ],
+    correct: "https_dns",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> HTTPS secures the initial payment routes, and DNS maps domains to public IP targets.<br>• <strong>CX/Agility:</strong> Bypasses browser alerts and connects clients directly.<br>• <strong>Textbook Concept:</strong> <em>Onboarding security and directory systems</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Standard HTTP allows packet sniffing, while VPN links block buyer access.<br>• <strong>Consequences:</strong> Zero client acquisition and security compliance failures.<br>• <strong>Better Strategy:</strong> Deploy HTTPS with dynamic DNS mapping."
+  },
+  2: {
+    title: "Quarter 2: Traffic Spike",
+    text: "E-Commerce traffic surges by 400%. CPU thrashes and customers report timed-out pages.",
+    options: [
+      { val: "cloud_lb", text: "Deploy Elastic Cloud host nodes and Load Balancers (Optimal)" },
+      { val: "local_box", text: "Manually install local motherboard RAM in branch offices (Needs Improvement)" },
+      { val: "limit_conn", text: "Limit connections and queue clients (Acceptable)" }
+    ],
+    correct: "cloud_lb",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Cloud platforms allocate virtual server nodes on demand, while Load Balancers split workloads.<br>• <strong>Scalability:</strong> Prevents transaction crashes during spikes.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler infrastructure orchestration</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Upgrading local branch RAM takes weeks, while limiting connections drives conversion drops.<br>• <strong>Consequences:</strong> System outages and lost retail revenue during sales.<br>• <strong>Better Strategy:</strong> Autoscale nodes via Cloud and Load Balancer layers."
+  },
+  3: {
+    title: "Quarter 3: Latency Complaints",
+    text: "Customers report 8-second page latency when browsing heavy product catalogs.",
+    options: [
+      { val: "cdn_cache", text: "Configure Edge CDN caches and compress image files (Optimal)" },
+      { val: "dns_any", text: "Re-index database catalog tables (Acceptable)" },
+      { val: "no_action", text: "Ignore latency and ask customers to clear cache (Needs Improvement)" }
+    ],
+    correct: "cdn_cache",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> CDN edge servers cache heavy assets near clients, bypassing distant routes.<br>• <strong>CX/Latency:</strong> Cuts load time from 8s to sub-second.<br>• <strong>Textbook Concept:</strong> <em>Edge Caching Acceleration</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Re-indexing database catalog tables fails to reduce physical fiber transport delay.<br>• <strong>Consequences:</strong> 8-second latencies continue, driving catalog checkout drops.<br>• <strong>Better Strategy:</strong> Deploy Edge CDN caching POPs."
+  },
+  4: {
+    title: "Quarter 4: International Expansion",
+    text: "Platform expands to European and Asian buyers. Long distance routes increase connection delays.",
+    options: [
+      { val: "multi_region", text: "Deploy Multi-region Cloud replicas & Anycast DNS routing (Optimal)" },
+      { val: "single_origin", text: "Keep single origin host and instruct remote offices to wait (Needs Improvement)" },
+      { val: "browser_ttl", text: "Set basic browser cache TTL tags (Acceptable)" }
+    ],
+    correct: "multi_region",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Regional replicas process transaction queries locally, keeping routing times low.<br>• <strong>Scalability:</strong> Supports worldwide expansion without bottlenecking.<br>• <strong>Textbook Concept:</strong> <em>Multi-region e-business deployment</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Restricting hosting to home country nodes forces international clients to experience fiber delay limits.<br>• <strong>Consequences:</strong> Poor global experience and massive cart drops.<br>• <strong>Better Strategy:</strong> Deploy regional cloud replicas and CDNs."
+  },
+  5: {
+    title: "Quarter 5: Supplier inventory sync",
+    text: "Suppliers demand automated access to inventory records to schedule factory replenishments.",
+    options: [
+      { val: "extranet_sync", text: "Deploy secure Supplier Extranet portals with restricted credentials (Optimal)" },
+      { val: "intranet_leak", text: "Allow suppliers access to internal Intranet servers (Needs Improvement)" },
+      { val: "open_web", text: "Post inventory CSV sheets on public open URLs (Needs Improvement)" }
+    ],
+    correct: "extranet_sync",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Extranets securely expose inventory databases to partners without leaking intranet files.<br>• <strong>Collaboration:</strong> Synchronizes parts supply chains automatically.<br>• <strong>Textbook Concept:</strong> <em>Partner Extranet Portal Management</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Exposing databases on public links allows competitors to steal pricing, while Intranets leak employee files.<br>• <strong>Consequences:</strong> Massive security breaches and trade data exposure.<br>• <strong>Better Strategy:</strong> Deploy secure supplier Extranets."
+  },
+  6: {
+    title: "Quarter 6: Remote Employee Workforces",
+    text: "Staff transition to remote work operations. Core ledger security must be maintained.",
+    options: [
+      { val: "vpn_infra", text: "Configure Encrypted VPN tunnels to Private Intranets (Optimal)" },
+      { val: "open_portal", text: "Open employee accounting files on public browser pages (Needs Improvement)" },
+      { val: "restrict_office", text: "Lock data to local branch desktops only (Needs Improvement)" }
+    ],
+    correct: "vpn_infra",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> VPN tunnels encrypt remote employee connections to corporate files.<br>• <strong>Security:</strong> Eliminates session intercept risks on home WiFi networks.<br>• <strong>Textbook Concept:</strong> <em>Remote Access Cryptographic Siloing</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Exposing internal ledger ports to public URLs allows unauthorized hacker logins.<br>• <strong>Consequences:</strong> Loss of sensitive accounting data and corporate records leakages.<br>• <strong>Better Strategy:</strong> Implement private VPN connections."
+  },
+  7: {
+    title: "Quarter 7: Hardware Outage Crisis",
+    text: "Your primary web hosting cloud zone experiences a power failure, dropping the site offline.",
+    options: [
+      { val: "dns_failover", text: "Trigger DNS Failover to multi-zone replica database backups (Optimal)" },
+      { val: "wait_reboot", text: "Wait for provider to manually reboot servers (Needs Improvement)" },
+      { val: "local_backup", text: "Restore database from offline tape backups (Acceptable)" }
+    ],
+    correct: "dns_failover",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> DNS failovers dynamically switch traffic to standby zones during hardware power crashes.<br>• <strong>Business Continuity:</strong> Minimizes recovery time to under a minute.<br>• <strong>Textbook Concept:</strong> <em>Active Standby Infrastructure Redundancy</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Waiting for server reboots or manually restoring daily tape backups creates multi-hour outages.<br>• <strong>Consequences:</strong> Zero website availability and high conversion losses.<br>• <strong>Better Strategy:</strong> Multi-zone active failover replica backups."
+  },
+  8: {
+    title: "Quarter 8: Budget cut 20%",
+    text: "Budgets cut by 20%. Scale back compute expenditures without collapsing platform operations.",
+    options: [
+      { val: "optimize_edge", text: "Increase edge CDN caching thresholds to offload server traffic (Optimal)" },
+      { val: "disable_https", text: "Disable HTTPS certificate encryptions (Needs Improvement)" },
+      { val: "shut_balancer", text: "Shut down load-balancing instances (Needs Improvement)" }
+    ],
+    correct: "optimize_edge",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> CDNs handle static page requests, dramatically reducing origin server compute workloads.<br>• <strong>Cost Efficiency:</strong> Lowers VM hosting expenses without risking downtime.<br>• <strong>Textbook Concept:</strong> <em>Static Asset Offloading Optimization</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Disabling HTTPS or shutting down active Load Balancers collapses checkout security or site stability.<br>• <strong>Consequences:</strong> Site crashes, legal compliance audits fail.<br>• <strong>Better Strategy:</strong> Increase CDN caching ratios to offload VM workloads."
+  },
+  9: {
+    title: "Quarter 9: Speed Expectations Spike",
+    text: "Competitors deploy sub-second loading storefronts. Customer conversion expectations rise.",
+    options: [
+      { val: "cache_policy", text: "Optimize CDN caching rules and use browser session caching (Optimal)" },
+      { val: "recompile", text: "Re-compile database SQL transaction scripts (Acceptable)" },
+      { val: "none", text: "Rely on current platform speeds (Needs Improvement)" }
+    ],
+    correct: "cache_policy",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Static cache rules serve page files instantly without querying origin SQL databases.<br>• <strong>CX/Speed:</strong> Increases page speed to sub-second targets.<br>• <strong>Textbook Concept:</strong> <em>Browser and Edge Session Caching</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Re-compilation of database scripts fails to bypass routing delays.<br>• <strong>Consequences:</strong> Slow storefront rendering speeds drive buyers to competitors.<br>• <strong>Better Strategy:</strong> Configure Edge CDN static caching."
+  },
+  10: {
+    title: "Quarter 10: Logistics Company Merger",
+    text: "Your company acquires a legacy logistics firm running local flat database spreadsheets.",
+    options: [
+      { val: "api_layer", text: "Deploy REST API interchange abstraction layers between ledgers (Optimal)" },
+      { val: "manual_csv", text: "Schedule daily manual CSV data transfers (Needs Improvement)" },
+      { val: "scrap_db", text: "Scrap acquired records and re-enter them from scratch (Acceptable)" }
+    ],
+    correct: "api_layer",
+    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> APIs create secure data gateways, connecting legacy databases with core ledgers.<br>• <strong>Integration:</strong> Integrates acquired distributor databases without custom rewrites.<br>• <strong>Textbook Concept:</strong> <em>Middleware Integration Abstractions</em>.",
+    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Scheduling daily CSV transfers manually invites duplicate items or out-of-sync inventory logs.<br>• <strong>Consequences:</strong> Delivery delays, stock-out errors, and data corruption.<br>• <strong>Better Strategy:</strong> Deploy REST API interchange middleware."
+  }
+};
 
-        let l3Answers = [];
+let l3Answers = [];
 
-        function renderL3Quarter() {
-            const r = l3EventsList[l3Quarter];
-            document.getElementById('l3-phase-badge').textContent = `Quarter ${l3Quarter} of 10`;
-            document.getElementById('l3-phase-title').textContent = r.title;
-            document.getElementById('l3-phase-text').textContent = r.text;
-            document.getElementById('qf-l3').innerHTML = "";
-            document.getElementById('nextL3Btn').style.display = "none";
-            document.getElementById('l3-submit-btn').disabled = false;
+function renderL3Quarter() {
+  const r = l3EventsList[l3Quarter];
+  document.getElementById('l3-phase-badge').textContent = `Quarter ${l3Quarter} of 10`;
+  document.getElementById('l3-phase-title').textContent = r.title;
+  document.getElementById('l3-phase-text').textContent = r.text;
+  document.getElementById('qf-l3').innerHTML = "";
+  document.getElementById('nextL3Btn').style.display = "none";
+  document.getElementById('l3-submit-btn').disabled = false;
 
-            const container = document.getElementById('l3-selectors');
-            container.innerHTML = "";
+  const container = document.getElementById('l3-selectors');
+  container.innerHTML = "";
 
-            let jumbled = shuffleArray(r.options);
-            let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
-            container.innerHTML = `
+  let jumbled = shuffleArray(r.options);
+  let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+  container.innerHTML = `
     <div>
       <span class="tk-label">Strategy Action Option</span>
       <select id="l3-sel-crisis" class="tk-entry" style="width:100%;">
@@ -1518,89 +963,89 @@
       </select>
     </div>
   `;
-        }
+}
 
-        function submitL3Phase() {
-            const r = l3EventsList[l3Quarter];
-            const choice = document.getElementById('l3-sel-crisis').value;
-            const feedback = document.getElementById('qf-l3');
+function submitL3Phase() {
+  const r = l3EventsList[l3Quarter];
+  const choice = document.getElementById('l3-sel-crisis').value;
+  const feedback = document.getElementById('qf-l3');
 
-            l3Answers.push(choice);
+  l3Answers.push(choice);
 
-            let isCorrect = (choice === r.correct);
+  let isCorrect = (choice === r.correct);
 
-            let score = 0;
-            l3Answers.forEach((ans, idx) => {
-                if (ans === l3EventsList[idx + 1].correct) score++;
-            });
-            let fitScore = Math.round((score / l3Quarter) * 100);
+  let score = 0;
+  l3Answers.forEach((ans, idx) => {
+    if (ans === l3EventsList[idx + 1].correct) score++;
+  });
+  let fitScore = Math.round((score / l3Quarter) * 100);
 
-            let cx = isCorrect ? 95 : 30;
-            let security = isCorrect ? 95 : 40;
-            let availability = isCorrect ? 98 : 30;
-            let scale = isCorrect ? 95 : 20;
-            let continuity = isCorrect ? 95 : 30;
-            let integration = isCorrect ? 90 : 40;
-            let readiness = fitScore;
-            let strategic = fitScore;
-            let budget = isCorrect ? 90 : 50;
+  let cx = isCorrect ? 95 : 30;
+  let security = isCorrect ? 95 : 40;
+  let availability = isCorrect ? 98 : 30;
+  let scale = isCorrect ? 95 : 20;
+  let continuity = isCorrect ? 95 : 30;
+  let integration = isCorrect ? 90 : 40;
+  let readiness = fitScore;
+  let strategic = fitScore;
+  let budget = isCorrect ? 90 : 50;
 
-            // Update HUD
-            document.getElementById('l3-hud-score').textContent = `${fitScore}%`;
-            document.getElementById('l3-hud-cx').textContent = `${cx}%`;
-            document.getElementById('l3-hud-continuity').textContent = `${continuity}%`;
-            document.getElementById('l3-hud-security').textContent = `${security}%`;
-            document.getElementById('l3-hud-availability').textContent = `${availability}%`;
-            document.getElementById('l3-hud-scale').textContent = `${scale}%`;
-            document.getElementById('l3-hud-integration').textContent = `${integration}%`;
-            document.getElementById('l3-hud-readiness').textContent = `${readiness}%`;
-            document.getElementById('l3-hud-strategic').textContent = `${strategic}%`;
-            document.getElementById('l3-hud-budget').textContent = `${budget}%`;
+  // Update HUD
+  document.getElementById('l3-hud-score').textContent = `${fitScore}%`;
+  document.getElementById('l3-hud-cx').textContent = `${cx}%`;
+  document.getElementById('l3-hud-continuity').textContent = `${continuity}%`;
+  document.getElementById('l3-hud-security').textContent = `${security}%`;
+  document.getElementById('l3-hud-availability').textContent = `${availability}%`;
+  document.getElementById('l3-hud-scale').textContent = `${scale}%`;
+  document.getElementById('l3-hud-integration').textContent = `${integration}%`;
+  document.getElementById('l3-hud-readiness').textContent = `${readiness}%`;
+  document.getElementById('l3-hud-strategic').textContent = `${strategic}%`;
+  document.getElementById('l3-hud-budget').textContent = `${budget}%`;
 
-            if (isCorrect) {
-                feedback.style.color = "var(--code-ok)";
-                feedback.innerHTML = r.correctFeedback;
-                document.getElementById('l3-submit-btn').disabled = true;
+  if (isCorrect) {
+    feedback.style.color = "var(--code-ok)";
+    feedback.innerHTML = r.correctFeedback;
+    document.getElementById('l3-submit-btn').disabled = true;
 
-                if (l3Quarter < 10) {
-                    document.getElementById('nextL3Btn').style.display = "inline-flex";
-                } else {
-                    concludeL3Simulation();
-                }
-            } else {
-                feedback.style.color = "var(--code-err)";
-                feedback.innerHTML = r.incorrectFeedback;
-                // Pop last choice to allow retry
-                l3Answers.pop();
-            }
-        }
+    if (l3Quarter < 10) {
+      document.getElementById('nextL3Btn').style.display = "inline-flex";
+    } else {
+      concludeL3Simulation();
+    }
+  } else {
+    feedback.style.color = "var(--code-err)";
+    feedback.innerHTML = r.incorrectFeedback;
+    // Pop last choice to allow retry
+    l3Answers.pop();
+  }
+}
 
-        function proceedL3NextPhase() {
-            l3Quarter++;
-            renderL3Quarter();
-        }
+function proceedL3NextPhase() {
+  l3Quarter++;
+  renderL3Quarter();
+}
 
-        function concludeL3Simulation() {
-            unlockBadge('badge-delivery', '🏆 Service Delivery Expert');
-            unlockBadge('badge-strategist', '🏆 Digital Infrastructure Strategist');
-            promoteConsultant(4);
+function concludeL3Simulation() {
+  unlockBadge('badge-delivery', '🏆 Service Delivery Expert');
+  unlockBadge('badge-strategist', '🏆 Digital Infrastructure Strategist');
+  promoteConsultant(4);
 
-            // Compute final score
-            let correctCount = 0;
-            l3Answers.forEach((ans, idx) => {
-                if (ans === l3EventsList[idx + 1].correct) correctCount++;
-            });
-            const score = Math.round((correctCount / 10) * 100);
+  // Compute final score
+  let correctCount = 0;
+  l3Answers.forEach((ans, idx) => {
+    if (ans === l3EventsList[idx + 1].correct) correctCount++;
+  });
+  const score = Math.round((correctCount / 10) * 100);
 
-            let rating = "Needs Improvement";
-            if (score >= 90) rating = "Level 3: Strategic Leader";
-            else if (score >= 70) rating = "Level 2: Integrated Manager";
-            else rating = "Level 1: Operational Analyst";
+  let rating = "Needs Improvement";
+  if (score >= 90) rating = "Level 3: Strategic Leader";
+  else if (score >= 70) rating = "Level 2: Integrated Manager";
+  else rating = "Level 1: Operational Analyst";
 
-            const report = document.getElementById('l3-report-card');
-            report.style.display = "block";
+  const report = document.getElementById('l3-report-card');
+  report.style.display = "block";
 
-            report.innerHTML = `
+  report.innerHTML = `
     <h3>Digital Infrastructure Command Report</h3>
     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Infrastructure Maturity: <strong>${rating}</strong></p>
 
@@ -1622,63 +1067,62 @@
     </div>
   `;
 
-            // Render blueprint playground
-            const play = document.getElementById('l3Playground');
-            const out = document.getElementById('l3Out');
-            play.style.display = "block";
+  // Render blueprint playground
+  const play = document.getElementById('l3Playground');
+  const out = document.getElementById('l3Out');
+  play.style.display = "block";
 
-            out.innerHTML = `digital_business_infrastructure:
+  out.innerHTML = `digital_business_infrastructure:
   target: Global E-Commerce
   status: Completed
   phases_survived: 10/10
   evaluation_score: ${score}/100
   consulting_rating: Excellent`;
-        }
+}
 
-        /* ─── GAMIFIED RATINGS CONTROLLER ─── */
-        const rankTitle = {
-            1: "Junior Analyst",
-            2: "Network Explorer",
-            3: "Infrastructure Consultant",
-            4: "Chief Infrastructure Strategist"
-        };
+/* ─── GAMIFIED RATINGS CONTROLLER ─── */
+const rankTitle = {
+  1: "Junior Analyst",
+  2: "Network Explorer",
+  3: "Infrastructure Consultant",
+  4: "Chief Infrastructure Strategist"
+};
 
-        function promoteConsultant(level) {
-            const starsEl = document.getElementById('consultant-stars');
-            const rankEl = document.getElementById('consultant-rank');
+function promoteConsultant(level) {
+  const starsEl = document.getElementById('consultant-stars');
+  const rankEl = document.getElementById('consultant-rank');
+  
+  if (starsEl) {
+    if (level === 2) starsEl.textContent = "⭐⭐⭐";
+    else if (level === 3) starsEl.textContent = "⭐⭐⭐⭐";
+    else if (level === 4) starsEl.textContent = "⭐⭐⭐⭐⭐";
+  }
+  if (rankEl) {
+    rankEl.textContent = rankTitle[level];
+  }
+}
 
-            if (starsEl) {
-                if (level === 2) starsEl.textContent = "⭐⭐⭐";
-                else if (level === 3) starsEl.textContent = "⭐⭐⭐⭐";
-                else if (level === 4) starsEl.textContent = "⭐⭐⭐⭐⭐";
-            }
-            if (rankEl) {
-                rankEl.textContent = rankTitle[level];
-            }
-        }
+function unlockBadge(id, text) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.background = 'var(--primary-light)';
+    el.style.color = 'var(--primary)';
+    el.style.borderColor = 'var(--primary)';
+    el.style.fontWeight = '700';
+    el.textContent = text;
+  }
+}
 
-        function unlockBadge(id, text) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.style.background = 'var(--primary-light)';
-                el.style.color = 'var(--primary)';
-                el.style.borderColor = 'var(--primary)';
-                el.style.fontWeight = '700';
-                el.textContent = text;
-            }
-        }
+function updateRatings(level) {
+  // Safe helper updates
+}
 
-        function updateRatings(level) {
-            // Safe helper updates
-        }
-
-        // Initialise defaults on load
-        window.addEventListener('DOMContentLoaded', () => {
-            renderL1Round();
-            changeL2Case();
-            renderL3Quarter();
-        });
-    </script>
+// Initialise defaults on load
+window.addEventListener('DOMContentLoaded', () => {
+  renderL1Round();
+  changeL2Case();
+  renderL3Quarter();
+});
+</script>
 </body>
-
 </html>
