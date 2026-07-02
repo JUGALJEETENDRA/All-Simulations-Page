@@ -1,1 +1,2042 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 5.3: Socket Programming using Python Simulation</title>
+
+    <!-- Modern clean typography from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+       DESIGN SYSTEM CONSTANTS & UTILITIES
+       ========================================================================== */
+        :root {
+            --white: #FFFFFF;
+            --red-primary: #D32F2F;
+            --red-light: #FFEBEE;
+            --red-dark: #B71C1C;
+            --grey-bg: #F5F5F5;
+            --grey-card: #FAFAFA;
+            --grey-border: #E0E0E0;
+
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --text-muted: #9E9E9E;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--grey-border);
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--red-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-title span {
+            font-size: 0.85rem;
+            background-color: var(--red-light);
+            color: var(--red-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Stepper Progress bar */
+        .progress-stepper {
+            display: flex;
+            background-color: var(--grey-bg);
+            border-radius: 8px;
+            padding: 0.4rem;
+            gap: 0.25rem;
+        }
+
+        .step-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-tab.active {
+            background-color: var(--white);
+            color: var(--red-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-tab.completed {
+            color: var(--text-primary);
+        }
+
+        .step-tab.completed::after {
+            content: '✓';
+            color: var(--red-primary);
+            font-weight: bold;
+        }
+
+        /* Instruction Card */
+        .instruction-card {
+            background-color: var(--grey-bg);
+            border-left: 4px solid var(--red-primary);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .instruction-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--red-primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .instruction-card ol {
+            padding-left: 1.25rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .instruction-card li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Main Level Containers */
+        .level-container {
+            display: none;
+        }
+
+        .level-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Grid Layouts */
+        .grid-two-col {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 992px) {
+            .grid-two-col {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        .studio-three-panel {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 992px) {
+            .studio-three-panel {
+                grid-template-columns: 280px 1.2fr 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--grey-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--grey-border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Sub-tabs for Activities inside Levels */
+        .activity-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--grey-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .act-btn {
+            background-color: var(--grey-bg);
+            border: 1px solid var(--grey-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .act-btn.active {
+            background-color: var(--red-light);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+        }
+
+        .activity-panel {
+            display: none;
+        }
+
+        .activity-panel.active {
+            display: block;
+        }
+
+        /* Code highlights & code wrappers */
+        .code-editor-container {
+            background-color: #1E1E1E;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1rem;
+        }
+
+        .code-editor-header {
+            background-color: #2D2D2D;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #404040;
+        }
+
+        .code-lang-label {
+            font-size: 0.75rem;
+            color: #9CDCFE;
+            font-family: var(--font-mono);
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: #CCC;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-main);
+        }
+
+        .copy-btn:hover {
+            background-color: #444;
+            color: #FFF;
+        }
+
+        .code-content {
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #D4D4D4;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+        }
+
+        .code-content span.kw {
+            color: #569CD6;
+            font-weight: bold;
+        }
+
+        /* Keyword */
+        .code-content span.str {
+            color: #CE9178;
+        }
+
+        /* String literal */
+        .code-content span.bi {
+            color: #4EC9B0;
+        }
+
+        /* Built-in */
+        .code-content span.com {
+            color: #6A9955;
+            font-style: italic;
+        }
+
+        /* Comment */
+
+        .highlight-line {
+            background-color: #383838;
+            border-left: 3px solid var(--red-primary);
+            padding-left: 4px;
+            display: block;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.88rem;
+            border: 1px solid var(--grey-border);
+            border-radius: 6px;
+            font-family: var(--font-main);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--red-primary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-main);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--red-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--grey-bg);
+            border: 1px solid var(--grey-border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--grey-border);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Level Footer Navigation */
+        .level-footer {
+            border-top: 1px solid var(--grey-border);
+            padding-top: 1.25rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Flow Chart Styles */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 0;
+        }
+
+        .flow-node {
+            border: 1.5px solid var(--grey-border);
+            background-color: var(--grey-card);
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            width: 220px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .flow-node.active {
+            background-color: var(--red-light);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+            transform: scale(1.04);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .flow-arrow {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: bold;
+            line-height: 1;
+            height: 18px;
+        }
+
+        .flow-arrow.active {
+            color: var(--red-primary);
+            animation: arrowBounce 0.5s ease infinite alternate;
+        }
+
+        /* Side-by-side Explanations */
+        .side-explanation-panel {
+            border: 1px solid var(--grey-border);
+            border-radius: 6px;
+            background-color: var(--grey-card);
+            padding: 1rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        #l1-code-annotation-box {
+            border-left: 3px solid var(--red-primary);
+            background-color: var(--grey-bg);
+            margin-top: 1rem;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+        }
+
+        .side-explanation-title {
+            font-weight: 700;
+            color: var(--red-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        /* Function Explorer Grid (L1 Activity 2) */
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .explorer-card {
+            border: 1px solid var(--grey-border);
+            background-color: var(--grey-card);
+            border-radius: 6px;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .explorer-card:hover {
+            border-color: var(--red-primary);
+            background-color: var(--grey-bg);
+        }
+
+        .explorer-card.active {
+            background-color: var(--red-light);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+            font-weight: 600;
+        }
+
+        /* Activity stages clickable checklist buttons */
+        .stage-btn {
+            background: transparent;
+            border: 1px solid var(--grey-border);
+            color: var(--text-primary);
+            text-align: left;
+            padding: 0.55rem 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .stage-btn:hover {
+            background-color: var(--grey-bg);
+        }
+
+        .stage-btn.active {
+            background-color: var(--red-light);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+            font-weight: 600;
+        }
+
+        .stage-btn.completed::after {
+            content: '✓';
+            color: var(--red-primary);
+            font-weight: bold;
+        }
+
+        /* Chat Terminal Simulators */
+        .chat-terminal {
+            background-color: #1E1E1E;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 250px;
+        }
+
+        .chat-terminal-header {
+            background-color: #2D2D2D;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            color: #9CDCFE;
+            font-weight: bold;
+            border-bottom: 1px solid #404040;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 0.75rem;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            color: #D4D4D4;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+
+        .chat-bubble.sent {
+            background-color: #0E639C;
+            color: #FFF;
+            align-self: flex-end;
+        }
+
+        .chat-bubble.recv {
+            background-color: #383838;
+            color: #D4D4D4;
+            align-self: flex-start;
+        }
+
+        .chat-bubble.system {
+            background-color: #2D2D2D;
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.7rem;
+            align-self: center;
+            max-width: 100%;
+        }
+
+        /* Completion Overlay Checklist */
+        .completion-check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .completion-check-item span.icon {
+            color: var(--red-primary);
+            font-weight: bold;
+        }
+
+        /* Animation workflow transitions keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes arrowBounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(3px);
+            }
+        }
+
+        /* Level 2 Visual Builder Grid split */
+        .builder-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .builder-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Banner -->
+    <header>
+        <div class="container header-content">
+            <div class="brand-title">
+                📁 Python Socket Programming <span>Module 5.3</span>
+            </div>
+
+            <!-- Horizontal Stepper Progress Indicator -->
+            <div class="progress-stepper">
+                <button class="step-tab active" id="btn-tab-1" onclick="app.switchLevel(1)">
+                    Level 1: Explorer
+                </button>
+                <button class="step-tab" id="btn-tab-2" onclick="app.switchLevel(2)">
+                    Level 2: Builder
+                </button>
+                <button class="step-tab" id="btn-tab-3" onclick="app.switchLevel(3)">
+                    Level 3: Studio
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- ==========================================================================
+         LEVEL 1: NETWORK EXPLORER
+         ========================================================================== -->
+        <div class="level-container active" id="level1">
+
+            <!-- Instruction Card -->
+            <div class="instruction-card">
+                <h3>Level 1 Instructions</h3>
+                <ol>
+                    <li>Understand the sequence flow between Client and Server socket handlers.</li>
+                    <li>Learn the purpose, parameters, and syntax details of core socket driver API calls.</li>
+                    <li>Complete both activities (Connection Timeline & Function Explorer) to advance.</li>
+                </ol>
+            </div>
+
+            <!-- Activities Selector -->
+            <div class="activity-selector">
+                <button class="act-btn active" id="l1-btn-act1" onclick="l1.switchActivity(1)">Activity 1: Client–Server
+                    Timeline</button>
+                <button class="act-btn" id="l1-btn-act2" onclick="l1.switchActivity(2)">Activity 2: Socket Function
+                    Explorer</button>
+            </div>
+
+            <!-- Grid layout panels -->
+            <div class="studio-three-panel">
+
+                <!-- Column 1: Interactive Stages Selector -->
+                <div class="level-workspace-left">
+
+                    <!-- ACTIVITY 1: Timeline stages buttons -->
+                    <div class="activity-panel active" id="l1-act-1">
+                        <div class="card" style="padding: 1.25rem;">
+                            <div class="card-title">Connection Stages Timeline</div>
+                            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Click
+                                timeline stages in sequence to animate request data and update code highlights:</p>
+
+                            <button class="stage-btn" id="l1-stg-1" onclick="l1.selectStage(1)">1. Socket Created
+                                (socket)</button>
+                            <button class="stage-btn" id="l1-stg-2" onclick="l1.selectStage(2)">2. Binding Port
+                                (bind)</button>
+                            <button class="stage-btn" id="l1-stg-3" onclick="l1.selectStage(3)">3. Listening
+                                (listen)</button>
+                            <button class="stage-btn" id="l1-stg-4" onclick="l1.selectStage(4)">4. Accepting Connection
+                                (accept)</button>
+                            <button class="stage-btn" id="l1-stg-5" onclick="l1.selectStage(5)">5. Message Transmitting
+                                (send)</button>
+                            <button class="stage-btn" id="l1-stg-6" onclick="l1.selectStage(6)">6. Message Received
+                                (recv)</button>
+                            <button class="stage-btn" id="l1-stg-7" onclick="l1.selectStage(7)">7. Sockets Terminated
+                                (close)</button>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVITY 2: Function cards selectors -->
+                    <div class="activity-panel" id="l1-act-2">
+                        <div class="card" style="padding: 1.25rem;">
+                            <div class="card-title">Socket APIs Registry</div>
+                            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">Select a
+                                client or server library driver call to inspect API syntax:</p>
+
+                            <div class="explorer-grid">
+                                <div class="explorer-card active" id="l1-ec-socket"
+                                    onclick="l1.selectExplorerCard('socket')">socket()</div>
+                                <div class="explorer-card" id="l1-ec-bind" onclick="l1.selectExplorerCard('bind')">
+                                    bind()</div>
+                                <div class="explorer-card" id="l1-ec-listen" onclick="l1.selectExplorerCard('listen')">
+                                    listen()</div>
+                                <div class="explorer-card" id="l1-ec-accept" onclick="l1.selectExplorerCard('accept')">
+                                    accept()</div>
+                                <div class="explorer-card" id="l1-ec-connect"
+                                    onclick="l1.selectExplorerCard('connect')">connect()</div>
+                                <div class="explorer-card" id="l1-ec-send" onclick="l1.selectExplorerCard('send')">
+                                    send()</div>
+                                <div class="explorer-card" id="l1-ec-recv" onclick="l1.selectExplorerCard('recv')">
+                                    recv()</div>
+                                <div class="explorer-card" id="l1-ec-close" onclick="l1.selectExplorerCard('close')">
+                                    close()</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Column 2: Simulated Live Output (Center Column) -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-title" id="l1-preview-title">Client-Server Connection Visualizer</div>
+
+                    <!-- Connection Builder flowchart animation container -->
+                    <div id="l1-connection-visualizer" style="display: block; min-height: 250px;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; padding:0 2rem;">
+                            <!-- Client node box -->
+                            <div id="l1-node-client"
+                                style="border: 2px solid var(--grey-border); border-radius: 8px; padding: 1rem; width: 100px; text-align: center; font-weight: bold; background: var(--grey-card); transition: all 0.3s;">
+                                💻 Client
+                                <div style="font-size:0.65rem; font-weight:normal; color:var(--text-secondary); margin-top:0.25rem;"
+                                    id="l1-lbl-cstate">OFFLINE</div>
+                            </div>
+
+                            <!-- Data Packet bubble -->
+                            <div id="l1-packet-bubble"
+                                style="width: 26px; height: 26px; border-radius: 50%; background-color: var(--red-primary); color: #FFF; display: none; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; position: relative; transition: left 0.8s ease;">
+                                pkg
+                            </div>
+                            <div id="l1-packet-line"
+                                style="flex:1; border-top: 2px dashed var(--grey-border); height: 2px; margin: 0 1rem; position: relative;">
+                            </div>
+
+                            <!-- Server node box -->
+                            <div id="l1-node-server"
+                                style="border: 2px solid var(--grey-border); border-radius: 8px; padding: 1rem; width: 100px; text-align: center; font-weight: bold; background: var(--grey-card); transition: all 0.3s;">
+                                🖧 Server
+                                <div style="font-size:0.65rem; font-weight:normal; color:var(--text-secondary); margin-top:0.25rem;"
+                                    id="l1-lbl-sstate">OFFLINE</div>
+                            </div>
+                        </div>
+
+                        <div id="l1-timeline-logs"
+                            style="text-align: center; font-size: 0.82rem; font-weight: bold; color: var(--text-secondary); margin-top: 3rem; border-top: 1px solid var(--grey-border); padding-top: 1rem;">
+                            Status: Select a stage on the Left Panel to initiate connection handshake.
+                        </div>
+                    </div>
+
+                    <!-- Function Description Card panel -->
+                    <div id="l1-function-visualizer" style="display: none; min-height: 250px;">
+                        <div class="side-explanation-panel">
+                            <div class="side-explanation-title" id="l1-func-title">socket() function</div>
+                            <p style="font-size: 0.8rem;" id="l1-func-desc">Instantiates a network communications socket
+                                boundary pipeline handler helper.</p>
+
+                            <div style="margin-top: 0.5rem;">
+                                <strong style="color:var(--text-primary);">Syntax Parameter signature:</strong>
+                                <div style="font-family: var(--font-mono); font-size: 0.72rem; background-color: var(--grey-bg); padding: 0.5rem; border-radius: 4px; margin: 0.25rem 0;"
+                                    id="l1-func-syntax">
+                                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 0.5rem;">
+                                <strong style="color:var(--text-primary);">Python Driver Context:</strong>
+                                <p style="font-size: 0.78rem; margin-top: 0.25rem;" id="l1-func-explanation">AF_INET
+                                    defines IPv4 protocol routing. SOCK_STREAM declares reliable TCP stream packet
+                                    transport.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Column 3: Code Generator Pane (Right Column) -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-title">Equivalent Python Scripts</div>
+
+                    <div class="code-editor-container">
+                        <div class="code-editor-header">
+                            <div class="code-lang-label" id="l1-code-header-lbl">socket_timeline.py</div>
+                            <button class="copy-btn" onclick="app.copyCode('l1-code-box')">Copy Code</button>
+                        </div>
+                        <div class="code-content" id="l1-code-box">
+                            <!-- Python Connection Timeline code highlights -->
+                        </div>
+                    </div>
+
+                    <!-- Interactive line commentary detail box -->
+                    <div class="side-explanation-panel" id="l1-code-annotation-box">
+                        <div class="side-explanation-title">Code Annotation Explainer</div>
+                        <p id="l1-code-annotation-text" style="font-size: 0.8rem;">Click stages or choose options to
+                            examine equivalent client/server Python code highlights.</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Footer Level controls -->
+            <div class="level-footer">
+                <span style="font-size: 0.85rem; color: var(--text-secondary);">Timeline and API exploration
+                    activities.</span>
+                <button class="btn btn-primary" id="l1-unlock-next-btn" onclick="app.switchLevel(2)">
+                    Next Level (Builder) &rarr;
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+         LEVEL 2: SOCKET BUILDER
+         ========================================================================== -->
+        <div class="level-container" id="level2">
+
+            <!-- Instruction Card -->
+            <div class="instruction-card">
+                <h3>Level 2 Instructions</h3>
+                <ol>
+                    <li>Initialize host ip and ports to construct simulated client-server sockets.</li>
+                    <li>Establish socket binding handlers, listen loops, and client handshake requests.</li>
+                    <li>Transmit byte payload strings dynamically across the channel.</li>
+                </ol>
+            </div>
+
+            <!-- Activities Selector -->
+            <div class="activity-selector">
+                <button class="act-btn active" id="l2-btn-act1" onclick="l2.switchActivity(1)">Activity 1: Client–Server
+                    Builder</button>
+                <button class="act-btn" id="l2-btn-act2" onclick="l2.switchActivity(2)">Activity 2: Message
+                    Exchange</button>
+            </div>
+
+            <div class="grid-two-col">
+
+                <!-- LEFT: Control panels / Configuration sliders -->
+                <div class="level-workspace-left">
+
+                    <!-- ACTIVITY 1: Client Server Builder Configurations -->
+                    <div class="activity-panel active" id="l2-act-1">
+                        <div class="card">
+                            <div class="card-title">Network Configurations parameters</div>
+
+                            <div class="builder-grid">
+                                <!-- Server settings -->
+                                <div style="border-right: 1px solid var(--grey-border); padding-right: 1rem;">
+                                    <strong style="color:var(--red-primary); display:block; margin-bottom:0.5rem;">🖧
+                                        Server Bindings</strong>
+                                    <div class="form-group">
+                                        <label>IP Address (Host)</label>
+                                        <input type="text" class="form-control" id="l2-host-srv" value="127.0.0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Listening Port</label>
+                                        <input type="number" class="form-control" id="l2-port-srv" value="5000">
+                                    </div>
+                                    <button class="btn btn-primary btn-block" onclick="l2.startServer()">Start Server
+                                        socket</button>
+                                </div>
+
+                                <!-- Client settings -->
+                                <div style="padding-left: 0.5rem;">
+                                    <strong style="color:var(--red-primary); display:block; margin-bottom:0.5rem;">💻
+                                        Client Handshake</strong>
+                                    <div class="form-group">
+                                        <label>IP Address (Host)</label>
+                                        <input type="text" class="form-control" id="l2-host-cli" value="127.0.0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Target Port</label>
+                                        <input type="number" class="form-control" id="l2-port-cli" value="5000">
+                                    </div>
+                                    <button class="btn btn-primary btn-block" id="l2-connect-cli-btn" disabled
+                                        onclick="l2.connectClient()">Connect Client</button>
+                                </div>
+                            </div>
+
+                            <!-- Connection status labels -->
+                            <div id="l2-conn-state-logs"
+                                style="background-color: var(--grey-bg); padding:0.6rem 1rem; border-radius:6px; margin-top:1rem; font-size:0.8rem; font-weight:600; text-align:center; color:var(--text-secondary);">
+                                Status: Sockets offline. Configure parameters above.
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ACTIVITY 2: Live Message Input Area -->
+                    <div class="activity-panel" id="l2-act-2">
+                        <div class="card">
+                            <div class="card-title">Live Message Stream Input</div>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;">Input
+                                characters text data to serialize, route across the socket, and print at the server
+                                terminal console:</p>
+
+                            <div class="form-group">
+                                <label>Text Payload Message</label>
+                                <input type="text" class="form-control" id="l2-msg-input" value="Hello Server"
+                                    placeholder="Type a message...">
+                            </div>
+
+                            <button class="btn btn-primary" id="l2-send-msg-btn" disabled
+                                onclick="l2.transmitMessagePayload()">
+                                Transmit Payload over TCP
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT: Results visualizer and Code highlights panel -->
+                <div class="level-workspace-right">
+
+                    <!-- Live Preview Visualizer Stack -->
+                    <div class="card">
+                        <div class="card-title">Socket Handshake Visualizer</div>
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem; padding:0 2rem; min-height:80px;">
+                            <div id="l2-node-client"
+                                style="border: 2px solid var(--grey-border); border-radius: 8px; padding: 0.8rem; width: 90px; text-align: center; font-weight: bold; background: var(--grey-card); transition: all 0.3s;">
+                                💻 Client
+                                <div style="font-size:0.6rem; font-weight:normal; color:var(--text-secondary); margin-top:0.25rem;"
+                                    id="l2-lbl-cstate">OFFLINE</div>
+                            </div>
+
+                            <!-- Data Packet bubble -->
+                            <div id="l2-packet-bubble"
+                                style="width: 26px; height: 26px; border-radius: 50%; background-color: var(--red-primary); color: #FFF; display: none; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; position: relative; transition: left 0.8s ease;">
+                                pkg
+                            </div>
+                            <div id="l2-packet-line"
+                                style="flex:1; border-top: 2px dashed var(--grey-border); height: 2px; margin: 0 1rem; position: relative;">
+                            </div>
+
+                            <div id="l2-node-server"
+                                style="border: 2px solid var(--grey-border); border-radius: 8px; padding: 0.8rem; width: 90px; text-align: center; font-weight: bold; background: var(--grey-card); transition: all 0.3s;">
+                                🖧 Server
+                                <div style="font-size:0.6rem; font-weight:normal; color:var(--text-secondary); margin-top:0.25rem;"
+                                    id="l2-lbl-sstate">OFFLINE</div>
+                            </div>
+                        </div>
+
+                        <!-- Terminal outputs feed -->
+                        <div style="background-color:#1E1E1E; padding:0.6rem 1rem; border-radius:6px; margin-top:1rem; height:120px; overflow-y:auto; font-family:var(--font-mono); font-size:0.75rem; color:#D4D4D4;"
+                            id="l2-terminal-feed">
+                            Awaiting system configuration boot...
+                        </div>
+                    </div>
+
+                    <!-- Python code editor highlights -->
+                    <div class="card">
+                        <div class="card-title" id="l2-code-title">Python Socket script</div>
+                        <div class="code-editor-container">
+                            <div class="code-editor-header">
+                                <div class="code-lang-label" id="l2-code-label">server_socket.py</div>
+                            </div>
+                            <div class="code-content" id="l2-code-box">
+                                <!-- Python Client and Server script contents updated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Level controls -->
+            <div class="level-footer">
+                <button class="btn btn-secondary" onclick="app.switchLevel(1)">
+                    &larr; Previous Level (Explorer)
+                </button>
+                <button class="btn btn-primary" id="l2-unlock-next-btn" onclick="app.switchLevel(3)">
+                    Next Level (Studio) &rarr;
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+         LEVEL 3: SOCKET STUDIO
+         ========================================================================== -->
+        <div class="level-container" id="level3">
+
+            <!-- Instruction Card -->
+            <div class="instruction-card">
+                <h3>Level 3 Instructions</h3>
+                <ol>
+                    <li>Visualize network serialization: translate string messages to binary byte frames.</li>
+                    <li>Run the interactive chat workspace simulator to exchange messages back and forth.</li>
+                    <li>Disconnect/Reconnect sockets to inspect closing connections and network exceptions.</li>
+                </ol>
+            </div>
+
+            <!-- Activities Selector -->
+            <div class="activity-selector">
+                <button class="act-btn active" id="l3-btn-act1" onclick="l3.switchActivity(1)">Activity 1: Network Flow
+                    Visualizer</button>
+                <button class="act-btn" id="l3-btn-act2" onclick="l3.switchActivity(2)">Activity 2: Chat
+                    Simulator</button>
+            </div>
+
+            <!-- ACTIVITY 1: Flowchart Visualizer panels wrapper -->
+            <div id="l3-act-1-wrapper" style="display: block;">
+                <div class="grid-two-col">
+
+                    <!-- Animation diagram workflow flowchart -->
+                    <div class="card">
+                        <div class="card-title">Network Serialization Pipeline Flowchart</div>
+                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:1rem;">Click Transmit
+                            below to watch characters serialize (`encode()`), route TCP frames, parse buffers, and
+                            deserialize (`decode()`):</p>
+
+                        <button class="btn btn-primary" style="margin-bottom:1.25rem;"
+                            onclick="l3.startFlowAnimation()">
+                            Transmit Animation Flow
+                        </button>
+
+                        <div class="flow-container">
+                            <div class="flow-node" id="l3-fn-form">1. Client inputs string message</div>
+                            <div class="flow-arrow" id="l3-fa-1">↓</div>
+                            <div class="flow-node" id="l3-fn-encode">2. message.encode() (String ➔ Bytes)</div>
+                            <div class="flow-arrow" id="l3-fa-2">↓</div>
+                            <div class="flow-node" id="l3-fn-socket">3. socket.send() buffers bytes</div>
+                            <div class="flow-arrow" id="l3-fa-3">↓</div>
+                            <div class="flow-node" id="l3-fn-network">4. TCP/IP Socket frame routing</div>
+                            <div class="flow-arrow" id="l3-fa-4">↓</div>
+                            <div class="flow-node" id="l3-fn-recv">5. server.recv(1024) gets payload</div>
+                            <div class="flow-arrow" id="l3-fa-5">↓</div>
+                            <div class="flow-node" id="l3-fn-decode">6. message.decode() (Bytes ➔ String)</div>
+                            <div class="flow-arrow" id="l3-fa-6">↓</div>
+                            <div class="flow-node" id="l3-fn-success" style="border-radius: 50px;">7. Text displayed
+                                inside server console</div>
+                        </div>
+                    </div>
+
+                    <!-- Python highlights & glossary explainer -->
+                    <div class="level-workspace-right">
+
+                        <!-- Python script highlighter box -->
+                        <div class="card">
+                            <div class="card-title">Driver Statements Highlighter</div>
+                            <div class="code-editor-container">
+                                <div class="code-editor-header">
+                                    <div class="code-lang-label">flow_execution.py</div>
+                                </div>
+                                <div class="code-content" id="l3-flow-code-box">
+                                    <!-- Python flow statements highlights -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Explainer box -->
+                        <div class="card">
+                            <div class="card-title">API Annotation Logs</div>
+                            <div class="side-explanation-panel" id="l3-flow-annotation-box">
+                                <div class="side-explanation-title" id="l3-flow-annotation-title">Serialization Details
+                                </div>
+                                <p style="font-size:0.8rem;" id="l3-flow-annotation-text">Awaiting pipeline animation
+                                    launch... click the button in the Left Panel to start.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ACTIVITY 2: Chat terminals workspace panels wrapper -->
+            <div id="l3-act-2-wrapper" style="display: none;">
+                <div class="studio-three-panel">
+
+                    <!-- Column 1: Client chat feed -->
+                    <div class="card" style="padding: 1.25rem;">
+                        <div class="card-title">💻 Client Console Node</div>
+
+                        <div class="chat-terminal" style="margin-bottom:1rem;">
+                            <div class="chat-terminal-header">client_timeline.log</div>
+                            <div class="chat-messages" id="l3-chat-client-feed">
+                                <div class="chat-bubble system">Client socket active. Connected.</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="l3-chat-client-input" value="Hello Server"
+                                placeholder="Type a message...">
+                        </div>
+
+                        <button class="btn btn-primary btn-block" onclick="l3.chatSendMessage('client')">Send to
+                            Server</button>
+                    </div>
+
+                    <!-- Column 2: Server chat feed -->
+                    <div class="card" style="padding: 1.25rem;">
+                        <div class="card-title">🖧 Server Console Node</div>
+
+                        <div class="chat-terminal" style="margin-bottom:1rem;">
+                            <div class="chat-terminal-header">server_timeline.log</div>
+                            <div class="chat-messages" id="l3-chat-server-feed">
+                                <div class="chat-bubble system">Server listening on port 5000...</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="l3-chat-server-input" value="Welcome Client"
+                                placeholder="Type a message...">
+                        </div>
+
+                        <button class="btn btn-primary btn-block" onclick="l3.chatSendMessage('server')">Send to
+                            Client</button>
+                    </div>
+
+                    <!-- Column 3: Chat connection controller triggers -->
+                    <div class="card" style="padding: 1.25rem;">
+                        <div class="card-title">Socket Handles Controls</div>
+
+                        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                            <button class="btn btn-block" style="background-color: #B71C1C; color:#FFF;"
+                                onclick="l3.chatDisconnect()">Disconnect Sockets</button>
+                            <button class="btn btn-block" style="background-color: #4CAF50; color:#FFF;"
+                                onclick="l3.chatReconnect()">Reconnect Handshake</button>
+                            <button class="btn btn-secondary btn-block" onclick="l3.chatClear()">Clear Console
+                                Logs</button>
+                        </div>
+
+                        <div class="side-explanation-panel" style="margin-top:1.25rem; font-size:0.78rem; gap:0.5rem;"
+                            id="l3-chat-explain-box">
+                            <div class="side-explanation-title" id="l3-chat-explain-title">Handshake Info</div>
+                            <p id="l3-chat-explain-text" style="color:var(--text-secondary);">Sockets are currently
+                                online. Transmit messages between client and server terminals to trace frame socket
+                                pipelines.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Level controls -->
+            <div class="level-footer">
+                <button class="btn btn-secondary" onclick="app.switchLevel(2)">
+                    &larr; Previous Level (Builder)
+                </button>
+                <button class="btn btn-primary" id="l3-unlock-next-btn" onclick="l3.finishStudioLevel()">
+                    Complete Level 3 & Finish Lab Module &rarr;
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+         COMPLETION SCREEN
+         ========================================================================== -->
+        <div class="level-container" id="completion-screen">
+            <div class="card"
+                style="text-align: center; padding: 3rem 2rem; max-width: 600px; margin: 3rem auto; box-shadow: var(--shadow-lg);">
+                <div style="font-size: 4rem; color: var(--red-primary); margin-bottom: 1.5rem;">🎉</div>
+                <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                    Module 5.3 Completed Successfully!</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">
+                    You have mastered Python network sockets, client-server bindings, data serialization, and
+                    communication lifecycles.
+                </p>
+
+                <!-- Completed concepts checklist checklist grid -->
+                <div
+                    style="background-color: var(--grey-bg); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; text-align: left;">
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Client & Server sockets creation</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Database bindings, listen pipelines & accept handshakes</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Dynamic Python code mapping timeline options</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>String serialization: string characters `encode()` and
+                            `decode()`</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Live network payload frame transmissions simulator</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Handshake reconnections & connection exceptions</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block" style="padding: 0.8rem 1.5rem; font-size: 1rem;"
+                    onclick="app.finishLabModule()">
+                    Proceed to final Module 5 Completion Screen
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==========================================================================
+       VANILLA JAVASCRIPT CONTROLLERS
+       ========================================================================== -->
+    <script>
+        // Global Application Router
+        class AppController {
+            constructor() {
+                this.level = 1;
+                this.level1Unlocked = true;
+                this.level2Unlocked = true;
+                this.level3Unlocked = true;
+            }
+
+            switchLevel(lvl) {
+                this.level = lvl;
+
+                // Stepper highlights status sync
+                document.querySelectorAll('.step-tab').forEach(tab => {
+                    const tabLvl = parseInt(tab.id.split('-').pop());
+                    tab.classList.toggle('active', tabLvl === lvl);
+                });
+
+                // Hide containers
+                document.querySelectorAll('.level-container').forEach(c => c.classList.remove('active'));
+
+                if (lvl === 1) {
+                    document.getElementById('level1').classList.add('active');
+                    l1.switchActivity(l1.activeActivity);
+                } else if (lvl === 2) {
+                    document.getElementById('level2').classList.add('active');
+                    l2.switchActivity(l2.activeActivity);
+                } else if (lvl === 3) {
+                    document.getElementById('level3').classList.add('active');
+                    l3.switchActivity(l3.activeActivity);
+                }
+            }
+
+            copyCode(id) {
+                const text = document.getElementById(id).innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Python code snippet copied to clipboard! 📋');
+                });
+            }
+
+            finishLabModule() {
+                alert('🎉 Congratulations! You have successfully completed all Module 5 Lab lessons!');
+                location.reload();
+            }
+        }
+
+        // ==========================================================================
+        // LEVEL 1: NETWORK EXPLORER CONTROLLER
+        // ==========================================================================
+        class Level1Explorer {
+            constructor() {
+                this.activeActivity = 1;
+                this.activeStage = 1;
+                this.activeFunction = 'socket';
+            }
+
+            switchActivity(num) {
+                this.activeActivity = num;
+
+                document.getElementById('l1-btn-act1').classList.toggle('active', num === 1);
+                document.getElementById('l1-btn-act2').classList.toggle('active', num === 2);
+
+                document.getElementById('l1-act-1').classList.remove('active');
+                document.getElementById('l1-act-2').classList.remove('active');
+                document.getElementById(`l1-act-${num}`).classList.add('active');
+
+                const connVis = document.getElementById('l1-connection-visualizer');
+                const funcVis = document.getElementById('l1-function-visualizer');
+                const previewTitle = document.getElementById('l1-preview-title');
+                const headerLbl = document.getElementById('l1-code-header-lbl');
+
+                if (num === 1) {
+                    connVis.style.display = 'block';
+                    funcVis.style.display = 'none';
+                    previewTitle.innerText = "Client-Server Connection Visualizer";
+                    headerLbl.innerText = "socket_timeline.py";
+                    this.selectStage(this.activeStage);
+                } else {
+                    connVis.style.display = 'none';
+                    funcVis.style.display = 'block';
+                    previewTitle.innerText = "Socket API Description";
+                    headerLbl.innerText = "socket_api_usage.py";
+                    this.selectExplorerCard(this.activeFunction);
+                }
+            }
+
+            selectStage(num) {
+                this.activeStage = num;
+
+                // Toggle button active highlights
+                for (let i = 1; i <= 7; i++) {
+                    const btn = document.getElementById(`l1-stg-${i}`);
+                    btn.classList.toggle('active', i === num);
+                    btn.classList.toggle('completed', i < num);
+                }
+
+                // Animate Client/Server Nodes and Packet
+                const client = document.getElementById('l1-node-client');
+                const server = document.getElementById('l1-node-server');
+                const packet = document.getElementById('l1-packet-bubble');
+                const line = document.getElementById('l1-packet-line');
+                const log = document.getElementById('l1-timeline-logs');
+
+                const cState = document.getElementById('l1-lbl-cstate');
+                const sState = document.getElementById('l1-lbl-sstate');
+
+                // Reset positions
+                packet.style.display = 'none';
+                packet.style.left = '0%';
+                client.style.borderColor = 'var(--grey-border)';
+                server.style.borderColor = 'var(--grey-border)';
+
+                if (num === 1) {
+                    client.style.borderColor = 'var(--red-primary)';
+                    cState.innerText = "SOCKET CREATED";
+                    sState.innerText = "OFFLINE";
+                    log.innerText = "Client socket() handler initialized. Allocated socket pipeline descriptor.";
+                } else if (num === 2) {
+                    server.style.borderColor = 'var(--red-primary)';
+                    cState.innerText = "SOCKET CREATED";
+                    sState.innerText = "PORT BOUND";
+                    log.innerText = "Server bind() binds the socket structure to host IP '127.0.0.1' and Port 5000.";
+                } else if (num === 3) {
+                    server.style.borderColor = 'var(--red-primary)';
+                    cState.innerText = "SOCKET CREATED";
+                    sState.innerText = "LISTENING";
+                    log.innerText = "Server listen(5) starts queue buffers waiting for client connection entries.";
+                } else if (num === 4) {
+                    client.style.borderColor = 'var(--red-primary)';
+                    server.style.borderColor = 'var(--red-primary)';
+                    cState.innerText = "CONNECTING...";
+                    sState.innerText = "ACCEPTING...";
+
+                    // Animate connection handshake request packet
+                    packet.style.display = 'flex';
+                    packet.innerText = "syn";
+                    packet.style.backgroundColor = "var(--red-primary)";
+
+                    setTimeout(() => {
+                        packet.style.left = "calc(100% - 26px)";
+                    }, 50);
+
+                    setTimeout(() => {
+                        cState.innerText = "CONNECTED";
+                        sState.innerText = "CONNECTED";
+                        log.innerText = "Connection handshake accepted! Server accept() establishes separate socket channel.";
+                    }, 850);
+                } else if (num === 5) {
+                    cState.innerText = "CONNECTED";
+                    sState.innerText = "CONNECTED";
+
+                    // Send data packet Client -> Server
+                    packet.style.display = 'flex';
+                    packet.innerText = "txt";
+                    packet.style.backgroundColor = "blue";
+
+                    setTimeout(() => {
+                        packet.style.left = "calc(100% - 26px)";
+                    }, 50);
+
+                    setTimeout(() => {
+                        log.innerText = "client.send(msg.encode()) serialized string message into binary frame packet bytes.";
+                    }, 850);
+                } else if (num === 6) {
+                    cState.innerText = "CONNECTED";
+                    sState.innerText = "CONNECTED";
+                    log.innerText = "server.recv(1024) read socket TCP buffer segment stream. Invoked decode() to render string.";
+                } else if (num === 7) {
+                    cState.innerText = "DISCONNECTED";
+                    sState.innerText = "LISTENING";
+                    log.style.borderColor = 'var(--grey-border)';
+                    log.innerText = "Socket connection closed. Released all socket pipeline file descriptors.";
+                }
+
+                this.updateCodeBox();
+            }
+
+            selectExplorerCard(name) {
+                this.activeFunction = name;
+
+                // Toggle grid selection highlights
+                document.querySelectorAll('.explorer-card').forEach(card => {
+                    card.classList.toggle('active', card.id === `l1-ec-${name}`);
+                });
+
+                const title = document.getElementById('l1-func-title');
+                const desc = document.getElementById('l1-func-desc');
+                const syntax = document.getElementById('l1-func-syntax');
+                const exp = document.getElementById('l1-func-explanation');
+
+                const map = {
+                    socket: {
+                        title: "socket.socket() API call",
+                        desc: "Allocates a network socket handle resource.",
+                        syntax: "s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)",
+                        exp: "AF_INET specifies IPv4 addressing. SOCK_STREAM sets TCP transmission stream protocols."
+                    },
+                    bind: {
+                        title: "bind() API call",
+                        desc: "Assigns a specific port number and IP address interface configuration to a server socket.",
+                        syntax: "server_socket.bind(('127.0.0.1', 5000))",
+                        exp: "Parameters are passed as a tuple containing IP address string and integer port index."
+                    },
+                    listen: {
+                        title: "listen() API call",
+                        desc: "Puts the server socket into reliable listening mode to capture client connection requests.",
+                        syntax: "server_socket.listen(backlog=5)",
+                        exp: "Backlog integer specifies the maximum queued connection entries allowed before dropping requests."
+                    },
+                    accept: {
+                        title: "accept() API call",
+                        desc: "Accepts client connection socket requests and allocates a brand new socket channel instance dedicated for payload data stream exchanges.",
+                        syntax: "connection_socket, client_address = server_socket.accept()",
+                        exp: "Blocks execution line. Returns a brand new socket object for sending/receiving data, plus client IP/Port details."
+                    },
+                    connect: {
+                        title: "connect() API call",
+                        desc: "Invoked by client scripts to initialize connection handshake loops with target server sockets.",
+                        syntax: "client_socket.connect(('127.0.0.1', 5000))",
+                        exp: "Triggers three-way handshake (SYN ➔ SYN-ACK ➔ ACK) network socket connections sequence."
+                    },
+                    send: {
+                        title: "send() API call",
+                        desc: "Transmits binary buffer packets across active socket pipelines.",
+                        syntax: "client_socket.send(message.encode())",
+                        exp: "Sockets only transmit raw binary bytes. String values must call encode() to serialize characters into bytes before transport."
+                    },
+                    recv: {
+                        title: "recv() API call",
+                        desc: "Blocks execution and reads incoming bytes stream payload from connection buffers.",
+                        syntax: "data = connection_socket.recv(bufsize=1024)",
+                        exp: "Bufsize sets the maximum byte chunk size to buffer in memory. Returns empty bytes object when connection closes."
+                    },
+                    close: {
+                        title: "close() API call",
+                        desc: "Terminates network communication sessions and cleans up descriptors descriptors.",
+                        syntax: "client_socket.close()",
+                        exp: "Frees network sockets ports allocations and handles."
+                    }
+                };
+
+                const item = map[name];
+                title.innerText = item.title;
+                desc.innerText = item.desc;
+                syntax.innerText = item.syntax;
+                exp.innerText = item.exp;
+
+                this.updateCodeBox();
+            }
+
+            updateCodeBox() {
+                const sync = document.getElementById('l1-code-box');
+                const box = document.getElementById('l1-code-annotation-text');
+
+                let code = '';
+                let highlights = [];
+
+                if (this.activeActivity === 1) {
+                    code += `<span class="kw">import</span> socket\n\n`;
+                    code += `<span class="com"># Server setup code block</span>\n`;
+                    code += `srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n`;
+                    code += `srv.bind((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))\n`;
+                    code += `srv.listen(<span class="bi">5</span>)\n\n`;
+                    code += `<span class="com"># Wait for incoming connections</span>\n`;
+                    code += `conn, addr = srv.accept()\n\n`;
+                    code += `<span class="com"># Exchanging message payload</span>\n`;
+                    code += `msg = <span class="str">"Hello Server"</span>\n`;
+                    code += `conn.send(msg.encode())\n`;
+                    code += `data = conn.recv(<span class="bi">1024</span>)\n\n`;
+                    code += `conn.close()\n`;
+                    code += `srv.close()`;
+
+                    // Map timelines to script rows highlights
+                    const rowsMap = {
+                        1: [2],
+                        2: [3],
+                        3: [4],
+                        4: [7],
+                        5: [11],
+                        6: [12],
+                        7: [14, 15]
+                    };
+
+                    highlights = rowsMap[this.activeStage] || [];
+                    box.innerHTML = this.getTimelineAnnotation(this.activeStage);
+                } else {
+                    // Card specific python code
+                    const maps = {
+                        socket: {
+                            code: `<span class="kw">import</span> socket\n\ns = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\nprint(<span class="str">"Socket created successfully"</span>)`,
+                            annot: "Instantiates socket pipeline driver resource block."
+                        },
+                        bind: {
+                            code: `<span class="kw">import</span> socket\n\nsrv = socket.socket()\nsrv.bind((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))\nprint(<span class="str">"Socket bound to port 5000"</span>)`,
+                            annot: "Associates TCP server socket with IP and port tuple configuration."
+                        },
+                        listen: {
+                            code: `<span class="kw">import</span> socket\n\nsrv = socket.socket()\nsrv.bind((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))\nsrv.listen(<span class="bi">5</span>)\nprint(<span class="str">"Server listening for handshakes..."</span>)`,
+                            annot: "Puts server into listening state queue queue buffer."
+                        },
+                        accept: {
+                            code: `<span class="kw">import</span> socket\n\nsrv = socket.socket()\nsrv.bind((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))\nsrv.listen(<span class="bi">5</span>)\nconn, addr = srv.accept()  <span class="com"># Execution blocks here waiting client</span>`,
+                            annot: "Accepts client connection request and spawns a new socket channel for communications."
+                        },
+                        connect: {
+                            code: `<span class="kw">import</span> socket\n\ncli = socket.socket()\ncli.connect((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))  <span class="com"># Request connection handshake</span>`,
+                            annot: "Initializes TCP connection handshake requests with target server."
+                        },
+                        send: {
+                            code: `<span class="kw">import</span> socket\n\ncli = socket.socket()\ncli.connect((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))\nmsg = <span class="str">"Handshake Hello"</span>\ncli.send(msg.encode())  <span class="com"># Strings must be encoded to byte structures</span>`,
+                            annot: "String payload must call encode() to serialize characters into binary socket stream packets."
+                        },
+                        recv: {
+                            code: `<span class="kw">import</span> socket\n\nconn, addr = srv.accept()\ndata = conn.recv(<span class="bi">1024</span>)  <span class="com"># Reads up to 1024 bytes buffer</span>\nprint(<span class="str">"Received:"</span>, data.decode())  <span class="com"># Convert bytes back to string</span>`,
+                            annot: "Reads data from socket stream and calls decode() to deserialize bytes back to readable text."
+                        },
+                        close: {
+                            code: `<span class="kw">import</span> socket\n\ncli = socket.socket()\ncli.close()  <span class="com"># Terminate connection and release system resources</span>`,
+                            annot: "Closes connection and frees socket ports."
+                        }
+                    };
+
+                    const item = maps[this.activeFunction];
+                    code = item.code;
+                    box.innerHTML = item.annot;
+                }
+
+                // Apply HTML structure wrapper highlighting lines
+                const lines = code.split('\n');
+                const formatted = lines.map((line, idx) => {
+                    if (highlights.includes(idx)) {
+                        return `<span class="highlight-line">${line}</span>`;
+                    }
+                    return line;
+                });
+
+                sync.innerHTML = formatted.join('\n');
+            }
+
+            getTimelineAnnotation(stage) {
+                const map = {
+                    1: "<strong>socket()</strong> initializes the client socket. It reserves operating system socket descriptors but does not start communication.",
+                    2: "<strong>bind()</strong> links the server socket to host address IP and Port tuples. Only server sockets require explicit binding.",
+                    3: "<strong>listen()</strong> activates connection backlog queues on ports. Server socket starts listening for clients.",
+                    4: "<strong>accept()</strong> blocks execution lines on the server script until a client requests connection. Creates new communication channel socket once SYN arrives.",
+                    5: "<strong>send(msg.encode())</strong> converts string to binary stream bytes, and pipes payload across TCP session channels.",
+                    6: "<strong>recv(1024)</strong> extracts up to 1024 bytes from incoming socket buffer streams, calling decode() to transform bytes back to strings.",
+                    7: "<strong>close()</strong> closes connection session descriptors, releasing reserved port mappings back to operating systems."
+                };
+                return map[stage] || "Click timeline items to investigate details.";
+            }
+        }
+
+        // ==========================================================================
+        // LEVEL 2: SOCKET BUILDER CONTROLLER
+        // ==========================================================================
+        class Level2Builder {
+            constructor() {
+                this.activeActivity = 1;
+
+                // Status state connection flags
+                this.serverStarted = false;
+                this.clientConnected = false;
+                this.srvPort = 5000;
+                this.cliPort = 5000;
+
+                this.sentMessagesCount = 0;
+            }
+
+            switchActivity(num) {
+                this.activeActivity = num;
+
+                document.getElementById('l2-btn-act1').classList.toggle('active', num === 1);
+                document.getElementById('l2-btn-act2').classList.toggle('active', num === 2);
+
+                document.getElementById('l2-act-1').classList.remove('active');
+                document.getElementById('l2-act-2').classList.remove('active');
+                document.getElementById(`l2-act-${num}`).classList.add('active');
+
+                this.syncCodeViewer();
+            }
+
+            startServer() {
+                const port = parseInt(document.getElementById('l2-port-srv').value) || 5000;
+                this.srvPort = port;
+                this.serverStarted = true;
+
+                document.getElementById('l2-lbl-sstate').innerText = "LISTENING";
+                document.getElementById('l2-node-server').style.borderColor = "var(--red-primary)";
+
+                const logs = document.getElementById('l2-conn-state-logs');
+                logs.innerText = `Server started on Port ${port}. Listening for handshake...`;
+
+                const feed = document.getElementById('l2-terminal-feed');
+                feed.innerHTML = `[Server Log] socket() allocated descriptor.\n[Server Log] bind() bound port ${port}.\n[Server Log] listen() queue active. Waiting for client SYN...`;
+
+                // Enable client connect button
+                document.getElementById('l2-connect-cli-btn').removeAttribute('disabled');
+
+                this.syncCodeViewer();
+            }
+
+            connectClient() {
+                if (!this.serverStarted) {
+                    alert("Start the server socket first!");
+                    return;
+                }
+
+                const port = parseInt(document.getElementById('l2-port-cli').value) || 5000;
+                this.cliPort = port;
+
+                if (port !== this.srvPort) {
+                    const feed = document.getElementById('l2-terminal-feed');
+                    feed.innerHTML += `\n[Network Error] Connection handshake rejected on Port ${port}. Port mismatch!`;
+                    alert("Port mismatch! Client target port must match the server listening port.");
+                    return;
+                }
+
+                // Animate handshake syn packet
+                const packet = document.getElementById('l2-packet-bubble');
+                packet.style.display = 'flex';
+                packet.innerText = "syn";
+                packet.style.backgroundColor = "var(--red-primary)";
+                packet.style.left = "0%";
+
+                setTimeout(() => {
+                    packet.style.left = "calc(100% - 26px)";
+                }, 50);
+
+                setTimeout(() => {
+                    this.clientConnected = true;
+                    document.getElementById('l2-lbl-cstate').innerText = "CONNECTED";
+                    document.getElementById('l2-lbl-sstate').innerText = "CONNECTED";
+                    document.getElementById('l2-node-client').style.borderColor = "var(--red-primary)";
+
+                    document.getElementById('l2-conn-state-logs').innerText = "Client and Server Connected. Ready for message payload transport.";
+
+                    const feed = document.getElementById('l2-terminal-feed');
+                    feed.innerHTML += `\n[Client Log] connect() triggered three-way handshake SYN.\n[Server Log] Handshake accepted. accept() spawned new communication connection channel.`;
+
+                    // Enable message Send button
+                    document.getElementById('l2-send-msg-btn').removeAttribute('disabled');
+
+                    this.syncCodeViewer();
+                }, 850);
+            }
+
+            transmitMessagePayload() {
+                if (!this.clientConnected) {
+                    alert("Establish socket connections handshake first!");
+                    return;
+                }
+
+                const msg = document.getElementById('l2-msg-input').value.trim();
+                if (!msg) {
+                    alert("Type a message to send!");
+                    return;
+                }
+
+                // Trigger packet slide CLIENT -> SERVER
+                const packet = document.getElementById('l2-packet-bubble');
+                packet.style.display = 'flex';
+                packet.innerText = "txt";
+                packet.style.backgroundColor = "blue";
+                packet.style.left = "0%";
+
+                document.getElementById('l2-send-msg-btn').disabled = true;
+
+                setTimeout(() => {
+                    packet.style.left = "calc(100% - 26px)";
+                }, 50);
+
+                setTimeout(() => {
+                    const feed = document.getElementById('l2-terminal-feed');
+                    feed.innerHTML += `\n[Client] client_socket.send(message.encode()) transmitted ${msg.length} bytes.\n[Server] connection_socket.recv(1024) buffer read.\n[Server] Received message: "${msg}" (decoded)`;
+                    feed.scrollTop = feed.scrollHeight;
+
+                    document.getElementById('l2-send-msg-btn').disabled = false;
+                    this.sentMessagesCount++;
+                    this.syncCodeViewer();
+                }, 850);
+            }
+
+            syncCodeViewer() {
+                const title = document.getElementById('l2-code-title');
+                const label = document.getElementById('l2-code-label');
+                const box = document.getElementById('l2-code-box');
+
+                let code = '';
+                let highlights = [];
+
+                if (this.activeActivity === 1) {
+                    title.innerText = "Python Socket script (Handshake)";
+                    if (!this.serverStarted) {
+                        label.innerText = "server_socket.py";
+                        code += `<span class="kw">import</span> socket\n\n`;
+                        code += `s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n`;
+                        code += `<span class="highlight-line">s.bind((<span class="str">"127.0.0.1"</span>, <span class="bi">5000</span>))  # Bind server port</span>\n`;
+                        code += `s.listen(<span class="bi">5</span>)\n`;
+                        code += `print(<span class="str">"Server listening..."</span>)\n`;
+                        code += `conn, addr = s.accept()`;
+                    } else if (this.serverStarted && !this.clientConnected) {
+                        label.innerText = "client_socket.py";
+                        code += `<span class="kw">import</span> socket\n\n`;
+                        code += `c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n`;
+                        code += `<span class="highlight-line">c.connect((<span class="str">"127.0.0.1"</span>, <span class="bi">${this.srvPort}</span>))  # Connect target port</span>\n`;
+                        code += `print(<span class="str">"Connected to server"</span>)`;
+                    } else {
+                        label.innerText = "server_socket.py (Connected)";
+                        code += `<span class="kw">import</span> socket\n\n`;
+                        code += `s = socket.socket()\n`;
+                        code += `s.bind((<span class="str">"127.0.0.1"</span>, <span class="bi">${this.srvPort}</span>))\n`;
+                        code += `s.listen(<span class="bi">5</span>)\n`;
+                        code += `<span class="highlight-line">conn, addr = s.accept()  # Blocked line unblocks!</span>\n`;
+                        code += `print(<span class="str">"Connection established from:"</span>, addr)`;
+                    }
+                } else {
+                    title.innerText = "Python Socket script (Message Exchange)";
+                    label.innerText = "socket_exchange.py";
+
+                    const msg = document.getElementById('l2-msg-input').value.trim() || "Hello Server";
+
+                    code += `<span class="com"># --- CLIENT SIDE ---</span>\n`;
+                    code += `message = <span class="str">"${msg}"</span>\n`;
+                    code += `<span class="highlight-line">client_socket.send(message.encode())  # encode converts to bytes</span>\n\n`;
+                    code += `<span class="com"># --- SERVER SIDE ---</span>\n`;
+                    code += `<span class="highlight-line">data = conn.recv(<span class="bi">1024</span>)  # Reads raw buffer bytes</span>\n`;
+                    code += `<span class="highlight-line">text = data.decode()  # decode converts back to string</span>\n`;
+                    code += `print(<span class="str">"Received:"</span>, text)`;
+                }
+
+                box.innerHTML = code;
+            }
+        }
+
+        // ==========================================================================
+        // LEVEL 3: SOCKET STUDIO CONTROLLER
+        // ==========================================================================
+        class Level3Studio {
+            constructor() {
+                this.activeActivity = 1;
+
+                // Timer elements
+                this.flowTimer = null;
+                this.flowStep = 0;
+
+                // Handshake flags
+                this.connectedState = true;
+            }
+
+            switchActivity(num) {
+                this.activeActivity = num;
+
+                document.getElementById('l3-btn-act1').classList.toggle('active', num === 1);
+                document.getElementById('l3-btn-act2').classList.toggle('active', num === 2);
+
+                const flowWrapper = document.getElementById('l3-act-1-wrapper');
+                const chatWrapper = document.getElementById('l3-act-2-wrapper');
+
+                if (num === 1) {
+                    flowWrapper.style.display = 'block';
+                    chatWrapper.style.display = 'none';
+                    this.resetFlowAnimation();
+                } else {
+                    flowWrapper.style.display = 'none';
+                    chatWrapper.style.display = 'block';
+                    this.chatInit();
+                }
+            }
+
+            startFlowAnimation() {
+                this.resetFlowAnimation();
+
+                let step = 0;
+                const nodes = ['form', 'encode', 'socket', 'network', 'recv', 'decode', 'success'];
+
+                this.flowTimer = setInterval(() => {
+                    if (step > 0) {
+                        document.getElementById(`l3-fa-${step}`).classList.add('active');
+                    }
+
+                    const activeNode = document.getElementById(`l3-fn-${nodes[step]}`);
+                    activeNode.classList.add('active', 'pulse-active');
+
+                    this.syncFlowHighlighterCode(step);
+
+                    step++;
+
+                    if (step === nodes.length) {
+                        clearInterval(this.flowTimer);
+                        this.flowTimer = null;
+                        alert("🎉 Serialization flowchart animation pipeline trace completed successfully!");
+                    }
+                }, 1100);
+            }
+
+            resetFlowAnimation() {
+                clearInterval(this.flowTimer);
+                this.flowTimer = null;
+
+                ['form', 'encode', 'socket', 'network', 'recv', 'decode', 'success'].forEach(name => {
+                    const el = document.getElementById(`l3-fn-${name}`);
+                    if (el) el.classList.remove('active', 'pulse-active');
+                });
+
+                for (let i = 1; i <= 6; i++) {
+                    const arrow = document.getElementById(`l3-fa-${i}`);
+                    if (arrow) arrow.classList.remove('active');
+                }
+
+                this.syncFlowHighlighterCode(-1);
+            }
+
+            syncFlowHighlighterCode(step) {
+                const box = document.getElementById('l3-flow-code-box');
+                const annot = document.getElementById('l3-flow-annotation-text');
+
+                let py = '';
+                py += `<span class="kw">import</span> socket\n\n`;
+
+                const linesMap = {
+                    0: `msg = <span class="str">"Hello World"</span>  <span class="com"># Step 1: String defined</span>\n`,
+                    1: `payload = msg.encode()  <span class="com"># Step 2: string characters to bytes</span>\n`,
+                    2: `client.send(payload)  <span class="com"># Step 3: pipes bytes across network</span>\n`,
+                    3: `  <span class="com"># Step 4: TCP frame socket buffer routing</span>\n`,
+                    4: `data = conn.recv(<span class="bi">1024</span>)  <span class="com"># Step 5: Read raw byte buffer stream</span>\n`,
+                    5: `text = data.decode()  <span class="com"># Step 6: Convert bytes to readable string</span>\n`,
+                    6: `print(text)  <span class="com"># Step 7: Display text inside server console</span>\n`
+                };
+
+                const explanation = {
+                    0: "<strong>String defined</strong>: Message starts as client string characters (UTF-8 unicode).",
+                    1: "<strong>message.encode()</strong>: Sockets do not understand string symbols. encode() serializes text into raw binary byte frames (zeros and ones).",
+                    2: "<strong>client.send()</strong>: Pushes serialized binary bytes into client socket network interfaces.",
+                    3: "<strong>Socket frame routing</strong>: TCP sockets packetize buffer streams and transmit packets across physical network layers.",
+                    4: "<strong>server.recv(1024)</strong>: Server captures payload from network sockets port buffer streams into memory.",
+                    5: "<strong>message.decode()</strong>: Deserializes the binary buffer byte list back to standard Python readable string format.",
+                    6: "<strong>Display text</strong>: Output print shows the same string message cleanly inside the server console."
+                };
+
+                for (let i = 0; i <= 6; i++) {
+                    if (i === step) {
+                        py += `<span class="highlight-line">${linesMap[i]}</span>`;
+                        annot.innerHTML = explanation[i];
+                    } else {
+                        py += linesMap[i];
+                    }
+                }
+
+                box.innerHTML = py;
+            }
+
+            // Activity 2: Chat functions
+            chatInit() {
+                // Reset logs
+                this.chatClear();
+                this.connectedState = true;
+            }
+
+            chatSendMessage(sender) {
+                if (!this.connectedState) {
+                    alert("Sockets are currently offline! Reconnect to chat.");
+                    return;
+                }
+
+                const inputId = sender === 'client' ? 'l3-chat-client-input' : 'l3-chat-server-input';
+                const msg = document.getElementById(inputId).value.trim();
+
+                if (!msg) return;
+
+                const clientFeed = document.getElementById('l3-chat-client-feed');
+                const serverFeed = document.getElementById('l3-chat-server-feed');
+                const annotText = document.getElementById('l3-chat-explain-text');
+
+                // Append to source feed
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${sender === 'client' ? 'sent' : 'recv'}`;
+                bubble.innerText = msg;
+
+                if (sender === 'client') {
+                    clientFeed.appendChild(bubble);
+                    annotText.innerHTML = `<strong>Client send()</strong>: String text "${msg}" encoded to byte arrays and routed.`;
+                } else {
+                    serverFeed.appendChild(bubble);
+                    annotText.innerHTML = `<strong>Server send()</strong>: Server replied with message text "${msg}".`;
+                }
+
+                // Animate transfer to target feed
+                setTimeout(() => {
+                    const recBubble = document.createElement('div');
+                    recBubble.className = `chat-bubble ${sender === 'client' ? 'recv' : 'sent'}`;
+                    recBubble.innerText = msg;
+
+                    if (sender === 'client') {
+                        serverFeed.appendChild(recBubble);
+                        serverFeed.scrollTop = serverFeed.scrollHeight;
+                    } else {
+                        clientFeed.appendChild(recBubble);
+                        clientFeed.scrollTop = clientFeed.scrollHeight;
+                    }
+                }, 500);
+
+                document.getElementById(inputId).value = '';
+                clientFeed.scrollTop = clientFeed.scrollHeight;
+            }
+
+            chatDisconnect() {
+                this.connectedState = false;
+
+                const clientFeed = document.getElementById('l3-chat-client-feed');
+                const serverFeed = document.getElementById('l3-chat-server-feed');
+
+                const b1 = document.createElement('div');
+                b1.className = "chat-bubble system";
+                b1.innerText = "Connection lost. client_socket.close() triggered.";
+                clientFeed.appendChild(b1);
+
+                const b2 = document.createElement('div');
+                b2.className = "chat-bubble system";
+                b2.innerText = "Connection lost. client socket closed.";
+                serverFeed.appendChild(b2);
+
+                document.getElementById('l3-chat-explain-text').innerHTML = `<strong>Connection Closed</strong>: Sockets close() triggered. Sockets released connection socket descriptor handles. Reconnection handshake required.`;
+            }
+
+            chatReconnect() {
+                if (this.connectedState) {
+                    alert("Sockets are already connected!");
+                    return;
+                }
+
+                this.connectedState = true;
+
+                const clientFeed = document.getElementById('l3-chat-client-feed');
+                const serverFeed = document.getElementById('l3-chat-server-feed');
+
+                const b1 = document.createElement('div');
+                b1.className = "chat-bubble system";
+                b1.innerText = "Handshake success. Socket connection established.";
+                clientFeed.appendChild(b1);
+
+                const b2 = document.createElement('div');
+                b2.className = "chat-bubble system";
+                b2.innerText = "Handshake accepted. Sockets online.";
+                serverFeed.appendChild(b2);
+
+                document.getElementById('l3-chat-explain-text').innerHTML = `<strong>Connection Established</strong>: Handshake success. Client connect() syn request resolved. Sockets online.`;
+            }
+
+            chatClear() {
+                document.getElementById('l3-chat-client-feed').innerHTML = '';
+                document.getElementById('l3-chat-server-feed').innerHTML = '';
+            }
+
+            finishStudioLevel() {
+                document.getElementById('level3').classList.remove('active');
+                document.getElementById('completion-screen').classList.add('active');
+
+                const tab = document.getElementById('btn-tab-3');
+                tab.classList.add('completed');
+            }
+        }
+
+        // Instantiation
+        let app, l1, l2, l3;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new AppController();
+            l1 = new Level1Explorer();
+            l2 = new Level2Builder();
+            l3 = new Level3Studio();
+
+            // Default views loader
+            l1.switchActivity(1);
+        });
+    </script>
+</body>
+
+</html>

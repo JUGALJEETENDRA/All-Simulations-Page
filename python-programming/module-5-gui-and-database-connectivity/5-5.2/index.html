@@ -1,1 +1,2348 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 5.2: Python Database Connectivity (MySQL) Simulation</title>
+
+    <!-- Modern clean typography from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+       DESIGN SYSTEM CONSTANTS & UTILITIES
+       ========================================================================== */
+        :root {
+            --white: #FFFFFF;
+            --red-primary: #D32F2F;
+            --red-light: #FFEBEE;
+            --red-dark: #B71C1C;
+            --grey-bg: #F5F5F5;
+            --grey-card: #FAFAFA;
+            --grey-border: #E0E0E0;
+
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --text-muted: #9E9E9E;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--grey-border);
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--red-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-title span {
+            font-size: 0.85rem;
+            background-color: var(--red-light);
+            color: var(--red-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Stepper Progress bar */
+        .progress-stepper {
+            display: flex;
+            background-color: var(--grey-bg);
+            border-radius: 8px;
+            padding: 0.4rem;
+            gap: 0.25rem;
+        }
+
+        .step-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-tab.active {
+            background-color: var(--white);
+            color: var(--red-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .step-tab.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .step-tab.completed {
+            color: var(--text-primary);
+        }
+
+        .step-tab.completed::after {
+            content: '✓';
+            color: var(--red-primary);
+            font-weight: bold;
+        }
+
+        /* Instruction Card */
+        .instruction-card {
+            background-color: var(--grey-bg);
+            border-left: 4px solid var(--red-primary);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .instruction-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--red-primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .instruction-card ol {
+            padding-left: 1.25rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .instruction-card li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Main Level Containers */
+        .level-container {
+            display: none;
+        }
+
+        .level-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Grid Layouts */
+        .grid-two-col {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 992px) {
+            .grid-two-col {
+                grid-template-columns: 1.2fr 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--white);
+            border: 1px solid var(--grey-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--grey-border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Sub-tabs for Activities inside Levels */
+        .activity-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--grey-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .act-btn {
+            background-color: var(--grey-bg);
+            border: 1px solid var(--grey-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .act-btn.active {
+            background-color: var(--red-light);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+        }
+
+        .activity-panel {
+            display: none;
+        }
+
+        .activity-panel.active {
+            display: block;
+        }
+
+        /* Code highlights & code wrappers */
+        .code-editor-container {
+            background-color: #1E1E1E;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1rem;
+        }
+
+        .code-editor-header {
+            background-color: #2D2D2D;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #404040;
+        }
+
+        .code-lang-label {
+            font-size: 0.75rem;
+            color: #9CDCFE;
+            font-family: var(--font-mono);
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: #CCC;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-main);
+        }
+
+        .copy-btn:hover {
+            background-color: #444;
+            color: #FFF;
+        }
+
+        .code-content {
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #D4D4D4;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+        }
+
+        .code-content span.kw {
+            color: #569CD6;
+            font-weight: bold;
+        }
+
+        /* Keyword */
+        .code-content span.str {
+            color: #CE9178;
+        }
+
+        /* String literal */
+        .code-content span.bi {
+            color: #4EC9B0;
+        }
+
+        /* Built-in */
+        .code-content span.com {
+            color: #6A9955;
+            font-style: italic;
+        }
+
+        /* Comment */
+
+        .highlight-line {
+            background-color: #383838;
+            border-left: 3px solid var(--red-primary);
+            padding-left: 4px;
+            display: block;
+        }
+
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.88rem;
+            border: 1px solid var(--grey-border);
+            border-radius: 6px;
+            font-family: var(--font-main);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--red-primary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-main);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--red-primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--red-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--grey-bg);
+            border: 1px solid var(--grey-border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--grey-border);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-disabled {
+            background-color: var(--grey-border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Level Footer Navigation */
+        .level-footer {
+            border-top: 1px solid var(--grey-border);
+            padding-top: 1.25rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Tables Styles */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--grey-border);
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: var(--grey-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--grey-border);
+        }
+
+        .data-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--grey-border);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover {
+            background-color: var(--grey-bg);
+        }
+
+        /* ==========================================================================
+       ANIMATION FLOW KEYFRAMES & FLOW NODES
+       ========================================================================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseRed {
+            0% {
+                box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(211, 47, 47, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
+            }
+        }
+
+        .pulse-active {
+            animation: pulseRed 1.8s infinite;
+        }
+
+        /* Flow Chart Styles */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 0;
+        }
+
+        .flow-node {
+            border: 1.5px solid var(--grey-border);
+            background-color: var(--grey-card);
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            width: 220px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .flow-node.active {
+            background-color: var(--red-light);
+            border-color: var(--red-primary);
+            color: var(--red-primary);
+            transform: scale(1.04);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .flow-arrow {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: bold;
+            line-height: 1;
+            height: 18px;
+        }
+
+        .flow-arrow.active {
+            color: var(--red-primary);
+            animation: arrowBounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes arrowBounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(3px);
+            }
+        }
+
+        /* Side-by-side Explanations (Level 1 Activity 1) */
+        .side-explanation-panel {
+            border: 1px solid var(--grey-border);
+            border-radius: 6px;
+            background-color: var(--grey-card);
+            padding: 1rem;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        #l1-code-annotation-box {
+            border-left: 3px solid var(--red-primary);
+            background-color: var(--grey-bg);
+            margin-top: 1rem;
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+        }
+
+        .side-explanation-title {
+            font-weight: 700;
+            color: var(--red-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        /* Database schema explorer tree layout (Level 1 Activity 2) */
+        .db-tree-container {
+            font-size: 0.85rem;
+        }
+
+        .tree-node {
+            padding: 0.4rem;
+            margin-left: 0.75rem;
+            border-left: 1px dashed var(--grey-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .tree-node:hover {
+            background-color: var(--grey-bg);
+        }
+
+        .tree-node.active {
+            color: var(--red-primary);
+            font-weight: 600;
+            background-color: var(--red-light);
+        }
+
+        .tree-leaf {
+            padding: 0.25rem 0.5rem;
+            margin-left: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        /* Three Panels layout for Level 3 Studio */
+        .studio-three-panel {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 992px) {
+            .studio-three-panel {
+                grid-template-columns: 300px 1.2fr 1fr;
+            }
+        }
+
+        /* properties selector in Visual SQL Builder Level 2 */
+        .playground-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .playground-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Completion Overlay Checklist */
+        .completion-check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .completion-check-item span.icon {
+            color: var(--red-primary);
+            font-weight: bold;
+        }
+
+        /* Simulated Alert popup inside level preview */
+        .mock-alert-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            z-index: 100;
+        }
+
+        .mock-alert-box {
+            background: var(--white);
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            max-width: 280px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border-top: 4px solid var(--red-primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Banner -->
+    <header>
+        <div class="container header-content">
+            <div class="brand-title">
+                📁 Python DB Integration <span>Module 5.2</span>
+            </div>
+
+            <!-- Horizontal Stepper Progress Indicator -->
+            <div class="progress-stepper">
+                <button class="step-tab active" id="btn-tab-1" onclick="app.switchLevel(1)">
+                    Level 1: Explorer
+                </button>
+                <button class="step-tab" id="btn-tab-2" onclick="app.switchLevel(2)">
+                    Level 2: Playground
+                </button>
+                <button class="step-tab" id="btn-tab-3" onclick="app.switchLevel(3)">
+                    Level 3: Studio
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- ==========================================================================
+         LEVEL 1: DATABASE EXPLORER
+         ========================================================================== -->
+        <div class="level-container active" id="level1">
+
+            <!-- Instruction Card -->
+            <div class="instruction-card">
+                <h3>Level 1 Instructions</h3>
+                <ol>
+                    <li>Understand how Python connects to MySQL using client driver modules.</li>
+                    <li>Explore database schemas, columns, row mappings, and data types.</li>
+                    <li>Complete both Activity 1 & Activity 2 to unlock Level 2.</li>
+                </ol>
+            </div>
+
+            <!-- Theory section snippet -->
+            <div class="card" style="padding: 1rem 1.25rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    <strong>Python Database Connectivity API</strong>: To integrate with SQL databases, Python
+                    applications utilize specialized drivers like <code
+                        style="font-family: var(--font-mono); color: var(--red-primary);">mysql.connector</code>.
+                    Connection flows require instantiating a connection object using host parameters, opening a
+                    transaction session, and establishing a cursor handler to execute SQL queries.
+                </p>
+            </div>
+
+            <!-- Activities Selector -->
+            <div class="activity-selector">
+                <button class="act-btn active" id="l1-btn-act1" onclick="l1.switchActivity(1)">Activity 1: Connection
+                    Builder</button>
+                <button class="act-btn" id="l1-btn-act2" onclick="l1.switchActivity(2)">Activity 2: Database
+                    Explorer</button>
+            </div>
+
+            <!-- Grid layout panels -->
+            <div class="studio-three-panel">
+
+                <!-- Interactive Controls Side -->
+                <div class="level-workspace-left">
+
+                    <!-- ACTIVITY 1: Connection Builder PANEL -->
+                    <div class="activity-panel active" id="l1-act-1">
+                        <div class="card">
+                            <div class="card-title">Database Parameters Setup</div>
+
+                            <div class="form-group">
+                                <label>Database Host</label>
+                                <input type="text" class="form-control" id="l1-conn-host" value="localhost">
+                            </div>
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" class="form-control" id="l1-conn-user" value="root">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="form-control" id="l1-conn-pass" value="••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label>Database Name</label>
+                                <input type="text" class="form-control" id="l1-conn-db" value="university_db">
+                            </div>
+
+                            <button class="btn btn-primary btn-block" style="margin-top: 1rem;" id="l1-conn-trigger"
+                                onclick="l1.executeConnectionFlow()">
+                                Establish Connection
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVITY 2: Schema Explorer PANEL -->
+                    <div class="activity-panel" id="l1-act-2">
+                        <div class="card">
+                            <div class="card-title">Database Tree Viewer</div>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Click table
+                                nodes below to inspect columns, indexes, metadata, and schemas:</p>
+
+                            <div class="db-tree-container">
+                                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">📁
+                                    university_db</div>
+
+                                <div class="tree-node active" id="l1-tree-students"
+                                    onclick="l1.selectExplorerTable('students')">
+                                    📄 tbl_students
+                                </div>
+                                <div class="tree-leaf">↳ Primary Key: id (INT)</div>
+                                <div class="tree-leaf">↳ Columns: id, name, email, branch, gpa</div>
+
+                                <div class="tree-node" id="l1-tree-courses" onclick="l1.selectExplorerTable('courses')">
+                                    📄 tbl_courses
+                                </div>
+                                <div class="tree-leaf">↳ Primary Key: course_id (INT)</div>
+                                <div class="tree-leaf">↳ Columns: course_id, title, credits, instructor</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Simulated Live Output (Center Column) -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-title" id="l1-preview-title">Connection Status Visualizer</div>
+
+                    <!-- Connection Builder flowchart animation container -->
+                    <div id="l1-connection-visualizer" style="display: block;">
+                        <div class="flow-container">
+                            <div class="flow-node" id="l1-fn-python">1. Python Script Environment</div>
+                            <div class="flow-arrow" id="l1-fa-1">↓</div>
+                            <div class="flow-node" id="l1-fn-driver">2. mysql.connector Client Driver</div>
+                            <div class="flow-arrow" id="l1-fa-2">↓</div>
+                            <div class="flow-node" id="l1-fn-server">3. MySQL Server Socket Connection</div>
+                            <div class="flow-arrow" id="l1-fa-3">↓</div>
+                            <div class="flow-node" id="l1-fn-db" style="border-radius: 50px;">4. Database Handshake
+                                Connected</div>
+                        </div>
+                        <div id="l1-connection-result"
+                            style="text-align: center; font-size: 0.82rem; font-weight: bold; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Status: Awaiting parameters setup...
+                        </div>
+                    </div>
+
+                    <!-- Table Schema Inspector View -->
+                    <div id="l1-schema-visualizer" style="display: none;">
+                        <div id="l1-schema-detail" class="side-explanation-panel">
+                            <div class="side-explanation-title" id="l1-schema-table-name">students Table Metadata</div>
+                            <div style="font-size: 0.8rem; margin-bottom: 0.5rem;" id="l1-schema-table-desc">Stores
+                                academic particulars records for university undergraduates.</div>
+
+                            <div style="margin-top: 0.5rem;">
+                                <strong style="color:var(--text-primary);">Table Properties:</strong>
+                                <ul style="padding-left: 1.2rem; font-size: 0.8rem; margin-top: 0.25rem;">
+                                    <li>Primary Key: <code
+                                            style="font-family: var(--font-mono); color: var(--red-primary);"
+                                            id="l1-schema-pk">id</code></li>
+                                    <li>Records Count: <span id="l1-schema-rows">4 records</span></li>
+                                    <li>Total Columns: <span id="l1-schema-cols">5 attributes</span></li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-top: 0.5rem;">
+                                <strong style="color:var(--text-primary);">Column Mappings:</strong>
+                                <div class="table-container">
+                                    <table class="data-table" id="l1-schema-columns-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Column Name</th>
+                                                <th>Data Type</th>
+                                                <th>Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Inserted dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Code Generator Pane (Right Column) -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-title">Generated Python Code Connection</div>
+
+                    <div class="code-editor-container">
+                        <div class="code-editor-header">
+                            <div class="code-lang-label">mysql_connect.py</div>
+                            <button class="copy-btn" onclick="app.copyCode('l1-code-box')">Copy Code</button>
+                        </div>
+                        <div class="code-content" id="l1-code-box">
+                            <!-- Generated Code with syntax annotations -->
+                        </div>
+                    </div>
+
+                    <!-- Interactive line commentary detail box -->
+                    <div class="side-explanation-panel" id="l1-code-annotation-box">
+                        <div class="side-explanation-title">Code Annotation Explainer</div>
+                        <p id="l1-code-annotation-text" style="font-size: 0.8rem;">Click lines in the code editor box
+                            above to inspect code logic details here.</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Footer Level controls -->
+            <div class="level-footer">
+                <span style="font-size: 0.85rem; color: var(--text-secondary);" id="l1-footer-status">Connection &
+                    database explorer activities.</span>
+                <button class="btn btn-primary" id="l1-unlock-next-btn" onclick="app.switchLevel(2)">
+                    Next Level (Playground) &rarr;
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+         LEVEL 2: SQL PLAYGROUND
+         ========================================================================== -->
+        <div class="level-container" id="level2">
+
+            <!-- Instruction Card -->
+            <div class="instruction-card">
+                <h3>Level 2 Instructions</h3>
+                <ol>
+                    <li>Perform SQL query manipulations using the interactive editor.</li>
+                    <li>Build queries visually using dropdown selectors to compare syntax.</li>
+                    <li>Complete both Activity 1 & Activity 2 to unlock Level 3.</li>
+                </ol>
+            </div>
+
+            <!-- Activities Selector -->
+            <div class="activity-selector">
+                <button class="act-btn active" id="l2-btn-act1" onclick="l2.switchActivity(1)">Activity 1: SQL
+                    Editor</button>
+                <button class="act-btn" id="l2-btn-act2" onclick="l2.switchActivity(2)">Activity 2: Visual Query
+                    Builder</button>
+            </div>
+
+            <div class="grid-two-col">
+
+                <!-- LEFT: Control panels / SQL Text input area -->
+                <div class="level-workspace-left">
+
+                    <!-- ACTIVITY 1: SQL EDITOR PANEL -->
+                    <div class="activity-panel active" id="l2-act-1">
+                        <div class="card">
+                            <div class="card-title">Interactive Query Editor</div>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Modify
+                                SQL commands below or select a helper preset query statement:</p>
+
+                            <!-- Helper Presets buttons row -->
+                            <div style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1rem;">
+                                <button class="btn btn-secondary" style="padding:0.3rem 0.5rem; font-size:0.75rem;"
+                                    onclick="l2.setPresetQuery('select')">Preset: SELECT ALL</button>
+                                <button class="btn btn-secondary" style="padding:0.3rem 0.5rem; font-size:0.75rem;"
+                                    onclick="l2.setPresetQuery('insert')">Preset: INSERT</button>
+                                <button class="btn btn-secondary" style="padding:0.3rem 0.5rem; font-size:0.75rem;"
+                                    onclick="l2.setPresetQuery('update')">Preset: UPDATE SET</button>
+                                <button class="btn btn-secondary" style="padding:0.3rem 0.5rem; font-size:0.75rem;"
+                                    onclick="l2.setPresetQuery('delete')">Preset: DELETE WHERE</button>
+                            </div>
+
+                            <textarea class="form-control" id="l2-sql-editor" rows="5"
+                                style="font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.5px; border-color: #555; background-color: #FAFAFA; resize: none; margin-bottom: 0.75rem;">SELECT * FROM students WHERE gpa > 8.5;</textarea>
+
+                            <div style="display:flex; gap:0.5rem;">
+                                <button class="btn btn-primary" onclick="l2.executePlaygroundSQL()">Run Query
+                                    Statement</button>
+                                <button class="btn btn-secondary" onclick="l2.resetPlaygroundTable()">Reset
+                                    Records</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVITY 2: VISUAL QUERY BUILDER PANEL -->
+                    <div class="activity-panel" id="l2-act-2">
+                        <div class="card">
+                            <div class="card-title">Visual Query Constructor</div>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">Assemble
+                                database queries visually by selecting statement parameters:</p>
+
+                            <div class="form-group">
+                                <label><span style="color:var(--red-primary); font-weight:700;">SELECT</span> (Retrieve
+                                    Attributes)</label>
+                                <select class="form-control" id="l2-vqb-select" onchange="l2.generateVisualQuery()">
+                                    <option value="*">* (All Columns)</option>
+                                    <option value="name, email">name, email</option>
+                                    <option value="name, branch, gpa">name, branch, gpa</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><span style="color:var(--red-primary); font-weight:700;">FROM</span> (Select
+                                    Table Source)</label>
+                                <select class="form-control" id="l2-vqb-from" onchange="l2.generateVisualQuery()">
+                                    <option value="students">students</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><span style="color:var(--red-primary); font-weight:700;">WHERE</span> (Filtering
+                                    Condition)</label>
+                                <select class="form-control" id="l2-vqb-where" onchange="l2.generateVisualQuery()">
+                                    <option value="ALL">None (No filter - show all)</option>
+                                    <option value="gpa_high">gpa > 8.5 (High GPA)</option>
+                                    <option value="gpa_low">gpa < 8.0 (Low performers)</option>
+                                    <option value="branch_cs">branch = 'Computer Science'</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-primary btn-block" style="margin-top: 1rem;"
+                                onclick="l2.executeVisualBuilderQuery()">
+                                Generate & Run Query
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT: Results table and Clause explainer -->
+                <div class="level-workspace-right">
+
+                    <!-- Live Preview Results Table -->
+                    <div class="card">
+                        <div class="card-title">Interactive Console Results</div>
+
+                        <div id="l2-execution-feedback"
+                            style="font-size:0.8rem; font-weight:bold; color:var(--text-secondary); margin-bottom:0.5rem;">
+                            Database Table state: 4 records loaded.
+                        </div>
+
+                        <div class="table-container" style="max-height: 200px;">
+                            <table class="data-table" id="l2-results-table">
+                                <thead>
+                                    <!-- dynamically filled -->
+                                </thead>
+                                <tbody>
+                                    <!-- dynamically filled -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Generated SQL Code Card -->
+                    <div class="card">
+                        <div class="card-title">Generated SQL Statement</div>
+                        <div class="code-editor-container" style="margin-bottom:0px;">
+                            <div class="code-editor-header">
+                                <div class="code-lang-label">query.sql</div>
+                                <button class="copy-btn" onclick="app.copyCode('l2-code-box')">Copy Code</button>
+                            </div>
+                            <div class="code-content" id="l2-code-box"
+                                style="white-space: pre-wrap; padding: 0.6rem 1rem;">
+                                -- Generated SQL script
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Syntax explainer dynamic block -->
+                    <div class="card">
+                        <div class="card-title">SQL Syntax Structure Explainer</div>
+
+                        <div id="l2-syntax-explainer-body" class="side-explanation-panel">
+                            <div class="side-explanation-title" id="l2-syntax-cmd-name">SELECT Clause Syntax</div>
+                            <p style="font-size:0.8rem;" id="l2-syntax-cmd-desc">SELECT operations retrieve data subsets
+                                from table arrays using filters options.</p>
+
+                            <div style="font-family: var(--font-mono); font-size: 0.75rem; background-color: var(--grey-bg); padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0;"
+                                id="l2-syntax-example">
+                                SELECT column_list FROM table_name WHERE condition;
+                            </div>
+
+                            <div id="l2-syntax-clauses-log" style="font-size: 0.78rem;">
+                                <!-- Filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Level controls -->
+            <div class="level-footer">
+                <button class="btn btn-secondary" onclick="app.switchLevel(1)">
+                    &larr; Previous Level (Explorer)
+                </button>
+                <button class="btn btn-primary" id="l2-unlock-next-btn" onclick="app.switchLevel(3)">
+                    Next Level (Studio) &rarr;
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+         LEVEL 3: DATABASE STUDIO
+         ========================================================================== -->
+        <div class="level-container" id="level3">
+
+            <!-- Instruction Card -->
+            <div class="instruction-card">
+                <h3>Level 3 Instructions</h3>
+                <ol>
+                    <li>Perform CRUD database updates and observe the generated Python scripts.</li>
+                    <li>Trigger the request workflow animation to trace connection socket pipelines.</li>
+                    <li>Pass both sub-modules tasks to complete Module 5.2.</li>
+                </ol>
+            </div>
+
+            <!-- Activities Selector -->
+            <div class="activity-selector">
+                <button class="act-btn active" id="l3-btn-act1" onclick="l3.switchActivity(1)">Activity 1: CRUD
+                    Studio</button>
+                <button class="act-btn" id="l3-btn-act2" onclick="l3.switchActivity(2)">Activity 2: Request Flow
+                    Animation</button>
+            </div>
+
+            <!-- Activity 1: Three Panels Studio UI -->
+            <div id="l3-panel-wrapper-crud" style="display: block;">
+                <div class="studio-three-panel">
+
+                    <!-- LEFT PANEL: Student Input Form -->
+                    <div class="card" style="padding: 1.25rem;">
+                        <div class="card-title">Student Parameters</div>
+
+                        <div class="form-group">
+                            <label>Student ID (Required for Update/Delete)</label>
+                            <input type="number" class="form-control" id="l3-crud-id"
+                                placeholder="Auto-assigned on Insert">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Student Name</label>
+                            <input type="text" class="form-control" id="l3-crud-name" placeholder="E.g., Priya Sen">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" class="form-control" id="l3-crud-email"
+                                placeholder="E.g., priya@university.edu">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Branch / Department</label>
+                            <select class="form-control" id="l3-crud-branch">
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Mechanical">Mechanical</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Academic GPA</label>
+                            <input type="number" class="form-control" id="l3-crud-gpa" min="0" max="10" step="0.1"
+                                value="8.5">
+                        </div>
+
+                        <!-- CRUD Action triggers grid -->
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:1rem;">
+                            <button class="btn btn-primary" onclick="l3.executeCRUD('insert')">Insert</button>
+                            <button class="btn btn-secondary" onclick="l3.executeCRUD('update')">Update</button>
+                            <button class="btn btn-secondary"
+                                style="border-color: var(--red-primary); color: var(--red-primary);"
+                                onclick="l3.executeCRUD('delete')">Delete</button>
+                            <button class="btn btn-secondary" onclick="l3.executeCRUD('search')">Search Name</button>
+                        </div>
+
+                        <button class="btn btn-secondary btn-block" style="margin-top: 0.5rem;"
+                            onclick="l3.resetDatabaseState()">
+                            Reset Table Records
+                        </button>
+                    </div>
+
+                    <!-- CENTER PANEL: Live Database Grid Table -->
+                    <div class="card" style="padding: 1.25rem; overflow-y: auto;">
+                        <div class="card-title">
+                            Live Database Table View
+                            <span id="l3-db-state-lbl"
+                                style="font-size:0.75rem; font-weight:normal; background:var(--grey-bg); padding:0.15rem 0.5rem; border-radius:10px;">
+                                university_db </span>
+                        </div>
+
+                        <p style="font-size:0.78rem; color:var(--text-secondary); margin-bottom:0.5rem;">Clicking rows
+                            below populates fields inside the Left parameters Panel:</p>
+
+                        <div class="table-container">
+                            <table class="data-table" id="l3-crud-table">
+                                <thead>
+                                    <tr>
+                                        <th>id (PK)</th>
+                                        <th>name</th>
+                                        <th>email</th>
+                                        <th>branch</th>
+                                        <th>gpa</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Filled dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT PANEL: Live Generated SQL and Python connection/cursor script -->
+                    <div class="card" style="padding: 1.25rem;">
+                        <div class="card-title">Generated Code output</div>
+
+                        <!-- SQL block -->
+                        <div class="code-editor-container" style="margin-bottom:0.75rem;">
+                            <div class="code-editor-header">
+                                <div class="code-lang-label">RAW SQL statement</div>
+                            </div>
+                            <div class="code-content" id="l3-sql-code-box"
+                                style="white-space: pre-wrap; padding: 0.6rem 1rem;">
+                                -- Generated SQL script
+                            </div>
+                        </div>
+
+                        <!-- Python connector script block -->
+                        <div class="code-editor-container">
+                            <div class="code-editor-header">
+                                <div class="code-lang-label">Python Tkinter driver script</div>
+                            </div>
+                            <div class="code-content" id="l3-python-code-box"
+                                style="white-space: pre-wrap; padding: 0.6rem 1rem;">
+                                # Generated python driver block
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Activity 2: Database Request Flow Animation Panels -->
+            <div id="l3-panel-wrapper-flow" style="display: none;">
+                <div class="grid-two-col">
+
+                    <!-- Animation workflow flowchart -->
+                    <div class="card">
+                        <div class="card-title">Execution Pipeline Animation</div>
+                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.75rem;">Click Start
+                            Animation below to watch records transfer from client browser forms down to the MySQL
+                            Database node:</p>
+
+                        <button class="btn btn-primary" style="margin-bottom: 1rem;" onclick="l3.startFlowAnimation()">
+                            Start Flow Animation
+                        </button>
+
+                        <div class="flow-container">
+                            <div class="flow-node" id="l3-fn-form">1. Input Form parameters captured</div>
+                            <div class="flow-arrow" id="l3-fa-1">↓</div>
+                            <div class="flow-node" id="l3-fn-python">2. Python mysql-connector driver</div>
+                            <div class="flow-arrow" id="l3-fa-2">↓</div>
+                            <div class="flow-node" id="l3-fn-cursor">3. cursor.execute() driver call</div>
+                            <div class="flow-arrow" id="l3-fa-3">↓</div>
+                            <div class="flow-node" id="l3-fn-sql">4. Dynamic SQL Statement compiled</div>
+                            <div class="flow-arrow" id="l3-fa-4">↓</div>
+                            <div class="flow-node" id="l3-fn-mysql">5. MySQL Database Server updates B-Tree</div>
+                            <div class="flow-arrow" id="l3-fa-5">↓</div>
+                            <div class="flow-node" id="l3-fn-commit">6. connection.commit() save state</div>
+                            <div class="flow-arrow" id="l3-fa-6">↓</div>
+                            <div class="flow-node" id="l3-fn-success" style="border-radius: 50px;">7. UI updates &
+                                Success confirmation</div>
+                        </div>
+                    </div>
+
+                    <!-- Python cursor highlight code panel + Glossary definition cards -->
+                    <div class="level-workspace-right">
+
+                        <!-- Python animation sync script -->
+                        <div class="card">
+                            <div class="card-title">Driver Statement Highlighter</div>
+
+                            <div class="code-editor-container">
+                                <div class="code-editor-header">
+                                    <div class="code-lang-label">flow_execution.py</div>
+                                </div>
+                                <div class="code-content" id="l3-flow-code-box">
+                                    <!-- Synced animation code goes here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Driver glossary explainer card -->
+                        <div class="card">
+                            <div class="card-title">Database APIs Glossary</div>
+
+                            <div class="side-explanation-panel" style="font-size:0.8rem; gap:0.75rem;">
+                                <div>
+                                    <strong style="color:var(--red-primary);">cursor.execute(query, params)</strong>
+                                    <p style="color:var(--text-secondary); margin-top:0.1rem;">Binds variables options
+                                        dynamically, compiles parameters values, and triggers SQL parsing on remote
+                                        databases.</p>
+                                </div>
+                                <div>
+                                    <strong style="color:var(--red-primary);">connection.commit()</strong>
+                                    <p style="color:var(--text-secondary); margin-top:0.1rem;">Commits active
+                                        transactions states. MySQL handles connections in sessions where writes are
+                                        uncommitted until committed.</p>
+                                </div>
+                                <div>
+                                    <strong style="color:var(--red-primary);">cursor.fetchall()</strong>
+                                    <p style="color:var(--text-secondary); margin-top:0.1rem;">Extracts buffer results
+                                        rows from query sets and returns standard Python tuple list objects.</p>
+                                </div>
+                                <div>
+                                    <strong style="color:var(--red-primary);">cursor.close() & conn.close()</strong>
+                                    <p style="color:var(--text-secondary); margin-top:0.1rem;">Frees server socket
+                                        connection buffers and network handles allocated for client streams.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Level controls -->
+            <div class="level-footer">
+                <button class="btn btn-secondary" onclick="app.switchLevel(2)">
+                    &larr; Previous Level (Playground)
+                </button>
+                <button class="btn btn-primary" id="l3-unlock-next-btn" onclick="l3.finishStudioLevel()">
+                    Complete Level 3 & Finish Lab Module &rarr;
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================================
+         COMPLETION SCREEN
+         ========================================================================== -->
+        <div class="level-container" id="completion-screen">
+            <div class="card"
+                style="text-align: center; padding: 3rem 2rem; max-width: 600px; margin: 3rem auto; box-shadow: var(--shadow-lg);">
+                <div style="font-size: 4rem; color: var(--red-primary); margin-bottom: 1.5rem;">🎉</div>
+                <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                    Module 5.2 Completed Successfully!</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">
+                    You have mastered Python connectivity pipelines, MySQL connectors, query parsers, and transactional
+                    updates.
+                </p>
+
+                <!-- Completed concepts checklist checklist grid -->
+                <div
+                    style="background-color: var(--grey-bg); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; text-align: left;">
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Python Database Connection establishes</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Database Table Schemas & columns explorer</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>SQL CRUD query execution (SELECT, INSERT, UPDATE,
+                            DELETE)</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Visual Query Builders configurations</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Generated Python code highlights</span>
+                    </div>
+                    <div class="completion-check-item">
+                        <span class="icon">✓</span> <span>Database transaction flow lifecycle pipeline (commit,
+                            execute)</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block" style="padding: 0.8rem 1.5rem; font-size: 1rem;"
+                    onclick="app.finishLabModule()">
+                    Proceed to Module 5.3 Lesson Labs
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Simulated Dialogue overlays container -->
+    <div class="mock-alert-overlay" id="simulatedDialogOverlay" style="display: none;">
+        <div class="mock-alert-box">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem;" id="tk-dialog-icon">ℹ️</div>
+            <h4 style="font-size: 1rem; font-weight: bold; margin-bottom: 0.25rem;" id="tk-dialog-title">Alert Title
+            </h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;" id="tk-dialog-text">
+                Dialogue explanation description parameters.</p>
+            <div id="tk-dialog-actions" style="display:flex; justify-content:center; gap:0.5rem;">
+                <!-- Filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       VANILLA JAVASCRIPT CONTROLLERS
+       ========================================================================== -->
+    <script>
+        // Global Application Router
+        class AppController {
+            constructor() {
+                this.level = 1;
+                this.level1Unlocked = true;
+                this.level2Unlocked = true;
+                this.level3Unlocked = true;
+            }
+
+            switchLevel(lvl) {
+                this.level = lvl;
+
+                // Stepper highlights status sync
+                document.querySelectorAll('.step-tab').forEach(tab => {
+                    const tabLvl = parseInt(tab.id.split('-').pop());
+                    tab.classList.toggle('active', tabLvl === lvl);
+                });
+
+                // Hide containers
+                document.querySelectorAll('.level-container').forEach(c => c.classList.remove('active'));
+
+                if (lvl === 1) {
+                    document.getElementById('level1').classList.add('active');
+                    l1.switchActivity(l1.activeActivity);
+                } else if (lvl === 2) {
+                    document.getElementById('level2').classList.add('active');
+                    l2.switchActivity(l2.activeActivity);
+                } else if (lvl === 3) {
+                    document.getElementById('level3').classList.add('active');
+                    l3.switchActivity(l3.activeActivity);
+                }
+            }
+
+            unlockLevel(lvl) {
+                if (lvl === 2) {
+                    this.level2Unlocked = true;
+                    const tab = document.getElementById('btn-tab-2');
+                    tab.classList.remove('disabled');
+                    tab.classList.add('completed');
+                } else if (lvl === 3) {
+                    this.level3Unlocked = true;
+                    const tab = document.getElementById('btn-tab-3');
+                    tab.classList.remove('disabled');
+                    tab.classList.add('completed');
+                }
+            }
+
+            copyCode(id) {
+                const text = document.getElementById(id).innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Python code snippet copied to clipboard! 📋');
+                });
+            }
+
+            finishLabModule() {
+                alert('Proceeding to Module 5.3: Advanced DB Queries using Python!');
+                location.reload();
+            }
+        }
+
+        // ==========================================================================
+        // LEVEL 1: DATABASE EXPLORER CONTROLLER
+        // ==========================================================================
+        class Level1Explorer {
+            constructor() {
+                this.activeActivity = 1;
+                this.connectionAttempts = 0;
+                this.connSuccess = false;
+
+                // Tree state
+                this.activeTable = 'students';
+
+                // Activities completion checklist tracker
+                this.act1Done = false;
+                this.act2Done = false;
+            }
+
+            switchActivity(num) {
+                this.activeActivity = num;
+
+                // Tabs highlights toggle
+                document.getElementById('l1-btn-act1').classList.toggle('active', num === 1);
+                document.getElementById('l1-btn-act2').classList.toggle('active', num === 2);
+
+                // Panels toggles
+                document.getElementById('l1-act-1').classList.remove('active');
+                document.getElementById('l1-act-2').classList.remove('active');
+                document.getElementById(`l1-act-${num}`).classList.add('active');
+
+                // Visualizer block toggle sync
+                const connVis = document.getElementById('l1-connection-visualizer');
+                const schemaVis = document.getElementById('l1-schema-visualizer');
+                const previewTitle = document.getElementById('l1-preview-title');
+
+                if (num === 1) {
+                    connVis.style.display = 'block';
+                    schemaVis.style.display = 'none';
+                    previewTitle.innerText = "Connection Status Visualizer";
+                } else {
+                    connVis.style.display = 'none';
+                    schemaVis.style.display = 'block';
+                    previewTitle.innerText = "Database Table Metadata Schema";
+                    this.selectExplorerTable(this.activeTable);
+                }
+
+                this.updateCodeGenerator();
+            }
+
+            executeConnectionFlow() {
+                const host = document.getElementById('l1-conn-host').value.trim();
+                const user = document.getElementById('l1-conn-user').value.trim();
+                const db = document.getElementById('l1-conn-db').value.trim();
+
+                if (!host || !user || !db) {
+                    alert("All connection parameters must be specified!");
+                    return;
+                }
+
+                // Reset flowchart node colors
+                this.resetConnectionNodes();
+                document.getElementById('l1-conn-trigger').disabled = true;
+
+                const nodes = ['python', 'driver', 'server', 'db'];
+                const resultLabel = document.getElementById('l1-connection-result');
+                let step = 0;
+
+                resultLabel.innerText = "Initiating connection handshake protocol...";
+
+                const interval = setInterval(() => {
+                    if (step > 0) {
+                        document.getElementById(`l1-fa-${step}`).classList.add('active');
+                    }
+                    const activeNode = document.getElementById(`l1-fn-${nodes[step]}`);
+                    activeNode.classList.add('active', 'pulse-active');
+
+                    step++;
+
+                    if (step === 1) {
+                        resultLabel.innerText = "Python environment loads mysql.connector adapter.";
+                    } else if (step === 2) {
+                        resultLabel.innerText = "Connecting socket pipe client to remote server port...";
+                    } else if (step === 3) {
+                        resultLabel.innerText = "MySQL authentication credentials check payload transfer.";
+                    } else if (step === 4) {
+                        clearInterval(interval);
+                        resultLabel.innerHTML = `✅ <span style="color:var(--red-primary);">Successfully connected to host ${host}! session connection open.</span>`;
+                        this.connSuccess = true;
+                        this.act1Done = true;
+                        document.getElementById('l1-conn-trigger').disabled = false;
+                        this.checkLevelProgress();
+                    }
+                }, 1000);
+            }
+
+            resetConnectionNodes() {
+                ['python', 'driver', 'server', 'db'].forEach(name => {
+                    const el = document.getElementById(`l1-fn-${name}`);
+                    el.classList.remove('active', 'pulse-active');
+                });
+                [1, 2, 3].forEach(idx => {
+                    document.getElementById(`l1-fa-${idx}`).classList.remove('active');
+                });
+            }
+
+            selectExplorerTable(table) {
+                this.activeTable = table;
+
+                document.getElementById('l1-tree-students').classList.toggle('active', table === 'students');
+                document.getElementById('l1-tree-courses').classList.toggle('active', table === 'courses');
+
+                const tblName = document.getElementById('l1-schema-table-name');
+                const tblDesc = document.getElementById('l1-schema-table-desc');
+                const tblPk = document.getElementById('l1-schema-pk');
+                const tblRows = document.getElementById('l1-schema-rows');
+                const tblCols = document.getElementById('l1-schema-cols');
+                const colBody = document.querySelector('#l1-schema-columns-table tbody');
+
+                colBody.innerHTML = '';
+
+                if (table === 'students') {
+                    tblName.innerText = "students (tbl_students) Metadata";
+                    tblDesc.innerText = "Stores academic profiles and records for enrolled students.";
+                    tblPk.innerText = "id";
+                    tblRows.innerText = "4 active records";
+                    tblCols.innerText = "5 columns";
+
+                    colBody.innerHTML = `
+            <tr><td><strong>id</strong></td><td><code>INT</code></td><td>Primary Key. Auto-increment index.</td></tr>
+            <tr><td><strong>name</strong></td><td><code>VARCHAR(80)</code></td><td>Student full name character text.</td></tr>
+            <tr><td><strong>email</strong></td><td><code>VARCHAR(100)</code></td><td>Unique institutional email address string.</td></tr>
+            <tr><td><strong>branch</strong></td><td><code>VARCHAR(50)</code></td><td>Enrolled branch department selection.</td></tr>
+            <tr><td><strong>gpa</strong></td><td><code>FLOAT</code></td><td>Academic Grade Point Average grade.</td></tr>
+          `;
+                } else if (table === 'courses') {
+                    tblName.innerText = "courses (tbl_courses) Metadata";
+                    tblDesc.innerText = "Stores details for institutional credit courses offered.";
+                    tblPk.innerText = "course_id";
+                    tblRows.innerText = "3 active records";
+                    tblCols.innerText = "4 columns";
+
+                    colBody.innerHTML = `
+            <tr><td><strong>course_id</strong></td><td><code>INT</code></td><td>Primary Key. Unique identifier.</td></tr>
+            <tr><td><strong>title</strong></td><td><code>VARCHAR(100)</code></td><td>Course syllabus name.</td></tr>
+            <tr><td><strong>credits</strong></td><td><code>INT</code></td><td>Course weight value (e.g. 3, 4 credits).</td></tr>
+            <tr><td><strong>instructor</strong></td><td><code>VARCHAR(80)</code></td><td>Assigned faculty professor name.</td></tr>
+          `;
+                }
+
+                this.act2Done = true;
+                this.checkLevelProgress();
+                this.updateCodeGenerator();
+            }
+
+            updateCodeGenerator() {
+                const sync = document.getElementById('l1-code-box');
+                const host = document.getElementById('l1-conn-host').value.trim();
+                const user = document.getElementById('l1-conn-user').value.trim();
+                const db = document.getElementById('l1-conn-db').value.trim();
+
+                let code = '';
+
+                if (this.activeActivity === 1) {
+                    code += `<div onclick="l1.showAnnotation(1)"><span class="kw">import</span> mysql.connector  <span class="com"># Line 1</span></div>`;
+                    code += `<div onclick="l1.showAnnotation(2)" style="margin-top:0.5rem;"><span class="com"># Instantiate connection handle</span>\n`;
+                    code += `conn = mysql.connector.connect(\n`;
+                    code += `    host=<span class="str">"${host}"</span>,\n`;
+                    code += `    user=<span class="str">"${user}"</span>,\n`;
+                    code += `    password=<span class="str">"••••••••"</span>,\n`;
+                    code += `    database=<span class="str">"${db}"</span>\n`;
+                    code += `)  <span class="com"># Line 2</span></div>`;
+                    code += `<div onclick="l1.showAnnotation(3)" style="margin-top:0.5rem;">cursor = conn.cursor()  <span class="com"># Line 3</span></div>`;
+                } else {
+                    // Schema query code
+                    code += `<div onclick="l1.showAnnotation(4)"><span class="kw">import</span> mysql.connector</div>`;
+                    code += `<div onclick="l1.showAnnotation(5)">cursor = conn.cursor()</div>\n`;
+                    code += `<div onclick="l1.showAnnotation(6)"><span class="com"># Fetch columns descriptor structures</span>\n`;
+                    code += `cursor.execute(<span class="str">"DESCRIBE ${this.activeTable}"</span>)\n`;
+                    code += `columns = cursor.fetchall()</div>\n`;
+                    code += `<div onclick="l1.showAnnotation(7)"><span class="kw">for</span> col <span class="kw">in</span> columns:\n`;
+                    code += `    print(<span class="str">"Column name:"</span>, col[<span class="bi">0</span>], <span class="str">"Type:"</span>, col[<span class="bi">1</span>])</div>`;
+                }
+
+                sync.innerHTML = code;
+            }
+
+            showAnnotation(line) {
+                // Highlight active clicked line in HTML wrapper
+                const box = document.getElementById('l1-code-annotation-text');
+
+                const linesMap = {
+                    1: "<strong>import mysql.connector</strong>: Imports the standard Oracle MySQL client socket driver adapter into your Python execution scope.",
+                    2: "<strong>mysql.connector.connect(...)</strong>: Establishes a TCP connection handle linking your script with the target MySQL database host. Returns a connection session stream instance.",
+                    3: "<strong>conn.cursor()</strong>: Allocates a cursor buffer object within the database engine session. The cursor translates Python strings into SQL commands and buffers execution results.",
+                    4: "<strong>import mysql.connector</strong>: Required to query schemas tables meta details via execution script.",
+                    5: "<strong>conn.cursor()</strong>: Allocates connection buffer resource stream.",
+                    6: "<strong>DESCRIBE table_name</strong>: A metadata query statement that tells MySQL to fetch column configurations (Datatypes, null permissions, PK structures) rather than rows records.",
+                    7: "<strong>cursor.fetchall()</strong>: Loops over query results array. The first index element `col[0]` contains the raw column attribute name string, and `col[1]` stores the SQL datatype token."
+                };
+
+                box.innerHTML = linesMap[line] || "Click code lines to inspect details.";
+            }
+
+            checkLevelProgress() {
+                // Activity status matches
+            }
+        }
+
+        // ==========================================================================
+        // LEVEL 2: SQL PLAYGROUND CONTROLLER
+        // ==========================================================================
+        class Level2Playground {
+            constructor() {
+                this.activeActivity = 1;
+
+                // Checklist completions
+                this.act1Done = false;
+                this.act2Done = false;
+
+                // In-memory mock database array state
+                this.records = [];
+                this.resetDatabase();
+            }
+
+            resetDatabase() {
+                this.records = [
+                    { id: 1, name: "Aarav Sharma", email: "aarav@university.edu", branch: "Computer Science", gpa: 9.1 },
+                    { id: 2, name: "Diya Patel", email: "diya@university.edu", branch: "Information Technology", gpa: 8.7 },
+                    { id: 3, name: "Kabir Singh", email: "kabir@university.edu", branch: "Electronics", gpa: 7.9 },
+                    { id: 4, name: "Ananya Rao", email: "ananya@university.edu", branch: "Computer Science", gpa: 9.4 }
+                ];
+            }
+
+            switchActivity(num) {
+                this.activeActivity = num;
+
+                document.getElementById('l2-btn-act1').classList.toggle('active', num === 1);
+                document.getElementById('l2-btn-act2').classList.toggle('active', num === 2);
+
+                document.getElementById('l2-act-1').classList.remove('active');
+                document.getElementById('l2-act-2').classList.remove('active');
+                document.getElementById(`l2-act-${num}`).classList.add('active');
+
+                if (num === 2) {
+                    this.generateVisualQuery();
+                } else {
+                    this.executePlaygroundSQL();
+                }
+            }
+
+            setPresetQuery(type) {
+                const editor = document.getElementById('l2-sql-editor');
+
+                const map = {
+                    select: "SELECT * FROM students WHERE gpa > 8.5;",
+                    insert: "INSERT INTO students (name, email, branch, gpa) VALUES ('Rahul Dev', 'rahul@university.edu', 'Mechanical', 8.2);",
+                    update: "UPDATE students SET gpa = 9.5 WHERE id = 1;",
+                    delete: "DELETE FROM students WHERE gpa < 8.0;"
+                };
+
+                editor.value = map[type];
+                this.executePlaygroundSQL();
+            }
+
+            executePlaygroundSQL() {
+                const query = document.getElementById('l2-sql-editor').value.trim();
+                const feedback = document.getElementById('l2-execution-feedback');
+
+                try {
+                    const res = this.parseAndRunMockQuery(query);
+                    this.renderResultsTable(res.rows, res.columns);
+                    feedback.innerHTML = `<span style="color:var(--red-primary);">${res.message}</span>`;
+                    this.updateSyntaxExplainer(query);
+
+                    const codeBox = document.getElementById('l2-code-box');
+                    if (codeBox) codeBox.innerHTML = this.formatSQLCode(query);
+
+                    this.act1Done = true;
+                    this.checkLevelProgress();
+                } catch (err) {
+                    feedback.innerHTML = `<span style="color:#B71C1C;">Error: ${err.message}</span>`;
+                }
+            }
+
+            resetPlaygroundTable() {
+                this.resetDatabase();
+                this.executePlaygroundSQL();
+                alert("Playground database records reset to defaults!");
+            }
+
+            parseAndRunMockQuery(sql) {
+                // Strip trailing semicolon
+                const queryClean = sql.replace(/;$/, '').trim();
+
+                // SELECT matching
+                if (/^select/i.test(queryClean)) {
+                    const match = queryClean.match(/^select\s+(.+?)\s+from\s+students(?:\s+where\s+(.+))?$/i);
+                    if (!match) throw new Error("Unsupported SELECT query statement syntax.");
+
+                    const selectCols = match[1].trim();
+                    const whereClause = match[2] ? match[2].trim() : null;
+
+                    let filteredRows = [...this.records];
+
+                    if (whereClause) {
+                        filteredRows = this.applyWhereFilter(filteredRows, whereClause);
+                    }
+
+                    // Map columns selector
+                    const allCols = ['id', 'name', 'email', 'branch', 'gpa'];
+                    let finalCols = selectCols === '*' ? allCols : selectCols.split(',').map(s => s.trim());
+
+                    const finalRows = filteredRows.map(row => {
+                        const mapped = {};
+                        finalCols.forEach(col => {
+                            if (row.hasOwnProperty(col)) {
+                                mapped[col] = row[col];
+                            }
+                        });
+                        return mapped;
+                    });
+
+                    return {
+                        rows: finalRows,
+                        columns: finalCols,
+                        message: `SELECT returned ${finalRows.length} matches.`
+                    };
+                }
+
+                // INSERT matching
+                if (/^insert\s+into/i.test(queryClean)) {
+                    const match = queryClean.match(/^insert\s+into\s+students\s*\((.+?)\)\s*values\s*\((.+?)\)$/i);
+                    if (!match) throw new Error("Unsupported INSERT statement format structure.");
+
+                    const cols = match[1].split(',').map(s => s.trim());
+                    const vals = match[2].split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+
+                    if (cols.length !== vals.length) throw new Error("Columns options counts do not match values counts.");
+
+                    const newObj = { id: this.records.length > 0 ? Math.max(...this.records.map(r => r.id)) + 1 : 1 };
+                    cols.forEach((col, idx) => {
+                        let val = vals[idx];
+                        if (col === 'gpa') val = parseFloat(val);
+                        newObj[col] = val;
+                    });
+
+                    this.records.push(newObj);
+                    return {
+                        rows: this.records,
+                        columns: ['id', 'name', 'email', 'branch', 'gpa'],
+                        message: "INSERT record transaction completed successfully. Row appended."
+                    };
+                }
+
+                // UPDATE matching
+                if (/^update/i.test(queryClean)) {
+                    const match = queryClean.match(/^update\s+students\s+set\s+(.+?)(?:\s+where\s+(.+))?$/i);
+                    if (!match) throw new Error("Unsupported UPDATE query syntax format.");
+
+                    const setExpr = match[1].trim();
+                    const whereClause = match[2] ? match[2].trim() : null;
+
+                    // Parse update set properties
+                    const updates = {};
+                    setExpr.split(',').forEach(expr => {
+                        const parts = expr.split('=');
+                        if (parts.length !== 2) throw new Error("Invalid SET parameters mapping expression.");
+                        const key = parts[0].trim();
+                        const val = parts[1].trim().replace(/^['"]|['"]$/g, '');
+                        updates[key] = key === 'gpa' ? parseFloat(val) : val;
+                    });
+
+                    let updateCount = 0;
+                    this.records.forEach(row => {
+                        let matches = true;
+                        if (whereClause) {
+                            matches = this.checkRowMatchesCondition(row, whereClause);
+                        }
+                        if (matches) {
+                            Object.assign(row, updates);
+                            updateCount++;
+                        }
+                    });
+
+                    return {
+                        rows: this.records,
+                        columns: ['id', 'name', 'email', 'branch', 'gpa'],
+                        message: `UPDATE records completed. ${updateCount} rows affected.`
+                    };
+                }
+
+                // DELETE matching
+                if (/^delete/i.test(queryClean)) {
+                    const match = queryClean.match(/^delete\s+from\s+students(?:\s+where\s+(.+))?$/i);
+                    if (!match) throw new Error("Unsupported DELETE query parameters syntax.");
+
+                    const whereClause = match[1] ? match[1].trim() : null;
+                    const preLength = this.records.length;
+
+                    if (whereClause) {
+                        this.records = this.records.filter(row => !this.checkRowMatchesCondition(row, whereClause));
+                    } else {
+                        this.records = []; // truncate
+                    }
+
+                    const deletedCount = preLength - this.records.length;
+
+                    return {
+                        rows: this.records,
+                        columns: ['id', 'name', 'email', 'branch', 'gpa'],
+                        message: `DELETE records operation complete. ${deletedCount} rows removed.`
+                    };
+                }
+
+                throw new Error("Unsupported query statement type. Use SELECT, INSERT, UPDATE, or DELETE.");
+            }
+
+            applyWhereFilter(rows, condition) {
+                return rows.filter(row => this.checkRowMatchesCondition(row, condition));
+            }
+
+            checkRowMatchesCondition(row, condition) {
+                // Strip parenthesises
+                const condClean = condition.replace(/[()]/g, '').trim();
+
+                // Check operators
+                const operators = ['>', '<', '=', '>=', '<='];
+                let matchedOp = null;
+
+                for (let op of operators) {
+                    if (condClean.includes(op)) {
+                        if (op === '>' && condClean.includes('>=')) continue;
+                        if (op === '<' && condClean.includes('<=')) continue;
+                        matchedOp = op;
+                        break;
+                    }
+                }
+
+                if (!matchedOp) throw new Error("Unsupported SQL operator condition inside WHERE filter.");
+
+                const parts = condClean.split(matchedOp);
+                const col = parts[0].trim();
+                let val = parts[1].trim().replace(/^['"]|['"]$/g, '');
+
+                if (!row.hasOwnProperty(col)) return false;
+
+                const rowVal = row[col];
+
+                if (col === 'gpa' || col === 'id') {
+                    val = parseFloat(val);
+                    if (matchedOp === '>') return rowVal > val;
+                    if (matchedOp === '<') return rowVal < val;
+                    if (matchedOp === '=') return rowVal === val;
+                    if (matchedOp === '>=') return rowVal >= val;
+                    if (matchedOp === '<=') return rowVal <= val;
+                } else {
+                    if (matchedOp === '=') return rowVal.toLowerCase() === val.toLowerCase();
+                }
+
+                return false;
+            }
+
+            renderResultsTable(rows, columns) {
+                const thead = document.querySelector('#l2-results-table thead');
+                const tbody = document.querySelector('#l2-results-table tbody');
+
+                thead.innerHTML = '';
+                tbody.innerHTML = '';
+
+                if (columns.length === 0) return;
+
+                const hr = document.createElement('tr');
+                columns.forEach(col => {
+                    const th = document.createElement('th');
+                    th.innerText = col;
+                    hr.appendChild(th);
+                });
+                thead.appendChild(hr);
+
+                if (rows.length === 0) {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.colSpan = columns.length;
+                    td.innerText = "[No records returned]";
+                    td.style.textAlign = 'center';
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                } else {
+                    rows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        columns.forEach(col => {
+                            const td = document.createElement('td');
+                            td.innerText = row[col] !== undefined ? row[col] : '';
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            updateSyntaxExplainer(sql) {
+                const title = document.getElementById('l2-syntax-cmd-name');
+                const desc = document.getElementById('l2-syntax-cmd-desc');
+                const ex = document.getElementById('l2-syntax-example');
+                const logs = document.getElementById('l2-syntax-clauses-log');
+
+                const sqlClean = sql.trim().toLowerCase();
+
+                if (sqlClean.startsWith('select')) {
+                    title.innerText = "SELECT Statement Syntax Explainer";
+                    desc.innerText = "Fetches and displays subsets of records matching condition options from tables.";
+                    ex.innerText = "SELECT columns FROM table WHERE condition;";
+                    logs.innerHTML = `
+            <ul style="padding-left:1.2rem; display:flex; flex-direction:column; gap:0.25rem;">
+              <li><strong>SELECT</strong>: Key command tag identifying columns elements to pull out.</li>
+              <li><strong>FROM</strong>: Declares the target table source containing rows data arrays.</li>
+              <li><strong>WHERE</strong>: Optional filters predicate. Filters rows using conditions.</li>
+            </ul>
+          `;
+                } else if (sqlClean.startsWith('insert')) {
+                    title.innerText = "INSERT INTO Statement Syntax Explainer";
+                    desc.innerText = "Appends new student records rows dynamically to database tables.";
+                    ex.innerText = "INSERT INTO table (col1, col2) VALUES (val1, val2);";
+                    logs.innerHTML = `
+            <ul style="padding-left:1.2rem; display:flex; flex-direction:column; gap:0.25rem;">
+              <li><strong>INSERT INTO</strong>: Target directory location path identifier command.</li>
+              <li><strong>(columns)</strong>: Exact order list mapping database columns bounds.</li>
+              <li><strong>VALUES</strong>: Data parameters variables mapped index-by-index with columns.</li>
+            </ul>
+          `;
+                } else if (sqlClean.startsWith('update')) {
+                    title.innerText = "UPDATE SET Statement Syntax Explainer";
+                    desc.innerText = "Modifies attribute values of existing matching rows in tables.";
+                    ex.innerText = "UPDATE table SET col1 = val1 WHERE condition;";
+                    logs.innerHTML = `
+            <ul style="padding-left:1.2rem; display:flex; flex-direction:column; gap:0.25rem;">
+              <li><strong>UPDATE table</strong>: Target database table schema modifier tag.</li>
+              <li><strong>SET</strong>: Explicit list of key=value pairs mapping modified fields.</li>
+              <li><strong>WHERE</strong>: Crucial safety filter. Modifies ALL table rows if omitted.</li>
+            </ul>
+          `;
+                } else if (sqlClean.startsWith('delete')) {
+                    title.innerText = "DELETE Statement Syntax Explainer";
+                    desc.innerText = "Removes records from database tables based on WHERE conditions.";
+                    ex.innerText = "DELETE FROM table WHERE condition;";
+                    logs.innerHTML = `
+            <ul style="padding-left:1.2rem; display:flex; flex-direction:column; gap:0.25rem;">
+              <li><strong>DELETE FROM</strong>: Removes matched table records.</li>
+              <li><strong>WHERE</strong>: Key safety clause. Truncates all rows inside table if left empty.</li>
+            </ul>
+          `;
+                }
+            }
+
+            generateVisualQuery() {
+                const select = document.getElementById('l2-vqb-select').value;
+                const table = document.getElementById('l2-vqb-from').value;
+                const cond = document.getElementById('l2-vqb-where').value;
+
+                let whereExpr = '';
+                if (cond === 'gpa_high') {
+                    whereExpr = ' WHERE gpa > 8.5';
+                } else if (cond === 'gpa_low') {
+                    whereExpr = ' WHERE gpa < 8.0';
+                } else if (cond === 'branch_cs') {
+                    whereExpr = " WHERE branch = 'Computer Science'";
+                }
+
+                const sql = `SELECT ${select} FROM ${table}${whereExpr};`;
+
+                document.getElementById('l2-sql-editor').value = sql;
+                this.updateSyntaxExplainer(sql);
+
+                const codeBox = document.getElementById('l2-code-box');
+                if (codeBox) codeBox.innerHTML = this.formatSQLCode(sql);
+            }
+
+            formatSQLCode(sqlText) {
+                let escaped = sqlText
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+
+                escaped = escaped
+                    .replace(/\b(SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|AND|OR|LIKE)\b/g, '<span class="kw">$1</span>')
+                    .replace(/(["'])(.*?)\1/g, '<span class="str">$1$2$1</span>')
+                    .replace(/\b(\d+(\.\d+)?)\b/g, '<span class="bi">$1</span>');
+
+                return escaped;
+            }
+
+            executeVisualBuilderQuery() {
+                this.generateVisualQuery();
+                this.executePlaygroundSQL();
+                this.act2Done = true;
+                this.checkLevelProgress();
+            }
+
+            checkLevelProgress() {
+                // Activity status matches
+            }
+        }
+
+        // ==========================================================================
+        // LEVEL 3: DATABASE STUDIO CONTROLLER
+        // ==========================================================================
+        class Level3Studio {
+            constructor() {
+                this.activeActivity = 1;
+
+                this.db = [];
+                this.resetDatabaseState();
+
+                this.lastQueryType = 'insert';
+                this.lastPythonHighlightLines = [];
+                this.flowTimer = null;
+            }
+
+            resetDatabaseState() {
+                this.db = [
+                    { id: 1, name: "Aarav Sharma", email: "aarav@university.edu", branch: "Computer Science", gpa: 9.1 },
+                    { id: 2, name: "Diya Patel", email: "diya@university.edu", branch: "Information Technology", gpa: 8.7 },
+                    { id: 3, name: "Kabir Singh", email: "kabir@university.edu", branch: "Electronics", gpa: 7.9 },
+                    { id: 4, name: "Ananya Rao", email: "ananya@university.edu", branch: "Computer Science", gpa: 9.4 }
+                ];
+
+                if (document.getElementById('l3-crud-table')) {
+                    this.renderCRUDTable();
+                    this.syncGeneratedCode();
+                }
+            }
+
+            switchActivity(num) {
+                this.activeActivity = num;
+
+                document.getElementById('l3-btn-act1').classList.toggle('active', num === 1);
+                document.getElementById('l3-btn-act2').classList.toggle('active', num === 2);
+
+                const crudPanel = document.getElementById('l3-panel-wrapper-crud');
+                const flowPanel = document.getElementById('l3-panel-wrapper-flow');
+
+                if (num === 1) {
+                    crudPanel.style.display = 'block';
+                    flowPanel.style.display = 'none';
+                    this.renderCRUDTable();
+                    this.syncGeneratedCode();
+                } else {
+                    crudPanel.style.display = 'none';
+                    flowPanel.style.display = 'block';
+                    this.resetFlowAnimation();
+                }
+            }
+
+            renderCRUDTable() {
+                const tbody = document.querySelector('#l3-crud-table tbody');
+                tbody.innerHTML = '';
+
+                this.db.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.style.cursor = 'pointer';
+                    tr.onclick = () => this.populateFormFields(row);
+                    tr.innerHTML = `
+            <td><strong>${row.id}</strong></td>
+            <td>${row.name}</td>
+            <td>${row.email}</td>
+            <td>${row.branch}</td>
+            <td>${row.gpa}</td>
+          `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            populateFormFields(row) {
+                document.getElementById('l3-crud-id').value = row.id;
+                document.getElementById('l3-crud-name').value = row.name;
+                document.getElementById('l3-crud-email').value = row.email;
+                document.getElementById('l3-crud-branch').value = row.branch;
+                document.getElementById('l3-crud-gpa').value = row.gpa;
+            }
+
+            executeCRUD(action) {
+                const idVal = document.getElementById('l3-crud-id').value.trim();
+                const nameVal = document.getElementById('l3-crud-name').value.trim();
+                const emailVal = document.getElementById('l3-crud-email').value.trim();
+                const branchVal = document.getElementById('l3-crud-branch').value;
+                const gpaVal = parseFloat(document.getElementById('l3-crud-gpa').value) || 0.0;
+
+                const id = parseInt(idVal);
+                this.lastQueryType = action;
+
+                if (action === 'insert') {
+                    if (!nameVal || !emailVal) {
+                        alert("Name and Email parameters are required to insert a record!");
+                        return;
+                    }
+                    const newId = this.db.length > 0 ? Math.max(...this.db.map(r => r.id)) + 1 : 1;
+                    this.db.push({ id: newId, name: nameVal, email: emailVal, branch: branchVal, gpa: gpaVal });
+                    this.showPopup("Success Alert", `Row successfully inserted with key id=${newId}`);
+                } else if (action === 'update') {
+                    if (!id) {
+                        alert("Explicit Student ID is required to perform update statements!");
+                        return;
+                    }
+                    const record = this.db.find(r => r.id === id);
+                    if (!record) {
+                        alert(`No student record found with key id=${id}`);
+                        return;
+                    }
+                    record.name = nameVal || record.name;
+                    record.email = emailVal || record.email;
+                    record.branch = branchVal;
+                    record.gpa = gpaVal;
+                    this.showPopup("Update Status", `Record id=${id} updated successfully.`);
+                } else if (action === 'delete') {
+                    if (!id) {
+                        alert("Explicit Student ID is required to perform delete statements!");
+                        return;
+                    }
+                    const idx = this.db.findIndex(r => r.id === id);
+                    if (idx === -1) {
+                        alert(`No student record found with key id=${id}`);
+                        return;
+                    }
+                    this.db.splice(idx, 1);
+                    this.showPopup("Delete Alert", `Record id=${id} removed from university database.`);
+                } else if (action === 'search') {
+                    if (!nameVal) {
+                        alert("Provide Name characters filter to query!");
+                        return;
+                    }
+                    const filtered = this.db.filter(r => r.name.toLowerCase().includes(nameVal.toLowerCase()));
+                    const tbody = document.querySelector('#l3-crud-table tbody');
+                    tbody.innerHTML = '';
+                    filtered.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+              <td><strong>${row.id}</strong></td>
+              <td>${row.name}</td>
+              <td>${row.email}</td>
+              <td>${row.branch}</td>
+              <td>${row.gpa}</td>
+            `;
+                        tbody.appendChild(tr);
+                    });
+                    this.syncGeneratedCode();
+                    return;
+                }
+
+                this.renderCRUDTable();
+                this.syncGeneratedCode();
+            }
+
+            showPopup(title, text) {
+                const overlay = document.getElementById('simulatedDialogOverlay');
+                document.getElementById('tk-dialog-title').innerText = title;
+                document.getElementById('tk-dialog-icon').innerText = "ℹ️";
+                document.getElementById('tk-dialog-text').innerText = text;
+                document.getElementById('tk-dialog-actions').innerHTML = `
+          <button class="btn btn-primary" onclick="document.getElementById('simulatedDialogOverlay').style.display='none'">OK</button>
+        `;
+                overlay.style.display = 'flex';
+            }
+
+            syncGeneratedCode() {
+                const sqlBox = document.getElementById('l3-sql-code-box');
+                const pyBox = document.getElementById('l3-python-code-box');
+
+                const idVal = document.getElementById('l3-crud-id').value.trim() || "NULL";
+                const nameVal = document.getElementById('l3-crud-name').value.trim() || "Student Name";
+                const emailVal = document.getElementById('l3-crud-email').value.trim() || "student@university.edu";
+                const branchVal = document.getElementById('l3-crud-branch').value;
+                const gpaVal = document.getElementById('l3-crud-gpa').value;
+
+                let sql = '';
+                let py = '';
+
+                if (this.lastQueryType === 'insert') {
+                    sql = `INSERT INTO students (name, email, branch, gpa) \nVALUES ('${nameVal}', '${emailVal}', '${branchVal}', ${gpaVal});`;
+
+                    py += `<span class="kw">import</span> mysql.connector\n\n`;
+                    py += `conn = mysql.connector.connect(host=<span class="str">"localhost"</span>, user=<span class="str">"root"</span>, database=<span class="str">"univ"</span>)\n`;
+                    py += `cursor = conn.cursor()\n\n`;
+                    py += `query = <span class="str">"INSERT INTO students (name, email, branch, gpa) VALUES (%s, %s, %s, %s)"</span>\n`;
+                    py += `values = (<span class="str">"${nameVal}"</span>, <span class="str">"${emailVal}"</span>, <span class="str">"${branchVal}"</span>, ${gpaVal})\n\n`;
+                    py += `<span class="highlight-line">cursor.execute(query, values)</span>\n`;
+                    py += `<span class="highlight-line">conn.commit()  # Required to finalize transactions</span>`;
+                } else if (this.lastQueryType === 'update') {
+                    sql = `UPDATE students \nSET name = '${nameVal}', email = '${emailVal}', branch = '${branchVal}', gpa = ${gpaVal} \nWHERE id = ${idVal};`;
+
+                    py += `<span class="kw">import</span> mysql.connector\n\n`;
+                    py += `conn = mysql.connector.connect(host=<span class="str">"localhost"</span>, database=<span class="str">"univ"</span>)\n`;
+                    py += `cursor = conn.cursor()\n\n`;
+                    py += `query = <span class="str">"UPDATE students SET name=%s, email=%s, branch=%s, gpa=%s WHERE id=%s"</span>\n`;
+                    py += `values = (<span class="str">"${nameVal}"</span>, <span class="str">"${emailVal}"</span>, <span class="str">"${branchVal}"</span>, ${gpaVal}, ${idVal})\n\n`;
+                    py += `<span class="highlight-line">cursor.execute(query, values)</span>\n`;
+                    py += `<span class="highlight-line">conn.commit()</span>`;
+                } else if (this.lastQueryType === 'delete') {
+                    sql = `DELETE FROM students WHERE id = ${idVal};`;
+
+                    py += `<span class="kw">import</span> mysql.connector\n\n`;
+                    py += `conn = mysql.connector.connect(host=<span class="str">"localhost"</span>)\n`;
+                    py += `cursor = conn.cursor()\n\n`;
+                    py += `query = <span class="str">"DELETE FROM students WHERE id = %s"</span>\n`;
+                    py += `values = (${idVal},)\n\n`;
+                    py += `<span class="highlight-line">cursor.execute(query, values)</span>\n`;
+                    py += `<span class="highlight-line">conn.commit()</span>`;
+                } else if (this.lastQueryType === 'search') {
+                    sql = `SELECT * FROM students WHERE name LIKE '%${nameVal}%';`;
+
+                    py += `<span class="kw">import</span> mysql.connector\n\n`;
+                    py += `conn = mysql.connector.connect(host=<span class="str">"localhost"</span>)\n`;
+                    py += `cursor = conn.cursor()\n\n`;
+                    py += `query = <span class="str">"SELECT * FROM students WHERE name LIKE %s"</span>\n`;
+                    py += `values = (<span class="str">"%${nameVal}%"</span>,)\n\n`;
+                    py += `<span class="highlight-line">cursor.execute(query, values)</span>\n`;
+                    py += `<span class="highlight-line">records = cursor.fetchall()</span>\n`;
+                    py += `<span class="kw">for</span> row <span class="kw">in</span> records:\n`;
+                    py += `    print(row)`;
+                }
+
+                sqlBox.innerText = sql;
+                pyBox.innerHTML = py;
+            }
+
+            startFlowAnimation() {
+                this.resetFlowAnimation();
+
+                let step = 0;
+                const nodes = ['form', 'python', 'cursor', 'sql', 'mysql', 'commit', 'success'];
+
+                this.flowTimer = setInterval(() => {
+                    if (step > 0) {
+                        document.getElementById(`l3-fa-${step}`).classList.add('active');
+                    }
+
+                    const activeNode = document.getElementById(`l3-fn-${nodes[step]}`);
+                    activeNode.classList.add('active', 'pulse-active');
+
+                    this.syncFlowHighlighterCode(step);
+
+                    step++;
+
+                    if (step === nodes.length) {
+                        clearInterval(this.flowTimer);
+                        this.flowTimer = null;
+                        alert("🎉 Database flow request pipeline animation trace completed successfully!");
+                    }
+                }, 1200);
+            }
+
+            resetFlowAnimation() {
+                clearInterval(this.flowTimer);
+                this.flowTimer = null;
+
+                ['form', 'python', 'cursor', 'sql', 'mysql', 'commit', 'success'].forEach(name => {
+                    const el = document.getElementById(`l3-fn-${name}`);
+                    if (el) el.classList.remove('active', 'pulse-active');
+                });
+
+                for (let i = 1; i <= 6; i++) {
+                    const arrow = document.getElementById(`l3-fa-${i}`);
+                    if (arrow) arrow.classList.remove('active');
+                }
+
+                this.syncFlowHighlighterCode(-1);
+            }
+
+            syncFlowHighlighterCode(step) {
+                const box = document.getElementById('l3-flow-code-box');
+
+                let py = '';
+                py += `import mysql.connector\n\n`;
+                py += `def execute_request():\n`;
+
+                const linesMap = {
+                    0: `    # Step 1: Capture form parameters input values\n    name = "Diya Sen"\n`,
+                    1: `    # Step 2: Access driver connection socket session\n    conn = mysql.connector.connect(host="localhost")\n`,
+                    2: `    # Step 3: Call cursor.execute handler helper\n    cursor = conn.cursor()\n`,
+                    3: `    # Step 4: Prepare target query statement string\n    sql = "INSERT INTO students (name) VALUES (%s)"\n    cursor.execute(sql, (name,))\n`,
+                    4: `    # Step 5: MySQL Server updates database indexes B-Tree structures\n`,
+                    5: `    # Step 6: connection.commit changes to files disk\n    conn.commit()\n`,
+                    6: `    # Step 7: Trigger frontend UI reload callback\n    print("Table updated. Record saved.")\n`
+                };
+
+                for (let i = 0; i <= 6; i++) {
+                    if (i === step) {
+                        py += `<span class="highlight-line">${linesMap[i]}</span>`;
+                    } else {
+                        py += linesMap[i];
+                    }
+                }
+
+                box.innerHTML = py;
+            }
+
+            finishStudioLevel() {
+                document.getElementById('level3').classList.remove('active');
+                document.getElementById('completion-screen').classList.add('active');
+
+                const tab = document.getElementById('btn-tab-3');
+                tab.classList.add('completed');
+            }
+        }
+
+        // Instantiation
+        let app, l1, l2, l3;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new AppController();
+            l1 = new Level1Explorer();
+            l2 = new Level2Playground();
+            l3 = new Level3Studio();
+
+            // Trigger initial loader
+            l1.switchActivity(1);
+        });
+    </script>
+</body>
+
+</html>
