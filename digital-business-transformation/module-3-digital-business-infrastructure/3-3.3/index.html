@@ -1,548 +1,1053 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 3.3 – Cloud Computing &amp; Virtualization</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3.3 – Cloud Computing &amp; Virtualization</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
-  :root {
-    color-scheme: light;
-    --primary: #E63946;
-    --primary-hover: #D62828;
-    --primary-light: rgba(230, 57, 70, 0.08);
-    --secondary: #FF4D6D;
-    --bg-page: #F8F9FA;
-    --bg-card: rgba(255, 255, 255, 0.9);
-    --bg-card-hover: #FFFFFF;
-    --text-main: #1D1D1F;
-    --text-muted: #6E6E73;
-    --border-light: rgba(0, 0, 0, 0.08);
-    --code-bg: #1E1E24;
-    --code-text: #F8F9FA;
-    --code-ok: #2A9D8F;
-    --code-warn: #E9C46A;
-    --code-err: #E63946;
-    --vendor-bg: #e5e5e5;
-    --user-bg: #E63946;
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
-    --radius-lg: 16px;
-    --radius-md: 10px;
-  }
+        :root {
+            color-scheme: light;
+            --primary: #E63946;
+            --primary-hover: #D62828;
+            --primary-light: rgba(230, 57, 70, 0.08);
+            --secondary: #FF4D6D;
+            --bg-page: #F8F9FA;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: #FFFFFF;
+            --text-main: #1D1D1F;
+            --text-muted: #6E6E73;
+            --border-light: rgba(0, 0, 0, 0.08);
+            --code-bg: #1E1E24;
+            --code-text: #F8F9FA;
+            --code-ok: #2A9D8F;
+            --code-warn: #E9C46A;
+            --code-err: #E63946;
+            --vendor-bg: #e5e5e5;
+            --user-bg: #E63946;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-page); color: var(--text-main); line-height: 1.6; scroll-behavior: smooth; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  /* ─── NAVIGATION ─── */
-  nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; gap: 1.5rem; z-index: 1000; padding: 0 2rem; }
-  .nav-brand { font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; color: var(--text-main); margin-right: auto; letter-spacing: -0.5px; }
-  .nav-brand span { color: var(--primary); }
-  nav a { text-decoration: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; transition: all 0.2s; padding: 0.4rem 0.8rem; border-radius: var(--radius-md); }
-  nav a:hover, nav a.active { color: var(--primary); background: var(--primary-light); }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
 
-  /* ─── COMPACT HERO ─── */
-  .hero { margin-top: 64px; padding: 2rem 2rem 1.5rem; text-align: center; background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%); }
-  .hero-badge { display: inline-block; padding: 0.3rem 0.8rem; background: var(--primary-light); color: var(--primary); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-radius: 99px; margin-bottom: 0.6rem; }
-  .hero h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.2; letter-spacing: -1px; margin-bottom: 0.5rem; }
-  .hero p { max-width: 600px; margin: 0 auto 1.2rem; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
-  .hero-stats { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
-  .hero-stat strong { display: block; font-family: 'Archivo Black', sans-serif; font-size: 1.3rem; color: var(--primary); }
-  .hero-stat span { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+        /* ─── NAVIGATION ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 1000;
+            padding: 0 2rem;
+        }
 
-  /* ─── LAYOUT & SECTIONS ─── */
-  .section { padding: 3rem 1.5rem; border-bottom: 1px solid var(--border-light); }
-  .container { max-width: 960px; margin: 0 auto; }
-  .section-header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem; }
-  .section-icon { font-size: 2.5rem; background: var(--bg-card); width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
-  .section-header h2 { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; letter-spacing: -0.5px; }
-  .section-header p { color: var(--text-muted); font-size: 0.95rem; }
-  .section-num { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: rgba(0, 0, 0, 0.08); }
+        .nav-brand {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-right: auto;
+            letter-spacing: -0.5px;
+        }
 
-  /* ─── LEVEL PILLS & CARDS ─── */
-  .level-pills { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-  .level-pill { background: var(--bg-card); border: 1px solid var(--border-light); padding: 0.6rem 1.2rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
-  .level-pill:hover { border-color: var(--primary); }
-  .level-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25); }
-  
-  .level-content { display: none; animation: fadeIn 0.3s ease; }
-  .level-content.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-brand span {
+            color: var(--primary);
+        }
 
-  .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); }
-  .card h3 { font-family: 'Archivo Black', sans-serif; font-size: 1.3rem; margin-bottom: 1rem; color: var(--text-main); }
-  
-  /* ─── CALLOUT BOXES ─── */
-  .info-box, .tip-box, .warn-box, .challenge-box { padding: 1rem 1.2rem; border-radius: var(--radius-md); font-size: 0.9rem; margin: 1.2rem 0; border-left: 4px solid; }
-  .info-box { background: rgba(42, 157, 143, 0.08); border-color: var(--code-ok); }
-  .tip-box { background: var(--primary-light); border-color: var(--primary); }
-  .warn-box { background: rgba(233, 196, 106, 0.15); border-color: var(--code-warn); }
-  
-  .challenge-box { background: #fff; border: 1px solid var(--border-light); padding: 1.5rem; }
-  .challenge-box h4 { font-size: 1.1rem; margin-bottom: 0.6rem; color: var(--text-main); }
-  
-  /* ─── QUIZZES ─── */
-  .quiz-option { display: block; width: 100%; text-align: left; background: var(--bg-page); border: 1px solid var(--border-light); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); margin: 0.5rem 0; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-  .quiz-option:hover { background: #fff; border-color: var(--primary); }
-  .quiz-feedback { margin-top: 0.8rem; font-size: 0.85rem; font-weight: 600; min-height: 1.2rem; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-md);
+        }
 
-  /* ─── INTERACTIVE ELEMENTS ─── */
-  .run-btn { background: var(--primary); color: #fff; border: none; padding: 0.8rem 1.6rem; border-radius: var(--radius-md); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
-  .run-btn:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3); }
-  .tk-entry { background: #fff; border: 1px solid var(--border-light); padding: 0.7rem 1rem; border-radius: var(--radius-md); font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; }
-  .tk-entry:focus { border-color: var(--primary); }
-  .tk-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; display: block; }
-  
-  .gauge-wrap { display: flex; gap: 2rem; margin-top: 1.2rem; flex-wrap: wrap; }
-  .gauge-num { font-family: 'Archivo Black', sans-serif; font-size: 2rem; color: var(--primary); }
-  .gauge-sub { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
-  .meter-bar { height: 10px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow: hidden; margin-top: 0.5rem; }
-  .meter-fill { height: 100%; transition: width 0.3s ease; }
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
 
-  /* ─── TERMINALS & PLAYGROUNDS ─── */
-  .playground { background: var(--code-bg); border-radius: var(--radius-lg); overflow: hidden; margin-top: 1.2rem; box-shadow: var(--shadow-md); }
-  .playground-header { background: rgba(255, 255, 255, 0.05); padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot-r { background: #FF5F56; } .dot-y { background: #FFBD2E; } .dot-g { background: #27C93F; }
-  .playground-title { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); margin-left: 0.5rem; }
-  .playground-output { padding: 1.2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--code-text); white-space: pre-wrap; max-height: 320px; overflow-y: auto; }
-  .out-info { color: #61AFEF; } .out-ok { color: var(--code-ok); }
+        /* ─── COMPACT HERO ─── */
+        .hero {
+            margin-top: 64px;
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+            background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%);
+        }
 
-  footer { text-align: center; padding: 3rem 1rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-light); margin-top: 2rem; }
-</style>
+        .hero-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 99px;
+            margin-bottom: 0.6rem;
+        }
+
+        .hero h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            max-width: 600px;
+            margin: 0 auto 1.2rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .hero-stat span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* ─── LAYOUT & SECTIONS ─── */
+        .section {
+            padding: 3rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+            background: var(--bg-card);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .section-num {
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ─── LEVEL PILLS & CARDS ─── */
+        .level-pills {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+        }
+
+        .level-pill.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+        }
+
+        .level-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .level-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card h3 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        /* ─── CALLOUT BOXES ─── */
+        .info-box,
+        .tip-box,
+        .warn-box,
+        .challenge-box {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            margin: 1.2rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box {
+            background: rgba(42, 157, 143, 0.08);
+            border-color: var(--code-ok);
+        }
+
+        .tip-box {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .warn-box {
+            background: rgba(233, 196, 106, 0.15);
+            border-color: var(--code-warn);
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+        }
+
+        .challenge-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-main);
+        }
+
+        /* ─── QUIZZES ─── */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: var(--bg-page);
+            border: 1px solid var(--border-light);
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-md);
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-option:hover {
+            background: #fff;
+            border-color: var(--primary);
+        }
+
+        .quiz-feedback {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 1.2rem;
+        }
+
+        /* ─── INTERACTIVE ELEMENTS ─── */
+        .run-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .run-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        }
+
+        .tk-entry {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .tk-entry:focus {
+            border-color: var(--primary);
+        }
+
+        .tk-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .gauge-wrap {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .gauge-num {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .gauge-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .meter-bar {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .meter-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* ─── TERMINALS & PLAYGROUNDS ─── */
+        .playground {
+            background: var(--code-bg);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 1.2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .playground-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-r {
+            background: #FF5F56;
+        }
+
+        .dot-y {
+            background: #FFBD2E;
+        }
+
+        .dot-g {
+            background: #27C93F;
+        }
+
+        .playground-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 0.5rem;
+        }
+
+        .playground-output {
+            padding: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--code-text);
+            white-space: pre-wrap;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .out-info {
+            color: #61AFEF;
+        }
+
+        .out-ok {
+            color: var(--code-ok);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+            margin-top: 2rem;
+        }
+    </style>
 </head>
+
 <body>
 
-<nav>
-  <div class="nav-brand">DB<span>/</span>MOD3</div>
-  <a href="3-3.3.html" class="active">3.3 Cloud</a>
-</nav>
+    <nav>
+        <div class="nav-brand">DB<span>/</span>MOD3</div>
+        <a href="3-3.3.html" class="active">3.3 Cloud</a>
+    </nav>
 
-<!-- COMPACT HERO BANNER -->
-<div class="hero">
-  <div class="hero-badge">Module 3.3 · Cloud Computing &amp; Virtualization</div>
-  <h1>Cloud Computing &amp; Virtualization</h1>
-  <p>Learn Cloud models, virtualization scaling, and shared responsibility strategies under dynamic business environments.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
-    <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
-    <div class="hero-stat"><strong>Live</strong><span>Simulator</span></div>
-  </div>
-</div>
-
-<!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
-<div class="section" id="theory-board">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-icon">📖</div>
-      <div>
-        <h2>Dave Chaffey's Reference Board</h2>
-        <p>Concise e-business cloud computing definitions</p>
-      </div>
-      <span class="section-num">Ref</span>
+    <!-- COMPACT HERO BANNER -->
+    <div class="hero">
+        <div class="hero-badge">Module 3.3 · Cloud Computing &amp; Virtualization</div>
+        <h1>Cloud Computing &amp; Virtualization</h1>
+        <p>Learn Cloud models, virtualization scaling, and shared responsibility strategies under dynamic business
+            environments.</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
+            <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
+            <div class="hero-stat"><strong>Live</strong><span>Simulator</span></div>
+        </div>
     </div>
 
-    <div class="card">
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
-        <div><strong>Cloud Computing:</strong> On-demand delivery of virtualized servers, database ledgers, and networks over public or private lines.</div>
-        <div><strong>Virtualization:</strong> Software hypervisor layer dividing physical server nodes into isolated VM client instances.</div>
-        <div><strong>IaaS:</strong> Raw virtualized servers, storage, and networking. You manage core OS runtimes and SQL databases.</div>
-        <div><strong>PaaS:</strong> Managed server runtime containers. You deploy app code; vendors control OS patches and capacity.</div>
-        <div><strong>SaaS:</strong> Turnkey business software consumed on subscription models directly inside client web browsers.</div>
-        <div><strong>Public Cloud:</strong> Shared virtualization compute pools hosted by third-party vendors and shared globally.</div>
-        <div><strong>Private Cloud:</strong> Dedicated server arrays hosted exclusively for one enterprise to maximize security barriers.</div>
-        <div><strong>Hybrid Cloud:</strong> Configuration uniting public cloud auto-scaling nodes with private on-premise silos.</div>
-        <div><strong>Multi-cloud:</strong> Utilizing separate public cloud providers to prevent server vendor locking.</div>
-      </div>
-    </div>
-  </div>
-</div>
+    <!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
+    <div class="section" id="theory-board">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">📖</div>
+                <div>
+                    <h2>Dave Chaffey's Reference Board</h2>
+                    <p>Concise e-business cloud computing definitions</p>
+                </div>
+                <span class="section-num">Ref</span>
+            </div>
 
-<!-- SIMULATION TASKS -->
-<div class="section" id="sec33">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-icon">☁️</div>
-      <div>
-        <h2>3.3 – Cloud Strategy &amp; Virtualization</h2>
-        <p>Interactive Cloud Adoption Strategy Game</p>
-      </div>
-      <span class="section-num">3.3</span>
-    </div>
-
-    <!-- LEVEL PILLS -->
-    <div class="level-pills" id="lp33">
-      <button class="level-pill active" onclick="switchLevel('33',1)">L1 Strategy Investigator</button>
-      <button class="level-pill" onclick="switchLevel('33',2)">L2 Cloud Consultant</button>
-      <button class="level-pill" onclick="switchLevel('33',3)">L3 CDTO Command Challenge</button>
-    </div>
-
-    <!-- PROGRESS TRACKER -->
-    <div class="progress-wrap">
-      <div class="progress-label"><span id="prog33-label">Level 1 of 3</span><span id="prog33-pct">33%</span></div>
-      <div class="progress-bar"><div class="progress-fill" id="prog33" style="width:33%"></div></div>
+            <div class="card">
+                <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+                    <div><strong>Cloud Computing:</strong> On-demand delivery of virtualized servers, database ledgers,
+                        and networks over public or private lines.</div>
+                    <div><strong>Virtualization:</strong> Software hypervisor layer dividing physical server nodes into
+                        isolated VM client instances.</div>
+                    <div><strong>IaaS:</strong> Raw virtualized servers, storage, and networking. You manage core OS
+                        runtimes and SQL databases.</div>
+                    <div><strong>PaaS:</strong> Managed server runtime containers. You deploy app code; vendors control
+                        OS patches and capacity.</div>
+                    <div><strong>SaaS:</strong> Turnkey business software consumed on subscription models directly
+                        inside client web browsers.</div>
+                    <div><strong>Public Cloud:</strong> Shared virtualization compute pools hosted by third-party
+                        vendors and shared globally.</div>
+                    <div><strong>Private Cloud:</strong> Dedicated server arrays hosted exclusively for one enterprise
+                        to maximize security barriers.</div>
+                    <div><strong>Hybrid Cloud:</strong> Configuration uniting public cloud auto-scaling nodes with
+                        private on-premise silos.</div>
+                    <div><strong>Multi-cloud:</strong> Utilizing separate public cloud providers to prevent server
+                        vendor locking.</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- LEVEL 1: CLOUD STRATEGY INVESTIGATOR -->
-    <div class="level-content active" id="lc33-1">
-      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-        <span class="hero-badge">Level 1 Mission Brief</span>
-        <h3>Cloud Strategy Investigator</h3>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-          Role: Junior Digital Transformation Analyst. Several organizations are experiencing critical IT blocks. Investigate symptoms and determine appropriate cloud models.
-        </p>
-      </div>
+    <!-- SIMULATION TASKS -->
+    <div class="section" id="sec33">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">☁️</div>
+                <div>
+                    <h2>3.3 – Cloud Strategy &amp; Virtualization</h2>
+                    <p>Interactive Cloud Adoption Strategy Game</p>
+                </div>
+                <span class="section-num">3.3</span>
+            </div>
 
-      <div class="card">
-        <h3 id="l1-round-title">Round 1 of 3</h3>
-        <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
-          <h4 id="l1-case-title">Loading case...</h4>
-          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;" id="l1-case-meta">
-            <!-- Details -->
-          </div>
+            <!-- LEVEL PILLS -->
+            <div class="level-pills" id="lp33">
+                <button class="level-pill active" onclick="switchLevel('33',1)">L1 Strategy Investigator</button>
+                <button class="level-pill" onclick="switchLevel('33',2)">L2 Cloud Consultant</button>
+                <button class="level-pill" onclick="switchLevel('33',3)">L3 CDTO Command Challenge</button>
+            </div>
 
-          <!-- Selectors -->
-          <div id="l1-selectors" style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
-            <!-- Injected by JS -->
-          </div>
+            <!-- PROGRESS TRACKER -->
+            <div class="progress-wrap">
+                <div class="progress-label"><span id="prog33-label">Level 1 of 3</span><span id="prog33-pct">33%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="prog33" style="width:33%"></div>
+                </div>
+            </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Diagnose Issue</button>
-            <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(1)">💡 Need Help?</button>
-          </div>
+            <!-- LEVEL 1: CLOUD STRATEGY INVESTIGATOR -->
+            <div class="level-content active" id="lc33-1">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 1 Mission Brief</span>
+                    <h3>Cloud Strategy Investigator</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Role: Junior Digital Transformation Analyst. Several organizations are experiencing critical IT
+                        blocks. Investigate symptoms and determine appropriate cloud models.
+                    </p>
+                </div>
 
-          <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
-          <div class="quiz-feedback" id="qf-l1" style="margin-top:1.2rem;"></div>
+                <div class="card">
+                    <h3 id="l1-round-title">Round 1 of 3</h3>
+                    <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
+                        <h4 id="l1-case-title">Loading case...</h4>
+                        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;"
+                            id="l1-case-meta">
+                            <!-- Details -->
+                        </div>
 
-          <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1rem;" onclick="nextL1Round()">Next Challenge ➔</button>
+                        <!-- Selectors -->
+                        <div id="l1-selectors"
+                            style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+                            <!-- Injected by JS -->
+                        </div>
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Diagnose
+                                Issue</button>
+                            <button class="run-btn"
+                                style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                                onclick="toggleHint(1)">💡 Need Help?</button>
+                        </div>
+
+                        <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
+                        <div class="quiz-feedback" id="qf-l1" style="margin-top:1.2rem;"></div>
+
+                        <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1rem;"
+                            onclick="nextL1Round()">Next Challenge ➔</button>
+                    </div>
+
+                    <!-- HUD -->
+                    <div class="gauge-wrap"
+                        style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <div>
+                            <div class="gauge-num" id="l1-hud-analysis">0%</div>
+                            <div class="gauge-sub">Business Analysis</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l1-hud-accuracy">0%</div>
+                            <div class="gauge-sub">Decision Accuracy</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l1-hud-strategic">0%</div>
+                            <div class="gauge-sub">Strategic Thinking</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l1-hud-readiness">0%</div>
+                            <div class="gauge-sub">Cloud Readiness</div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL NAVIGATION -->
+                    <div
+                        style="display:flex; justify-content:flex-end; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('33', 2)">Go
+                            to Level 2 ➔</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 2: CLOUD TRANSFORMATION CONSULTANT -->
+            <div class="level-content" id="lc33-2">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 2 Mission Brief</span>
+                    <h3>Cloud Transformation Consultant</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Role: Senior Cloud Transformation Consultant. Develop cloud strategy roadmaps for organizations
+                        with competing requirements.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <span class="tk-label">Select Active Client Profile:</span>
+                    <select id="l2CaseSelect" class="tk-entry" style="width: 100%; margin-bottom: 1.2rem;"
+                        onchange="changeL2Case()">
+                        <option value="streaming">Global Streaming Company (Scale/Speed)</option>
+                        <option value="healthcare">Healthcare Provider (Privacy/Backup)</option>
+                        <option value="university">University Campus (Budget/Research)</option>
+                    </select>
+
+                    <div class="challenge-box" style="margin-top:0;">
+                        <h4 id="l2-title">Global Streaming Company</h4>
+                        <p id="l2-desc" style="color: var(--text-muted); margin-top:0.4rem; font-size:0.95rem;"></p>
+                        <div style="margin-top:1rem; font-weight:700; font-size:0.95rem; color:var(--primary);">
+                            Available Strategy Budget: <span id="l2-budget-count">₹100,000</span>
+                        </div>
+                    </div>
+
+                    <!-- EVENT TRIGGER NOTIFICATION -->
+                    <div class="warn-box" id="l2-event-alert" style="display:none;">
+                        <strong>🚨 DYNAMIC CONSTRAINTS SPIKE</strong>
+                        <p id="l2-event-text" style="font-size:0.85rem; margin-top:0.3rem;"></p>
+                    </div>
+
+                    <!-- TOOL LIST CHECKLIST -->
+                    <div style="margin-top:1.5rem;">
+                        <span class="tk-label">Select Strategy Components:</span>
+                        <div id="l2-tech-list"
+                            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                            <!-- Dynamically populated checkboxes -->
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" id="l2-submit-btn" onclick="submitL2Evaluation()">▶ Compile Strategy
+                            Blueprint</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(2)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l2" style="margin-top:1.2rem;"></div>
+
+                    <!-- HUD GAUGE -->
+                    <div class="gauge-wrap"
+                        style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <div>
+                            <div class="gauge-num" id="l2-hud-agility">0%</div>
+                            <div class="gauge-sub">Business Agility</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-hud-readiness">0%</div>
+                            <div class="gauge-sub">Cloud Readiness</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-hud-alignment">0%</div>
+                            <div class="gauge-sub">Strategic Align</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-hud-efficiency">0%</div>
+                            <div class="gauge-sub">Cost Efficiency</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-hud-innovation">0%</div>
+                            <div class="gauge-sub">Innovation</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l2-hud-cx">0%</div>
+                            <div class="gauge-sub">Customer Experience</div>
+                        </div>
+                    </div>
+
+                    <div id="l2-reinforcement" style="display:none; margin-top: 1.5rem;"></div>
+
+                    <!-- LEVEL NAVIGATION -->
+                    <div
+                        style="display:flex; justify-content:space-between; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('33', 1)">⬅
+                            Go to Level 1</button>
+                        <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('33', 3)">Go
+                            to Level 3 ➔</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 3: CDTO COMMAND CHALLENGE -->
+            <div class="level-content" id="lc33-3">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge" id="l3-phase-badge">Year 1 of 10</span>
+                    <h3>Digital Enterprise Transformation Simulator</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Role: Chief Digital Transformation Officer (CDTO). Lead a multinational retail company's
+                        modernization across 10 business years.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="challenge-box" style="margin-top:0;" id="l3-challenge-box">
+                        <h4 id="l3-phase-title">Year 1: Legacy Assessment</h4>
+                        <p id="l3-phase-text" style="color: var(--text-muted); margin-top:0.5rem; font-size:0.95rem;">
+                        </p>
+                    </div>
+
+                    <div id="l3-selectors"
+                        style="display:grid; grid-template-columns:1fr; gap:1rem; margin-top:1.5rem;">
+                        <!-- Dropdowns injected by JS -->
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Deploy Strategy</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(3)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l3" style="margin-top:1.2rem;"></div>
+
+                    <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1rem;"
+                        onclick="proceedL3NextPhase()">Proceed to Next Year ➔</button>
+
+                    <!-- DASHBOARD HUD -->
+                    <div class="gauge-wrap"
+                        style="margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                        <div>
+                            <div class="gauge-num" id="l3-hud-agility">0%</div>
+                            <div class="gauge-sub">Agility</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-innovation">0%</div>
+                            <div class="gauge-sub">Innovation Speed</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-cx">0%</div>
+                            <div class="gauge-sub">CX Score</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-readiness">0%</div>
+                            <div class="gauge-sub">Readiness</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-efficiency">0%</div>
+                            <div class="gauge-sub">Cost Efficiency</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-continuity">0%</div>
+                            <div class="gauge-sub">Continuity</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-alignment">0%</div>
+                            <div class="gauge-sub">Strategic Align</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-advantage">0%</div>
+                            <div class="gauge-sub">Advantage</div>
+                        </div>
+                        <div>
+                            <div class="gauge-num" id="l3-hud-progress">0%</div>
+                            <div class="gauge-sub">Progress</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAYGROUND OUTPUT (Blueprints) -->
+                <div class="playground" id="l3Playground" style="display:none;">
+                    <div class="playground-header">
+                        <div class="dot dot-r"></div>
+                        <div class="dot dot-y"></div>
+                        <div class="dot dot-g"></div><span class="playground-title">enterprise_roadmap.yaml</span>
+                    </div>
+                    <div class="playground-output" id="l3Out"></div>
+                </div>
+
+                <!-- CONSULTING REPORT OUTPUT -->
+                <div class="card" id="l3-report-card" style="display:none;">
+                    <!-- Compiled on Year 10 simulation completion -->
+                </div>
+
+                <!-- LEVEL NAVIGATION -->
+                <div
+                    style="display:flex; justify-content:flex-start; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                    <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('33', 2)">⬅ Go to
+                        Level 2</button>
+                </div>
+            </div>
         </div>
-
-        <!-- HUD -->
-        <div class="gauge-wrap" style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-          <div><div class="gauge-num" id="l1-hud-analysis">0%</div><div class="gauge-sub">Business Analysis</div></div>
-          <div><div class="gauge-num" id="l1-hud-accuracy">0%</div><div class="gauge-sub">Decision Accuracy</div></div>
-          <div><div class="gauge-num" id="l1-hud-strategic">0%</div><div class="gauge-sub">Strategic Thinking</div></div>
-          <div><div class="gauge-num" id="l1-hud-readiness">0%</div><div class="gauge-sub">Cloud Readiness</div></div>
-        </div>
-
-        <!-- LEVEL NAVIGATION -->
-        <div style="display:flex; justify-content:flex-end; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-          <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('33', 2)">Go to Level 2 ➔</button>
-        </div>
-      </div>
     </div>
 
-    <!-- LEVEL 2: CLOUD TRANSFORMATION CONSULTANT -->
-    <div class="level-content" id="lc33-2">
-      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-        <span class="hero-badge">Level 2 Mission Brief</span>
-        <h3>Cloud Transformation Consultant</h3>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-          Role: Senior Cloud Transformation Consultant. Develop cloud strategy roadmaps for organizations with competing requirements.
-        </p>
-      </div>
+    <footer>
+        Digital Business Simulation Series · <strong>Module 3.3 — Cloud Computing &amp; Virtualization</strong>
+    </footer>
 
-      <div class="card">
-        <span class="tk-label">Select Active Client Profile:</span>
-        <select id="l2CaseSelect" class="tk-entry" style="width: 100%; margin-bottom: 1.2rem;" onchange="changeL2Case()">
-          <option value="streaming">Global Streaming Company (Scale/Speed)</option>
-          <option value="healthcare">Healthcare Provider (Privacy/Backup)</option>
-          <option value="university">University Campus (Budget/Research)</option>
-        </select>
+    <script>
+        /* ─── GENERAL UI & NAVIGATION ─── */
+        function switchLevel(secId, targetLevel) {
+            document.querySelectorAll(`#lp${secId} .level-pill`).forEach((pill, idx) => pill.classList.toggle('active', (idx + 1) === targetLevel));
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`lc${secId}-${i}`);
+                if (el) el.classList.toggle('active', i === targetLevel);
+            }
+            const pct = Math.round((targetLevel / 3) * 100);
+            const label = document.getElementById(`prog${secId}-label`);
+            const pctEl = document.getElementById(`prog${secId}-pct`);
+            const bar = document.getElementById(`prog${secId}`);
+            if (label) label.textContent = `Level ${targetLevel} of 3`;
+            if (pctEl) pctEl.textContent = `${pct}%`;
+            if (bar) bar.style.width = `${pct}%`;
+        }
 
-        <div class="challenge-box" style="margin-top:0;">
-          <h4 id="l2-title">Global Streaming Company</h4>
-          <p id="l2-desc" style="color: var(--text-muted); margin-top:0.4rem; font-size:0.95rem;"></p>
-          <div style="margin-top:1rem; font-weight:700; font-size:0.95rem; color:var(--primary);">
-            Available Strategy Budget: <span id="l2-budget-count">₹100,000</span>
-          </div>
-        </div>
+        /* ─── HINTS SYSTEM ─── */
+        const hints = {
+            1: {
+                1: "Physical server overhead causes bottlenecks. Hybrid hosting enables core database siloing with dynamic public cloud scaling.",
+                2: "Startups have low resources. SaaS options bypass hardware Capex, and PaaS allows code pushes without server admin roles.",
+                3: "Sensitive government data mandates isolated private cloud configurations to ensure strict compliance gates."
+            },
+            2: {
+                streaming: "Streaming relies on high scalability. Select Public Cloud, Multi-cloud structures, PaaS hosting platforms, Caching pipelines, and Redundancy backups. Avoid high-overhead Private hardware silos.",
+                healthcare: "Health portals prioritize confidentiality. Purchase Private Cloud databases, Hybrid data synchronization pipelines, IaaS hosting, Redundancy, and Backup infrastructure.",
+                university: "Universities operate under strict budget limits. Ensure you select Public cloud, Hybrid links, SaaS course software, PaaS compute platforms, and caching pipelines."
+            },
+            3: "Year 1: Migrate low-risk marketing PaaS nodes first. Year 2: Use auto-scaling. Year 5: Redesign data flows via Hybrid configurations."
+        };
 
-        <!-- EVENT TRIGGER NOTIFICATION -->
-        <div class="warn-box" id="l2-event-alert" style="display:none;">
-          <strong>🚨 DYNAMIC CONSTRAINTS SPIKE</strong>
-          <p id="l2-event-text" style="font-size:0.85rem; margin-top:0.3rem;"></p>
-        </div>
+        function toggleHint(level) {
+            let box = null;
+            let text = "";
 
-        <!-- TOOL LIST CHECKLIST -->
-        <div style="margin-top:1.5rem;">
-          <span class="tk-label">Select Strategy Components:</span>
-          <div id="l2-tech-list" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-            <!-- Dynamically populated checkboxes -->
-          </div>
-        </div>
+            if (level === 1) {
+                box = document.getElementById('l1-hint-box');
+                text = hints[1][l1Round];
+            } else if (level === 2) {
+                box = document.getElementById('l2-hint-box');
+                const caseKey = document.getElementById('l2CaseSelect').value;
+                text = hints[2][caseKey];
+            } else {
+                box = document.getElementById('l3-hint-box');
+                text = hints[3];
+            }
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-          <button class="run-btn" id="l2-submit-btn" onclick="submitL2Evaluation()">▶ Compile Strategy Blueprint</button>
-          <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(2)">💡 Need Help?</button>
-        </div>
+            if (box) {
+                box.style.display = box.style.display === 'none' ? 'block' : 'none';
+                box.innerHTML = `<strong>💡 Consulting Hint:</strong><br>${text}`;
+            }
+        }
 
-        <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
-        <div class="quiz-feedback" id="qf-l2" style="margin-top:1.2rem;"></div>
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
 
-        <!-- HUD GAUGE -->
-        <div class="gauge-wrap" style="margin-top:1.5rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-          <div><div class="gauge-num" id="l2-hud-agility">0%</div><div class="gauge-sub">Business Agility</div></div>
-          <div><div class="gauge-num" id="l2-hud-readiness">0%</div><div class="gauge-sub">Cloud Readiness</div></div>
-          <div><div class="gauge-num" id="l2-hud-alignment">0%</div><div class="gauge-sub">Strategic Align</div></div>
-          <div><div class="gauge-num" id="l2-hud-efficiency">0%</div><div class="gauge-sub">Cost Efficiency</div></div>
-          <div><div class="gauge-num" id="l2-hud-innovation">0%</div><div class="gauge-sub">Innovation</div></div>
-          <div><div class="gauge-num" id="l2-hud-cx">0%</div><div class="gauge-sub">Customer Experience</div></div>
-        </div>
+        /* ─── LEVEL 1: STRATEGY INVESTIGATOR ─── */
+        const l1Cases = {
+            1: {
+                title: "Investigation 1: Traditional Retail Chain",
+                type: "Retail Storefront",
+                symptoms: "High server maintenance expenses. Software rollouts take weeks. Storefront crashes during festival traffic spikes.",
+                infra: "Physical localized office servers, manually patched.",
+                selectors: [
+                    {
+                        id: "l1-sel-cause", label: "Identify Root Cause", options: [
+                            { val: "legacy_overhead", text: "Manual server patch routines and static capacity limits" },
+                            { val: "bad_ui", text: "Poor customer visual layouts and checkout form friction" },
+                            { val: "no_vpn", text: "Missing internal corporate virtual network channels" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-deploy", label: "deployment Model Recommendation", options: [
+                            { val: "hybrid", text: "Hybrid Cloud (Public frontend scaling with private database nodes)" },
+                            { val: "private", text: "Private Cloud (Siloed internal networks only)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-service", label: "Service Model Recommendation", options: [
+                            { val: "paas_iaas", text: "PaaS runtimes & IaaS database virtualization instances" },
+                            { val: "saas", text: "SaaS licensing packages" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-benefit", label: "Identify Business Benefit", options: [
+                            { val: "elasticity", text: "Elastic scaling during shopping surges and rapid code rollouts" },
+                            { val: "data_silo", text: "Total isolated protection from customer transactions" }
+                        ]
+                    }
+                ],
+                correct: { "l1-sel-cause": "legacy_overhead", "l1-sel-deploy": "hybrid", "l1-sel-service": "paas_iaas", "l1-sel-benefit": "elasticity" },
+                correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Integrates public cloud peak scalability with private database nodes.<br>• <strong>Agility:</strong> Runtimes auto-deploy in days rather than weeks.<br>• <strong>Scalability:</strong> Public frontends scale dynamically during festivals.<br>• <strong>Customer Experience:</strong> Prevents system crashes and shopping cart queues.<br>• <strong>Textbook Concept:</strong> <em>Hybrid Cloud systems integration</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Keeping systems physical or using private-only clouds bottlenecks peak holiday traffic.<br>• <strong>Consequences:</strong> The website crashes during shopping sales, driving customer abandonment.<br>• <strong>Better Strategy:</strong> A Hybrid Cloud strategy (public frontends + private databases) balances agility and scale.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Infrastructure Scaling</em> - aligning compute capacity with dynamic user loads."
+            },
+            2: {
+                title: "Investigation 2: Rapidly Growing Fintech Startup",
+                type: "Financial Mobile App",
+                symptoms: "Limited IT support staff. Low strategy budgets. Unpredictable user spikes with plans for global expansions.",
+                infra: "No physical local server rooms, starting from scratch.",
+                selectors: [
+                    {
+                        id: "l1-sel-cause", label: "Identify Root Cause", options: [
+                            { val: "resource_shortage", text: "Lack of IT infrastructure scale budget and operational resources" },
+                            { val: "high_latency", text: "Excessive client round-trip packet transport delays" },
+                            { val: "db_index", text: "Inefficient database catalog indexes" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-deploy", label: "deployment Model Recommendation", options: [
+                            { val: "public", text: "Public Cloud (Shared multi-tenant hyperscaler grids)" },
+                            { val: "private", text: "Private Cloud (Isolated localized hosting arrays)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-service", label: "Service Model Recommendation", options: [
+                            { val: "saas_paas", text: "SaaS for operations, PaaS container runtimes for app code" },
+                            { val: "iaas", text: "IaaS raw servers with manual operating system updates" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-benefit", label: "Identify Business Benefit", options: [
+                            { val: "cost_agility", text: "Bypassing hardware CapEx and allowing fast market releases" },
+                            { val: "isolation", text: "Custom hypervisor configuration control" }
+                        ]
+                    }
+                ],
+                correct: { "l1-sel-cause": "resource_shortage", "l1-sel-deploy": "public", "l1-sel-service": "saas_paas", "l1-sel-benefit": "cost_agility" },
+                correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Bypasses massive hardware CapEx, offloading server administration to the host.<br>• <strong>Agility:</strong> Small IT teams focus 100% on app code instead of server patches.<br>• <strong>Scalability:</strong> Public cloud scales automatically as customers grow.<br>• <strong>Customer Experience:</strong> Fast global load times via local CDN caching links.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler Public Utility Billing</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Setting up local datacenters or running raw virtual machines requires large support teams.<br>• <strong>Consequences:</strong> Starves seed budgets on server maintenance, delaying app releases.<br>• <strong>Better Strategy:</strong> Public Cloud using SaaS (operations) and PaaS (app container runtime) is optimal.<br>• <strong>Dave Chaffey Principle:</strong> <em>Infrastructure Outsourcing</em> - utilizing public cloud tiers to conserve startup resources."
+            },
+            3: {
+                title: "Investigation 3: National Security Registry",
+                type: "Government Citizen Portal",
+                symptoms: "Strict data privacy legislation prohibits citizen records from crossing borders. Hackers frequently target login endpoints.",
+                infra: "Shared third-party virtual machine networks.",
+                selectors: [
+                    {
+                        id: "l1-sel-cause", label: "Identify Root Cause", options: [
+                            { val: "sovereignty", text: "Compliance risks of shared multi-tenant database systems" },
+                            { val: "slow_loading", text: "Excessive static image load latencies" },
+                            { val: "routing", text: "Incorrect domain name resolution records" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-deploy", label: "deployment Model Recommendation", options: [
+                            { val: "private", text: "Private Cloud (Dedicated secure server infrastructure)" },
+                            { val: "public", text: "Public Cloud (Hyperscaler shared grids)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-service", label: "Service Model Recommendation", options: [
+                            { val: "iaas", text: "IaaS (Ensuring full root operating system registry control)" },
+                            { val: "saas", text: "SaaS (Consuming standardized pre-built databases)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-benefit", label: "Identify Business Benefit", options: [
+                            { val: "strict_compliance", text: "Uncompromising compliance with national privacy data laws" },
+                            { val: "elasticity", text: "Auto-provisioning client backend server capacity" }
+                        ]
+                    }
+                ],
+                correct: { "l1-sel-cause": "sovereignty", "l1-sel-deploy": "private", "l1-sel-service": "iaas", "l1-sel-benefit": "strict_compliance" },
+                correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Dedicated private cloud instances satisfy national data residency regulations.<br>• <strong>Agility:</strong> Grants security teams full administrative root access to logs.<br>• <strong>Scalability:</strong> Scales securely within internal corporate clusters.<br>• <strong>Customer Experience:</strong> Citizens securely access portals without trust warnings.<br>• <strong>Textbook Concept:</strong> <em>Private sovereign database siloing</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Hosting sensitive registry files in multi-tenant public environments violates security laws.<br>• <strong>Consequences:</strong> Large data breaches, compliance fines, and loss of public confidence.<br>• <strong>Better Strategy:</strong> Private Cloud hosting coupled with administrative IaaS OS controls.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Security Management</em> - establishing secure isolated hosting boundaries."
+            }
+        };
 
-        <div id="l2-reinforcement" style="display:none; margin-top: 1.5rem;"></div>
+        let l1Round = 1;
+        let l1Score = 0;
 
-        <!-- LEVEL NAVIGATION -->
-        <div style="display:flex; justify-content:space-between; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-          <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('33', 1)">⬅ Go to Level 1</button>
-          <button class="run-btn" style="background:var(--secondary);" onclick="switchLevel('33', 3)">Go to Level 3 ➔</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- LEVEL 3: CDTO COMMAND CHALLENGE -->
-    <div class="level-content" id="lc33-3">
-      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-        <span class="hero-badge" id="l3-phase-badge">Year 1 of 10</span>
-        <h3>Digital Enterprise Transformation Simulator</h3>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-          Role: Chief Digital Transformation Officer (CDTO). Lead a multinational retail company's modernization across 10 business years.
-        </p>
-      </div>
-
-      <div class="card">
-        <div class="challenge-box" style="margin-top:0;" id="l3-challenge-box">
-          <h4 id="l3-phase-title">Year 1: Legacy Assessment</h4>
-          <p id="l3-phase-text" style="color: var(--text-muted); margin-top:0.5rem; font-size:0.95rem;"></p>
-        </div>
-
-        <div id="l3-selectors" style="display:grid; grid-template-columns:1fr; gap:1rem; margin-top:1.5rem;">
-          <!-- Dropdowns injected by JS -->
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-          <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Deploy Strategy</button>
-          <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(3)">💡 Need Help?</button>
-        </div>
-
-        <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
-        <div class="quiz-feedback" id="qf-l3" style="margin-top:1.2rem;"></div>
-
-        <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1rem;" onclick="proceedL3NextPhase()">Proceed to Next Year ➔</button>
-
-        <!-- DASHBOARD HUD -->
-        <div class="gauge-wrap" style="margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-          <div><div class="gauge-num" id="l3-hud-agility">0%</div><div class="gauge-sub">Agility</div></div>
-          <div><div class="gauge-num" id="l3-hud-innovation">0%</div><div class="gauge-sub">Innovation Speed</div></div>
-          <div><div class="gauge-num" id="l3-hud-cx">0%</div><div class="gauge-sub">CX Score</div></div>
-          <div><div class="gauge-num" id="l3-hud-readiness">0%</div><div class="gauge-sub">Readiness</div></div>
-          <div><div class="gauge-num" id="l3-hud-efficiency">0%</div><div class="gauge-sub">Cost Efficiency</div></div>
-          <div><div class="gauge-num" id="l3-hud-continuity">0%</div><div class="gauge-sub">Continuity</div></div>
-          <div><div class="gauge-num" id="l3-hud-alignment">0%</div><div class="gauge-sub">Strategic Align</div></div>
-          <div><div class="gauge-num" id="l3-hud-advantage">0%</div><div class="gauge-sub">Advantage</div></div>
-          <div><div class="gauge-num" id="l3-hud-progress">0%</div><div class="gauge-sub">Progress</div></div>
-        </div>
-      </div>
-
-      <!-- PLAYGROUND OUTPUT (Blueprints) -->
-      <div class="playground" id="l3Playground" style="display:none;">
-        <div class="playground-header"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><span class="playground-title">enterprise_roadmap.yaml</span></div>
-        <div class="playground-output" id="l3Out"></div>
-      </div>
-
-      <!-- CONSULTING REPORT OUTPUT -->
-      <div class="card" id="l3-report-card" style="display:none;">
-        <!-- Compiled on Year 10 simulation completion -->
-      </div>
-
-      <!-- LEVEL NAVIGATION -->
-      <div style="display:flex; justify-content:flex-start; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-        <button class="run-btn" style="background:var(--text-muted);" onclick="switchLevel('33', 2)">⬅ Go to Level 2</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<footer>
-  Digital Business Simulation Series · <strong>Module 3.3 — Cloud Computing &amp; Virtualization</strong>
-</footer>
-
-<script>
-/* ─── GENERAL UI & NAVIGATION ─── */
-function switchLevel(secId, targetLevel) {
-  document.querySelectorAll(`#lp${secId} .level-pill`).forEach((pill, idx) => pill.classList.toggle('active', (idx + 1) === targetLevel));
-  for (let i = 1; i <= 3; i++) {
-    const el = document.getElementById(`lc${secId}-${i}`);
-    if (el) el.classList.toggle('active', i === targetLevel);
-  }
-  const pct = Math.round((targetLevel / 3) * 100);
-  const label = document.getElementById(`prog${secId}-label`);
-  const pctEl = document.getElementById(`prog${secId}-pct`);
-  const bar = document.getElementById(`prog${secId}`);
-  if (label) label.textContent = `Level ${targetLevel} of 3`;
-  if (pctEl) pctEl.textContent = `${pct}%`;
-  if (bar) bar.style.width = `${pct}%`;
-}
-
-/* ─── HINTS SYSTEM ─── */
-const hints = {
-  1: {
-    1: "Physical server overhead causes bottlenecks. Hybrid hosting enables core database siloing with dynamic public cloud scaling.",
-    2: "Startups have low resources. SaaS options bypass hardware Capex, and PaaS allows code pushes without server admin roles.",
-    3: "Sensitive government data mandates isolated private cloud configurations to ensure strict compliance gates."
-  },
-  2: {
-    streaming: "Streaming relies on high scalability. Select Public Cloud, Multi-cloud structures, PaaS hosting platforms, Caching pipelines, and Redundancy backups. Avoid high-overhead Private hardware silos.",
-    healthcare: "Health portals prioritize confidentiality. Purchase Private Cloud databases, Hybrid data synchronization pipelines, IaaS hosting, Redundancy, and Backup infrastructure.",
-    university: "Universities operate under strict budget limits. Ensure you select Public cloud, Hybrid links, SaaS course software, PaaS compute platforms, and caching pipelines."
-  },
-  3: "Year 1: Migrate low-risk marketing PaaS nodes first. Year 2: Use auto-scaling. Year 5: Redesign data flows via Hybrid configurations."
-};
-
-function toggleHint(level) {
-  let box = null;
-  let text = "";
-
-  if (level === 1) {
-    box = document.getElementById('l1-hint-box');
-    text = hints[1][l1Round];
-  } else if (level === 2) {
-    box = document.getElementById('l2-hint-box');
-    const caseKey = document.getElementById('l2CaseSelect').value;
-    text = hints[2][caseKey];
-  } else {
-    box = document.getElementById('l3-hint-box');
-    text = hints[3];
-  }
-
-  if (box) {
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    box.innerHTML = `<strong>💡 Consulting Hint:</strong><br>${text}`;
-  }
-}
-
-function shuffleArray(array) {
-  let arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-/* ─── LEVEL 1: STRATEGY INVESTIGATOR ─── */
-const l1Cases = {
-  1: {
-    title: "Investigation 1: Traditional Retail Chain",
-    type: "Retail Storefront",
-    symptoms: "High server maintenance expenses. Software rollouts take weeks. Storefront crashes during festival traffic spikes.",
-    infra: "Physical localized office servers, manually patched.",
-    selectors: [
-      { id: "l1-sel-cause", label: "Identify Root Cause", options: [
-        { val: "legacy_overhead", text: "Manual server patch routines and static capacity limits" },
-        { val: "bad_ui", text: "Poor customer visual layouts and checkout form friction" },
-        { val: "no_vpn", text: "Missing internal corporate virtual network channels" }
-      ]},
-      { id: "l1-sel-deploy", label: "deployment Model Recommendation", options: [
-        { val: "hybrid", text: "Hybrid Cloud (Public frontend scaling with private database nodes)" },
-        { val: "private", text: "Private Cloud (Siloed internal networks only)" }
-      ]},
-      { id: "l1-sel-service", label: "Service Model Recommendation", options: [
-        { val: "paas_iaas", text: "PaaS runtimes & IaaS database virtualization instances" },
-        { val: "saas", text: "SaaS licensing packages" }
-      ]},
-      { id: "l1-sel-benefit", label: "Identify Business Benefit", options: [
-        { val: "elasticity", text: "Elastic scaling during shopping surges and rapid code rollouts" },
-        { val: "data_silo", text: "Total isolated protection from customer transactions" }
-      ]}
-    ],
-    correct: { "l1-sel-cause": "legacy_overhead", "l1-sel-deploy": "hybrid", "l1-sel-service": "paas_iaas", "l1-sel-benefit": "elasticity" },
-    correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Integrates public cloud peak scalability with private database nodes.<br>• <strong>Agility:</strong> Runtimes auto-deploy in days rather than weeks.<br>• <strong>Scalability:</strong> Public frontends scale dynamically during festivals.<br>• <strong>Customer Experience:</strong> Prevents system crashes and shopping cart queues.<br>• <strong>Textbook Concept:</strong> <em>Hybrid Cloud systems integration</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Keeping systems physical or using private-only clouds bottlenecks peak holiday traffic.<br>• <strong>Consequences:</strong> The website crashes during shopping sales, driving customer abandonment.<br>• <strong>Better Strategy:</strong> A Hybrid Cloud strategy (public frontends + private databases) balances agility and scale.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Infrastructure Scaling</em> - aligning compute capacity with dynamic user loads."
-  },
-  2: {
-    title: "Investigation 2: Rapidly Growing Fintech Startup",
-    type: "Financial Mobile App",
-    symptoms: "Limited IT support staff. Low strategy budgets. Unpredictable user spikes with plans for global expansions.",
-    infra: "No physical local server rooms, starting from scratch.",
-    selectors: [
-      { id: "l1-sel-cause", label: "Identify Root Cause", options: [
-        { val: "resource_shortage", text: "Lack of IT infrastructure scale budget and operational resources" },
-        { val: "high_latency", text: "Excessive client round-trip packet transport delays" },
-        { val: "db_index", text: "Inefficient database catalog indexes" }
-      ]},
-      { id: "l1-sel-deploy", label: "deployment Model Recommendation", options: [
-        { val: "public", text: "Public Cloud (Shared multi-tenant hyperscaler grids)" },
-        { val: "private", text: "Private Cloud (Isolated localized hosting arrays)" }
-      ]},
-      { id: "l1-sel-service", label: "Service Model Recommendation", options: [
-        { val: "saas_paas", text: "SaaS for operations, PaaS container runtimes for app code" },
-        { val: "iaas", text: "IaaS raw servers with manual operating system updates" }
-      ]},
-      { id: "l1-sel-benefit", label: "Identify Business Benefit", options: [
-        { val: "cost_agility", text: "Bypassing hardware CapEx and allowing fast market releases" },
-        { val: "isolation", text: "Custom hypervisor configuration control" }
-      ]}
-    ],
-    correct: { "l1-sel-cause": "resource_shortage", "l1-sel-deploy": "public", "l1-sel-service": "saas_paas", "l1-sel-benefit": "cost_agility" },
-    correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Bypasses massive hardware CapEx, offloading server administration to the host.<br>• <strong>Agility:</strong> Small IT teams focus 100% on app code instead of server patches.<br>• <strong>Scalability:</strong> Public cloud scales automatically as customers grow.<br>• <strong>Customer Experience:</strong> Fast global load times via local CDN caching links.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler Public Utility Billing</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Setting up local datacenters or running raw virtual machines requires large support teams.<br>• <strong>Consequences:</strong> Starves seed budgets on server maintenance, delaying app releases.<br>• <strong>Better Strategy:</strong> Public Cloud using SaaS (operations) and PaaS (app container runtime) is optimal.<br>• <strong>Dave Chaffey Principle:</strong> <em>Infrastructure Outsourcing</em> - utilizing public cloud tiers to conserve startup resources."
-  },
-  3: {
-    title: "Investigation 3: National Security Registry",
-    type: "Government Citizen Portal",
-    symptoms: "Strict data privacy legislation prohibits citizen records from crossing borders. Hackers frequently target login endpoints.",
-    infra: "Shared third-party virtual machine networks.",
-    selectors: [
-      { id: "l1-sel-cause", label: "Identify Root Cause", options: [
-        { val: "sovereignty", text: "Compliance risks of shared multi-tenant database systems" },
-        { val: "slow_loading", text: "Excessive static image load latencies" },
-        { val: "routing", text: "Incorrect domain name resolution records" }
-      ]},
-      { id: "l1-sel-deploy", label: "deployment Model Recommendation", options: [
-        { val: "private", text: "Private Cloud (Dedicated secure server infrastructure)" },
-        { val: "public", text: "Public Cloud (Hyperscaler shared grids)" }
-      ]},
-      { id: "l1-sel-service", label: "Service Model Recommendation", options: [
-        { val: "iaas", text: "IaaS (Ensuring full root operating system registry control)" },
-        { val: "saas", text: "SaaS (Consuming standardized pre-built databases)" }
-      ]},
-      { id: "l1-sel-benefit", label: "Identify Business Benefit", options: [
-        { val: "strict_compliance", text: "Uncompromising compliance with national privacy data laws" },
-        { val: "elasticity", text: "Auto-provisioning client backend server capacity" }
-      ]}
-    ],
-    correct: { "l1-sel-cause": "sovereignty", "l1-sel-deploy": "private", "l1-sel-service": "iaas", "l1-sel-benefit": "strict_compliance" },
-    correctFeedback: "<strong>✓ Case Solved!</strong><br>• <strong>Why it works:</strong> Dedicated private cloud instances satisfy national data residency regulations.<br>• <strong>Agility:</strong> Grants security teams full administrative root access to logs.<br>• <strong>Scalability:</strong> Scales securely within internal corporate clusters.<br>• <strong>Customer Experience:</strong> Citizens securely access portals without trust warnings.<br>• <strong>Textbook Concept:</strong> <em>Private sovereign database siloing</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Hosting sensitive registry files in multi-tenant public environments violates security laws.<br>• <strong>Consequences:</strong> Large data breaches, compliance fines, and loss of public confidence.<br>• <strong>Better Strategy:</strong> Private Cloud hosting coupled with administrative IaaS OS controls.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Security Management</em> - establishing secure isolated hosting boundaries."
-  }
-};
-
-let l1Round = 1;
-let l1Score = 0;
-
-function renderL1Round() {
-  const c = l1Cases[l1Round];
-  document.getElementById('l1-round-title').textContent = `Round ${l1Round} of 3`;
-  document.getElementById('l1-case-title').textContent = c.title;
-  document.getElementById('l1-case-meta').innerHTML = `
+        function renderL1Round() {
+            const c = l1Cases[l1Round];
+            document.getElementById('l1-round-title').textContent = `Round ${l1Round} of 3`;
+            document.getElementById('l1-case-title').textContent = c.title;
+            document.getElementById('l1-case-meta').innerHTML = `
     <div><strong>Business Profile:</strong> ${c.type}</div>
     <div><strong>Current Environment:</strong> ${c.infra}</div>
     <div style="grid-column:1/-1;"><strong>Symptoms:</strong> ${c.symptoms}</div>
   `;
-  document.getElementById('qf-l1').innerHTML = "";
-  document.getElementById('nextL1Btn').style.display = "none";
-  document.getElementById('l1-hint-box').style.display = "none";
-  document.getElementById('l1-submit-btn').disabled = false;
+            document.getElementById('qf-l1').innerHTML = "";
+            document.getElementById('nextL1Btn').style.display = "none";
+            document.getElementById('l1-hint-box').style.display = "none";
+            document.getElementById('l1-submit-btn').disabled = false;
 
-  const selectors = document.getElementById('l1-selectors');
-  selectors.innerHTML = "";
+            const selectors = document.getElementById('l1-selectors');
+            selectors.innerHTML = "";
 
-  c.selectors.forEach(sel => {
-    let jumbled = shuffleArray(sel.options);
-    let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
-    selectors.innerHTML += `
+            c.selectors.forEach(sel => {
+                let jumbled = shuffleArray(sel.options);
+                let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+                selectors.innerHTML += `
       <div>
         <span class="tk-label">${sel.label}</span>
         <select id="${sel.id}" class="tk-entry" style="width:100%;">
@@ -550,47 +1055,47 @@ function renderL1Round() {
         </select>
       </div>
     `;
-  });
-}
+            });
+        }
 
-function submitL1Answer() {
-  const c = l1Cases[l1Round];
-  const feedback = document.getElementById('qf-l1');
+        function submitL1Answer() {
+            const c = l1Cases[l1Round];
+            const feedback = document.getElementById('qf-l1');
 
-  const cause = document.getElementById('l1-sel-cause').value;
-  const deploy = document.getElementById('l1-sel-deploy').value;
-  const service = document.getElementById('l1-sel-service').value;
-  const benefit = document.getElementById('l1-sel-benefit').value;
+            const cause = document.getElementById('l1-sel-cause').value;
+            const deploy = document.getElementById('l1-sel-deploy').value;
+            const service = document.getElementById('l1-sel-service').value;
+            const benefit = document.getElementById('l1-sel-benefit').value;
 
-  const isCorrect = (cause === c.correct["l1-sel-cause"] && deploy === c.correct["l1-sel-deploy"] && service === c.correct["l1-sel-service"] && benefit === c.correct["l1-sel-benefit"]);
+            const isCorrect = (cause === c.correct["l1-sel-cause"] && deploy === c.correct["l1-sel-deploy"] && service === c.correct["l1-sel-service"] && benefit === c.correct["l1-sel-benefit"]);
 
-  if (isCorrect) {
-    l1Score++;
-    feedback.style.color = "var(--code-ok)";
-    feedback.innerHTML = c.correctFeedback;
-    document.getElementById('l1-submit-btn').disabled = true;
-    document.getElementById('nextL1Btn').style.display = "inline-flex";
-  } else {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = c.incorrectFeedback;
-  }
+            if (isCorrect) {
+                l1Score++;
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = c.correctFeedback;
+                document.getElementById('l1-submit-btn').disabled = true;
+                document.getElementById('nextL1Btn').style.display = "inline-flex";
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = c.incorrectFeedback;
+            }
 
-  // Update HUD
-  const accuracy = Math.round((l1Score / l1Round) * 100);
-  document.getElementById('l1-hud-analysis').textContent = isCorrect ? "100%" : "30%";
-  document.getElementById('l1-hud-accuracy').textContent = `${accuracy}%`;
-  document.getElementById('l1-hud-strategic').textContent = isCorrect ? "95%" : "40%";
-  document.getElementById('l1-hud-readiness').textContent = `${l1Score * 33}%`;
-}
+            // Update HUD
+            const accuracy = Math.round((l1Score / l1Round) * 100);
+            document.getElementById('l1-hud-analysis').textContent = isCorrect ? "100%" : "30%";
+            document.getElementById('l1-hud-accuracy').textContent = `${accuracy}%`;
+            document.getElementById('l1-hud-strategic').textContent = isCorrect ? "95%" : "40%";
+            document.getElementById('l1-hud-readiness').textContent = `${l1Score * 33}%`;
+        }
 
-function nextL1Round() {
-  l1Round++;
-  if (l1Round <= 3) {
-    renderL1Round();
-  } else {
-    unlockBadge('badge-expert', '🏆 Cloud Strategy Investigator');
-    const container = document.getElementById('l1-game-box');
-    container.innerHTML = `
+        function nextL1Round() {
+            l1Round++;
+            if (l1Round <= 3) {
+                renderL1Round();
+            } else {
+                unlockBadge('badge-expert', '🏆 Cloud Strategy Investigator');
+                const container = document.getElementById('l1-game-box');
+                container.innerHTML = `
       <div class="info-box" style="margin-top:0;">
         <h4>🎉 Level 1 Completed! Cloud Strategy Investigator Badge Unlocked 🏆</h4>
         <p style="margin-top:0.4rem;">You have diagnosed client cases and mapped appropriate cloud models:</p>
@@ -604,95 +1109,95 @@ function nextL1Round() {
         <button class="run-btn" onclick="switchLevel('33', 2)">Proceed to Level 2: Cloud Consultant ➔</button>
       </div>
     `;
-  }
-}
+            }
+        }
 
-/* ─── LEVEL 2: CLOUD TRANSFORMATION CONSULTANT ─── */
-const l2Cases = {
-  streaming: {
-    title: "Global Video Streaming Company",
-    desc: "Requirements: Millions of users, high availability, continuous innovation, global expansion, cost efficiency.",
-    budget: 100000,
-    technologies: [
-      { id: "public", text: "Public Hyperscaler Cloud Compute", cost: 30000 },
-      { id: "private", text: "Private Office Server Mainframe", cost: 40000 },
-      { id: "multi", text: "Multi-cloud vendor replication", cost: 20000 },
-      { id: "iaas", text: "IaaS Raw VM Hosting Instance", cost: 20000 },
-      { id: "paas", text: "PaaS Auto-scaling Runtime Containers", cost: 20000 },
-      { id: "saas", text: "SaaS turn-key subscription packages", cost: 15000 },
-      { id: "caching", text: "Cloud-native caching pipelines", cost: 10000 },
-      { id: "redundancy", text: "Redundant active multi-zone replica", cost: 15000 }
-    ],
-    correct: ["public", "multi", "paas", "caching", "redundancy"], // Total: ₹95,000
-    eventText: "Customer traffic suddenly doubles! Competitors launch lower latency video channels.",
-    eventCorrect: ["public", "multi", "paas", "caching", "redundancy"],
-    correctFeedback: "<strong>✓ Strategy Confirmed!</strong><br>• <strong>Why it works:</strong> Distributes massive video workloads close to global customer lines.<br>• <strong>Agility/Scalability/CX:</strong> Multi-cloud safeguards 99.99% uptime, while CDNs offload origin database queues.<br>• <strong>Textbook Concept:</strong> <em>Global dynamic content delivery architectures</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Restricting streaming to private server cabinets bottlenecks during traffic peaks.<br>• <strong>Consequences:</strong> Spikes latency and client drop-offs, depleting subscriber counts.<br>• <strong>Better Strategy:</strong> Public hyperscalers using PaaS runtime environments and CDNs.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Infrastructure Scaling</em>."
-  },
-  healthcare: {
-    title: "Healthcare Provider Registry",
-    desc: "Requirements: Patient privacy, regulatory compliance, AI-assisted diagnosis, remote doctors, disaster backups.",
-    budget: 90000,
-    technologies: [
-      { id: "public", text: "Public Hyperscaler Cloud Compute", cost: 30000 },
-      { id: "private", text: "Private Dedicated Secure Cloud", cost: 30000 },
-      { id: "hybrid", text: "Hybrid Data Synchronization", cost: 10000 },
-      { id: "iaas", text: "IaaS Secure Root VM Platform", cost: 20000 },
-      { id: "paas", text: "PaaS Auto-scaling Runtime Containers", cost: 20000 },
-      { id: "saas", text: "SaaS Patient Billing packages", cost: 15000 },
-      { id: "caching", text: "Cloud-native caching pipelines", cost: 10000 },
-      { id: "redundancy", text: "Redundant Database Backups", cost: 15000 }
-    ],
-    correct: ["private", "hybrid", "iaas", "saas", "redundancy"], // Total: ₹90,000
-    eventText: "New privacy legislation mandates local residency checks for health files.",
-    eventCorrect: ["private", "hybrid", "iaas", "saas", "redundancy"],
-    correctFeedback: "<strong>✓ Strategy Confirmed!</strong><br>• <strong>Why it works:</strong> Dedicated private databases protect patient file privacy while secure hybrid links synchronize logs.<br>• <strong>Agility/Scalability/CX:</strong> Redundant clusters secure systems during primary outages.<br>• <strong>Textbook Concept:</strong> <em>Hybrid Data Siloing & Compliance</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Storing patient files on public SaaS databases violates compliance regulations.<br>• <strong>Consequences:</strong> Data leaks, legal lawsuits, and administrative compliance penalties.<br>• <strong>Better Strategy:</strong> Private cloud infrastructure paired with IaaS administrative control.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Security Governance</em>."
-  },
-  university: {
-    title: "University Campus Portal",
-    desc: "Requirements: Student portal, learning systems, research clusters, strict budget constraints.",
-    budget: 75000,
-    technologies: [
-      { id: "public", text: "Public Hyperscaler Cloud Compute", cost: 20000 },
-      { id: "private", text: "Private Dedicated Campus Server", cost: 30000 },
-      { id: "hybrid", text: "Hybrid Data Synchronization", cost: 10000 },
-      { id: "iaas", text: "IaaS Linux Research Instance", cost: 15000 },
-      { id: "paas", text: "PaaS developer environment nodes", cost: 15000 },
-      { id: "saas", text: "SaaS Class management software", cost: 15000 },
-      { id: "caching", text: "Cloud-native caching pipelines", cost: 10000 },
-      { id: "redundancy", text: "Redundant Database Backups", cost: 15000 }
-    ],
-    correct: ["public", "hybrid", "paas", "saas", "caching"], // Total: ₹75,000
-    eventText: "Budget reduced by 20% mid-semester!",
-    eventCorrect: ["public", "hybrid", "paas", "saas", "caching"],
-    correctFeedback: "<strong>✓ Strategy Confirmed!</strong><br>• <strong>Why it works:</strong> Low-cost public compute hosts portals while SaaS tools run course registration.<br>• <strong>Agility/Scalability/CX:</strong> PaaS developer sandboxes run student research clusters within budget limits.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler resource pools allocation</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Overprovisioning private physical mainframe racks exceeds university capital budgets.<br>• <strong>Consequences:</strong> Exhausts strategy funds, forcing team lay-offs and project freezes.<br>• <strong>Better Strategy:</strong> Public Cloud PaaS and SaaS subscriptions.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Cost Optimization</em>."
-  }
-};
+        /* ─── LEVEL 2: CLOUD TRANSFORMATION CONSULTANT ─── */
+        const l2Cases = {
+            streaming: {
+                title: "Global Video Streaming Company",
+                desc: "Requirements: Millions of users, high availability, continuous innovation, global expansion, cost efficiency.",
+                budget: 100000,
+                technologies: [
+                    { id: "public", text: "Public Hyperscaler Cloud Compute", cost: 30000 },
+                    { id: "private", text: "Private Office Server Mainframe", cost: 40000 },
+                    { id: "multi", text: "Multi-cloud vendor replication", cost: 20000 },
+                    { id: "iaas", text: "IaaS Raw VM Hosting Instance", cost: 20000 },
+                    { id: "paas", text: "PaaS Auto-scaling Runtime Containers", cost: 20000 },
+                    { id: "saas", text: "SaaS turn-key subscription packages", cost: 15000 },
+                    { id: "caching", text: "Cloud-native caching pipelines", cost: 10000 },
+                    { id: "redundancy", text: "Redundant active multi-zone replica", cost: 15000 }
+                ],
+                correct: ["public", "multi", "paas", "caching", "redundancy"], // Total: ₹95,000
+                eventText: "Customer traffic suddenly doubles! Competitors launch lower latency video channels.",
+                eventCorrect: ["public", "multi", "paas", "caching", "redundancy"],
+                correctFeedback: "<strong>✓ Strategy Confirmed!</strong><br>• <strong>Why it works:</strong> Distributes massive video workloads close to global customer lines.<br>• <strong>Agility/Scalability/CX:</strong> Multi-cloud safeguards 99.99% uptime, while CDNs offload origin database queues.<br>• <strong>Textbook Concept:</strong> <em>Global dynamic content delivery architectures</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Restricting streaming to private server cabinets bottlenecks during traffic peaks.<br>• <strong>Consequences:</strong> Spikes latency and client drop-offs, depleting subscriber counts.<br>• <strong>Better Strategy:</strong> Public hyperscalers using PaaS runtime environments and CDNs.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Infrastructure Scaling</em>."
+            },
+            healthcare: {
+                title: "Healthcare Provider Registry",
+                desc: "Requirements: Patient privacy, regulatory compliance, AI-assisted diagnosis, remote doctors, disaster backups.",
+                budget: 90000,
+                technologies: [
+                    { id: "public", text: "Public Hyperscaler Cloud Compute", cost: 30000 },
+                    { id: "private", text: "Private Dedicated Secure Cloud", cost: 30000 },
+                    { id: "hybrid", text: "Hybrid Data Synchronization", cost: 10000 },
+                    { id: "iaas", text: "IaaS Secure Root VM Platform", cost: 20000 },
+                    { id: "paas", text: "PaaS Auto-scaling Runtime Containers", cost: 20000 },
+                    { id: "saas", text: "SaaS Patient Billing packages", cost: 15000 },
+                    { id: "caching", text: "Cloud-native caching pipelines", cost: 10000 },
+                    { id: "redundancy", text: "Redundant Database Backups", cost: 15000 }
+                ],
+                correct: ["private", "hybrid", "iaas", "saas", "redundancy"], // Total: ₹90,000
+                eventText: "New privacy legislation mandates local residency checks for health files.",
+                eventCorrect: ["private", "hybrid", "iaas", "saas", "redundancy"],
+                correctFeedback: "<strong>✓ Strategy Confirmed!</strong><br>• <strong>Why it works:</strong> Dedicated private databases protect patient file privacy while secure hybrid links synchronize logs.<br>• <strong>Agility/Scalability/CX:</strong> Redundant clusters secure systems during primary outages.<br>• <strong>Textbook Concept:</strong> <em>Hybrid Data Siloing & Compliance</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Storing patient files on public SaaS databases violates compliance regulations.<br>• <strong>Consequences:</strong> Data leaks, legal lawsuits, and administrative compliance penalties.<br>• <strong>Better Strategy:</strong> Private cloud infrastructure paired with IaaS administrative control.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Security Governance</em>."
+            },
+            university: {
+                title: "University Campus Portal",
+                desc: "Requirements: Student portal, learning systems, research clusters, strict budget constraints.",
+                budget: 75000,
+                technologies: [
+                    { id: "public", text: "Public Hyperscaler Cloud Compute", cost: 20000 },
+                    { id: "private", text: "Private Dedicated Campus Server", cost: 30000 },
+                    { id: "hybrid", text: "Hybrid Data Synchronization", cost: 10000 },
+                    { id: "iaas", text: "IaaS Linux Research Instance", cost: 15000 },
+                    { id: "paas", text: "PaaS developer environment nodes", cost: 15000 },
+                    { id: "saas", text: "SaaS Class management software", cost: 15000 },
+                    { id: "caching", text: "Cloud-native caching pipelines", cost: 10000 },
+                    { id: "redundancy", text: "Redundant Database Backups", cost: 15000 }
+                ],
+                correct: ["public", "hybrid", "paas", "saas", "caching"], // Total: ₹75,000
+                eventText: "Budget reduced by 20% mid-semester!",
+                eventCorrect: ["public", "hybrid", "paas", "saas", "caching"],
+                correctFeedback: "<strong>✓ Strategy Confirmed!</strong><br>• <strong>Why it works:</strong> Low-cost public compute hosts portals while SaaS tools run course registration.<br>• <strong>Agility/Scalability/CX:</strong> PaaS developer sandboxes run student research clusters within budget limits.<br>• <strong>Textbook Concept:</strong> <em>Hyperscaler resource pools allocation</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Overprovisioning private physical mainframe racks exceeds university capital budgets.<br>• <strong>Consequences:</strong> Exhausts strategy funds, forcing team lay-offs and project freezes.<br>• <strong>Better Strategy:</strong> Public Cloud PaaS and SaaS subscriptions.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Business Cost Optimization</em>."
+            }
+        };
 
-let l2ActiveAttempt = 1;
+        let l2ActiveAttempt = 1;
 
-function changeL2Case() {
-  l2ActiveAttempt = 1;
-  document.getElementById('l2-event-alert').style.display = "none";
-  document.getElementById('qf-l2').innerHTML = "";
-  document.getElementById('l2-reinforcement').style.display = "none";
+        function changeL2Case() {
+            l2ActiveAttempt = 1;
+            document.getElementById('l2-event-alert').style.display = "none";
+            document.getElementById('qf-l2').innerHTML = "";
+            document.getElementById('l2-reinforcement').style.display = "none";
 
-  const key = document.getElementById('l2CaseSelect').value;
-  const c = l2Cases[key];
+            const key = document.getElementById('l2CaseSelect').value;
+            const c = l2Cases[key];
 
-  document.getElementById('l2-title').textContent = c.title;
-  document.getElementById('l2-desc').textContent = c.desc;
-  document.getElementById('l2-budget-count').textContent = `₹${c.budget.toLocaleString()}`;
+            document.getElementById('l2-title').textContent = c.title;
+            document.getElementById('l2-desc').textContent = c.desc;
+            document.getElementById('l2-budget-count').textContent = `₹${c.budget.toLocaleString()}`;
 
-  // Render checkboxes
-  const container = document.getElementById('l2-tech-list');
-  container.innerHTML = "";
+            // Render checkboxes
+            const container = document.getElementById('l2-tech-list');
+            container.innerHTML = "";
 
-  let jumbled = shuffleArray(c.technologies);
-  jumbled.forEach(tech => {
-    container.innerHTML += `
+            let jumbled = shuffleArray(c.technologies);
+            jumbled.forEach(tech => {
+                container.innerHTML += `
       <div class="concept-card" id="l2-card-${tech.id}" style="display:flex; align-items:center; gap:0.8rem; padding: 0.8rem 1.2rem; cursor:pointer; border: 1px solid var(--border-light); border-radius: var(--radius-md); transition: all 0.2s;" onclick="toggleL2Checkbox('${tech.id}')">
         <input type="checkbox" id="l2-chk-${tech.id}" value="${tech.id}" style="pointer-events:none;" onchange="updateL2BudgetLive()">
         <div style="flex-grow:1;">
@@ -701,111 +1206,111 @@ function changeL2Case() {
         </div>
       </div>
     `;
-  });
+            });
 
-  resetL2HUD();
-}
+            resetL2HUD();
+        }
 
-function toggleL2Checkbox(id) {
-  const chk = document.getElementById(`l2-chk-${id}`);
-  if (chk) {
-    chk.checked = !chk.checked;
-    const card = document.getElementById(`l2-card-${id}`);
-    if (card) {
-      card.style.borderColor = chk.checked ? "var(--code-ok)" : "var(--border-light)";
-      card.style.background = chk.checked ? "rgba(42, 157, 143, 0.04)" : "#fff";
-    }
-    updateL2BudgetLive();
-  }
-}
+        function toggleL2Checkbox(id) {
+            const chk = document.getElementById(`l2-chk-${id}`);
+            if (chk) {
+                chk.checked = !chk.checked;
+                const card = document.getElementById(`l2-card-${id}`);
+                if (card) {
+                    card.style.borderColor = chk.checked ? "var(--code-ok)" : "var(--border-light)";
+                    card.style.background = chk.checked ? "rgba(42, 157, 143, 0.04)" : "#fff";
+                }
+                updateL2BudgetLive();
+            }
+        }
 
-function updateL2BudgetLive() {
-  const key = document.getElementById('l2CaseSelect').value;
-  const c = l2Cases[key];
+        function updateL2BudgetLive() {
+            const key = document.getElementById('l2CaseSelect').value;
+            const c = l2Cases[key];
 
-  let currentSpend = 0;
-  c.technologies.forEach(tech => {
-    const chk = document.getElementById(`l2-chk-${tech.id}`);
-    if (chk && chk.checked) {
-      currentSpend += tech.cost;
-    }
-  });
+            let currentSpend = 0;
+            c.technologies.forEach(tech => {
+                const chk = document.getElementById(`l2-chk-${tech.id}`);
+                if (chk && chk.checked) {
+                    currentSpend += tech.cost;
+                }
+            });
 
-  const remaining = c.budget - currentSpend;
-  const counter = document.getElementById('l2-budget-count');
-  counter.textContent = `₹${remaining.toLocaleString()}`;
-  counter.style.color = remaining < 0 ? 'var(--code-err)' : 'var(--primary)';
-}
+            const remaining = c.budget - currentSpend;
+            const counter = document.getElementById('l2-budget-count');
+            counter.textContent = `₹${remaining.toLocaleString()}`;
+            counter.style.color = remaining < 0 ? 'var(--code-err)' : 'var(--primary)';
+        }
 
-function resetL2HUD() {
-  document.getElementById('l2-hud-agility').textContent = "0%";
-  document.getElementById('l2-hud-readiness').textContent = "0%";
-  document.getElementById('l2-hud-alignment').textContent = "0%";
-  document.getElementById('l2-hud-efficiency').textContent = "0%";
-  document.getElementById('l2-hud-innovation').textContent = "0%";
-  document.getElementById('l2-hud-cx').textContent = "0%";
-}
+        function resetL2HUD() {
+            document.getElementById('l2-hud-agility').textContent = "0%";
+            document.getElementById('l2-hud-readiness').textContent = "0%";
+            document.getElementById('l2-hud-alignment').textContent = "0%";
+            document.getElementById('l2-hud-efficiency').textContent = "0%";
+            document.getElementById('l2-hud-innovation').textContent = "0%";
+            document.getElementById('l2-hud-cx').textContent = "0%";
+        }
 
-function submitL2Evaluation() {
-  const key = document.getElementById('l2CaseSelect').value;
-  const c = l2Cases[key];
-  const feedback = document.getElementById('qf-l2');
+        function submitL2Evaluation() {
+            const key = document.getElementById('l2CaseSelect').value;
+            const c = l2Cases[key];
+            const feedback = document.getElementById('qf-l2');
 
-  let selected = [];
-  let spend = 0;
-  c.technologies.forEach(tech => {
-    const chk = document.getElementById(`l2-chk-${tech.id}`);
-    if (chk && chk.checked) {
-      selected.push(tech.id);
-      spend += tech.cost;
-    }
-  });
+            let selected = [];
+            let spend = 0;
+            c.technologies.forEach(tech => {
+                const chk = document.getElementById(`l2-chk-${tech.id}`);
+                if (chk && chk.checked) {
+                    selected.push(tech.id);
+                    spend += tech.cost;
+                }
+            });
 
-  if (spend > c.budget) {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = `<strong>✗ Over Budget!</strong> Spend exceeds Strategy configuration threshold limits.`;
-    return;
-  }
+            if (spend > c.budget) {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = `<strong>✗ Over Budget!</strong> Spend exceeds Strategy configuration threshold limits.`;
+                return;
+            }
 
-  if (l2ActiveAttempt === 1) {
-    l2ActiveAttempt = 2;
-    document.getElementById('l2-event-alert').style.display = "block";
-    document.getElementById('l2-event-text').textContent = c.eventText;
-    feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Business priorities changed. Redesign infrastructure adjustments without resetting!`;
-    feedback.style.color = "var(--code-warn)";
-    return;
-  }
+            if (l2ActiveAttempt === 1) {
+                l2ActiveAttempt = 2;
+                document.getElementById('l2-event-alert').style.display = "block";
+                document.getElementById('l2-event-text').textContent = c.eventText;
+                feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Business priorities changed. Redesign infrastructure adjustments without resetting!`;
+                feedback.style.color = "var(--code-warn)";
+                return;
+            }
 
-  // Evaluate second attempt
-  let correctCount = 0;
-  c.eventCorrect.forEach(id => {
-    if (selected.includes(id)) correctCount++;
-  });
+            // Evaluate second attempt
+            let correctCount = 0;
+            c.eventCorrect.forEach(id => {
+                if (selected.includes(id)) correctCount++;
+            });
 
-  let fitScore = Math.round((correctCount / c.eventCorrect.length) * 100);
+            let fitScore = Math.round((correctCount / c.eventCorrect.length) * 100);
 
-  let agility = fitScore;
-  let readiness = fitScore;
-  let alignment = fitScore;
-  let efficiency = Math.round(((c.budget - spend) / c.budget) * 100);
-  let innovation = selected.includes('paas') ? 95 : 40;
-  let cx = selected.includes('caching') || selected.includes('saas') ? 98 : 45;
+            let agility = fitScore;
+            let readiness = fitScore;
+            let alignment = fitScore;
+            let efficiency = Math.round(((c.budget - spend) / c.budget) * 100);
+            let innovation = selected.includes('paas') ? 95 : 40;
+            let cx = selected.includes('caching') || selected.includes('saas') ? 98 : 45;
 
-  document.getElementById('l2-hud-agility').textContent = `${agility}%`;
-  document.getElementById('l2-hud-readiness').textContent = `${readiness}%`;
-  document.getElementById('l2-hud-alignment').textContent = `${alignment}%`;
-  document.getElementById('l2-hud-efficiency').textContent = `${100 - efficiency}%`;
-  document.getElementById('l2-hud-innovation').textContent = `${innovation}%`;
-  document.getElementById('l2-hud-cx').textContent = `${cx}%`;
+            document.getElementById('l2-hud-agility').textContent = `${agility}%`;
+            document.getElementById('l2-hud-readiness').textContent = `${readiness}%`;
+            document.getElementById('l2-hud-alignment').textContent = `${alignment}%`;
+            document.getElementById('l2-hud-efficiency').textContent = `${100 - efficiency}%`;
+            document.getElementById('l2-hud-innovation').textContent = `${innovation}%`;
+            document.getElementById('l2-hud-cx').textContent = `${cx}%`;
 
-  if (fitScore >= 85) {
-    feedback.style.color = "var(--code-ok)";
-    feedback.innerHTML = c.correctFeedback;
-    unlockBadge('badge-consultant', '🏆 Cloud Transformation Consultant');
+            if (fitScore >= 85) {
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = c.correctFeedback;
+                unlockBadge('badge-consultant', '🏆 Cloud Transformation Consultant');
 
-    const reinf = document.getElementById('l2-reinforcement');
-    reinf.style.display = "block";
-    reinf.innerHTML = `
+                const reinf = document.getElementById('l2-reinforcement');
+                reinf.style.display = "block";
+                reinf.innerHTML = `
       <h3>Level 2 Completed! Cloud Transformation Consultant Badge Unlocked 🏆</h3>
       <div class="tip-box" style="margin-top:0.5rem;">
         <strong>Chaffey's Rule of Migration:</strong> Transforming legacy models requires mapping appropriate service levels (IaaS vs PaaS vs SaaS) to control workloads.
@@ -814,154 +1319,154 @@ function submitL2Evaluation() {
         <button class="run-btn" onclick="switchLevel('33', 3)">Proceed to Level 3: Command Challenge ➔</button>
       </div>
     `;
-  } else {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = c.incorrectFeedback;
-  }
-}
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = c.incorrectFeedback;
+            }
+        }
 
-/* ─── LEVEL 3: COMMAND CHALLENGE ─── */
-let l3Year = 1;
-const l3EventsList = {
-  1: {
-    title: "Year 1: Legacy Assessment",
-    text: "Analyze existing operational bottlenecks, maintenance costs, and innovation delays. Choose which systems to migrate first.",
-    options: [
-      { val: "non_core", text: "Migrate non-core marketing and static landing pages to PaaS first (Optimal - Low risk/High learning)" },
-      { val: "core_ledger", text: "Migrate primary transaction financial databases first (Needs Improvement - Excessive risk)" },
-      { val: "keep_physical", text: "Maintain all legacy local physical office server mainframes (Needs Improvement)" }
-    ],
-    correct: "non_core",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Starts with low-risk systems to validate pipelines without disrupting core cash flows.<br>• <strong>Agility:</strong> Ramps developer competencies safely.<br>• <strong>Textbook Concept:</strong> <em>Phased Cloud Migration Approach</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Migrating complex financial ledgers first poses high business failure risks, while staying physical blocks innovation.<br>• <strong>Consequences:</strong> System downtime halts transactions, exhausting strategy budgets.<br>• <strong>Better Strategy:</strong> Migrate non-core channels (PaaS marketing/landing) first."
-  },
-  2: {
-    title: "Year 2: Rapid Customer Growth",
-    text: "Online customer traffic surges by 400%. Your storefront database thrashes due to high request queues.",
-    options: [
-      { val: "auto_paas", text: "Deploy auto-scaling Public Cloud PaaS clusters (Optimal - Scalable)" },
-      { val: "manual_vps", text: "Manually purchase and deploy additional local server racks (Acceptable - slow/costly)" },
-      { val: "limit_buyers", text: "Limit concurrent store visitors and queue clients (Needs Improvement)" }
-    ],
-    correct: "auto_paas",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Runtimes auto-provision based on traffic spikes.<br>• <strong>Scalability:</strong> Public cloud servers scale automatically.<br>• <strong>Textbook Concept:</strong> <em>Elastic resource orchestration</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Manual overprovisioning takes weeks, while queuing buyers causes conversion drops.<br>• <strong>Consequences:</strong> Severe transaction drops and site slow-downs.<br>• <strong>Better Strategy:</strong> Leverage public cloud auto-scaling runtimes."
-  },
-  3: {
-    title: "Year 3: International Expansion",
-    text: "Launching online stores in Europe and Asia. Latency spikes for distant international buyers.",
-    options: [
-      { val: "multi_region", text: "Deploy multi-region cloud servers and local edge caches (Optimal)" },
-      { val: "single_origin", text: "Keep single origin host and instruct remote offices to wait (Needs Improvement)" },
-      { val: "browser_cache", text: "Configure basic browser caching headers (Acceptable)" }
-    ],
-    correct: "multi_region",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Processing database transactions closer to international regions cuts route delays.<br>• <strong>Scalability/CX:</strong> Fast page render speeds restore checkout conversions.<br>• <strong>Textbook Concept:</strong> <em>Multi-region infrastructure deployment</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Hosting in a single central home region forces international buyers to experience extreme round-trip latencies.<br>• <strong>Consequences:</strong> Global conversion losses and shopping checkout drops.<br>• <strong>Better Strategy:</strong> Multi-region cloud servers and local caches."
-  },
-  4: {
-    title: "Year 4: AI & Digital Innovation",
-    text: "The business wants to launch AI-driven product recommendation engines to maximize cart sizes.",
-    options: [
-      { val: "cloud_api", text: "Utilize managed public cloud AI PaaS APIs (Optimal)" },
-      { val: "local_compile", text: "Compile custom neural models on branch office desktop processors (Needs Improvement)" },
-      { val: "mainframe", text: "Purchase a dedicated AI mainframe cabinet (Acceptable)" }
-    ],
-    correct: "cloud_api",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Offloads model training times by consuming managed API interfaces.<br>• <strong>Agility/Innovation:</strong> Developers deploy recommender bots in days.<br>• <strong>Textbook Concept:</strong> <em>PaaS API enablement</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Building neural models on branch computers delays release timelines by months.<br>• <strong>Consequences:</strong> Competitors steal market share while your team builds basic backend layers.<br>• <strong>Better Strategy:</strong> Utilize public cloud managed AI services."
-  },
-  5: {
-    title: "Year 5: Regulatory Compliance",
-    text: "New national privacy laws mandate citizen financial records remain within local boundaries.",
-    options: [
-      { val: "hybrid_flow", text: "Redesign data flows using Hybrid Cloud, keeping databases local (Optimal)" },
-      { val: "ignore_law", text: "Ignore laws and host all records in the central public cloud (Needs Improvement)" },
-      { val: "shut_retail", text: "Shut down international stores to bypass compliance audits (Needs Improvement)" }
-    ],
-    correct: "hybrid_flow",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Keeps regulated files inside national borders while frontends run on public servers.<br>• <strong>Agility/Compliance:</strong> Fulfills audits without closing international stores.<br>• <strong>Textbook Concept:</strong> <em>Hybrid cloud compliance integration</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Hosting personal records in shared central public clouds violates data sovereignty laws.<br>• <strong>Consequences:</strong> Operational suspension, fines, and legal class actions.<br>• <strong>Better Strategy:</strong> Redesign data pipelines via Hybrid configurations."
-  },
-  6: {
-    title: "Year 6: Disaster Recovery Blackout",
-    text: "Your primary hosting datacenter zone experiences a complete physical network blackout.",
-    options: [
-      { val: "failover_replica", text: "Deploy automated multi-region active failover backups (Optimal)" },
-      { val: "offline_tape", text: "Rely on daily offline tape back-ups (Acceptable)" },
-      { val: "wait_power", text: "Wait for provider to manually reboot nodes (Needs Improvement)" }
-    ],
-    correct: "failover_replica",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Auto-failovers redirect client traffic to standby zones instantly.<br>• <strong>Business Continuity:</strong> Minimizes database recovery time objective (RTO).<br>• <strong>Textbook Concept:</strong> <em>Multi-zone active disaster recovery</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Relying on single-zone backups or waiting for provider reboots results in prolonged system downtime.<br>• <strong>Consequences:</strong> Zero availability, severe revenue loss, and brand damage.<br>• <strong>Better Strategy:</strong> Dynamic multi-region active database backups."
-  },
-  7: {
-    title: "Year 7: Logistics Company Merger",
-    text: "The firm acquires a logistics business running local mainframe database software.",
-    options: [
-      { val: "api_middleware", text: "Unify infrastructure using REST API middleware layers (Optimal)" },
-      { val: "csv_transfer", text: "Schedule daily manual CSV data transfers (Needs Improvement)" },
-      { val: "rekey_data", text: "Rekey all acquired inventory logistics records manually (Acceptable)" }
-    ],
-    correct: "api_middleware",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> API abstractions link disparate systems without rewriting databases.<br>• <strong>Agility:</strong> Integrates logistics records immediately.<br>• <strong>Textbook Concept:</strong> <em>Service-Oriented Integration Architecture</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Keeping networks isolated or transferring CSV tables manually invites synchronization errors.<br>• <strong>Consequences:</strong> Double-shipping errors and logistics database corruption.<br>• <strong>Better Strategy:</strong> Deploy REST API interchange layers."
-  },
-  8: {
-    title: "Year 8: Budget cut 20%",
-    text: "Economic slowdown cuts tech budgets by 20%. Optimize operating costs.",
-    options: [
-      { val: "resize_idle", text: "Optimize resource sizing, clean idle instances, and implement caching (Optimal)" },
-      { val: "disable_ssl", text: "De-activate all security and SSL encryption keys (Needs Improvement)" },
-      { val: "no_backup", text: "Cancel all data backup systems (Needs Improvement)" }
-    ],
-    correct: "resize_idle",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Cleaning idle nodes and caching offloads computing costs.<br>• <strong>Cost Efficiency:</strong> Lowers expenses while maintaining availability.<br>• <strong>Textbook Concept:</strong> <em>Utility allocation optimization</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Disabling SSL or cancelling backup nodes exposes the firm to data hacks.<br>• <strong>Consequences:</strong> Security breaches and catastrophic backup losses.<br>• <strong>Better Strategy:</strong> Optimize resource sizing and clean orphan volumes."
-  },
-  9: {
-    title: "Year 9: Competitive Pressures",
-    text: "Competitors launch an agile, AI-driven mobile app that steals market share.",
-    options: [
-      { val: "accelerate_paas", text: "Accelerate PaaS feature deployments and mobile API routes (Optimal)" },
-      { val: "marketing_only", text: "Increase marketing budgets without upgrading systems (Needs Improvement)" },
-      { val: "external_copy", text: "Run a copycat app built by external third-party agencies (Acceptable)" }
-    ],
-    correct: "accelerate_paas",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Leveraging agile PaaS runtimes accelerates mobile feature development.<br>• <strong>Agility/Advantage:</strong> Restores competitive edge rapidly.<br>• <strong>Textbook Concept:</strong> <em>Rapid Application Prototyping</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Relying on static site formats or external copycats fails to build internal agility.<br>• <strong>Consequences:</strong> Continued loss of market share and developer technical debt.<br>• <strong>Better Strategy:</strong> Accelerate PaaS feature deployments and APIs."
-  },
-  10: {
-    title: "Year 10: Future Enterprise Roadmap",
-    text: "Transform the firm into a digital leader. Avoid platform locking constraints.",
-    options: [
-      { val: "multi_cloud", text: "Deploy multi-cloud server frameworks to maximize agility (Optimal)" },
-      { val: "single_vendor", text: "Lock all functions into a single public cloud provider (Acceptable)" },
-      { val: "local_revert", text: "Revert systems to local hardware nodes (Needs Improvement)" }
-    ],
-    correct: "multi_cloud",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Distributing platforms prevents single-vendor pricing spikes.<br>• <strong>Agility/Strategic Alignment:</strong> Maximizes long-term flexibility.<br>• <strong>Textbook Concept:</strong> <em>Multi-cloud strategic redundancy</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Locking operations into one provider or reverting to local hardware restricts agility.<br>• <strong>Consequences:</strong> High operational costs and provider migration locks.<br>• <strong>Better Strategy:</strong> Deploy multi-cloud server frameworks."
-  }
-};
+        /* ─── LEVEL 3: COMMAND CHALLENGE ─── */
+        let l3Year = 1;
+        const l3EventsList = {
+            1: {
+                title: "Year 1: Legacy Assessment",
+                text: "Analyze existing operational bottlenecks, maintenance costs, and innovation delays. Choose which systems to migrate first.",
+                options: [
+                    { val: "non_core", text: "Migrate non-core marketing and static landing pages to PaaS first (Optimal - Low risk/High learning)" },
+                    { val: "core_ledger", text: "Migrate primary transaction financial databases first (Needs Improvement - Excessive risk)" },
+                    { val: "keep_physical", text: "Maintain all legacy local physical office server mainframes (Needs Improvement)" }
+                ],
+                correct: "non_core",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Starts with low-risk systems to validate pipelines without disrupting core cash flows.<br>• <strong>Agility:</strong> Ramps developer competencies safely.<br>• <strong>Textbook Concept:</strong> <em>Phased Cloud Migration Approach</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Migrating complex financial ledgers first poses high business failure risks, while staying physical blocks innovation.<br>• <strong>Consequences:</strong> System downtime halts transactions, exhausting strategy budgets.<br>• <strong>Better Strategy:</strong> Migrate non-core channels (PaaS marketing/landing) first."
+            },
+            2: {
+                title: "Year 2: Rapid Customer Growth",
+                text: "Online customer traffic surges by 400%. Your storefront database thrashes due to high request queues.",
+                options: [
+                    { val: "auto_paas", text: "Deploy auto-scaling Public Cloud PaaS clusters (Optimal - Scalable)" },
+                    { val: "manual_vps", text: "Manually purchase and deploy additional local server racks (Acceptable - slow/costly)" },
+                    { val: "limit_buyers", text: "Limit concurrent store visitors and queue clients (Needs Improvement)" }
+                ],
+                correct: "auto_paas",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Runtimes auto-provision based on traffic spikes.<br>• <strong>Scalability:</strong> Public cloud servers scale automatically.<br>• <strong>Textbook Concept:</strong> <em>Elastic resource orchestration</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Manual overprovisioning takes weeks, while queuing buyers causes conversion drops.<br>• <strong>Consequences:</strong> Severe transaction drops and site slow-downs.<br>• <strong>Better Strategy:</strong> Leverage public cloud auto-scaling runtimes."
+            },
+            3: {
+                title: "Year 3: International Expansion",
+                text: "Launching online stores in Europe and Asia. Latency spikes for distant international buyers.",
+                options: [
+                    { val: "multi_region", text: "Deploy multi-region cloud servers and local edge caches (Optimal)" },
+                    { val: "single_origin", text: "Keep single origin host and instruct remote offices to wait (Needs Improvement)" },
+                    { val: "browser_cache", text: "Configure basic browser caching headers (Acceptable)" }
+                ],
+                correct: "multi_region",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Processing database transactions closer to international regions cuts route delays.<br>• <strong>Scalability/CX:</strong> Fast page render speeds restore checkout conversions.<br>• <strong>Textbook Concept:</strong> <em>Multi-region infrastructure deployment</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Hosting in a single central home region forces international buyers to experience extreme round-trip latencies.<br>• <strong>Consequences:</strong> Global conversion losses and shopping checkout drops.<br>• <strong>Better Strategy:</strong> Multi-region cloud servers and local caches."
+            },
+            4: {
+                title: "Year 4: AI & Digital Innovation",
+                text: "The business wants to launch AI-driven product recommendation engines to maximize cart sizes.",
+                options: [
+                    { val: "cloud_api", text: "Utilize managed public cloud AI PaaS APIs (Optimal)" },
+                    { val: "local_compile", text: "Compile custom neural models on branch office desktop processors (Needs Improvement)" },
+                    { val: "mainframe", text: "Purchase a dedicated AI mainframe cabinet (Acceptable)" }
+                ],
+                correct: "cloud_api",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Offloads model training times by consuming managed API interfaces.<br>• <strong>Agility/Innovation:</strong> Developers deploy recommender bots in days.<br>• <strong>Textbook Concept:</strong> <em>PaaS API enablement</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Building neural models on branch computers delays release timelines by months.<br>• <strong>Consequences:</strong> Competitors steal market share while your team builds basic backend layers.<br>• <strong>Better Strategy:</strong> Utilize public cloud managed AI services."
+            },
+            5: {
+                title: "Year 5: Regulatory Compliance",
+                text: "New national privacy laws mandate citizen financial records remain within local boundaries.",
+                options: [
+                    { val: "hybrid_flow", text: "Redesign data flows using Hybrid Cloud, keeping databases local (Optimal)" },
+                    { val: "ignore_law", text: "Ignore laws and host all records in the central public cloud (Needs Improvement)" },
+                    { val: "shut_retail", text: "Shut down international stores to bypass compliance audits (Needs Improvement)" }
+                ],
+                correct: "hybrid_flow",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Keeps regulated files inside national borders while frontends run on public servers.<br>• <strong>Agility/Compliance:</strong> Fulfills audits without closing international stores.<br>• <strong>Textbook Concept:</strong> <em>Hybrid cloud compliance integration</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Hosting personal records in shared central public clouds violates data sovereignty laws.<br>• <strong>Consequences:</strong> Operational suspension, fines, and legal class actions.<br>• <strong>Better Strategy:</strong> Redesign data pipelines via Hybrid configurations."
+            },
+            6: {
+                title: "Year 6: Disaster Recovery Blackout",
+                text: "Your primary hosting datacenter zone experiences a complete physical network blackout.",
+                options: [
+                    { val: "failover_replica", text: "Deploy automated multi-region active failover backups (Optimal)" },
+                    { val: "offline_tape", text: "Rely on daily offline tape back-ups (Acceptable)" },
+                    { val: "wait_power", text: "Wait for provider to manually reboot nodes (Needs Improvement)" }
+                ],
+                correct: "failover_replica",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Auto-failovers redirect client traffic to standby zones instantly.<br>• <strong>Business Continuity:</strong> Minimizes database recovery time objective (RTO).<br>• <strong>Textbook Concept:</strong> <em>Multi-zone active disaster recovery</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Relying on single-zone backups or waiting for provider reboots results in prolonged system downtime.<br>• <strong>Consequences:</strong> Zero availability, severe revenue loss, and brand damage.<br>• <strong>Better Strategy:</strong> Dynamic multi-region active database backups."
+            },
+            7: {
+                title: "Year 7: Logistics Company Merger",
+                text: "The firm acquires a logistics business running local mainframe database software.",
+                options: [
+                    { val: "api_middleware", text: "Unify infrastructure using REST API middleware layers (Optimal)" },
+                    { val: "csv_transfer", text: "Schedule daily manual CSV data transfers (Needs Improvement)" },
+                    { val: "rekey_data", text: "Rekey all acquired inventory logistics records manually (Acceptable)" }
+                ],
+                correct: "api_middleware",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> API abstractions link disparate systems without rewriting databases.<br>• <strong>Agility:</strong> Integrates logistics records immediately.<br>• <strong>Textbook Concept:</strong> <em>Service-Oriented Integration Architecture</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Keeping networks isolated or transferring CSV tables manually invites synchronization errors.<br>• <strong>Consequences:</strong> Double-shipping errors and logistics database corruption.<br>• <strong>Better Strategy:</strong> Deploy REST API interchange layers."
+            },
+            8: {
+                title: "Year 8: Budget cut 20%",
+                text: "Economic slowdown cuts tech budgets by 20%. Optimize operating costs.",
+                options: [
+                    { val: "resize_idle", text: "Optimize resource sizing, clean idle instances, and implement caching (Optimal)" },
+                    { val: "disable_ssl", text: "De-activate all security and SSL encryption keys (Needs Improvement)" },
+                    { val: "no_backup", text: "Cancel all data backup systems (Needs Improvement)" }
+                ],
+                correct: "resize_idle",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Cleaning idle nodes and caching offloads computing costs.<br>• <strong>Cost Efficiency:</strong> Lowers expenses while maintaining availability.<br>• <strong>Textbook Concept:</strong> <em>Utility allocation optimization</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Disabling SSL or cancelling backup nodes exposes the firm to data hacks.<br>• <strong>Consequences:</strong> Security breaches and catastrophic backup losses.<br>• <strong>Better Strategy:</strong> Optimize resource sizing and clean orphan volumes."
+            },
+            9: {
+                title: "Year 9: Competitive Pressures",
+                text: "Competitors launch an agile, AI-driven mobile app that steals market share.",
+                options: [
+                    { val: "accelerate_paas", text: "Accelerate PaaS feature deployments and mobile API routes (Optimal)" },
+                    { val: "marketing_only", text: "Increase marketing budgets without upgrading systems (Needs Improvement)" },
+                    { val: "external_copy", text: "Run a copycat app built by external third-party agencies (Acceptable)" }
+                ],
+                correct: "accelerate_paas",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Leveraging agile PaaS runtimes accelerates mobile feature development.<br>• <strong>Agility/Advantage:</strong> Restores competitive edge rapidly.<br>• <strong>Textbook Concept:</strong> <em>Rapid Application Prototyping</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Relying on static site formats or external copycats fails to build internal agility.<br>• <strong>Consequences:</strong> Continued loss of market share and developer technical debt.<br>• <strong>Better Strategy:</strong> Accelerate PaaS feature deployments and APIs."
+            },
+            10: {
+                title: "Year 10: Future Enterprise Roadmap",
+                text: "Transform the firm into a digital leader. Avoid platform locking constraints.",
+                options: [
+                    { val: "multi_cloud", text: "Deploy multi-cloud server frameworks to maximize agility (Optimal)" },
+                    { val: "single_vendor", text: "Lock all functions into a single public cloud provider (Acceptable)" },
+                    { val: "local_revert", text: "Revert systems to local hardware nodes (Needs Improvement)" }
+                ],
+                correct: "multi_cloud",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Distributing platforms prevents single-vendor pricing spikes.<br>• <strong>Agility/Strategic Alignment:</strong> Maximizes long-term flexibility.<br>• <strong>Textbook Concept:</strong> <em>Multi-cloud strategic redundancy</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it's unsuitable:</strong> Locking operations into one provider or reverting to local hardware restricts agility.<br>• <strong>Consequences:</strong> High operational costs and provider migration locks.<br>• <strong>Better Strategy:</strong> Deploy multi-cloud server frameworks."
+            }
+        };
 
-let l3Answers = [];
+        let l3Answers = [];
 
-function renderL3Quarter() {
-  const r = l3EventsList[l3Year];
-  document.getElementById('l3-phase-badge').textContent = `Year ${l3Year} of 10`;
-  document.getElementById('l3-phase-title').textContent = r.title;
-  document.getElementById('l3-phase-text').textContent = r.text;
-  document.getElementById('qf-l3').innerHTML = "";
-  document.getElementById('nextL3Btn').style.display = "none";
-  document.getElementById('l3-submit-btn').disabled = false;
+        function renderL3Quarter() {
+            const r = l3EventsList[l3Year];
+            document.getElementById('l3-phase-badge').textContent = `Year ${l3Year} of 10`;
+            document.getElementById('l3-phase-title').textContent = r.title;
+            document.getElementById('l3-phase-text').textContent = r.text;
+            document.getElementById('qf-l3').innerHTML = "";
+            document.getElementById('nextL3Btn').style.display = "none";
+            document.getElementById('l3-submit-btn').disabled = false;
 
-  const container = document.getElementById('l3-selectors');
-  container.innerHTML = "";
+            const container = document.getElementById('l3-selectors');
+            container.innerHTML = "";
 
-  let jumbled = shuffleArray(r.options);
-  let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
-  container.innerHTML = `
+            let jumbled = shuffleArray(r.options);
+            let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+            container.innerHTML = `
     <div>
       <span class="tk-label">Transformation Policy Option</span>
       <select id="l3-sel-crisis" class="tk-entry" style="width:100%;">
@@ -969,89 +1474,89 @@ function renderL3Quarter() {
       </select>
     </div>
   `;
-}
+        }
 
-function submitL3Phase() {
-  const r = l3EventsList[l3Year];
-  const choice = document.getElementById('l3-sel-crisis').value;
-  const feedback = document.getElementById('qf-l3');
+        function submitL3Phase() {
+            const r = l3EventsList[l3Year];
+            const choice = document.getElementById('l3-sel-crisis').value;
+            const feedback = document.getElementById('qf-l3');
 
-  l3Answers.push(choice);
+            l3Answers.push(choice);
 
-  let isCorrect = (choice === r.correct);
+            let isCorrect = (choice === r.correct);
 
-  let score = 0;
-  l3Answers.forEach((ans, idx) => {
-    if (ans === l3EventsList[idx + 1].correct) score++;
-  });
-  let fitScore = Math.round((score / l3Year) * 100);
+            let score = 0;
+            l3Answers.forEach((ans, idx) => {
+                if (ans === l3EventsList[idx + 1].correct) score++;
+            });
+            let fitScore = Math.round((score / l3Year) * 100);
 
-  let agility = isCorrect ? 95 : 30;
-  let innovation = isCorrect ? 95 : 40;
-  let cx = isCorrect ? 98 : 30;
-  let readiness = fitScore;
-  let efficiency = isCorrect ? 90 : 50;
-  let continuity = isCorrect ? 95 : 30;
-  let alignment = fitScore;
-  let advantage = fitScore;
-  let progress = fitScore;
+            let agility = isCorrect ? 95 : 30;
+            let innovation = isCorrect ? 95 : 40;
+            let cx = isCorrect ? 98 : 30;
+            let readiness = fitScore;
+            let efficiency = isCorrect ? 90 : 50;
+            let continuity = isCorrect ? 95 : 30;
+            let alignment = fitScore;
+            let advantage = fitScore;
+            let progress = fitScore;
 
-  // Update HUD
-  document.getElementById('l3-hud-agility').textContent = `${agility}%`;
-  document.getElementById('l3-hud-innovation').textContent = `${innovation}%`;
-  document.getElementById('l3-hud-cx').textContent = `${cx}%`;
-  document.getElementById('l3-hud-readiness').textContent = `${readiness}%`;
-  document.getElementById('l3-hud-efficiency').textContent = `${efficiency}%`;
-  document.getElementById('l3-hud-continuity').textContent = `${continuity}%`;
-  document.getElementById('l3-hud-alignment').textContent = `${alignment}%`;
-  document.getElementById('l3-hud-advantage').textContent = `${advantage}%`;
-  document.getElementById('l3-hud-progress').textContent = `${progress}%`;
+            // Update HUD
+            document.getElementById('l3-hud-agility').textContent = `${agility}%`;
+            document.getElementById('l3-hud-innovation').textContent = `${innovation}%`;
+            document.getElementById('l3-hud-cx').textContent = `${cx}%`;
+            document.getElementById('l3-hud-readiness').textContent = `${readiness}%`;
+            document.getElementById('l3-hud-efficiency').textContent = `${efficiency}%`;
+            document.getElementById('l3-hud-continuity').textContent = `${continuity}%`;
+            document.getElementById('l3-hud-alignment').textContent = `${alignment}%`;
+            document.getElementById('l3-hud-advantage').textContent = `${advantage}%`;
+            document.getElementById('l3-hud-progress').textContent = `${progress}%`;
 
-  if (isCorrect) {
-    feedback.style.color = "var(--code-ok)";
-    feedback.innerHTML = r.correctFeedback;
-    document.getElementById('l3-submit-btn').disabled = true;
+            if (isCorrect) {
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = r.correctFeedback;
+                document.getElementById('l3-submit-btn').disabled = true;
 
-    if (l3Year < 10) {
-      document.getElementById('nextL3Btn').style.display = "inline-flex";
-    } else {
-      concludeL3Simulation();
-    }
-  } else {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = r.incorrectFeedback;
-    // Pop last choice to allow retry
-    l3Answers.pop();
-  }
-}
+                if (l3Year < 10) {
+                    document.getElementById('nextL3Btn').style.display = "inline-flex";
+                } else {
+                    concludeL3Simulation();
+                }
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = r.incorrectFeedback;
+                // Pop last choice to allow retry
+                l3Answers.pop();
+            }
+        }
 
-function proceedL3NextPhase() {
-  l3Year++;
-  renderL3Quarter();
-}
+        function proceedL3NextPhase() {
+            l3Year++;
+            renderL3Quarter();
+        }
 
-function concludeL3Simulation() {
-  unlockBadge('badge-delivery', '🏆 Cloud Transformation Strategist');
-  unlockBadge('badge-strategist', '🏆 Chief Digital Transformation Officer');
-  promoteConsultant(4);
+        function concludeL3Simulation() {
+            unlockBadge('badge-delivery', '🏆 Cloud Transformation Strategist');
+            unlockBadge('badge-strategist', '🏆 Chief Digital Transformation Officer');
+            promoteConsultant(4);
 
-  // Compute final score
-  let correctCount = 0;
-  l3Answers.forEach((ans, idx) => {
-    if (ans === l3EventsList[idx + 1].correct) correctCount++;
-  });
-  const score = Math.round((correctCount / 10) * 100);
+            // Compute final score
+            let correctCount = 0;
+            l3Answers.forEach((ans, idx) => {
+                if (ans === l3EventsList[idx + 1].correct) correctCount++;
+            });
+            const score = Math.round((correctCount / 10) * 100);
 
-  let rating = "Emerging";
-  if (score >= 90) rating = "Digital Leader";
-  else if (score >= 70) rating = "Optimized";
-  else if (score >= 50) rating = "Integrated";
-  else rating = "Developing";
+            let rating = "Emerging";
+            if (score >= 90) rating = "Digital Leader";
+            else if (score >= 70) rating = "Optimized";
+            else if (score >= 50) rating = "Integrated";
+            else rating = "Developing";
 
-  const report = document.getElementById('l3-report-card');
-  report.style.display = "block";
+            const report = document.getElementById('l3-report-card');
+            report.style.display = "block";
 
-  report.innerHTML = `
+            report.innerHTML = `
     <h3>Digital Enterprise Transformation Consulting Report</h3>
     <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Digital Maturity Rating: <strong>${rating}</strong></p>
 
@@ -1073,57 +1578,58 @@ function concludeL3Simulation() {
     </div>
   `;
 
-  // Render blueprint playground
-  const play = document.getElementById('l3Playground');
-  const out = document.getElementById('l3Out');
-  play.style.display = "block";
+            // Render blueprint playground
+            const play = document.getElementById('l3Playground');
+            const out = document.getElementById('l3Out');
+            play.style.display = "block";
 
-  out.innerHTML = `digital_transformation_roadmap:
+            out.innerHTML = `digital_transformation_roadmap:
   status: Completed
   years_migrated: 10/10
   strategic_alignment_score: ${score}/100
   digital_maturity: ${rating}`;
-}
+        }
 
-/* ─── GAMIFIED RATINGS CONTROLLER ─── */
-const rankTitle = {
-  1: "Junior Analyst",
-  2: "Network Explorer",
-  3: "Infrastructure Consultant",
-  4: "Chief Digital Transformation Officer"
-};
+        /* ─── GAMIFIED RATINGS CONTROLLER ─── */
+        const rankTitle = {
+            1: "Junior Analyst",
+            2: "Network Explorer",
+            3: "Infrastructure Consultant",
+            4: "Chief Digital Transformation Officer"
+        };
 
-function promoteConsultant(level) {
-  const starsEl = document.getElementById('consultant-stars');
-  const rankEl = document.getElementById('consultant-rank');
-  
-  if (starsEl) {
-    if (level === 2) starsEl.textContent = "⭐⭐⭐";
-    else if (level === 3) starsEl.textContent = "⭐⭐⭐⭐";
-    else if (level === 4) starsEl.textContent = "⭐⭐⭐⭐⭐";
-  }
-  if (rankEl) {
-    rankEl.textContent = rankTitle[level];
-  }
-}
+        function promoteConsultant(level) {
+            const starsEl = document.getElementById('consultant-stars');
+            const rankEl = document.getElementById('consultant-rank');
 
-function unlockBadge(id, text) {
-  const el = document.getElementById(id);
-  if (el) {
-    el.style.background = 'var(--primary-light)';
-    el.style.color = 'var(--primary)';
-    el.style.borderColor = 'var(--primary)';
-    el.style.fontWeight = '700';
-    el.textContent = text;
-  }
-}
+            if (starsEl) {
+                if (level === 2) starsEl.textContent = "⭐⭐⭐";
+                else if (level === 3) starsEl.textContent = "⭐⭐⭐⭐";
+                else if (level === 4) starsEl.textContent = "⭐⭐⭐⭐⭐";
+            }
+            if (rankEl) {
+                rankEl.textContent = rankTitle[level];
+            }
+        }
 
-// Initialise defaults on load
-window.addEventListener('DOMContentLoaded', () => {
-  renderL1Round();
-  changeL2Case();
-  renderL3Quarter();
-});
-</script>
+        function unlockBadge(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.background = 'var(--primary-light)';
+                el.style.color = 'var(--primary)';
+                el.style.borderColor = 'var(--primary)';
+                el.style.fontWeight = '700';
+                el.textContent = text;
+            }
+        }
+
+        // Initialise defaults on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderL1Round();
+            changeL2Case();
+            renderL3Quarter();
+        });
+    </script>
 </body>
+
 </html>

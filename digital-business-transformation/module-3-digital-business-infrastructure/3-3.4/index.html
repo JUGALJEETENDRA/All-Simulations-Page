@@ -1,718 +1,1142 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 3.4 – APIs, Web Services &amp; Hosting Architecture</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3.4 – APIs, Web Services &amp; Hosting Architecture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
-  :root {
-    color-scheme: light;
-    --primary: #E63946;
-    --primary-hover: #D62828;
-    --primary-light: rgba(230, 57, 70, 0.08);
-    --secondary: #FF4D6D;
-    --bg-page: #F8F9FA;
-    --bg-card: rgba(255, 255, 255, 0.9);
-    --bg-card-hover: #FFFFFF;
-    --text-main: #1D1D1F;
-    --text-muted: #6E6E73;
-    --border-light: rgba(0, 0, 0, 0.08);
-    --code-bg: #1E1E24;
-    --code-text: #F8F9FA;
-    --code-ok: #2A9D8F;
-    --code-warn: #E9C46A;
-    --code-err: #E63946;
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
-    --radius-lg: 16px;
-    --radius-md: 10px;
-  }
+        :root {
+            color-scheme: light;
+            --primary: #E63946;
+            --primary-hover: #D62828;
+            --primary-light: rgba(230, 57, 70, 0.08);
+            --secondary: #FF4D6D;
+            --bg-page: #F8F9FA;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: #FFFFFF;
+            --text-main: #1D1D1F;
+            --text-muted: #6E6E73;
+            --border-light: rgba(0, 0, 0, 0.08);
+            --code-bg: #1E1E24;
+            --code-text: #F8F9FA;
+            --code-ok: #2A9D8F;
+            --code-warn: #E9C46A;
+            --code-err: #E63946;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-page); color: var(--text-main); line-height: 1.6; scroll-behavior: smooth; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  /* ─── NAVIGATION ─── */
-  nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: center; gap: 1.5rem; z-index: 1000; padding: 0 2rem; }
-  .nav-brand { font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; color: var(--text-main); margin-right: auto; letter-spacing: -0.5px; }
-  .nav-brand span { color: var(--primary); }
-  nav a { text-decoration: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; transition: all 0.2s; padding: 0.4rem 0.8rem; border-radius: var(--radius-md); }
-  nav a:hover, nav a.active { color: var(--primary); background: var(--primary-light); }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
 
-  /* ─── HERO ─── */
-  .hero { margin-top: 64px; padding: 4rem 2rem 3rem; text-align: center; background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%); }
-  .hero-badge { display: inline-block; padding: 0.35rem 0.9rem; background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; border-radius: 99px; margin-bottom: 1.2rem; }
-  .hero h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.1; letter-spacing: -1px; margin-bottom: 1.2rem; }
-  .hero p { max-width: 680px; margin: 0 auto 2.5rem; color: var(--text-muted); font-size: 1.1rem; }
-  .hero-stats { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
-  .hero-stat strong { display: block; font-family: 'Archivo Black', sans-serif; font-size: 1.5rem; color: var(--primary); }
-  .hero-stat span { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+        /* ─── NAVIGATION ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 1000;
+            padding: 0 2rem;
+        }
 
-  /* ─── LAYOUT & SECTIONS ─── */
-  .section { padding: 3rem 1.5rem; border-bottom: 1px solid var(--border-light); }
-  .container { max-width: 960px; margin: 0 auto; }
-  .section-header { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 2rem; }
-  .section-icon { font-size: 2.5rem; background: var(--bg-card); width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
-  .section-header h2 { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; letter-spacing: -0.5px; }
-  .section-header p { color: var(--text-muted); font-size: 0.95rem; }
-  .section-num { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: rgba(0, 0, 0, 0.08); }
+        .nav-brand {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-right: auto;
+            letter-spacing: -0.5px;
+        }
 
-  /* ─── LEVEL PILLS & CARDS ─── */
-  .level-pills { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-  .level-pill { background: var(--bg-card); border: 1px solid var(--border-light); padding: 0.6rem 1.2rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
-  .level-pill:hover { border-color: var(--primary); }
-  .level-pill.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25); }
-  
-  .level-content { display: none; animation: fadeIn 0.3s ease; }
-  .level-content.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-brand span {
+            color: var(--primary);
+        }
 
-  .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); }
-  .card h3 { font-family: 'Archivo Black', sans-serif; font-size: 1.3rem; margin-bottom: 1rem; color: var(--text-main); }
-  
-  /* ─── CALLOUT BOXES ─── */
-  .info-box, .tip-box, .warn-box, .challenge-box { padding: 1rem 1.2rem; border-radius: var(--radius-md); font-size: 0.9rem; margin: 1.2rem 0; border-left: 4px solid; }
-  .info-box { background: rgba(42, 157, 143, 0.08); border-color: var(--code-ok); }
-  .tip-box { background: var(--primary-light); border-color: var(--primary); }
-  .warn-box { background: rgba(233, 196, 106, 0.15); border-color: var(--code-warn); }
-  
-  .challenge-box { background: #fff; border: 1px solid var(--border-light); padding: 1.5rem; }
-  .challenge-box h4 { font-size: 1.1rem; margin-bottom: 0.6rem; color: var(--text-main); }
-  
-  .quiz-feedback { margin-top: 0.8rem; font-size: 0.85rem; font-weight: 600; min-height: 1.2rem; }
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-md);
+        }
 
-  /* ─── INTERACTIVE ELEMENTS ─── */
-  .run-btn { background: var(--primary); color: #fff; border: none; padding: 0.8rem 1.6rem; border-radius: var(--radius-md); font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
-  .run-btn:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3); }
-  .run-btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
-  .tk-entry { background: #fff; border: 1px solid var(--border-light); padding: 0.7rem 1rem; border-radius: var(--radius-md); font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; }
-  .tk-entry:focus { border-color: var(--primary); }
-  .tk-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; display: block; }
-  
-  .gauge-wrap { display: flex; gap: 1.5rem; margin-top: 1.2rem; flex-wrap: wrap; }
-  .gauge-num { font-family: 'Archivo Black', sans-serif; font-size: 2rem; color: var(--primary); }
-  .gauge-sub { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
 
-  /* Badge styling */
-  .badge-locked { filter: grayscale(100%); opacity: 0.4; }
-  .badge-unlocked { filter: none; opacity: 1; transform: scale(1.05); }
+        /* ─── HERO ─── */
+        .hero {
+            margin-top: 64px;
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%);
+        }
 
-  footer { text-align: center; padding: 3rem 1rem; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-light); margin-top: 2rem; }
-</style>
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 99px;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero p {
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .hero-stat span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* ─── LAYOUT & SECTIONS ─── */
+        .section {
+            padding: 3rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+            background: var(--bg-card);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .section-num {
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ─── LEVEL PILLS & CARDS ─── */
+        .level-pills {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+        }
+
+        .level-pill.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+        }
+
+        .level-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .level-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card h3 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        /* ─── CALLOUT BOXES ─── */
+        .info-box,
+        .tip-box,
+        .warn-box,
+        .challenge-box {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            margin: 1.2rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box {
+            background: rgba(42, 157, 143, 0.08);
+            border-color: var(--code-ok);
+        }
+
+        .tip-box {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .warn-box {
+            background: rgba(233, 196, 106, 0.15);
+            border-color: var(--code-warn);
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+        }
+
+        .challenge-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-main);
+        }
+
+        .quiz-feedback {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 1.2rem;
+        }
+
+        /* ─── INTERACTIVE ELEMENTS ─── */
+        .run-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .run-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        }
+
+        .run-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tk-entry {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .tk-entry:focus {
+            border-color: var(--primary);
+        }
+
+        .tk-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .gauge-wrap {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .gauge-num {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .gauge-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Badge styling */
+        .badge-locked {
+            filter: grayscale(100%);
+            opacity: 0.4;
+        }
+
+        .badge-unlocked {
+            filter: none;
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+            margin-top: 2rem;
+        }
+    </style>
 </head>
+
 <body>
 
-<nav>
-  <div class="nav-brand">DB<span>/</span>MOD3</div>
-  <a href="#sec34" class="active">3.4 APIs</a>
-</nav>
+    <nav>
+        <div class="nav-brand">DB<span>/</span>MOD3</div>
+        <a href="#sec34" class="active">3.4 APIs</a>
+    </nav>
 
-<div class="hero">
-  <div class="hero-badge">Module 3.4 · APIs, Web Services &amp; Hosting Architecture</div>
-  <h1>APIs, Web Services<br>&amp; Hosting Architecture</h1>
-  <p>Transition from a developer mindset to an enterprise integration strategist. Learn how standard gateways, middleware and hosting balance agility against operational risks.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
-    <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
-    <div class="hero-stat"><strong>Strategy</strong><span>Game</span></div>
-  </div>
-</div>
-
-<!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
-<div class="section" id="theory-board">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-icon">📖</div>
-      <div>
-        <h2>Dave Chaffey's Reference Board</h2>
-        <p>Concise definitions for digital ecosystems</p>
-      </div>
-      <span class="section-num">Ref</span>
+    <div class="hero">
+        <div class="hero-badge">Module 3.4 · APIs, Web Services &amp; Hosting Architecture</div>
+        <h1>APIs, Web Services<br>&amp; Hosting Architecture</h1>
+        <p>Transition from a developer mindset to an enterprise integration strategist. Learn how standard gateways,
+            middleware and hosting balance agility against operational risks.</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
+            <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
+            <div class="hero-stat"><strong>Strategy</strong><span>Game</span></div>
+        </div>
     </div>
 
-    <div class="card">
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
-        <div><strong>API:</strong> Standard contract allowing software platforms to securely exchange business data.</div>
-        <div><strong>Web Service:</strong> Web-based interfaces exchanging structured data over standard Internet protocols.</div>
-        <div><strong>Middleware:</strong> Software glue translating between legacy on-premise systems and modern web networks.</div>
-        <div><strong>Hosting:</strong> Allocating hardware resources to run web applications and store databases.</div>
-        <div><strong>Cloud Hosting:</strong> Dynamically-allocated virtual servers billed on utility usage metrics.</div>
-        <div><strong>Digital Integration:</strong> Linking digital channels, CRM, and ERP to create unified customer flows.</div>
-        <div><strong>Service Level Agreement (SLA):</strong> A business contract guaranteeing service uptime and defining financial penalties.</div>
-        <div><strong>Digital Ecosystem:</strong> A collaborative network of customers, suppliers, and partners connected via APIs.</div>
-      </div>
-    </div>
-  </div>
-</div>
+    <!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
+    <div class="section" id="theory-board">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">📖</div>
+                <div>
+                    <h2>Dave Chaffey's Reference Board</h2>
+                    <p>Concise definitions for digital ecosystems</p>
+                </div>
+                <span class="section-num">Ref</span>
+            </div>
 
-<!-- MAIN SIMULATION INTERFACE -->
-<div class="section" id="sec34">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-icon">🔌</div>
-      <div>
-        <h2>3.4 – Interactive Strategy Simulation</h2>
-        <p>APIs, Web Services &amp; Hosting Architecture</p>
-      </div>
-      <span class="section-num">3.4</span>
-    </div>
-
-    <!-- LEVEL PILLS -->
-    <div class="level-pills" id="lp34">
-      <button class="level-pill active" onclick="switchLevel('34',1)">Level 1: Integration Detective</button>
-      <button class="level-pill" onclick="switchLevel('34',2)">Level 2: Integration Consultant</button>
-      <button class="level-pill" onclick="switchLevel('34',3)">Level 3: Ecosystem Strategy Simulator</button>
-    </div>
-
-    <!-- PROGRESS TRACKER -->
-    <div class="progress-wrap" style="margin-bottom: 2rem;">
-      <div class="progress-label" style="display:flex; justify-content:space-between; font-size: 0.85rem; font-weight:700; margin-bottom: 0.4rem;">
-        <span id="prog34-label">Level 1 of 3</span>
-        <span id="prog34-pct">33%</span>
-      </div>
-      <div class="progress-bar" style="height: 10px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow:hidden;">
-        <div class="progress-fill" id="prog34" style="width:33%; height:100%; background:var(--primary); transition: width 0.3s ease;"></div>
-      </div>
+            <div class="card">
+                <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+                    <div><strong>API:</strong> Standard contract allowing software platforms to securely exchange
+                        business data.</div>
+                    <div><strong>Web Service:</strong> Web-based interfaces exchanging structured data over standard
+                        Internet protocols.</div>
+                    <div><strong>Middleware:</strong> Software glue translating between legacy on-premise systems and
+                        modern web networks.</div>
+                    <div><strong>Hosting:</strong> Allocating hardware resources to run web applications and store
+                        databases.</div>
+                    <div><strong>Cloud Hosting:</strong> Dynamically-allocated virtual servers billed on utility usage
+                        metrics.</div>
+                    <div><strong>Digital Integration:</strong> Linking digital channels, CRM, and ERP to create unified
+                        customer flows.</div>
+                    <div><strong>Service Level Agreement (SLA):</strong> A business contract guaranteeing service uptime
+                        and defining financial penalties.</div>
+                    <div><strong>Digital Ecosystem:</strong> A collaborative network of customers, suppliers, and
+                        partners connected via APIs.</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- BADGES CONTAINER -->
-    <div class="card" style="padding: 1rem 2rem; display:flex; align-items:center; justify-content:space-around; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; background:rgba(255,255,255,0.5);">
-      <div id="badge-detective" class="badge-locked" style="text-align:center; font-size: 0.8rem; font-weight:700;">
-        <span style="font-size:2rem; display:block;">🏆</span> Detective Unlocked
-      </div>
-      <div id="badge-consultant" class="badge-locked" style="text-align:center; font-size: 0.8rem; font-weight:700;">
-        <span style="font-size:2rem; display:block;">💼</span> Consultant Unlocked
-      </div>
-      <div id="badge-chief" class="badge-locked" style="text-align:center; font-size: 0.8rem; font-weight:700;">
-        <span style="font-size:2rem; display:block;">👑</span> CDTO Unlocked
-      </div>
+    <!-- MAIN SIMULATION INTERFACE -->
+    <div class="section" id="sec34">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🔌</div>
+                <div>
+                    <h2>3.4 – Interactive Strategy Simulation</h2>
+                    <p>APIs, Web Services &amp; Hosting Architecture</p>
+                </div>
+                <span class="section-num">3.4</span>
+            </div>
+
+            <!-- LEVEL PILLS -->
+            <div class="level-pills" id="lp34">
+                <button class="level-pill active" onclick="switchLevel('34',1)">Level 1: Integration Detective</button>
+                <button class="level-pill" onclick="switchLevel('34',2)">Level 2: Integration Consultant</button>
+                <button class="level-pill" onclick="switchLevel('34',3)">Level 3: Ecosystem Strategy Simulator</button>
+            </div>
+
+            <!-- PROGRESS TRACKER -->
+            <div class="progress-wrap" style="margin-bottom: 2rem;">
+                <div class="progress-label"
+                    style="display:flex; justify-content:space-between; font-size: 0.85rem; font-weight:700; margin-bottom: 0.4rem;">
+                    <span id="prog34-label">Level 1 of 3</span>
+                    <span id="prog34-pct">33%</span>
+                </div>
+                <div class="progress-bar"
+                    style="height: 10px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow:hidden;">
+                    <div class="progress-fill" id="prog34"
+                        style="width:33%; height:100%; background:var(--primary); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <!-- BADGES CONTAINER -->
+            <div class="card"
+                style="padding: 1rem 2rem; display:flex; align-items:center; justify-content:space-around; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; background:rgba(255,255,255,0.5);">
+                <div id="badge-detective" class="badge-locked"
+                    style="text-align:center; font-size: 0.8rem; font-weight:700;">
+                    <span style="font-size:2rem; display:block;">🏆</span> Detective Unlocked
+                </div>
+                <div id="badge-consultant" class="badge-locked"
+                    style="text-align:center; font-size: 0.8rem; font-weight:700;">
+                    <span style="font-size:2rem; display:block;">💼</span> Consultant Unlocked
+                </div>
+                <div id="badge-chief" class="badge-locked"
+                    style="text-align:center; font-size: 0.8rem; font-weight:700;">
+                    <span style="font-size:2rem; display:block;">👑</span> CDTO Unlocked
+                </div>
+            </div>
+
+            <!-- LEVEL 1: DIGITAL INTEGRATION DETECTIVE -->
+            <div class="level-content active" id="lc34-1">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 1: Mission Brief</span>
+                    <h3>Digital Integration Detective</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Role: Junior Digital Business Analyst. Several organizations are suffering from catastrophic
+                        operational failures. Investigate disconnected platforms, isolate root causes, and recommend
+                        integration strategies.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3 id="l1-round-title">Case 1 of 3</h3>
+                    <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
+                        <h4 id="l1-case-title">Loading case...</h4>
+                        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; display:grid; grid-template-columns:1fr; gap:0.5rem;"
+                            id="l1-case-meta">
+                            <!-- Case profiles -->
+                        </div>
+
+                        <!-- Diagnostic Selectors -->
+                        <div id="l1-selectors"
+                            style="display:flex; flex-direction:column; gap:1.2rem; margin-top:1.5rem;">
+                            <!-- Selectors injected dynamically -->
+                        </div>
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Diagnose
+                                Issue</button>
+                            <button class="run-btn"
+                                style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                                onclick="toggleHint(1)">💡 Need Help?</button>
+                        </div>
+
+                        <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
+                        <div class="quiz-feedback" id="qf-l1" style="margin-top:1.2rem; line-height: 1.5;"></div>
+
+                        <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1.5rem;"
+                            onclick="nextL1Round()">Next Case Investigation ➔</button>
+                    </div>
+
+                    <!-- LEVEL 1 PERFORMANCE DASHBOARD -->
+                    <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+                        <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">
+                            Performance Dashboard</h4>
+                        <div class="gauge-wrap"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-diag">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Business Diagnosis</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-think">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Integration Thinking</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-cx">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Customer Impact</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-strategy">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Strategic Analysis</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-ready">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Digital Readiness</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="l1-reinforcement"
+                        style="display:none; margin-top:2rem; padding:1.5rem; background:rgba(42, 157, 143, 0.08); border-left:4px solid var(--code-ok); border-radius:var(--radius-md);">
+                        <!-- Completion reinforcement banner -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 2: ENTERPRISE INTEGRATION CONSULTANT -->
+            <div class="level-content" id="lc34-2">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 2: Mission Brief</span>
+                    <h3>Enterprise Integration Consultant</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Role: Senior Enterprise Integration Consultant. Clients hire you to construct digital
+                        integration roadmaps. Balance budget limits against business values, and adapt to sudden
+                        mid-play market events.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <h3>Consulting Engagement Profile</h3>
+                        <select id="l2CaseSelect" class="tk-entry" onchange="changeL2Case()"
+                            style="font-weight: 700; border-color: var(--primary);">
+                            <option value="streaming">Global Retail Company</option>
+                            <option value="bank">Digital Bank Portal</option>
+                            <option value="university">Campus LMS Ecosystem</option>
+                        </select>
+                    </div>
+
+                    <div class="info-box" style="margin-top:0;">
+                        <h4 id="l2-title" style="margin-bottom:0.3rem;">Global Retail Company</h4>
+                        <p id="l2-desc" style="color:var(--text-muted); font-size:0.85rem;">Integrating Mobile App, CRM,
+                            ERP, and payment channels under strict budgets.</p>
+                    </div>
+
+                    <!-- HUD budget tracker -->
+                    <div
+                        style="display:flex; gap:1.5rem; margin: 1.5rem 0; flex-wrap:wrap; background:rgba(0,0,0,0.03); padding:1rem; border-radius:var(--radius-md);">
+                        <div>
+                            <div class="gauge-sub" style="font-size:0.7rem;">Strategy Budget Remaining</div>
+                            <div class="gauge-num" id="l2-budget-count"
+                                style="font-size:1.8rem; font-family:'Archivo Black',sans-serif;">₹0</div>
+                        </div>
+                    </div>
+
+                    <!-- Technologies selection grid -->
+                    <h4 style="font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:1rem;">Available
+                        Business Integrations</h4>
+                    <div id="l2-tech-list"
+                        style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+                        <!-- Injected dynamically -->
+                    </div>
+
+                    <!-- Mid-round dynamic event warnings -->
+                    <div class="warn-box" id="l2-event-alert"
+                        style="display:none; margin-top:2rem; border-left-color:var(--code-err);">
+                        <h4
+                            style="color:var(--code-err); font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:0.3rem;">
+                            🚨 Critical Business Event Alert!</h4>
+                        <p id="l2-event-text" style="font-size:0.85rem;"></p>
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" onclick="submitL2Evaluation()">▶ Submit Strategy Roadmap</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(2)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l2" style="margin-top:1.5rem; line-height:1.5;"></div>
+
+                    <!-- LEVEL 2 PERFORMANCE DASHBOARD -->
+                    <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+                        <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">
+                            Performance Dashboard</h4>
+                        <div class="gauge-wrap"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-agility">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Business Agility</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-quality">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Integration Quality</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-cx">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Customer Experience</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-partner">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Partner Connect</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-scale">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Scalability</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-reliability">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Reliability</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="l2-reinforcement"
+                        style="display:none; margin-top:2rem; padding:1.5rem; background:rgba(42, 157, 143, 0.08); border-left:4px solid var(--code-ok); border-radius:var(--radius-md);">
+                        <!-- Completion banner -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 3: DIGITAL ECOSYSTEM STRATEGY SIMULATOR -->
+            <div class="level-content" id="lc34-3">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 3: Boss Mission</span>
+                    <h3>Digital Ecosystem Strategy Simulator</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Role: Chief Digital Ecosystem Officer. Lead a multinational enterprise over a 10-year digital
+                        migration roadmap. Manage budgets, withstand outages, and integrate strategic partners before
+                        tackling the final ecosystem consolidation.
+                    </p>
+                </div>
+
+                <div class="card" id="l3-gameplay-card">
+                    <span class="hero-badge" id="l3-phase-badge">Year 1 of 10</span>
+                    <h3 id="l3-phase-title" style="margin-top:0.5rem;">Year 1: Digital Foundation</h3>
+                    <p id="l3-phase-text" style="color:var(--text-muted); margin-bottom:1.5rem; font-size:0.95rem;"></p>
+
+                    <!-- Dropdowns for timeline -->
+                    <div id="l3-selectors" style="margin-bottom:1.5rem;">
+                        <!-- Injected dynamically -->
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Submit Strategy
+                            Decision</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(3)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l3" style="margin-top:1.5rem; line-height:1.5;"></div>
+
+                    <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1.5rem;"
+                        onclick="proceedL3NextPhase()">Proceed to Next Year ➔</button>
+                </div>
+
+                <!-- LEVEL 3 PERFORMANCE DASHBOARD -->
+                <div class="card" id="l3-dashboard-card">
+                    <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">Ecosystem
+                        Performance Tracker</h4>
+                    <div class="gauge-wrap"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-score">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Integration Score</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-cx">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Customer Exp</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-partner">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Partner Connect</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-agility">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Business Agility</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-innov">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Innovation Cap</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-scale">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Scalability</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-eff">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Operational Eff</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-ready">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Digital Readiness</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-strat">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Strategic Thinking</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-comp">0%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Competitive Adv</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FINAL BOSS CHALLENGE MODULE -->
+                <div class="card" id="l3-boss-challenge" style="display:none;">
+                    <span class="hero-badge">Final Boss Strategy Challenge</span>
+                    <h3>Multinational Enterprise Ecosystem Consolidation</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                        The Global Marketplace operates a completely disconnected infrastructure: Website, Mobile App,
+                        CRM, ERP, Warehouse, Payment Gateway, Marketing, Supplier Portal, Logistics, Analytics, AI
+                        Recommender, and Government Tax records. Structure a 4-point roadmap to integrate their systems.
+                    </p>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.5rem;"
+                        id="l3-boss-selectors">
+                        <div>
+                            <span class="tk-label">Q1 Focus: Foundation Bridging</span>
+                            <select id="boss-q1" class="tk-entry" style="width:100%;">
+                                <option value="core_first">Integrate core ERP and Warehouse nodes (High Business
+                                    Continuity)</option>
+                                <option value="marketing_first">Integrate AI recommender and marketing platforms (Needs
+                                    Improvement)</option>
+                                <option value="tax_first">Integrate Government Tax systems first (Needs Improvement)
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="tk-label">Q2 Focus: Core API Deployment</span>
+                            <select id="boss-q2" class="tk-entry" style="width:100%;">
+                                <option value="supplier_client">Real-time Supplier inventory and Checkout payment APIs
+                                    (Optimal)</option>
+                                <option value="support_internal">Internal staff messaging and email template APIs (Needs
+                                    Improvement)</option>
+                                <option value="alumni_public">Public social network login feeds (Needs Improvement)
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="tk-label">Q3 Focus: Hosting Infrastructure</span>
+                            <select id="boss-q3" class="tk-entry" style="width:100%;">
+                                <option value="hybrid_multi">Hybrid Multi-cloud hosting with automated zone failover
+                                    (Optimal)</option>
+                                <option value="onprem">Dedicated physical office mainframes (Needs Improvement)</option>
+                                <option value="public_single">Single public cloud instance without replication (Needs
+                                    Improvement)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="tk-label">Q4 Focus: Customer Experience</span>
+                            <select id="boss-q4" class="tk-entry" style="width:100%;">
+                                <option value="realtime_events">Event-driven updates (Webhooks) for order status and
+                                    tracking (Optimal)</option>
+                                <option value="daily_email">Daily email updates summarizing all transactions (Needs
+                                    Improvement)</option>
+                                <option value="no_updates">Instruct users to call customer support lines (Needs
+                                    Improvement)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="run-btn" onclick="concludeBossSimulation()">▶ Analyze Ecosystem &amp; Generate
+                        Consulting Report</button>
+                </div>
+
+                <!-- SYSTEM CONSULTING REPORT -->
+                <div id="l3-consulting-report" style="display:none; margin-top:2rem;">
+                    <!-- Dynamically injected consulting report -->
+                </div>
+            </div>
+
+            <!-- PREV / NEXT BOTTOM NAVIGATION PANEL -->
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                <button class="run-btn" id="prevLevelBtn" style="background:var(--secondary);"
+                    onclick="navigateLevel(-1)">◀ Previous Level</button>
+                <button class="run-btn" id="nextLevelBtn" onclick="navigateLevel(1)">Next Level ▶</button>
+            </div>
+
+        </div>
     </div>
 
-    <!-- LEVEL 1: DIGITAL INTEGRATION DETECTIVE -->
-    <div class="level-content active" id="lc34-1">
-      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-        <span class="hero-badge">Level 1: Mission Brief</span>
-        <h3>Digital Integration Detective</h3>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-          Role: Junior Digital Business Analyst. Several organizations are suffering from catastrophic operational failures. Investigate disconnected platforms, isolate root causes, and recommend integration strategies.
-        </p>
-      </div>
+    <footer>
+        Digital Business Simulation Series · <strong>Module 3.4 — APIs, Web Services &amp; Hosting Architecture</strong>
+    </footer>
 
-      <div class="card">
-        <h3 id="l1-round-title">Case 1 of 3</h3>
-        <div class="challenge-box" style="margin-top:0;" id="l1-game-box">
-          <h4 id="l1-case-title">Loading case...</h4>
-          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; display:grid; grid-template-columns:1fr; gap:0.5rem;" id="l1-case-meta">
-            <!-- Case profiles -->
-          </div>
+    <script>
+        /* ─── GENERAL NAVIGATION & UI STATE ─── */
+        let activeLevel = 1;
 
-          <!-- Diagnostic Selectors -->
-          <div id="l1-selectors" style="display:flex; flex-direction:column; gap:1.2rem; margin-top:1.5rem;">
-            <!-- Selectors injected dynamically -->
-          </div>
+        function switchLevel(secId, targetLevel) {
+            activeLevel = targetLevel;
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-            <button class="run-btn" id="l1-submit-btn" onclick="submitL1Answer()">▶ Diagnose Issue</button>
-            <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(1)">💡 Need Help?</button>
-          </div>
+            // Update Pills
+            document.querySelectorAll(`#lp34 .level-pill`).forEach((pill, idx) => {
+                pill.classList.toggle('active', (idx + 1) === targetLevel);
+            });
 
-          <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
-          <div class="quiz-feedback" id="qf-l1" style="margin-top:1.2rem; line-height: 1.5;"></div>
+            // Update Content Panels
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`lc34-${i}`);
+                if (el) el.classList.toggle('active', i === targetLevel);
+            }
 
-          <button class="run-btn" id="nextL1Btn" style="display:none; margin-top:1.5rem;" onclick="nextL1Round()">Next Case Investigation ➔</button>
-        </div>
+            // Update Progress values
+            const pct = Math.round((targetLevel / 3) * 100);
+            document.getElementById('prog34-label').textContent = `Level ${targetLevel} of 3`;
+            document.getElementById('prog34-pct').textContent = `${pct}%`;
+            document.getElementById('prog34').style.width = `${pct}%`;
 
-        <!-- LEVEL 1 PERFORMANCE DASHBOARD -->
-        <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
-          <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">Performance Dashboard</h4>
-          <div class="gauge-wrap" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l1-hud-diag">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Business Diagnosis</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l1-hud-think">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Integration Thinking</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l1-hud-cx">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Customer Impact</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l1-hud-strategy">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Strategic Analysis</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l1-hud-ready">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Digital Readiness</div>
-            </div>
-          </div>
-        </div>
+            // Update Nav Buttons
+            document.getElementById('prevLevelBtn').style.display = (targetLevel === 1) ? 'none' : 'inline-flex';
+            document.getElementById('nextLevelBtn').style.display = (targetLevel === 3) ? 'none' : 'inline-flex';
+        }
 
-        <div id="l1-reinforcement" style="display:none; margin-top:2rem; padding:1.5rem; background:rgba(42, 157, 143, 0.08); border-left:4px solid var(--code-ok); border-radius:var(--radius-md);">
-          <!-- Completion reinforcement banner -->
-        </div>
-      </div>
-    </div>
+        function navigateLevel(direction) {
+            let target = activeLevel + direction;
+            if (target >= 1 && target <= 3) {
+                switchLevel('34', target);
+            }
+        }
 
-    <!-- LEVEL 2: ENTERPRISE INTEGRATION CONSULTANT -->
-    <div class="level-content" id="lc34-2">
-      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-        <span class="hero-badge">Level 2: Mission Brief</span>
-        <h3>Enterprise Integration Consultant</h3>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-          Role: Senior Enterprise Integration Consultant. Clients hire you to construct digital integration roadmaps. Balance budget limits against business values, and adapt to sudden mid-play market events.
-        </p>
-      </div>
-
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
-          <h3>Consulting Engagement Profile</h3>
-          <select id="l2CaseSelect" class="tk-entry" onchange="changeL2Case()" style="font-weight: 700; border-color: var(--primary);">
-            <option value="streaming">Global Retail Company</option>
-            <option value="bank">Digital Bank Portal</option>
-            <option value="university">Campus LMS Ecosystem</option>
-          </select>
-        </div>
-
-        <div class="info-box" style="margin-top:0;">
-          <h4 id="l2-title" style="margin-bottom:0.3rem;">Global Retail Company</h4>
-          <p id="l2-desc" style="color:var(--text-muted); font-size:0.85rem;">Integrating Mobile App, CRM, ERP, and payment channels under strict budgets.</p>
-        </div>
-
-        <!-- HUD budget tracker -->
-        <div style="display:flex; gap:1.5rem; margin: 1.5rem 0; flex-wrap:wrap; background:rgba(0,0,0,0.03); padding:1rem; border-radius:var(--radius-md);">
-          <div>
-            <div class="gauge-sub" style="font-size:0.7rem;">Strategy Budget Remaining</div>
-            <div class="gauge-num" id="l2-budget-count" style="font-size:1.8rem; font-family:'Archivo Black',sans-serif;">₹0</div>
-          </div>
-        </div>
-
-        <!-- Technologies selection grid -->
-        <h4 style="font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:1rem;">Available Business Integrations</h4>
-        <div id="l2-tech-list" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
-          <!-- Injected dynamically -->
-        </div>
-
-        <!-- Mid-round dynamic event warnings -->
-        <div class="warn-box" id="l2-event-alert" style="display:none; margin-top:2rem; border-left-color:var(--code-err);">
-          <h4 style="color:var(--code-err); font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:0.3rem;">🚨 Critical Business Event Alert!</h4>
-          <p id="l2-event-text" style="font-size:0.85rem;"></p>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; flex-wrap:wrap; gap:1rem;">
-          <button class="run-btn" onclick="submitL2Evaluation()">▶ Submit Strategy Roadmap</button>
-          <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(2)">💡 Need Help?</button>
-        </div>
-
-        <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
-        <div class="quiz-feedback" id="qf-l2" style="margin-top:1.5rem; line-height:1.5;"></div>
-
-        <!-- LEVEL 2 PERFORMANCE DASHBOARD -->
-        <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
-          <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">Performance Dashboard</h4>
-          <div class="gauge-wrap" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l2-hud-agility">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Business Agility</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l2-hud-quality">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Integration Quality</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l2-hud-cx">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Customer Experience</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l2-hud-partner">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Partner Connect</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l2-hud-scale">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Scalability</div>
-            </div>
-            <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-              <div class="gauge-num" id="l2-hud-reliability">0%</div>
-              <div class="gauge-sub" style="font-size: 0.65rem;">Reliability</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="l2-reinforcement" style="display:none; margin-top:2rem; padding:1.5rem; background:rgba(42, 157, 143, 0.08); border-left:4px solid var(--code-ok); border-radius:var(--radius-md);">
-          <!-- Completion banner -->
-        </div>
-      </div>
-    </div>
-
-    <!-- LEVEL 3: DIGITAL ECOSYSTEM STRATEGY SIMULATOR -->
-    <div class="level-content" id="lc34-3">
-      <div class="card" style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
-        <span class="hero-badge">Level 3: Boss Mission</span>
-        <h3>Digital Ecosystem Strategy Simulator</h3>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
-          Role: Chief Digital Ecosystem Officer. Lead a multinational enterprise over a 10-year digital migration roadmap. Manage budgets, withstand outages, and integrate strategic partners before tackling the final ecosystem consolidation.
-        </p>
-      </div>
-
-      <div class="card" id="l3-gameplay-card">
-        <span class="hero-badge" id="l3-phase-badge">Year 1 of 10</span>
-        <h3 id="l3-phase-title" style="margin-top:0.5rem;">Year 1: Digital Foundation</h3>
-        <p id="l3-phase-text" style="color:var(--text-muted); margin-bottom:1.5rem; font-size:0.95rem;"></p>
-
-        <!-- Dropdowns for timeline -->
-        <div id="l3-selectors" style="margin-bottom:1.5rem;">
-          <!-- Injected dynamically -->
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; flex-wrap:wrap; gap:1rem;">
-          <button class="run-btn" id="l3-submit-btn" onclick="submitL3Phase()">▶ Submit Strategy Decision</button>
-          <button class="run-btn" style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;" onclick="toggleHint(3)">💡 Need Help?</button>
-        </div>
-
-        <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
-        <div class="quiz-feedback" id="qf-l3" style="margin-top:1.5rem; line-height:1.5;"></div>
-
-        <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1.5rem;" onclick="proceedL3NextPhase()">Proceed to Next Year ➔</button>
-      </div>
-
-      <!-- LEVEL 3 PERFORMANCE DASHBOARD -->
-      <div class="card" id="l3-dashboard-card">
-        <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">Ecosystem Performance Tracker</h4>
-        <div class="gauge-wrap" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-score">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Integration Score</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-cx">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Customer Exp</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-partner">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Partner Connect</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-agility">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Business Agility</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-innov">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Innovation Cap</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-scale">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Scalability</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-eff">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Operational Eff</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-ready">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Digital Readiness</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-strat">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Strategic Thinking</div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
-            <div class="gauge-num" id="l3-hud-comp">0%</div>
-            <div class="gauge-sub" style="font-size: 0.65rem;">Competitive Adv</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FINAL BOSS CHALLENGE MODULE -->
-      <div class="card" id="l3-boss-challenge" style="display:none;">
-        <span class="hero-badge">Final Boss Strategy Challenge</span>
-        <h3>Multinational Enterprise Ecosystem Consolidation</h3>
-        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-          The Global Marketplace operates a completely disconnected infrastructure: Website, Mobile App, CRM, ERP, Warehouse, Payment Gateway, Marketing, Supplier Portal, Logistics, Analytics, AI Recommender, and Government Tax records. Structure a 4-point roadmap to integrate their systems.
-        </p>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.5rem;" id="l3-boss-selectors">
-          <div>
-            <span class="tk-label">Q1 Focus: Foundation Bridging</span>
-            <select id="boss-q1" class="tk-entry" style="width:100%;">
-              <option value="core_first">Integrate core ERP and Warehouse nodes (High Business Continuity)</option>
-              <option value="marketing_first">Integrate AI recommender and marketing platforms (Needs Improvement)</option>
-              <option value="tax_first">Integrate Government Tax systems first (Needs Improvement)</option>
-            </select>
-          </div>
-          <div>
-            <span class="tk-label">Q2 Focus: Core API Deployment</span>
-            <select id="boss-q2" class="tk-entry" style="width:100%;">
-              <option value="supplier_client">Real-time Supplier inventory and Checkout payment APIs (Optimal)</option>
-              <option value="support_internal">Internal staff messaging and email template APIs (Needs Improvement)</option>
-              <option value="alumni_public">Public social network login feeds (Needs Improvement)</option>
-            </select>
-          </div>
-          <div>
-            <span class="tk-label">Q3 Focus: Hosting Infrastructure</span>
-            <select id="boss-q3" class="tk-entry" style="width:100%;">
-              <option value="hybrid_multi">Hybrid Multi-cloud hosting with automated zone failover (Optimal)</option>
-              <option value="onprem">Dedicated physical office mainframes (Needs Improvement)</option>
-              <option value="public_single">Single public cloud instance without replication (Needs Improvement)</option>
-            </select>
-          </div>
-          <div>
-            <span class="tk-label">Q4 Focus: Customer Experience</span>
-            <select id="boss-q4" class="tk-entry" style="width:100%;">
-              <option value="realtime_events">Event-driven updates (Webhooks) for order status and tracking (Optimal)</option>
-              <option value="daily_email">Daily email updates summarizing all transactions (Needs Improvement)</option>
-              <option value="no_updates">Instruct users to call customer support lines (Needs Improvement)</option>
-            </select>
-          </div>
-        </div>
-
-        <button class="run-btn" onclick="concludeBossSimulation()">▶ Analyze Ecosystem &amp; Generate Consulting Report</button>
-      </div>
-
-      <!-- SYSTEM CONSULTING REPORT -->
-      <div id="l3-consulting-report" style="display:none; margin-top:2rem;">
-        <!-- Dynamically injected consulting report -->
-      </div>
-    </div>
-
-    <!-- PREV / NEXT BOTTOM NAVIGATION PANEL -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
-      <button class="run-btn" id="prevLevelBtn" style="background:var(--secondary);" onclick="navigateLevel(-1)">◀ Previous Level</button>
-      <button class="run-btn" id="nextLevelBtn" onclick="navigateLevel(1)">Next Level ▶</button>
-    </div>
-
-  </div>
-</div>
-
-<footer>
-  Digital Business Simulation Series · <strong>Module 3.4 — APIs, Web Services &amp; Hosting Architecture</strong>
-</footer>
-
-<script>
-/* ─── GENERAL NAVIGATION & UI STATE ─── */
-let activeLevel = 1;
-
-function switchLevel(secId, targetLevel) {
-  activeLevel = targetLevel;
-  
-  // Update Pills
-  document.querySelectorAll(`#lp34 .level-pill`).forEach((pill, idx) => {
-    pill.classList.toggle('active', (idx + 1) === targetLevel);
-  });
-
-  // Update Content Panels
-  for (let i = 1; i <= 3; i++) {
-    const el = document.getElementById(`lc34-${i}`);
-    if (el) el.classList.toggle('active', i === targetLevel);
-  }
-
-  // Update Progress values
-  const pct = Math.round((targetLevel / 3) * 100);
-  document.getElementById('prog34-label').textContent = `Level ${targetLevel} of 3`;
-  document.getElementById('prog34-pct').textContent = `${pct}%`;
-  document.getElementById('prog34').style.width = `${pct}%`;
-
-  // Update Nav Buttons
-  document.getElementById('prevLevelBtn').style.display = (targetLevel === 1) ? 'none' : 'inline-flex';
-  document.getElementById('nextLevelBtn').style.display = (targetLevel === 3) ? 'none' : 'inline-flex';
-}
-
-function navigateLevel(direction) {
-  let target = activeLevel + direction;
-  if (target >= 1 && target <= 3) {
-    switchLevel('34', target);
-  }
-}
-
-function toggleHint(levelNum) {
-  const box = document.getElementById(`l${levelNum}-hint-box`);
-  if (!box) return;
-  if (box.style.display === "none") {
-    box.style.display = "block";
-    if (levelNum === 1) {
-      if (l1Round === 1) {
-        box.innerHTML = `<strong>💡 Hint for Case 1:</strong> Select the following options:<br>
+        function toggleHint(levelNum) {
+            const box = document.getElementById(`l${levelNum}-hint-box`);
+            if (!box) return;
+            if (box.style.display === "none") {
+                box.style.display = "block";
+                if (levelNum === 1) {
+                    if (l1Round === 1) {
+                        box.innerHTML = `<strong>💡 Hint for Case 1:</strong> Select the following options:<br>
           • <strong>Missing Integration:</strong> 'Inventory & Warehouse API Bridging (Optimal)'<br>
           • <strong>Root Cause:</strong> 'Siloed database records with zero real-time interchange channels (Optimal)'<br>
           • <strong>Business Impact:</strong> 'Damaged brand trust and operational overhead resolving disputes (Optimal)'<br>
           • <strong>Remedy:</strong> 'Implement RESTful middleware API connections to sync ERP with Warehouse systems (Optimal)'`;
-      } else if (l1Round === 2) {
-        box.innerHTML = `<strong>💡 Hint for Case 2:</strong> Select the following options:<br>
+                    } else if (l1Round === 2) {
+                        box.innerHTML = `<strong>💡 Hint for Case 2:</strong> Select the following options:<br>
           • <strong>Missing Integration:</strong> 'Event-driven Webhook & State APIs (Optimal)'<br>
           • <strong>Root Cause:</strong> 'Lack of transactional messaging state between payment and order queues (Optimal)'<br>
           • <strong>Business Impact:</strong> 'High order cancellations, double-refund overheads, and driver resource waste (Optimal)'<br>
           • <strong>Remedy:</strong> 'Deploy RESTful transactional APIs with event-driven Webhook queues (Optimal)'`;
-      } else {
-        box.innerHTML = `<strong>💡 Hint for Case 3:</strong> Select the following options:<br>
+                    } else {
+                        box.innerHTML = `<strong>💡 Hint for Case 3:</strong> Select the following options:<br>
           • <strong>Missing Integration:</strong> 'Enterprise Service Bus (ESB) & Partner APIs (Optimal)'<br>
           • <strong>Root Cause:</strong> 'Isolated legacy databases requiring manual CSV tables rekeying (Optimal)'<br>
           • <strong>Business Impact:</strong> 'Severe operational processing delays and administrative resource leakage (Optimal)'<br>
           • <strong>Remedy:</strong> 'Implement RESTful service gateways and insurance API endpoints (Optimal)'`;
-      }
-    } else if (levelNum === 2) {
-      const key = document.getElementById('l2CaseSelect').value;
-      if (key === 'streaming') {
-        box.textContent = "Chaffey Tip: Integrate web channels, supplier portals, and checkouts. Ensure you select standard APIs, middleware ESB, supplier XML connectors, Stripe gateway, and Zendesk support.";
-      } else if (key === 'bank') {
-        box.textContent = "Chaffey Tip: Security is critical for ATM and verification channels. Select standard APIs, OAuth authentication, ESB middleware, Stripe payment gateway, and telemetry analytics.";
-      } else {
-        box.textContent = "Chaffey Tip: Focus on managing student traffic spikes during registration. Choose standard APIs, Elastic Cloud hosting, OAuth engines, telemetry analytics, and Zendesk support.";
-      }
-    } else {
-      const yearHints = {
-        1: "Chaffey Hint: Avoid massive database rewrites at day one. Standardize data interfaces using standard APIs first.",
-        2: "Chaffey Hint: Overprovisioning physical servers manually is slow and costly. Transition to dynamic Cloud Hosting.",
-        3: "Chaffey Hint: Do not expose raw internal databases directly to third parties. Protect connections using secure partner APIs.",
-        4: "Chaffey Hint: Synchronizing store checkouts and web portals in real-time requires a central ESB middleware platform.",
-        5: "Chaffey Hint: Reduce long-distance routing delays for European and Asian buyers by deploying multi-region cloud servers.",
-        6: "Chaffey Hint: Writing custom spreadsheet parsers for each partner breaks easily. Standardize checkout routes via partner APIs.",
-        7: "Chaffey Hint: A single payment provider failure halts storefront transactions. Configure automated failover gateways.",
-        8: "Chaffey Hint: Minimize server utility expenses during budget cuts by cleaning up dynamic node sizes and edge CDN caches.",
-        9: "Chaffey Hint: Build AI recommendation layers rapidly by consuming managed public cloud AI API platforms.",
-        10: "Chaffey Hint: Prevent long-term provider locking. Build an open digital ecosystem with API lifecycle management."
-      };
-      box.textContent = yearHints[l3Year] || "Chaffey Hint: Focus on digital integration principles to maximize corporate agility.";
-    }
-  } else {
-    box.style.display = "none";
-  }
-}
+                    }
+                } else if (levelNum === 2) {
+                    const key = document.getElementById('l2CaseSelect').value;
+                    if (key === 'streaming') {
+                        box.textContent = "Chaffey Tip: Integrate web channels, supplier portals, and checkouts. Ensure you select standard APIs, middleware ESB, supplier XML connectors, Stripe gateway, and Zendesk support.";
+                    } else if (key === 'bank') {
+                        box.textContent = "Chaffey Tip: Security is critical for ATM and verification channels. Select standard APIs, OAuth authentication, ESB middleware, Stripe payment gateway, and telemetry analytics.";
+                    } else {
+                        box.textContent = "Chaffey Tip: Focus on managing student traffic spikes during registration. Choose standard APIs, Elastic Cloud hosting, OAuth engines, telemetry analytics, and Zendesk support.";
+                    }
+                } else {
+                    const yearHints = {
+                        1: "Chaffey Hint: Avoid massive database rewrites at day one. Standardize data interfaces using standard APIs first.",
+                        2: "Chaffey Hint: Overprovisioning physical servers manually is slow and costly. Transition to dynamic Cloud Hosting.",
+                        3: "Chaffey Hint: Do not expose raw internal databases directly to third parties. Protect connections using secure partner APIs.",
+                        4: "Chaffey Hint: Synchronizing store checkouts and web portals in real-time requires a central ESB middleware platform.",
+                        5: "Chaffey Hint: Reduce long-distance routing delays for European and Asian buyers by deploying multi-region cloud servers.",
+                        6: "Chaffey Hint: Writing custom spreadsheet parsers for each partner breaks easily. Standardize checkout routes via partner APIs.",
+                        7: "Chaffey Hint: A single payment provider failure halts storefront transactions. Configure automated failover gateways.",
+                        8: "Chaffey Hint: Minimize server utility expenses during budget cuts by cleaning up dynamic node sizes and edge CDN caches.",
+                        9: "Chaffey Hint: Build AI recommendation layers rapidly by consuming managed public cloud AI API platforms.",
+                        10: "Chaffey Hint: Prevent long-term provider locking. Build an open digital ecosystem with API lifecycle management."
+                    };
+                    box.textContent = yearHints[l3Year] || "Chaffey Hint: Focus on digital integration principles to maximize corporate agility.";
+                }
+            } else {
+                box.style.display = "none";
+            }
+        }
 
-function unlockBadge(id, badgeText) {
-  const badge = document.getElementById(id);
-  if (badge) {
-    badge.className = "badge-unlocked";
-    badge.innerHTML = `<span style="font-size:2rem; display:block;">🏆</span> ${badgeText}`;
-  }
-}
+        function unlockBadge(id, badgeText) {
+            const badge = document.getElementById(id);
+            if (badge) {
+                badge.className = "badge-unlocked";
+                badge.innerHTML = `<span style="font-size:2rem; display:block;">🏆</span> ${badgeText}`;
+            }
+        }
 
-function shuffleArray(array) {
-  let arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
 
-/* ─── LEVEL 1: DIGITAL INTEGRATION DETECTIVE ─── */
-const l1Cases = {
-  1: {
-    title: "Investigation 1: Disconnected Retailer",
-    symptoms: "Customer orders delayed, warehouse inventory mismatch, delivery tracking states outdated. Complaints surge.",
-    infra: "Siloed website databases, separate CRM client records, zero automation channels.",
-    selectors: [
-      { id: "l1-sel-cause", label: "Identify Missing Business Integration", options: [
-        { val: "inventory_bridge", text: "Inventory & Warehouse API Bridging (Optimal)" },
-        { val: "ssl_gate", text: "Unencrypted SSL Web Gateway (Needs Improvement)" },
-        { val: "single_db", text: "Single Database Locking bottlenecks (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-root", label: "Identify Root Cause", options: [
-        { val: "silo_db", text: "Siloed database records with zero real-time interchange channels (Optimal)" },
-        { val: "no_https", text: "Missing HTTPS redirection rules (Needs Improvement)" },
-        { val: "slow_rtt", text: "Slow page loads caused by server latency (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-impact", label: "Identify Business Impact", options: [
-        { val: "brand_damage", text: "Damaged brand trust and operational overhead resolving disputes (Optimal)" },
-        { val: "data_leak", text: "Unauthorized client account profile leaks (Needs Improvement)" },
-        { val: "cost_spike", text: "Excessive cloud hosting compute costs (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-remedy", label: "Recommended Integration Strategy", options: [
-        { val: "rest_api", text: "Implement RESTful middleware API connections to sync ERP with Warehouse systems (Optimal)" },
-        { val: "load_bal", text: "Deploy active Load Balancer clusters (Needs Improvement)" },
-        { val: "dns_any", text: "Configure Anycast domain name servers (Needs Improvement)" }
-      ]}
-    ],
-    correct: { "l1-sel-cause": "inventory_bridge", "l1-sel-root": "silo_db", "l1-sel-impact": "brand_damage", "l1-sel-remedy": "rest_api" },
-    correctFeedback: "<strong>✓ Diagnosis Confirmed!</strong><br>• <strong>Why it helps:</strong> Bridging siloed records prevents double-entry human errors.<br>• <strong>CX Impact:</strong> Restores immediate stock tracking updates at checkout.<br>• <strong>Textbook Concept:</strong> <em>Enterprise Application Integration (EAI)</em>.",
-    incorrectFeedback: "<strong>✗ Diagnosis Mismatch!</strong><br>• <strong>Why it fails:</strong> Upgrading encryption algorithms or load-balancers fails to bridge isolated databases.<br>• <strong>Consequences:</strong> ERP and warehouse tables remain out of sync.<br>• <strong>Better Action:</strong> Select Inventory API integration and RESTful middleware.<br>• <strong>Dave Chaffey Principle:</strong> <em>Siloed digital systems fragmentation</em>."
-  },
-  2: {
-    title: "Investigation 2: Fragmented Delivery Platform",
-    symptoms: "Payment gateway charges succeed but kitchen dispatch orders fail. Drivers get wrong address routes.",
-    infra: "Customer App and Delivery Tracker running on independent servers without active sync.",
-    selectors: [
-      { id: "l1-sel-cause", label: "Identify Missing Business Integration", options: [
-        { val: "webhook_api", text: "Event-driven Webhook & State APIs (Optimal)" },
-        { val: "anycast", text: "Anycast DNS resolution (Needs Improvement)" },
-        { val: "vpn_line", text: "Private VPN lines (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-root", label: "Identify Root Cause", options: [
-        { val: "state_desync", text: "Lack of transactional messaging state between payment and order queues (Optimal)" },
-        { val: "dns_rtt", text: "Slow domain name resolutions (Needs Improvement)" },
-        { val: "tls_leak", text: "No TLS data encryption keys (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-impact", label: "Identify Business Impact", options: [
-        { val: "cancel_loss", text: "High order cancellations, double-refund overheads, and driver resource waste (Optimal)" },
-        { val: "load_drop", text: "Slow page rendering RTT limits (Needs Improvement)" },
-        { val: "audit_fail", text: "Security compliance failures (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-remedy", label: "Recommended Integration Strategy", options: [
-        { val: "webhook_sync", text: "Deploy RESTful transactional APIs with event-driven Webhook queues (Optimal)" },
-        { val: "edge_cdn", text: "Install basic browser caches (Needs Improvement)" },
-        { val: "private_cloud", text: "Upgrade to Private Cloud servers (Needs Improvement)" }
-      ]}
-    ],
-    correct: { "l1-sel-cause": "webhook_api", "l1-sel-root": "state_desync", "l1-sel-impact": "cancel_loss", "l1-sel-remedy": "webhook_sync" },
-    correctFeedback: "<strong>✓ Diagnosis Confirmed!</strong><br>• <strong>Why it helps:</strong> Webhooks trigger transactional dispatches instantly upon payment receipts.<br>• <strong>CX Impact:</strong> Customers, kitchens, and drivers stay aligned in real-time.<br>• <strong>Textbook Concept:</strong> <em>Real-time web service notifications</em>.",
-    incorrectFeedback: "<strong>✗ Diagnosis Mismatch!</strong><br>• <strong>Why it fails:</strong> Updating DNS routing paths or caching static web assets fails to sync transaction status codes.<br>• <strong>Consequences:</strong> Customers pay but kitchens receive no order tickets.<br>• <strong>Better Action:</strong> Implement event-driven Webhooks and state APIs.<br>• <strong>Dave Chaffey Principle:</strong> <em>Web Service transactional orchestration</em>."
-  },
-  3: {
-    title: "Investigation 3: Siloed Clinical Records",
-    symptoms: "Patient registration records must be typed multiple times; appointments delay; lab test verifications take days.",
-    infra: "Separate medical databases with no unified directory mappings.",
-    selectors: [
-      { id: "l1-sel-cause", label: "Identify Missing Business Integration", options: [
-        { val: "esb_api", text: "Enterprise Service Bus (ESB) & Partner APIs (Optimal)" },
-        { val: "cdn_cache", text: "Edge CDN static caching (Needs Improvement)" },
-        { val: "lb_nodes", text: "Load balancing clusters (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-root", label: "Identify Root Cause", options: [
-        { val: "manual_csv", text: "Isolated legacy databases requiring manual CSV tables rekeying (Optimal)" },
-        { val: "cpu_limit", text: "Lack of server node capacity (Needs Improvement)" },
-        { val: "fiber_rtt", text: "Slow route transit delays (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-impact", label: "Identify Business Impact", options: [
-        { val: "delay_leak", text: "Severe operational processing delays and administrative resource leakage (Optimal)" },
-        { val: "cost_waste", text: "High VM pricing expenditures (Needs Improvement)" },
-        { val: "rtt_drop", text: "User browser rendering delays (Needs Improvement)" }
-      ]},
-      { id: "l1-sel-remedy", label: "Recommended Integration Strategy", options: [
-        { val: "esb_gateway", text: "Implement RESTful service gateways and insurance API endpoints (Optimal)" },
-        { val: "cdn_edge", text: "Deploy global CDN networks (Needs Improvement)" },
-        { val: "multi_zone", text: "Set up multi-zone servers (Needs Improvement)" }
-      ]}
-    ],
-    correct: { "l1-sel-cause": "esb_api", "l1-sel-root": "manual_csv", "l1-sel-impact": "delay_leak", "l1-sel-remedy": "esb_gateway" },
-    correctFeedback: "<strong>✓ Diagnosis Confirmed!</strong><br>• <strong>Why it helps:</strong> Gateways bridge insurance portals with local lab registries seamlessly.<br>• <strong>CX Impact:</strong> Fast admissions check-in, reducing registration delays.<br>• <strong>Textbook Concept:</strong> <em>Service Oriented Architecture (SOA)</em>.",
-    incorrectFeedback: "<strong>✗ Diagnosis Mismatch!</strong><br>• <strong>Why it fails:</strong> Caching static HTML files does not bridge disconnected patient databases.<br>• <strong>Consequences:</strong> Manual data transcription delays continue.<br>• <strong>Better Action:</strong> Integrate via ESB and partner API gateways.<br>• <strong>Dave Chaffey Principle:</strong> <em>Digital business process alignment</em>."
-  }
-};
+        /* ─── LEVEL 1: DIGITAL INTEGRATION DETECTIVE ─── */
+        const l1Cases = {
+            1: {
+                title: "Investigation 1: Disconnected Retailer",
+                symptoms: "Customer orders delayed, warehouse inventory mismatch, delivery tracking states outdated. Complaints surge.",
+                infra: "Siloed website databases, separate CRM client records, zero automation channels.",
+                selectors: [
+                    {
+                        id: "l1-sel-cause", label: "Identify Missing Business Integration", options: [
+                            { val: "inventory_bridge", text: "Inventory & Warehouse API Bridging (Optimal)" },
+                            { val: "ssl_gate", text: "Unencrypted SSL Web Gateway (Needs Improvement)" },
+                            { val: "single_db", text: "Single Database Locking bottlenecks (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-root", label: "Identify Root Cause", options: [
+                            { val: "silo_db", text: "Siloed database records with zero real-time interchange channels (Optimal)" },
+                            { val: "no_https", text: "Missing HTTPS redirection rules (Needs Improvement)" },
+                            { val: "slow_rtt", text: "Slow page loads caused by server latency (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-impact", label: "Identify Business Impact", options: [
+                            { val: "brand_damage", text: "Damaged brand trust and operational overhead resolving disputes (Optimal)" },
+                            { val: "data_leak", text: "Unauthorized client account profile leaks (Needs Improvement)" },
+                            { val: "cost_spike", text: "Excessive cloud hosting compute costs (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-remedy", label: "Recommended Integration Strategy", options: [
+                            { val: "rest_api", text: "Implement RESTful middleware API connections to sync ERP with Warehouse systems (Optimal)" },
+                            { val: "load_bal", text: "Deploy active Load Balancer clusters (Needs Improvement)" },
+                            { val: "dns_any", text: "Configure Anycast domain name servers (Needs Improvement)" }
+                        ]
+                    }
+                ],
+                correct: { "l1-sel-cause": "inventory_bridge", "l1-sel-root": "silo_db", "l1-sel-impact": "brand_damage", "l1-sel-remedy": "rest_api" },
+                correctFeedback: "<strong>✓ Diagnosis Confirmed!</strong><br>• <strong>Why it helps:</strong> Bridging siloed records prevents double-entry human errors.<br>• <strong>CX Impact:</strong> Restores immediate stock tracking updates at checkout.<br>• <strong>Textbook Concept:</strong> <em>Enterprise Application Integration (EAI)</em>.",
+                incorrectFeedback: "<strong>✗ Diagnosis Mismatch!</strong><br>• <strong>Why it fails:</strong> Upgrading encryption algorithms or load-balancers fails to bridge isolated databases.<br>• <strong>Consequences:</strong> ERP and warehouse tables remain out of sync.<br>• <strong>Better Action:</strong> Select Inventory API integration and RESTful middleware.<br>• <strong>Dave Chaffey Principle:</strong> <em>Siloed digital systems fragmentation</em>."
+            },
+            2: {
+                title: "Investigation 2: Fragmented Delivery Platform",
+                symptoms: "Payment gateway charges succeed but kitchen dispatch orders fail. Drivers get wrong address routes.",
+                infra: "Customer App and Delivery Tracker running on independent servers without active sync.",
+                selectors: [
+                    {
+                        id: "l1-sel-cause", label: "Identify Missing Business Integration", options: [
+                            { val: "webhook_api", text: "Event-driven Webhook & State APIs (Optimal)" },
+                            { val: "anycast", text: "Anycast DNS resolution (Needs Improvement)" },
+                            { val: "vpn_line", text: "Private VPN lines (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-root", label: "Identify Root Cause", options: [
+                            { val: "state_desync", text: "Lack of transactional messaging state between payment and order queues (Optimal)" },
+                            { val: "dns_rtt", text: "Slow domain name resolutions (Needs Improvement)" },
+                            { val: "tls_leak", text: "No TLS data encryption keys (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-impact", label: "Identify Business Impact", options: [
+                            { val: "cancel_loss", text: "High order cancellations, double-refund overheads, and driver resource waste (Optimal)" },
+                            { val: "load_drop", text: "Slow page rendering RTT limits (Needs Improvement)" },
+                            { val: "audit_fail", text: "Security compliance failures (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-remedy", label: "Recommended Integration Strategy", options: [
+                            { val: "webhook_sync", text: "Deploy RESTful transactional APIs with event-driven Webhook queues (Optimal)" },
+                            { val: "edge_cdn", text: "Install basic browser caches (Needs Improvement)" },
+                            { val: "private_cloud", text: "Upgrade to Private Cloud servers (Needs Improvement)" }
+                        ]
+                    }
+                ],
+                correct: { "l1-sel-cause": "webhook_api", "l1-sel-root": "state_desync", "l1-sel-impact": "cancel_loss", "l1-sel-remedy": "webhook_sync" },
+                correctFeedback: "<strong>✓ Diagnosis Confirmed!</strong><br>• <strong>Why it helps:</strong> Webhooks trigger transactional dispatches instantly upon payment receipts.<br>• <strong>CX Impact:</strong> Customers, kitchens, and drivers stay aligned in real-time.<br>• <strong>Textbook Concept:</strong> <em>Real-time web service notifications</em>.",
+                incorrectFeedback: "<strong>✗ Diagnosis Mismatch!</strong><br>• <strong>Why it fails:</strong> Updating DNS routing paths or caching static web assets fails to sync transaction status codes.<br>• <strong>Consequences:</strong> Customers pay but kitchens receive no order tickets.<br>• <strong>Better Action:</strong> Implement event-driven Webhooks and state APIs.<br>• <strong>Dave Chaffey Principle:</strong> <em>Web Service transactional orchestration</em>."
+            },
+            3: {
+                title: "Investigation 3: Siloed Clinical Records",
+                symptoms: "Patient registration records must be typed multiple times; appointments delay; lab test verifications take days.",
+                infra: "Separate medical databases with no unified directory mappings.",
+                selectors: [
+                    {
+                        id: "l1-sel-cause", label: "Identify Missing Business Integration", options: [
+                            { val: "esb_api", text: "Enterprise Service Bus (ESB) & Partner APIs (Optimal)" },
+                            { val: "cdn_cache", text: "Edge CDN static caching (Needs Improvement)" },
+                            { val: "lb_nodes", text: "Load balancing clusters (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-root", label: "Identify Root Cause", options: [
+                            { val: "manual_csv", text: "Isolated legacy databases requiring manual CSV tables rekeying (Optimal)" },
+                            { val: "cpu_limit", text: "Lack of server node capacity (Needs Improvement)" },
+                            { val: "fiber_rtt", text: "Slow route transit delays (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-impact", label: "Identify Business Impact", options: [
+                            { val: "delay_leak", text: "Severe operational processing delays and administrative resource leakage (Optimal)" },
+                            { val: "cost_waste", text: "High VM pricing expenditures (Needs Improvement)" },
+                            { val: "rtt_drop", text: "User browser rendering delays (Needs Improvement)" }
+                        ]
+                    },
+                    {
+                        id: "l1-sel-remedy", label: "Recommended Integration Strategy", options: [
+                            { val: "esb_gateway", text: "Implement RESTful service gateways and insurance API endpoints (Optimal)" },
+                            { val: "cdn_edge", text: "Deploy global CDN networks (Needs Improvement)" },
+                            { val: "multi_zone", text: "Set up multi-zone servers (Needs Improvement)" }
+                        ]
+                    }
+                ],
+                correct: { "l1-sel-cause": "esb_api", "l1-sel-root": "manual_csv", "l1-sel-impact": "delay_leak", "l1-sel-remedy": "esb_gateway" },
+                correctFeedback: "<strong>✓ Diagnosis Confirmed!</strong><br>• <strong>Why it helps:</strong> Gateways bridge insurance portals with local lab registries seamlessly.<br>• <strong>CX Impact:</strong> Fast admissions check-in, reducing registration delays.<br>• <strong>Textbook Concept:</strong> <em>Service Oriented Architecture (SOA)</em>.",
+                incorrectFeedback: "<strong>✗ Diagnosis Mismatch!</strong><br>• <strong>Why it fails:</strong> Caching static HTML files does not bridge disconnected patient databases.<br>• <strong>Consequences:</strong> Manual data transcription delays continue.<br>• <strong>Better Action:</strong> Integrate via ESB and partner API gateways.<br>• <strong>Dave Chaffey Principle:</strong> <em>Digital business process alignment</em>."
+            }
+        };
 
-let l1Round = 1;
-let l1Score = 0;
+        let l1Round = 1;
+        let l1Score = 0;
 
-function renderL1Round() {
-  const c = l1Cases[l1Round];
-  document.getElementById('l1-round-title').textContent = `Case ${l1Round} of 3: ${c.title}`;
-  document.getElementById('l1-case-title').textContent = c.title;
-  document.getElementById('l1-case-meta').innerHTML = `
+        function renderL1Round() {
+            const c = l1Cases[l1Round];
+            document.getElementById('l1-round-title').textContent = `Case ${l1Round} of 3: ${c.title}`;
+            document.getElementById('l1-case-title').textContent = c.title;
+            document.getElementById('l1-case-meta').innerHTML = `
     <div><strong>Operational Symptoms:</strong> ${c.symptoms}</div>
     <div style="margin-top:0.3rem;"><strong>Current Infrastructure:</strong> ${c.infra}</div>
   `;
-  document.getElementById('qf-l1').innerHTML = "";
-  document.getElementById('nextL1Btn').style.display = "none";
-  document.getElementById('l1-hint-box').style.display = "none";
-  document.getElementById('l1-submit-btn').disabled = false;
+            document.getElementById('qf-l1').innerHTML = "";
+            document.getElementById('nextL1Btn').style.display = "none";
+            document.getElementById('l1-hint-box').style.display = "none";
+            document.getElementById('l1-submit-btn').disabled = false;
 
-  const selectors = document.getElementById('l1-selectors');
-  selectors.innerHTML = "";
+            const selectors = document.getElementById('l1-selectors');
+            selectors.innerHTML = "";
 
-  c.selectors.forEach(sel => {
-    let jumbled = shuffleArray(sel.options);
-    let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
-    selectors.innerHTML += `
+            c.selectors.forEach(sel => {
+                let jumbled = shuffleArray(sel.options);
+                let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+                selectors.innerHTML += `
       <div>
         <span class="tk-label">${sel.label}</span>
         <select id="${sel.id}" class="tk-entry" style="width:100%;">
@@ -720,58 +1144,58 @@ function renderL1Round() {
         </select>
       </div>
     `;
-  });
-}
+            });
+        }
 
-function submitL1Answer() {
-  const c = l1Cases[l1Round];
-  const feedback = document.getElementById('qf-l1');
+        function submitL1Answer() {
+            const c = l1Cases[l1Round];
+            const feedback = document.getElementById('qf-l1');
 
-  const cause = document.getElementById('l1-sel-cause').value;
-  const root = document.getElementById('l1-sel-root').value;
-  const impact = document.getElementById('l1-sel-impact').value;
-  const remedy = document.getElementById('l1-sel-remedy').value;
+            const cause = document.getElementById('l1-sel-cause').value;
+            const root = document.getElementById('l1-sel-root').value;
+            const impact = document.getElementById('l1-sel-impact').value;
+            const remedy = document.getElementById('l1-sel-remedy').value;
 
-  const isCorrect = (
-    cause === c.correct["l1-sel-cause"] && 
-    root === c.correct["l1-sel-root"] && 
-    impact === c.correct["l1-sel-impact"] && 
-    remedy === c.correct["l1-sel-remedy"]
-  );
+            const isCorrect = (
+                cause === c.correct["l1-sel-cause"] &&
+                root === c.correct["l1-sel-root"] &&
+                impact === c.correct["l1-sel-impact"] &&
+                remedy === c.correct["l1-sel-remedy"]
+            );
 
-  if (isCorrect) {
-    l1Score++;
-    feedback.style.color = "var(--code-ok)";
-    feedback.innerHTML = c.correctFeedback;
-    document.getElementById('l1-submit-btn').disabled = true;
-    document.getElementById('nextL1Btn').style.display = "inline-flex";
-  } else {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = c.incorrectFeedback;
-  }
+            if (isCorrect) {
+                l1Score++;
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = c.correctFeedback;
+                document.getElementById('l1-submit-btn').disabled = true;
+                document.getElementById('nextL1Btn').style.display = "inline-flex";
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = c.incorrectFeedback;
+            }
 
-  // Update HUD
-  const accuracy = Math.round((l1Score / l1Round) * 100);
-  document.getElementById('l1-hud-diag').textContent = isCorrect ? "100%" : "30%";
-  document.getElementById('l1-hud-think').textContent = `${accuracy}%`;
-  document.getElementById('l1-hud-cx').textContent = isCorrect ? "95%" : "40%";
-  document.getElementById('l1-hud-strategy').textContent = `${l1Score * 33}%`;
-  document.getElementById('l1-hud-ready').textContent = isCorrect ? "95%" : "30%";
-}
+            // Update HUD
+            const accuracy = Math.round((l1Score / l1Round) * 100);
+            document.getElementById('l1-hud-diag').textContent = isCorrect ? "100%" : "30%";
+            document.getElementById('l1-hud-think').textContent = `${accuracy}%`;
+            document.getElementById('l1-hud-cx').textContent = isCorrect ? "95%" : "40%";
+            document.getElementById('l1-hud-strategy').textContent = `${l1Score * 33}%`;
+            document.getElementById('l1-hud-ready').textContent = isCorrect ? "95%" : "30%";
+        }
 
-function nextL1Round() {
-  if (l1Round < 3) {
-    l1Round++;
-    renderL1Round();
-  } else {
-    // Level complete
-    unlockBadge('badge-detective', '🏆 Digital Integration Investigator');
-    document.getElementById('l1-submit-btn').disabled = true;
-    document.getElementById('nextL1Btn').style.display = "none";
-    
-    const reinf = document.getElementById('l1-reinforcement');
-    reinf.style.display = "block";
-    reinf.innerHTML = `
+        function nextL1Round() {
+            if (l1Round < 3) {
+                l1Round++;
+                renderL1Round();
+            } else {
+                // Level complete
+                unlockBadge('badge-detective', '🏆 Digital Integration Investigator');
+                document.getElementById('l1-submit-btn').disabled = true;
+                document.getElementById('nextL1Btn').style.display = "none";
+
+                const reinf = document.getElementById('l1-reinforcement');
+                reinf.style.display = "block";
+                reinf.innerHTML = `
       <h3>Level 1 Complete! Digital Integration Investigator Unlocked 🏆</h3>
       <ul style="margin-top:0.8rem; margin-left:1.2rem; font-size:0.85rem;">
         <li>APIs resolve operational disconnects, syncing ERP logs with online web storefronts.</li>
@@ -784,97 +1208,97 @@ function nextL1Round() {
         <button class="run-btn" onclick="switchLevel('34', 2)">Proceed to Level 2: Integration Consultant ➔</button>
       </div>
     `;
-  }
-}
+            }
+        }
 
-/* ─── LEVEL 2: ENTERPRISE INTEGRATION CONSULTANT ─── */
-const l2Cases = {
-  streaming: {
-    title: "Global Retail Company Roadmap",
-    desc: "Requirements: Mobile App, Website, CRM, ERP, Inventory, Payments, Supplier Portal, Customer Support. Budget: ₹120,000.",
-    budget: 120000,
-    technologies: [
-      { id: "apis", text: "Standardized RESTful APIs", cost: 20000 },
-      { id: "webservices", text: "Enterprise SOAP Web Services", cost: 30000 },
-      { id: "cloud", text: "Elastic Cloud Server Hosting", cost: 25000 },
-      { id: "middleware", text: "Enterprise Middleware ESB", cost: 35000 },
-      { id: "auth", text: "Secure Authentication OAuth Engine", cost: 20000 },
-      { id: "partner", text: "Supplier Partner XML Connectors", cost: 15000 },
-      { id: "gateway", text: "Stripe Payment Gateway Integration", cost: 15000 },
-      { id: "analytics", text: "Real-time Telemetry Analytics", cost: 15000 },
-      { id: "support", text: "Zendesk Customer Support API", cost: 10000 }
-    ],
-    correct: ["apis", "middleware", "partner", "gateway", "support"], // Total: ₹95,000
-    eventText: "A major supplier updates their inventory schema, breaking existing connections. Deploy Partner Integration and Middleware!",
-    eventCorrect: ["apis", "middleware", "partner", "gateway", "support"],
-    correctFeedback: "<strong>✓ Integration Approved!</strong><br>• <strong>Why it works:</strong> RESTful APIs connect user frontends, while ESB middleware isolates supplier schema changes.<br>• <strong>CX/Agility:</strong> Seamless checkouts and automatic parts reordering.<br>• <strong>Textbook Concept:</strong> <em>Agile partner interface abstraction</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Omitting partner connectors or middleware leaves supplier databases disconnected during schema changes.<br>• <strong>Consequences:</strong> Manual inventory updates delay dispatches, creating customer friction.<br>• <strong>Better Strategy:</strong> Combine RESTful APIs, Middleware ESB, and Partner connectors.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Commerce Supply Chain Integration</em>."
-  },
-  bank: {
-    title: "Digital Banking Infrastructure",
-    desc: "Requirements: Mobile Banking, ATMs, Government Verification, Credit Bureaus, Fraud engines. Budget: ₹150,000.",
-    budget: 150000,
-    technologies: [
-      { id: "apis", text: "Standardized RESTful APIs", cost: 20000 },
-      { id: "webservices", text: "Enterprise SOAP Web Services", cost: 30000 },
-      { id: "cloud", text: "Elastic Cloud Server Hosting", cost: 25000 },
-      { id: "middleware", text: "Enterprise Middleware ESB", cost: 35000 },
-      { id: "auth", text: "Secure Authentication OAuth Engine", cost: 20000 },
-      { id: "partner", text: "Supplier Partner XML Connectors", cost: 15000 },
-      { id: "gateway", text: "Stripe Payment Gateway Integration", cost: 15000 },
-      { id: "analytics", text: "Real-time Telemetry Analytics", cost: 15000 },
-      { id: "support", text: "Zendesk Customer Support API", cost: 10000 }
-    ],
-    correct: ["apis", "auth", "middleware", "gateway", "analytics"], // Total: ₹105,000
-    eventText: "A security audit flags unauthenticated API endpoints. Deploy Authentication Services and Middleware immediately!",
-    eventCorrect: ["apis", "auth", "middleware", "gateway", "analytics"],
-    correctFeedback: "<strong>✓ Integration Approved!</strong><br>• <strong>Why it works:</strong> OAuth engines secure transaction endpoints, while middleware manages connections to legacy ATM ledgers.<br>• <strong>CX/Agility:</strong> High trust, automated fraud detection, and instant banking checkouts.<br>• <strong>Textbook Concept:</strong> <em>Cryptographic token authentication</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Missing authentication keys or middleware triggers data leakage, failing security audits.<br>• <strong>Consequences:</strong> User accounts are vulnerable to intercept attacks, resulting in legal fines.<br>• <strong>Better Strategy:</strong> Deploy OAuth engines, RESTful APIs, and ESB middleware.<br>• <strong>Dave Chaffey Principle:</strong> <em>Corporate digital security governance</em>."
-  },
-  university: {
-    title: "Campus LMS Ecosystem",
-    desc: "Requirements: LMS, Student Portal, Finance, Library, Alumni files. Budget: ₹100,000.",
-    budget: 100000,
-    technologies: [
-      { id: "apis", text: "Standardized RESTful APIs", cost: 20000 },
-      { id: "webservices", text: "Enterprise SOAP Web Services", cost: 30000 },
-      { id: "cloud", text: "Elastic Cloud Server Hosting", cost: 25000 },
-      { id: "middleware", text: "Enterprise Middleware ESB", cost: 35000 },
-      { id: "auth", text: "Secure Authentication OAuth Engine", cost: 20000 },
-      { id: "partner", text: "Supplier Partner XML Connectors", cost: 15000 },
-      { id: "gateway", text: "Stripe Payment Gateway Integration", cost: 15000 },
-      { id: "analytics", text: "Real-time Telemetry Analytics", cost: 15000 },
-      { id: "support", text: "Zendesk Customer Support API", cost: 10000 }
-    ],
-    correct: ["apis", "cloud", "auth", "analytics", "support"], // Total: ₹90,000
-    eventText: "Sudden student traffic surge during course registration! Implement Cloud Hosting and APIs!",
-    eventCorrect: ["apis", "cloud", "auth", "analytics", "support"],
-    correctFeedback: "<strong>✓ Integration Approved!</strong><br>• <strong>Why it works:</strong> Autoscaling Cloud Host servers manage spiky traffic bursts without portal slowdowns.<br>• <strong>CX/Agility:</strong> Continuous uptime, real-time telemetry alerts, and automated support queries.<br>• <strong>Textbook Concept:</strong> <em>Capacity management hosting optimization</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Sticking to legacy on-premise hardware without cloud provisioning crashes portals during peak loads.<br>• <strong>Consequences:</strong> Students experience 504 gateway timeouts and registration failures.<br>• <strong>Better Strategy:</strong> Leverage dynamic Cloud Hosting, APIs, and analytics metrics.<br>• <strong>Dave Chaffey Principle:</strong> <em>Site capacity and system availability planning</em>."
-  }
-};
+        /* ─── LEVEL 2: ENTERPRISE INTEGRATION CONSULTANT ─── */
+        const l2Cases = {
+            streaming: {
+                title: "Global Retail Company Roadmap",
+                desc: "Requirements: Mobile App, Website, CRM, ERP, Inventory, Payments, Supplier Portal, Customer Support. Budget: ₹120,000.",
+                budget: 120000,
+                technologies: [
+                    { id: "apis", text: "Standardized RESTful APIs", cost: 20000 },
+                    { id: "webservices", text: "Enterprise SOAP Web Services", cost: 30000 },
+                    { id: "cloud", text: "Elastic Cloud Server Hosting", cost: 25000 },
+                    { id: "middleware", text: "Enterprise Middleware ESB", cost: 35000 },
+                    { id: "auth", text: "Secure Authentication OAuth Engine", cost: 20000 },
+                    { id: "partner", text: "Supplier Partner XML Connectors", cost: 15000 },
+                    { id: "gateway", text: "Stripe Payment Gateway Integration", cost: 15000 },
+                    { id: "analytics", text: "Real-time Telemetry Analytics", cost: 15000 },
+                    { id: "support", text: "Zendesk Customer Support API", cost: 10000 }
+                ],
+                correct: ["apis", "middleware", "partner", "gateway", "support"], // Total: ₹95,000
+                eventText: "A major supplier updates their inventory schema, breaking existing connections. Deploy Partner Integration and Middleware!",
+                eventCorrect: ["apis", "middleware", "partner", "gateway", "support"],
+                correctFeedback: "<strong>✓ Integration Approved!</strong><br>• <strong>Why it works:</strong> RESTful APIs connect user frontends, while ESB middleware isolates supplier schema changes.<br>• <strong>CX/Agility:</strong> Seamless checkouts and automatic parts reordering.<br>• <strong>Textbook Concept:</strong> <em>Agile partner interface abstraction</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Omitting partner connectors or middleware leaves supplier databases disconnected during schema changes.<br>• <strong>Consequences:</strong> Manual inventory updates delay dispatches, creating customer friction.<br>• <strong>Better Strategy:</strong> Combine RESTful APIs, Middleware ESB, and Partner connectors.<br>• <strong>Dave Chaffey Principle:</strong> <em>E-Commerce Supply Chain Integration</em>."
+            },
+            bank: {
+                title: "Digital Banking Infrastructure",
+                desc: "Requirements: Mobile Banking, ATMs, Government Verification, Credit Bureaus, Fraud engines. Budget: ₹150,000.",
+                budget: 150000,
+                technologies: [
+                    { id: "apis", text: "Standardized RESTful APIs", cost: 20000 },
+                    { id: "webservices", text: "Enterprise SOAP Web Services", cost: 30000 },
+                    { id: "cloud", text: "Elastic Cloud Server Hosting", cost: 25000 },
+                    { id: "middleware", text: "Enterprise Middleware ESB", cost: 35000 },
+                    { id: "auth", text: "Secure Authentication OAuth Engine", cost: 20000 },
+                    { id: "partner", text: "Supplier Partner XML Connectors", cost: 15000 },
+                    { id: "gateway", text: "Stripe Payment Gateway Integration", cost: 15000 },
+                    { id: "analytics", text: "Real-time Telemetry Analytics", cost: 15000 },
+                    { id: "support", text: "Zendesk Customer Support API", cost: 10000 }
+                ],
+                correct: ["apis", "auth", "middleware", "gateway", "analytics"], // Total: ₹105,000
+                eventText: "A security audit flags unauthenticated API endpoints. Deploy Authentication Services and Middleware immediately!",
+                eventCorrect: ["apis", "auth", "middleware", "gateway", "analytics"],
+                correctFeedback: "<strong>✓ Integration Approved!</strong><br>• <strong>Why it works:</strong> OAuth engines secure transaction endpoints, while middleware manages connections to legacy ATM ledgers.<br>• <strong>CX/Agility:</strong> High trust, automated fraud detection, and instant banking checkouts.<br>• <strong>Textbook Concept:</strong> <em>Cryptographic token authentication</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Missing authentication keys or middleware triggers data leakage, failing security audits.<br>• <strong>Consequences:</strong> User accounts are vulnerable to intercept attacks, resulting in legal fines.<br>• <strong>Better Strategy:</strong> Deploy OAuth engines, RESTful APIs, and ESB middleware.<br>• <strong>Dave Chaffey Principle:</strong> <em>Corporate digital security governance</em>."
+            },
+            university: {
+                title: "Campus LMS Ecosystem",
+                desc: "Requirements: LMS, Student Portal, Finance, Library, Alumni files. Budget: ₹100,000.",
+                budget: 100000,
+                technologies: [
+                    { id: "apis", text: "Standardized RESTful APIs", cost: 20000 },
+                    { id: "webservices", text: "Enterprise SOAP Web Services", cost: 30000 },
+                    { id: "cloud", text: "Elastic Cloud Server Hosting", cost: 25000 },
+                    { id: "middleware", text: "Enterprise Middleware ESB", cost: 35000 },
+                    { id: "auth", text: "Secure Authentication OAuth Engine", cost: 20000 },
+                    { id: "partner", text: "Supplier Partner XML Connectors", cost: 15000 },
+                    { id: "gateway", text: "Stripe Payment Gateway Integration", cost: 15000 },
+                    { id: "analytics", text: "Real-time Telemetry Analytics", cost: 15000 },
+                    { id: "support", text: "Zendesk Customer Support API", cost: 10000 }
+                ],
+                correct: ["apis", "cloud", "auth", "analytics", "support"], // Total: ₹90,000
+                eventText: "Sudden student traffic surge during course registration! Implement Cloud Hosting and APIs!",
+                eventCorrect: ["apis", "cloud", "auth", "analytics", "support"],
+                correctFeedback: "<strong>✓ Integration Approved!</strong><br>• <strong>Why it works:</strong> Autoscaling Cloud Host servers manage spiky traffic bursts without portal slowdowns.<br>• <strong>CX/Agility:</strong> Continuous uptime, real-time telemetry alerts, and automated support queries.<br>• <strong>Textbook Concept:</strong> <em>Capacity management hosting optimization</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch</strong><br>• <strong>Why it's unsuitable:</strong> Sticking to legacy on-premise hardware without cloud provisioning crashes portals during peak loads.<br>• <strong>Consequences:</strong> Students experience 504 gateway timeouts and registration failures.<br>• <strong>Better Strategy:</strong> Leverage dynamic Cloud Hosting, APIs, and analytics metrics.<br>• <strong>Dave Chaffey Principle:</strong> <em>Site capacity and system availability planning</em>."
+            }
+        };
 
-let l2ActiveAttempt = 1;
+        let l2ActiveAttempt = 1;
 
-function changeL2Case() {
-  l2ActiveAttempt = 1;
-  document.getElementById('l2-event-alert').style.display = "none";
-  document.getElementById('qf-l2').innerHTML = "";
-  document.getElementById('l2-reinforcement').style.display = "none";
+        function changeL2Case() {
+            l2ActiveAttempt = 1;
+            document.getElementById('l2-event-alert').style.display = "none";
+            document.getElementById('qf-l2').innerHTML = "";
+            document.getElementById('l2-reinforcement').style.display = "none";
 
-  const key = document.getElementById('l2CaseSelect').value;
-  const c = l2Cases[key];
+            const key = document.getElementById('l2CaseSelect').value;
+            const c = l2Cases[key];
 
-  document.getElementById('l2-title').textContent = c.title;
-  document.getElementById('l2-desc').textContent = c.desc;
-  document.getElementById('l2-budget-count').textContent = `₹${c.budget.toLocaleString()}`;
+            document.getElementById('l2-title').textContent = c.title;
+            document.getElementById('l2-desc').textContent = c.desc;
+            document.getElementById('l2-budget-count').textContent = `₹${c.budget.toLocaleString()}`;
 
-  const container = document.getElementById('l2-tech-list');
-  container.innerHTML = "";
+            const container = document.getElementById('l2-tech-list');
+            container.innerHTML = "";
 
-  let jumbled = shuffleArray(c.technologies);
-  jumbled.forEach(tech => {
-    container.innerHTML += `
+            let jumbled = shuffleArray(c.technologies);
+            jumbled.forEach(tech => {
+                container.innerHTML += `
       <div class="concept-card" id="l2-card-${tech.id}" style="display:flex; align-items:center; gap:0.8rem; padding: 0.8rem 1.2rem; cursor:pointer; border: 1px solid var(--border-light); border-radius: var(--radius-md); transition: all 0.2s;" onclick="toggleL2Checkbox('${tech.id}')">
         <input type="checkbox" id="l2-chk-${tech.id}" value="${tech.id}" style="pointer-events:none;" onchange="updateL2BudgetLive()">
         <div style="flex-grow:1;">
@@ -883,111 +1307,111 @@ function changeL2Case() {
         </div>
       </div>
     `;
-  });
+            });
 
-  resetL2HUD();
-}
+            resetL2HUD();
+        }
 
-function toggleL2Checkbox(id) {
-  const chk = document.getElementById(`l2-chk-${id}`);
-  if (chk) {
-    chk.checked = !chk.checked;
-    const card = document.getElementById(`l2-card-${id}`);
-    if (card) {
-      card.style.borderColor = chk.checked ? "var(--code-ok)" : "var(--border-light)";
-      card.style.background = chk.checked ? "rgba(42, 157, 143, 0.04)" : "#fff";
-    }
-    updateL2BudgetLive();
-  }
-}
+        function toggleL2Checkbox(id) {
+            const chk = document.getElementById(`l2-chk-${id}`);
+            if (chk) {
+                chk.checked = !chk.checked;
+                const card = document.getElementById(`l2-card-${id}`);
+                if (card) {
+                    card.style.borderColor = chk.checked ? "var(--code-ok)" : "var(--border-light)";
+                    card.style.background = chk.checked ? "rgba(42, 157, 143, 0.04)" : "#fff";
+                }
+                updateL2BudgetLive();
+            }
+        }
 
-function updateL2BudgetLive() {
-  const key = document.getElementById('l2CaseSelect').value;
-  const c = l2Cases[key];
+        function updateL2BudgetLive() {
+            const key = document.getElementById('l2CaseSelect').value;
+            const c = l2Cases[key];
 
-  let currentSpend = 0;
-  c.technologies.forEach(tech => {
-    const chk = document.getElementById(`l2-chk-${tech.id}`);
-    if (chk && chk.checked) {
-      currentSpend += tech.cost;
-    }
-  });
+            let currentSpend = 0;
+            c.technologies.forEach(tech => {
+                const chk = document.getElementById(`l2-chk-${tech.id}`);
+                if (chk && chk.checked) {
+                    currentSpend += tech.cost;
+                }
+            });
 
-  const remaining = c.budget - currentSpend;
-  const counter = document.getElementById('l2-budget-count');
-  counter.textContent = `₹${remaining.toLocaleString()}`;
-  counter.style.color = remaining < 0 ? 'var(--code-err)' : 'var(--primary)';
-}
+            const remaining = c.budget - currentSpend;
+            const counter = document.getElementById('l2-budget-count');
+            counter.textContent = `₹${remaining.toLocaleString()}`;
+            counter.style.color = remaining < 0 ? 'var(--code-err)' : 'var(--primary)';
+        }
 
-function resetL2HUD() {
-  document.getElementById('l2-hud-agility').textContent = "0%";
-  document.getElementById('l2-hud-quality').textContent = "0%";
-  document.getElementById('l2-hud-cx').textContent = "0%";
-  document.getElementById('l2-hud-partner').textContent = "0%";
-  document.getElementById('l2-hud-scale').textContent = "0%";
-  document.getElementById('l2-hud-reliability').textContent = "0%";
-}
+        function resetL2HUD() {
+            document.getElementById('l2-hud-agility').textContent = "0%";
+            document.getElementById('l2-hud-quality').textContent = "0%";
+            document.getElementById('l2-hud-cx').textContent = "0%";
+            document.getElementById('l2-hud-partner').textContent = "0%";
+            document.getElementById('l2-hud-scale').textContent = "0%";
+            document.getElementById('l2-hud-reliability').textContent = "0%";
+        }
 
-function submitL2Evaluation() {
-  const key = document.getElementById('l2CaseSelect').value;
-  const c = l2Cases[key];
-  const feedback = document.getElementById('qf-l2');
+        function submitL2Evaluation() {
+            const key = document.getElementById('l2CaseSelect').value;
+            const c = l2Cases[key];
+            const feedback = document.getElementById('qf-l2');
 
-  let selected = [];
-  let spend = 0;
-  c.technologies.forEach(tech => {
-    const chk = document.getElementById(`l2-chk-${tech.id}`);
-    if (chk && chk.checked) {
-      selected.push(tech.id);
-      spend += tech.cost;
-    }
-  });
+            let selected = [];
+            let spend = 0;
+            c.technologies.forEach(tech => {
+                const chk = document.getElementById(`l2-chk-${tech.id}`);
+                if (chk && chk.checked) {
+                    selected.push(tech.id);
+                    spend += tech.cost;
+                }
+            });
 
-  if (spend > c.budget) {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = `<strong>✗ Over Budget!</strong> Integration costs exceed Strategy roadmap limits.`;
-    return;
-  }
+            if (spend > c.budget) {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = `<strong>✗ Over Budget!</strong> Integration costs exceed Strategy roadmap limits.`;
+                return;
+            }
 
-  if (l2ActiveAttempt === 1) {
-    l2ActiveAttempt = 2;
-    document.getElementById('l2-event-alert').style.display = "block";
-    document.getElementById('l2-event-text').textContent = c.eventText;
-    feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Business priorities changed. Adjust choices dynamically without resetting and submit again!`;
-    feedback.style.color = "var(--code-warn)";
-    return;
-  }
+            if (l2ActiveAttempt === 1) {
+                l2ActiveAttempt = 2;
+                document.getElementById('l2-event-alert').style.display = "block";
+                document.getElementById('l2-event-text').textContent = c.eventText;
+                feedback.innerHTML = `<strong>🚨 Event Triggered!</strong> Business priorities changed. Adjust choices dynamically without resetting and submit again!`;
+                feedback.style.color = "var(--code-warn)";
+                return;
+            }
 
-  // Second attempt check
-  let correctCount = 0;
-  c.eventCorrect.forEach(id => {
-    if (selected.includes(id)) correctCount++;
-  });
+            // Second attempt check
+            let correctCount = 0;
+            c.eventCorrect.forEach(id => {
+                if (selected.includes(id)) correctCount++;
+            });
 
-  let fitScore = Math.round((correctCount / c.eventCorrect.length) * 100);
+            let fitScore = Math.round((correctCount / c.eventCorrect.length) * 100);
 
-  let agility = fitScore;
-  let quality = fitScore;
-  let cx = selected.includes('support') || selected.includes('gateway') ? 95 : 40;
-  let partner = selected.includes('partner') ? 98 : 45;
-  let scale = selected.includes('cloud') ? 95 : 50;
-  let reliability = selected.includes('middleware') ? 98 : 55;
+            let agility = fitScore;
+            let quality = fitScore;
+            let cx = selected.includes('support') || selected.includes('gateway') ? 95 : 40;
+            let partner = selected.includes('partner') ? 98 : 45;
+            let scale = selected.includes('cloud') ? 95 : 50;
+            let reliability = selected.includes('middleware') ? 98 : 55;
 
-  document.getElementById('l2-hud-agility').textContent = `${agility}%`;
-  document.getElementById('l2-hud-quality').textContent = `${quality}%`;
-  document.getElementById('l2-hud-cx').textContent = `${cx}%`;
-  document.getElementById('l2-hud-partner').textContent = `${partner}%`;
-  document.getElementById('l2-hud-scale').textContent = `${scale}%`;
-  document.getElementById('l2-hud-reliability').textContent = `${reliability}%`;
+            document.getElementById('l2-hud-agility').textContent = `${agility}%`;
+            document.getElementById('l2-hud-quality').textContent = `${quality}%`;
+            document.getElementById('l2-hud-cx').textContent = `${cx}%`;
+            document.getElementById('l2-hud-partner').textContent = `${partner}%`;
+            document.getElementById('l2-hud-scale').textContent = `${scale}%`;
+            document.getElementById('l2-hud-reliability').textContent = `${reliability}%`;
 
-  if (fitScore >= 85) {
-    feedback.style.color = "var(--code-ok)";
-    feedback.innerHTML = c.correctFeedback;
-    unlockBadge('badge-consultant', '🏆 Enterprise Integration Consultant');
+            if (fitScore >= 85) {
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = c.correctFeedback;
+                unlockBadge('badge-consultant', '🏆 Enterprise Integration Consultant');
 
-    const reinf = document.getElementById('l2-reinforcement');
-    reinf.style.display = "block";
-    reinf.innerHTML = `
+                const reinf = document.getElementById('l2-reinforcement');
+                reinf.style.display = "block";
+                reinf.innerHTML = `
       <h3>Level 2 Completed! Enterprise Integration Consultant Badge Unlocked 🏆</h3>
       <div class="tip-box" style="margin-top:0.5rem;">
         <strong>Chaffey's Rule of Enterprise Integration:</strong> Digital success requires bridging client portals with logistics and suppliers via managed web gateways, avoiding silos.
@@ -996,154 +1420,154 @@ function submitL2Evaluation() {
         <button class="run-btn" onclick="switchLevel('34', 3)">Proceed to Level 3: Command Challenge ➔</button>
       </div>
     `;
-  } else {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = c.incorrectFeedback;
-  }
-}
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = c.incorrectFeedback;
+            }
+        }
 
-/* ─── LEVEL 3: DIGITAL ECOSYSTEM STRATEGY SIMULATOR ─── */
-let l3Year = 1;
-const l3EventsList = {
-  1: {
-    title: "Year 1: Digital Foundation",
-    text: "The enterprise currently runs fragmented local databases. Select which integrations to prioritize first.",
-    options: [
-      { val: "api_first", text: "Establish standard RESTful APIs to bridge core databases (Optimal)" },
-      { val: "scrap_all", text: "Scrap all legacy systems and build one giant database from scratch (Needs Improvement)" },
-      { val: "ftp_csv", text: "Rely on daily manual FTP CSV data transfers between departments (Needs Improvement)" }
-    ],
-    correct: "api_first",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Standardizing data contracts allows systems to exchange logs without sharing raw database files.<br>• <strong>Strategic Concept:</strong> Dave Chaffey's <em>API-First Digital Integration</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Manual CSV tables transfers create duplicate logs, while rebuilding monoliths exceeds budgets.<br>• <strong>Better Action:</strong> Focus on standardizing RESTful APIs to connect core databases."
-  },
-  2: {
-    title: "Year 2: Customer Growth Surge",
-    text: "Storefront traffic increases by 400%. Your physical server queues bottleneck customer transactions.",
-    options: [
-      { val: "cloud_scale", text: "Transition to dynamic Cloud Hosting with autoscaling clusters (Optimal)" },
-      { val: "vps_add", text: "Manually launch additional Virtual Private Servers in branch sites (Acceptable)" },
-      { val: "limit_users", text: "Block user access once concurrency limits are reached (Needs Improvement)" }
-    ],
-    correct: "cloud_scale",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Autoscaling clusters scale nodes dynamically based on active customer queues.<br>• <strong>Strategic Concept:</strong> <em>Elastic resource capacity hosting</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Queuing online checkout buyers causes immediate shopping cart drop-offs.<br>• <strong>Better Action:</strong> Migrate static layout hosting to auto-scaling cloud servers."
-  },
-  3: {
-    title: "Year 3: Marketplace Expansion",
-    text: "150 external suppliers want real-time warehouse inventory and checkout feeds.",
-    options: [
-      { val: "partner_api", text: "Publish secure Partner API feeds with authentication keys (Optimal)" },
-      { val: "allow_db", text: "Grant suppliers read access to your internal database server (Needs Improvement)" },
-      { val: "email_csv", text: "Instruct employees to email stock CSV logs every hour (Needs Improvement)" }
-    ],
-    correct: "partner_api",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Secure client-token APIs isolate supplier queries, protecting internal databases.<br>• <strong>Strategic Concept:</strong> <em>Extranet Partner Integration Feeds</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Allowing external access directly to database layers exposes proprietary financial databases to data breaches.<br>• <strong>Better Action:</strong> Deploy secure authenticated Partner APIs."
-  },
-  4: {
-    title: "Year 4: Omnichannel Integration",
-    text: "Establish unified real-time logs between physical retail checkouts, mobile apps, and web portals.",
-    options: [
-      { val: "middleware_sync", text: "Implement middleware ESB and REST endpoints (Optimal)" },
-      { val: "offline_rekey", text: "Rekey physical store transaction sales every evening (Needs Improvement)" },
-      { val: "separate_ledgers", text: "Maintain separate inventory logs for web and store sales (Needs Improvement)" }
-    ],
-    correct: "middleware_sync",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> ESB middleware acts as a translation layer, unifying offline cash registers with online servers.<br>• <strong>Strategic Concept:</strong> <em>E-Business Process Middleware Integration</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Separate ledger inventories lead to product stock-outs and delivery delays.<br>• <strong>Better Action:</strong> Configure central Middleware ESB connectors."
-  },
-  5: {
-    title: "Year 5: International Expansion",
-    text: "Storefront launches in Europe and Asia. Latency spikes checkout abandonments.",
-    options: [
-      { val: "global_hosting", text: "Deploy multi-region hosting and Anycast DNS (Optimal)" },
-      { val: "central_host", text: "Keep all servers in your home country origin node (Needs Improvement)" },
-      { val: "simple_redirect", text: "Build static localized clone sites with manual synchronization (Needs Improvement)" }
-    ],
-    correct: "global_hosting",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Processing database transactions closer to international regions cuts round-trip latencies.<br>• <strong>Strategic Concept:</strong> <em>Distributed hosting architectures</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Sticking to central domestic nodes forces distant buyers to suffer slow connection speeds.<br>• <strong>Better Action:</strong> Set up multi-region cloud servers and local edge caches."
-  },
-  6: {
-    title: "Year 6: Ecosystem Partnerships",
-    text: "Unify financial transactions, shipping logisticians, and support platforms.",
-    options: [
-      { val: "api_ecosystem", text: "Unify checkout partners using standard API ecosystem gateways (Optimal)" },
-      { val: "custom_scripts", text: "Write custom parsing scripts for each partner's spreadsheets (Needs Improvement)" },
-      { val: "separate_flows", text: "Force partners to navigate your client web portal manually (Needs Improvement)" }
-    ],
-    correct: "api_ecosystem",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Standards-based APIs connect partners quickly, minimizing custom translation overhead.<br>• <strong>Strategic Concept:</strong> <em>The Digital Ecosystem Economy</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Custom parsing scripts create significant technical debt, breaking whenever partners tweak schemas.<br>• <strong>Better Action:</strong> Standardize checkout routes via partner APIs."
-  },
-  7: {
-    title: "Year 7: Major Partner API Outage",
-    text: "Your primary checkout payment gateway experiences a total service blackout.",
-    options: [
-      { val: "failover_gateway", text: "Redirection: automatically failover to secondary backup API (Optimal)" },
-      { val: "site_offline", text: "Take the entire storefront site offline until provider reboots (Needs Improvement)" },
-      { val: "ignore_fail", text: "Allow users to check out with pending bank transfer alerts (Needs Improvement)" }
-    ],
-    correct: "failover_gateway",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Auto-routing transactions to fallback systems preserves checkout operations.<br>• <strong>Strategic Concept:</strong> <em>High Availability & Business Continuity Architecture</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Taking pages offline instantly halts sales, destroying customer trust.<br>• <strong>Better Action:</strong> Deploy an automated failover backup gateway."
-  },
-  8: {
-    title: "Year 8: Budget Reductions",
-    text: "Economic slowdown cuts tech strategy budgets by 25%. Maintain core performance.",
-    options: [
-      { val: "optimize_cloud", text: "Optimize server sizing and implement browser edge caching (Optimal)" },
-      { val: "cancel_auth", text: "De-activate OAuth security keys to save processing costs (Needs Improvement)" },
-      { val: "drop_backups", text: "Cancel all automated redundant backup processes (Needs Improvement)" }
-    ],
-    correct: "optimize_cloud",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Edge caching offloads CPU processes, reducing server utility bills without risking data loss.<br>• <strong>Strategic Concept:</strong> <em>Infrastructure cost optimization</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> De-activating security keys or redundant backups exposes the firm to hacks and system failure.<br>• <strong>Better Action:</strong> Tweak cloud node sizing and edge cache rules."
-  },
-  9: {
-    title: "Year 9: AI & Personalization Integration",
-    text: "Business partners demand real-time customer recommendation capabilities.",
-    options: [
-      { val: "ai_paas_api", text: "Integrate public cloud AI recommendation API nodes (Optimal)" },
-      { val: "local_model", text: "Train custom neural models on internal employee desktops (Needs Improvement)" },
-      { val: "static_logic", text: "Write static SQL queries matching products based on hardcoded tags (Needs Improvement)" }
-    ],
-    correct: "ai_paas_api",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Managed AI APIs reduce development time, letting teams integrate recommendations instantly.<br>• <strong>Strategic Concept:</strong> <em>Cloud service capability augmentation</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Local model training on desk computers takes months, delaying market entry.<br>• <strong>Better Action:</strong> Implement managed AI cloud APIs."
-  },
-  10: {
-    title: "Year 10: Future Digital Enterprise Roadmap",
-    text: "Establish long-term architectural rules to handle international platform scales.",
-    options: [
-      { val: "ecosystem_maturity", text: "Deploy an open digital ecosystem with API lifecycle management (Optimal)" },
-      { val: "monolith_lock", text: "Standardize all company nodes on a single vendor's platform (Needs Improvement)" },
-      { val: "revert_onprem", text: "Move all cloud nodes back to on-premise physical mainframes (Needs Improvement)" }
-    ],
-    correct: "ecosystem_maturity",
-    correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Open systems allow quick integration of new features, avoiding lock-in.<br>• <strong>Strategic Concept:</strong> <em>Digital Ecosystem Evolution</em>.",
-    incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Vendor locking blocks future migrations when licensing fees spike.<br>• <strong>Better Action:</strong> Build API lifecycle governance layers."
-  }
-};
+        /* ─── LEVEL 3: DIGITAL ECOSYSTEM STRATEGY SIMULATOR ─── */
+        let l3Year = 1;
+        const l3EventsList = {
+            1: {
+                title: "Year 1: Digital Foundation",
+                text: "The enterprise currently runs fragmented local databases. Select which integrations to prioritize first.",
+                options: [
+                    { val: "api_first", text: "Establish standard RESTful APIs to bridge core databases (Optimal)" },
+                    { val: "scrap_all", text: "Scrap all legacy systems and build one giant database from scratch (Needs Improvement)" },
+                    { val: "ftp_csv", text: "Rely on daily manual FTP CSV data transfers between departments (Needs Improvement)" }
+                ],
+                correct: "api_first",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Standardizing data contracts allows systems to exchange logs without sharing raw database files.<br>• <strong>Strategic Concept:</strong> Dave Chaffey's <em>API-First Digital Integration</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Manual CSV tables transfers create duplicate logs, while rebuilding monoliths exceeds budgets.<br>• <strong>Better Action:</strong> Focus on standardizing RESTful APIs to connect core databases."
+            },
+            2: {
+                title: "Year 2: Customer Growth Surge",
+                text: "Storefront traffic increases by 400%. Your physical server queues bottleneck customer transactions.",
+                options: [
+                    { val: "cloud_scale", text: "Transition to dynamic Cloud Hosting with autoscaling clusters (Optimal)" },
+                    { val: "vps_add", text: "Manually launch additional Virtual Private Servers in branch sites (Acceptable)" },
+                    { val: "limit_users", text: "Block user access once concurrency limits are reached (Needs Improvement)" }
+                ],
+                correct: "cloud_scale",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Autoscaling clusters scale nodes dynamically based on active customer queues.<br>• <strong>Strategic Concept:</strong> <em>Elastic resource capacity hosting</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Queuing online checkout buyers causes immediate shopping cart drop-offs.<br>• <strong>Better Action:</strong> Migrate static layout hosting to auto-scaling cloud servers."
+            },
+            3: {
+                title: "Year 3: Marketplace Expansion",
+                text: "150 external suppliers want real-time warehouse inventory and checkout feeds.",
+                options: [
+                    { val: "partner_api", text: "Publish secure Partner API feeds with authentication keys (Optimal)" },
+                    { val: "allow_db", text: "Grant suppliers read access to your internal database server (Needs Improvement)" },
+                    { val: "email_csv", text: "Instruct employees to email stock CSV logs every hour (Needs Improvement)" }
+                ],
+                correct: "partner_api",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Secure client-token APIs isolate supplier queries, protecting internal databases.<br>• <strong>Strategic Concept:</strong> <em>Extranet Partner Integration Feeds</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Allowing external access directly to database layers exposes proprietary financial databases to data breaches.<br>• <strong>Better Action:</strong> Deploy secure authenticated Partner APIs."
+            },
+            4: {
+                title: "Year 4: Omnichannel Integration",
+                text: "Establish unified real-time logs between physical retail checkouts, mobile apps, and web portals.",
+                options: [
+                    { val: "middleware_sync", text: "Implement middleware ESB and REST endpoints (Optimal)" },
+                    { val: "offline_rekey", text: "Rekey physical store transaction sales every evening (Needs Improvement)" },
+                    { val: "separate_ledgers", text: "Maintain separate inventory logs for web and store sales (Needs Improvement)" }
+                ],
+                correct: "middleware_sync",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> ESB middleware acts as a translation layer, unifying offline cash registers with online servers.<br>• <strong>Strategic Concept:</strong> <em>E-Business Process Middleware Integration</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Separate ledger inventories lead to product stock-outs and delivery delays.<br>• <strong>Better Action:</strong> Configure central Middleware ESB connectors."
+            },
+            5: {
+                title: "Year 5: International Expansion",
+                text: "Storefront launches in Europe and Asia. Latency spikes checkout abandonments.",
+                options: [
+                    { val: "global_hosting", text: "Deploy multi-region hosting and Anycast DNS (Optimal)" },
+                    { val: "central_host", text: "Keep all servers in your home country origin node (Needs Improvement)" },
+                    { val: "simple_redirect", text: "Build static localized clone sites with manual synchronization (Needs Improvement)" }
+                ],
+                correct: "global_hosting",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Processing database transactions closer to international regions cuts round-trip latencies.<br>• <strong>Strategic Concept:</strong> <em>Distributed hosting architectures</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Sticking to central domestic nodes forces distant buyers to suffer slow connection speeds.<br>• <strong>Better Action:</strong> Set up multi-region cloud servers and local edge caches."
+            },
+            6: {
+                title: "Year 6: Ecosystem Partnerships",
+                text: "Unify financial transactions, shipping logisticians, and support platforms.",
+                options: [
+                    { val: "api_ecosystem", text: "Unify checkout partners using standard API ecosystem gateways (Optimal)" },
+                    { val: "custom_scripts", text: "Write custom parsing scripts for each partner's spreadsheets (Needs Improvement)" },
+                    { val: "separate_flows", text: "Force partners to navigate your client web portal manually (Needs Improvement)" }
+                ],
+                correct: "api_ecosystem",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Standards-based APIs connect partners quickly, minimizing custom translation overhead.<br>• <strong>Strategic Concept:</strong> <em>The Digital Ecosystem Economy</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Custom parsing scripts create significant technical debt, breaking whenever partners tweak schemas.<br>• <strong>Better Action:</strong> Standardize checkout routes via partner APIs."
+            },
+            7: {
+                title: "Year 7: Major Partner API Outage",
+                text: "Your primary checkout payment gateway experiences a total service blackout.",
+                options: [
+                    { val: "failover_gateway", text: "Redirection: automatically failover to secondary backup API (Optimal)" },
+                    { val: "site_offline", text: "Take the entire storefront site offline until provider reboots (Needs Improvement)" },
+                    { val: "ignore_fail", text: "Allow users to check out with pending bank transfer alerts (Needs Improvement)" }
+                ],
+                correct: "failover_gateway",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Auto-routing transactions to fallback systems preserves checkout operations.<br>• <strong>Strategic Concept:</strong> <em>High Availability & Business Continuity Architecture</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Taking pages offline instantly halts sales, destroying customer trust.<br>• <strong>Better Action:</strong> Deploy an automated failover backup gateway."
+            },
+            8: {
+                title: "Year 8: Budget Reductions",
+                text: "Economic slowdown cuts tech strategy budgets by 25%. Maintain core performance.",
+                options: [
+                    { val: "optimize_cloud", text: "Optimize server sizing and implement browser edge caching (Optimal)" },
+                    { val: "cancel_auth", text: "De-activate OAuth security keys to save processing costs (Needs Improvement)" },
+                    { val: "drop_backups", text: "Cancel all automated redundant backup processes (Needs Improvement)" }
+                ],
+                correct: "optimize_cloud",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Edge caching offloads CPU processes, reducing server utility bills without risking data loss.<br>• <strong>Strategic Concept:</strong> <em>Infrastructure cost optimization</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> De-activating security keys or redundant backups exposes the firm to hacks and system failure.<br>• <strong>Better Action:</strong> Tweak cloud node sizing and edge cache rules."
+            },
+            9: {
+                title: "Year 9: AI & Personalization Integration",
+                text: "Business partners demand real-time customer recommendation capabilities.",
+                options: [
+                    { val: "ai_paas_api", text: "Integrate public cloud AI recommendation API nodes (Optimal)" },
+                    { val: "local_model", text: "Train custom neural models on internal employee desktops (Needs Improvement)" },
+                    { val: "static_logic", text: "Write static SQL queries matching products based on hardcoded tags (Needs Improvement)" }
+                ],
+                correct: "ai_paas_api",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Managed AI APIs reduce development time, letting teams integrate recommendations instantly.<br>• <strong>Strategic Concept:</strong> <em>Cloud service capability augmentation</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Local model training on desk computers takes months, delaying market entry.<br>• <strong>Better Action:</strong> Implement managed AI cloud APIs."
+            },
+            10: {
+                title: "Year 10: Future Digital Enterprise Roadmap",
+                text: "Establish long-term architectural rules to handle international platform scales.",
+                options: [
+                    { val: "ecosystem_maturity", text: "Deploy an open digital ecosystem with API lifecycle management (Optimal)" },
+                    { val: "monolith_lock", text: "Standardize all company nodes on a single vendor's platform (Needs Improvement)" },
+                    { val: "revert_onprem", text: "Move all cloud nodes back to on-premise physical mainframes (Needs Improvement)" }
+                ],
+                correct: "ecosystem_maturity",
+                correctFeedback: "<strong>✓ Strategy Implemented!</strong><br>• <strong>Why it helps:</strong> Open systems allow quick integration of new features, avoiding lock-in.<br>• <strong>Strategic Concept:</strong> <em>Digital Ecosystem Evolution</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Vendor locking blocks future migrations when licensing fees spike.<br>• <strong>Better Action:</strong> Build API lifecycle governance layers."
+            }
+        };
 
-let l3Answers = [];
+        let l3Answers = [];
 
-function renderL3Quarter() {
-  const r = l3EventsList[l3Year];
-  document.getElementById('l3-phase-badge').textContent = `Year ${l3Year} of 10`;
-  document.getElementById('l3-phase-title').textContent = r.title;
-  document.getElementById('l3-phase-text').textContent = r.text;
-  document.getElementById('qf-l3').innerHTML = "";
-  document.getElementById('nextL3Btn').style.display = "none";
-  document.getElementById('l3-submit-btn').disabled = false;
+        function renderL3Quarter() {
+            const r = l3EventsList[l3Year];
+            document.getElementById('l3-phase-badge').textContent = `Year ${l3Year} of 10`;
+            document.getElementById('l3-phase-title').textContent = r.title;
+            document.getElementById('l3-phase-text').textContent = r.text;
+            document.getElementById('qf-l3').innerHTML = "";
+            document.getElementById('nextL3Btn').style.display = "none";
+            document.getElementById('l3-submit-btn').disabled = false;
 
-  const container = document.getElementById('l3-selectors');
-  container.innerHTML = "";
+            const container = document.getElementById('l3-selectors');
+            container.innerHTML = "";
 
-  let jumbled = shuffleArray(r.options);
-  let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
-  container.innerHTML = `
+            let jumbled = shuffleArray(r.options);
+            let optionsHtml = jumbled.map(o => `<option value="${o.val}">${o.text}</option>`).join('');
+            container.innerHTML = `
     <div>
       <span class="tk-label">Strategy Action Option</span>
       <select id="l3-sel-crisis" class="tk-entry" style="width:100%;">
@@ -1151,94 +1575,94 @@ function renderL3Quarter() {
       </select>
     </div>
   `;
-}
+        }
 
-function submitL3Phase() {
-  const r = l3EventsList[l3Year];
-  const choice = document.getElementById('l3-sel-crisis').value;
-  const feedback = document.getElementById('qf-l3');
+        function submitL3Phase() {
+            const r = l3EventsList[l3Year];
+            const choice = document.getElementById('l3-sel-crisis').value;
+            const feedback = document.getElementById('qf-l3');
 
-  l3Answers.push(choice);
+            l3Answers.push(choice);
 
-  let isCorrect = (choice === r.correct);
+            let isCorrect = (choice === r.correct);
 
-  let score = 0;
-  l3Answers.forEach((ans, idx) => {
-    if (ans === l3EventsList[idx + 1].correct) score++;
-  });
-  let fitScore = Math.round((score / l3Year) * 100);
+            let score = 0;
+            l3Answers.forEach((ans, idx) => {
+                if (ans === l3EventsList[idx + 1].correct) score++;
+            });
+            let fitScore = Math.round((score / l3Year) * 100);
 
-  let agility = isCorrect ? 95 : 30;
-  let cx = isCorrect ? 98 : 40;
-  let partner = isCorrect ? 95 : 45;
-  let scale = isCorrect ? 90 : 30;
-  let eff = isCorrect ? 95 : 50;
-  let ready = fitScore;
-  let strat = fitScore;
-  let comp = fitScore;
+            let agility = isCorrect ? 95 : 30;
+            let cx = isCorrect ? 98 : 40;
+            let partner = isCorrect ? 95 : 45;
+            let scale = isCorrect ? 90 : 30;
+            let eff = isCorrect ? 95 : 50;
+            let ready = fitScore;
+            let strat = fitScore;
+            let comp = fitScore;
 
-  // Update HUD
-  document.getElementById('l3-hud-score').textContent = `${fitScore}%`;
-  document.getElementById('l3-hud-cx').textContent = `${cx}%`;
-  document.getElementById('l3-hud-partner').textContent = `${partner}%`;
-  document.getElementById('l3-hud-agility').textContent = `${agility}%`;
-  document.getElementById('l3-hud-innov').textContent = isCorrect ? "95%" : "40%";
-  document.getElementById('l3-hud-scale').textContent = `${scale}%`;
-  document.getElementById('l3-hud-eff').textContent = `${eff}%`;
-  document.getElementById('l3-hud-ready').textContent = `${ready}%`;
-  document.getElementById('l3-hud-strat').textContent = `${strat}%`;
-  document.getElementById('l3-hud-comp').textContent = `${comp}%`;
+            // Update HUD
+            document.getElementById('l3-hud-score').textContent = `${fitScore}%`;
+            document.getElementById('l3-hud-cx').textContent = `${cx}%`;
+            document.getElementById('l3-hud-partner').textContent = `${partner}%`;
+            document.getElementById('l3-hud-agility').textContent = `${agility}%`;
+            document.getElementById('l3-hud-innov').textContent = isCorrect ? "95%" : "40%";
+            document.getElementById('l3-hud-scale').textContent = `${scale}%`;
+            document.getElementById('l3-hud-eff').textContent = `${eff}%`;
+            document.getElementById('l3-hud-ready').textContent = `${ready}%`;
+            document.getElementById('l3-hud-strat').textContent = `${strat}%`;
+            document.getElementById('l3-hud-comp').textContent = `${comp}%`;
 
-  if (isCorrect) {
-    feedback.style.color = "var(--code-ok)";
-    feedback.innerHTML = r.correctFeedback;
-    document.getElementById('l3-submit-btn').disabled = true;
+            if (isCorrect) {
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = r.correctFeedback;
+                document.getElementById('l3-submit-btn').disabled = true;
 
-    if (l3Year < 10) {
-      document.getElementById('nextL3Btn').style.display = "inline-flex";
-    } else {
-      // Trigger Final Boss Challenge
-      document.getElementById('l3-gameplay-card').style.display = "none";
-      document.getElementById('l3-boss-challenge').style.display = "block";
-    }
-  } else {
-    feedback.style.color = "var(--code-err)";
-    feedback.innerHTML = r.incorrectFeedback;
-    l3Answers.pop(); // Allow retry
-  }
-}
+                if (l3Year < 10) {
+                    document.getElementById('nextL3Btn').style.display = "inline-flex";
+                } else {
+                    // Trigger Final Boss Challenge
+                    document.getElementById('l3-gameplay-card').style.display = "none";
+                    document.getElementById('l3-boss-challenge').style.display = "block";
+                }
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = r.incorrectFeedback;
+                l3Answers.pop(); // Allow retry
+            }
+        }
 
-function proceedL3NextPhase() {
-  l3Year++;
-  renderL3Quarter();
-}
+        function proceedL3NextPhase() {
+            l3Year++;
+            renderL3Quarter();
+        }
 
-function concludeBossSimulation() {
-  document.getElementById('l3-boss-challenge').style.display = "none";
-  document.getElementById('l3-dashboard-card').style.display = "none";
-  
-  const q1 = document.getElementById('boss-q1').value;
-  const q2 = document.getElementById('boss-q2').value;
-  const q3 = document.getElementById('boss-q3').value;
-  const q4 = document.getElementById('boss-q4').value;
+        function concludeBossSimulation() {
+            document.getElementById('l3-boss-challenge').style.display = "none";
+            document.getElementById('l3-dashboard-card').style.display = "none";
 
-  let correctCount = 0;
-  if (q1 === "core_first") correctCount++;
-  if (q2 === "supplier_client") correctCount++;
-  if (q3 === "hybrid_multi") correctCount++;
-  if (q4 === "realtime_events") correctCount++;
+            const q1 = document.getElementById('boss-q1').value;
+            const q2 = document.getElementById('boss-q2').value;
+            const q3 = document.getElementById('boss-q3').value;
+            const q4 = document.getElementById('boss-q4').value;
 
-  let finalScore = Math.round((correctCount / 4) * 100);
+            let correctCount = 0;
+            if (q1 === "core_first") correctCount++;
+            if (q2 === "supplier_client") correctCount++;
+            if (q3 === "hybrid_multi") correctCount++;
+            if (q4 === "realtime_events") correctCount++;
 
-  let maturity = "Disconnected";
-  if (finalScore === 100) maturity = "Digital Ecosystem Leader 🏆";
-  else if (finalScore >= 75) maturity = "Optimized";
-  else if (finalScore >= 50) maturity = "Integrated";
-  else if (finalScore >= 25) maturity = "Connected";
+            let finalScore = Math.round((correctCount / 4) * 100);
 
-  unlockBadge('badge-chief', '🏆 Chief Digital Ecosystem Officer');
+            let maturity = "Disconnected";
+            if (finalScore === 100) maturity = "Digital Ecosystem Leader 🏆";
+            else if (finalScore >= 75) maturity = "Optimized";
+            else if (finalScore >= 50) maturity = "Integrated";
+            else if (finalScore >= 25) maturity = "Connected";
 
-  let reportHtml = `
+            unlockBadge('badge-chief', '🏆 Chief Digital Ecosystem Officer');
+
+            let reportHtml = `
     <div class="card" style="border: 2px solid var(--primary); background: #fff;">
       <span class="hero-badge" style="background:var(--primary); color:#fff;">Ecosystem Strategy Report</span>
       <h2 style="font-family:'Archivo Black',sans-serif; font-size:1.6rem; margin-top:0.8rem; letter-spacing:-1px;">Enterprise Digital Consulting Report</h2>
@@ -1285,15 +1709,16 @@ function concludeBossSimulation() {
     </div>
   `;
 
-  document.getElementById('l3-consulting-report').innerHTML = reportHtml;
-  document.getElementById('l3-consulting-report').style.display = "block";
-}
+            document.getElementById('l3-consulting-report').innerHTML = reportHtml;
+            document.getElementById('l3-consulting-report').style.display = "block";
+        }
 
-/* ─── INITIALIZATION ON PAGE LOAD ─── */
-renderL1Round();
-changeL2Case();
-renderL3Quarter();
-switchLevel('34', 1);
-</script>
+        /* ─── INITIALIZATION ON PAGE LOAD ─── */
+        renderL1Round();
+        changeL2Case();
+        renderL3Quarter();
+        switchLevel('34', 1);
+    </script>
 </body>
+
 </html>
