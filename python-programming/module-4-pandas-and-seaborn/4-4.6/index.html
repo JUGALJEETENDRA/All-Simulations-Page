@@ -1,1 +1,2654 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Data Science Lab - Advanced Statistical Visualizations</title>
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- Core Styling & Palette --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    :root {
+      --primary-red: #D32F2F;
+      --primary-red-hover: #B71C1C;
+      --light-red-bg: #FFEBEE;
+      --light-red-border: #FFCDD2;
+      --pure-white: #FFFFFF;
+      --off-white: #F9F9F9;
+      --text-dark: #212121;
+      --text-muted: #666666;
+      --slate-grey: #263238;
+      --slate-light: #37474F;
+      --accent-green: #2E7D32;
+      --accent-green-bg: #E8F5E9;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --border-radius-sm: 8px;
+      --border-radius-md: 16px;
+      --border-radius-lg: 24px;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--off-white);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* --- Vector Background Grid --- */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image:
+        radial-gradient(var(--light-red-border) 1px, transparent 1px),
+        radial-gradient(var(--light-red-border) 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      opacity: 0.3;
+      z-index: -1;
+    }
+
+    /* --- Header Controls --- */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--light-red-border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--primary-red);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pure-white);
+      font-weight: 800;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary-red);
+      letter-spacing: -0.5px;
+    }
+
+    .level-nav-hud {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--off-white);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--border-radius-lg);
+      border: 1.5px solid var(--light-red-border);
+    }
+
+    .hud-node {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--pure-white);
+      border: 1.5px solid var(--light-red-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .hud-node.active {
+      background: var(--primary-red);
+      color: var(--pure-white);
+      border-color: var(--primary-red);
+      box-shadow: 0 3px 8px rgba(211, 47, 47, 0.25);
+    }
+
+    .hud-node-line {
+      width: 16px;
+      height: 2px;
+      background: var(--light-red-border);
+    }
+
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* --- Buttons --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius-sm);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--primary-red);
+      color: var(--pure-white);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-red-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--pure-white);
+      color: var(--primary-red);
+      border: 1.5px solid var(--primary-red);
+    }
+
+    .btn-outline:hover {
+      background: var(--light-red-bg);
+    }
+
+    /* --- Workspace Layout --- */
+    .app-workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      padding: 1rem;
+      gap: 1rem;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1024px) {
+      .app-workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Interactive Sandbox */
+    .sandbox-panel {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-md);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .sandbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--light-red-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .sandbox-header h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary-red);
+    }
+
+    .active-info-box {
+      background: var(--light-red-bg);
+      border: 1px dashed var(--primary-red);
+      padding: 0.75rem;
+      border-radius: var(--border-radius-sm);
+      margin-bottom: 0.25rem;
+    }
+
+    .active-info-box h3 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary-red);
+      margin-bottom: 0.25rem;
+    }
+
+    .active-info-box p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .sandbox-canvas {
+      flex: 1;
+      min-height: 300px;
+      background: var(--pure-white);
+      border: 1.5px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+      position: relative;
+    }
+
+    /* Right Code Compiler Panel */
+    .compiler-panel {
+      background: var(--slate-grey);
+      border-radius: var(--border-radius-md);
+      color: var(--pure-white);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-lg);
+      border: 2px solid var(--slate-light);
+    }
+
+    .compiler-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--slate-light);
+      padding-bottom: 0.5rem;
+    }
+
+    .compiler-title {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #90A4AE;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .compiler-screen {
+      flex: 1;
+      background: #1e262b;
+      border-radius: var(--border-radius-sm);
+      padding: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .compiler-screen .exec-line {
+      border-left: 3px solid transparent;
+      padding-left: 0.5rem;
+    }
+
+    .compiler-screen .exec-line.active {
+      border-left-color: var(--primary-red);
+      background: rgba(211, 47, 47, 0.15);
+    }
+
+    .comment { color: #78909C; }
+    .keyword { color: #F07178; font-weight: 600; }
+    .function { color: #82B1FF; }
+    .string { color: #C3E88D; }
+    .number { color: #F78C6C; }
+
+    /* --- Status Banners --- */
+    .status-banner {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .status-banner.success {
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid #C8E6C9;
+    }
+
+    .status-banner.error {
+      background: var(--light-red-bg);
+      color: var(--primary-red);
+      border: 1px solid var(--light-red-border);
+    }
+
+    /* --- Level 1: Distribution Scanner Elements --- */
+    .scanner-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--off-white);
+      border: 1.5px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    .scan-beam {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-red);
+      box-shadow: 0 0 10px var(--primary-red);
+      pointer-events: none;
+    }
+
+    /* --- Draggable & Drop Targets --- */
+    .drag-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+
+    .drag-chip {
+      padding: 0.4rem 0.8rem;
+      background: var(--pure-white);
+      border: 1.5px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--text-dark);
+      cursor: grab;
+      touch-action: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .drag-chip:active {
+      cursor: grabbing;
+    }
+
+    .drop-cell {
+      border: 2px dashed var(--light-red-border);
+      background: var(--off-white);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .drop-cell.hovered {
+      border-color: var(--primary-red);
+      background: var(--light-red-bg);
+    }
+
+    /* --- Outlier Hunter Laser HUD --- */
+    .outlier-hud {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tool-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1.5px solid var(--light-red-border);
+      background: var(--pure-white);
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .tool-btn.active {
+      background: var(--primary-red);
+      color: var(--pure-white);
+      border-color: var(--primary-red);
+    }
+
+    .particle-glow {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: explode 0.8s ease-out forwards;
+    }
+
+    /* --- AI Scientist Championship Elements --- */
+    .boss-battle-view {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .boss-character-avatar {
+      font-size: 2rem;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    .boss-bar-row {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+    }
+
+    .boss-hp-track {
+      width: 70%;
+      height: 8px;
+      background: #E0E0E0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .boss-hp-fill {
+      width: 100%;
+      height: 100%;
+      background: var(--primary-red);
+      transition: width 0.3s ease;
+    }
+
+    .player-hp-fill {
+      width: 100%;
+      height: 100%;
+      background: var(--accent-green);
+      transition: width 0.3s ease;
+    }
+
+    .battle-options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 0.5rem;
+    }
+
+    .battle-option-btn {
+      padding: 0.5rem;
+      border: 1.5px solid var(--light-red-border);
+      background: var(--pure-white);
+      border-radius: var(--border-radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .battle-option-btn:hover {
+      background: var(--light-red-bg);
+      border-color: var(--primary-red);
+    }
+
+    /* Dialog Popups */
+    dialog {
+      border: none;
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 1.5rem;
+      max-width: 400px;
+      margin: auto;
+      outline: none;
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* --- Animations --- */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(4); opacity: 0; }
+    }
+
+    /* Shield and Inspector styling */
+    .shield-container {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+      margin-top: 0.25rem;
+    }
+    .shield-heart {
+      font-size: 0.95rem;
+      color: var(--primary-red);
+      transition: transform 0.2s;
+    }
+    .shield-heart.damaged {
+      color: #D7CCC8;
+      opacity: 0.4;
+      transform: scale(0.85);
+    }
+    .inspector-panel {
+      background: var(--dark-navy);
+      color: var(--pure-white);
+      border-radius: var(--border-radius-sm);
+      padding: 0.5rem 0.7rem;
+      font-size: 0.7rem;
+      font-family: monospace;
+      margin-top: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .inspector-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    .inspector-label {
+      color: #90A4AE;
+    }
+    .inspector-val {
+      font-weight: 700;
+      color: #81D4FA;
+    }
+
+    /* Syntax Assembler Styles */
+    .syntax-zone {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+    .assembled-box {
+      min-height: 2.2rem;
+      background: var(--dark-navy);
+      border: 1.5px dashed var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      padding: 0.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .tokens-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      justify-content: center;
+      width: 100%;
+      margin-top: 0.25rem;
+    }
+    .token-btn {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.7rem;
+      font-family: monospace;
+      font-weight: bold;
+      background: var(--pure-white);
+      border: 1px solid var(--light-red-border);
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: all var(--transition-fast);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .token-btn:hover {
+      background: var(--light-red-bg);
+      border-color: var(--primary-red);
+      transform: translateY(-1px);
+    }
+    .token-btn.placed {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .token-active {
+      background: var(--primary-red);
+      color: var(--pure-white);
+      border-color: var(--primary-red);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-family: monospace;
+      font-size: 0.7rem;
+      font-weight: bold;
+      animation: fadeIn var(--transition-fast) ease-out;
+    }
+    .token-active:hover {
+      background: #B71C1C;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- Header Section -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">📊</div>
+      <div class="brand-title">Advanced Statistical Visualizations</div>
+    </div>
+
+    <!-- Unlocked Level Navigation Nodes -->
+    <div class="level-nav-hud">
+      <div class="hud-node active" id="btn-lvl-1" onclick="switchLevel(1)">1</div>
+      <div class="hud-node-line"></div>
+      <div class="hud-node" id="btn-lvl-2" onclick="switchLevel(2)">2</div>
+      <div class="hud-node-line"></div>
+      <div class="hud-node" id="btn-lvl-3" onclick="switchLevel(3)">3</div>
+    </div>
+
+    <!-- Global Toolbar & Stats -->
+    <div class="hud-stats">
+      <button class="btn btn-outline" style="padding: 0.35rem 0.75rem;" onclick="resetCurrentActivity()">🔄 Reset</button>
+      <button class="btn btn-primary" style="padding: 0.35rem 0.75rem;" id="nav-next-btn" onclick="goToNextActivity()">Next ▶</button>
+    </div>
+  </header>
+
+  <!-- Workspace Section -->
+  <main class="app-workspace">
+    <!-- Left panel (Interactive Playgrounds) -->
+    <section class="sandbox-panel">
+      <div class="sandbox-header" style="flex-direction:column; align-items:flex-start; gap:0.25rem; border-bottom: 1.5px solid var(--light-red-border); padding-bottom: 0.5rem;">
+        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+          <h2 id="active-title">Activity Title</h2>
+          <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; color: var(--text-muted);" id="activity-id-label">Level 1 - Activity 1</div>
+        </div>
+        <p style="font-size:0.75rem; color:var(--text-muted);" id="active-subtitle">Activity Subtitle</p>
+      </div>
+
+      <div class="active-info-box">
+        <h3 id="active-brief-title">Instructions</h3>
+        <p id="active-brief-desc">Perform the required actions to complete the simulation.</p>
+      </div>
+
+      <!-- Main simulator viewport -->
+      <div class="sandbox-canvas" id="sandbox-content">
+        <!-- Replaced dynamically by JS modules -->
+      </div>
+
+      <!-- Status banner alerts -->
+      <div class="status-banner" id="app-status-banner">Status Banner</div>
+    </section>
+
+    <!-- Right panel (Python Code Compiler Terminal) -->
+    <section class="compiler-panel">
+      <div class="compiler-header">
+        <div class="compiler-title">Seaborn Code Compiler</div>
+        <div style="width: 10px; height: 10px; border-radius: 50%; background: #4CAF50;"></div>
+      </div>
+      <div class="compiler-screen" id="compiler-code-box">
+        <!-- Rendered code highlights here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Victory Dialog modal -->
+  <dialog id="victory-modal">
+    <div style="text-align: center; display: flex; flex-direction: column; gap: 0.75rem; align-items: center;">
+      <span style="font-size: 3rem;">🎓</span>
+      <h3 style="color: var(--primary-red); font-weight: 800;">Academic Master Scientist</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted);" id="victory-desc">You completed the capstone visualization tournament!</p>
+      <button class="btn btn-primary" onclick="document.getElementById('victory-modal').close()">Fantastic!</button>
+    </div>
+  </dialog>
+
+  <!-- JS Confetti helper -->
+  <script>
+    const confetti = {
+      start: function() {
+        let container = document.body;
+        for (let i = 0; i < 40; i++) {
+          let particle = document.createElement('div');
+          particle.className = 'particle-glow';
+          particle.style.background = ['#D32F2F', '#FFCDD2', '#FF8A80', '#4CAF50'][Math.floor(Math.random() * 4)];
+          particle.style.width = Math.random() * 8 + 4 + 'px';
+          particle.style.height = particle.style.width;
+          particle.style.left = Math.random() * 100 + 'vw';
+          particle.style.top = Math.random() * 100 + 'vh';
+          container.appendChild(particle);
+          setTimeout(() => particle.remove(), 1000);
+        }
+      },
+      stop: function() {}
+    };
+  </script>
+
+  <!-- Core App Logic -->
+  <script>
+    /* =========================================================================
+       AUDIO SYNTHESIZER CLASS (WEB AUDIO API)
+       ========================================================================= */
+    class SoundSynth {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      click() {
+        this.init();
+        if (!this.ctx) return;
+        let osc = this.ctx.createOscillator();
+        let gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+      }
+      success() {
+        this.init();
+        if (!this.ctx) return;
+        let osc = this.ctx.createOscillator();
+        let gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
+        osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(783.99, this.ctx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.4);
+      }
+      error() {
+        this.init();
+        if (!this.ctx) return;
+        let osc = this.ctx.createOscillator();
+        let gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.4);
+      }
+    }
+    const audio = new SoundSynth();
+
+    /* =========================================================================
+       GLOBAL APP STATE
+       ========================================================================= */
+    const state = {
+      level: 1,
+      activity: 1,
+      completedActivities: []
+    };
+
+    function saveState() {
+      localStorage.setItem('state_4_6', JSON.stringify(state));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('state_4_6');
+      if (saved) {
+        Object.assign(state, JSON.parse(saved));
+      }
+      updateLevelNavHUD();
+    }
+
+    function awardXP(val) {
+      // XP removed from course spec
+    }
+
+    function updateLevelNavHUD() {
+      document.querySelectorAll('.hud-node').forEach((node, idx) => {
+        const lvl = idx + 1;
+        node.className = 'hud-node';
+        if (state.level === lvl) {
+          node.classList.add('active');
+        }
+      });
+    }
+
+    function switchLevel(lvl) {
+      audio.click();
+      state.level = lvl;
+      state.activity = 1;
+      saveState();
+      updateLevelNavHUD();
+      loadActiveActivity();
+    }
+
+    function resetCurrentActivity() {
+      audio.click();
+      loadActiveActivity();
+      showStatusBanner("🔄 Activity sandbox configuration reset.", 'success');
+    }
+
+    function goToNextActivity() {
+      audio.click();
+      if (state.activity === 1) {
+        state.activity = 2;
+      } else {
+        if (state.level < 3) {
+          state.level++;
+          state.activity = 1;
+        } else {
+          document.getElementById('victory-modal').showModal();
+          return;
+        }
+      }
+      saveState();
+      updateLevelNavHUD();
+      loadActiveActivity();
+    }
+
+    function showStatusBanner(text, type = 'success') {
+      const banner = document.getElementById('app-status-banner');
+      banner.className = `status-banner ${type}`;
+      banner.innerHTML = text;
+      banner.style.display = 'block';
+    }
+
+    function formatPythonCode(code, activeLineIndex = -1) {
+      const container = document.getElementById('compiler-code-box');
+      const lines = code.split('\n');
+      let html = '';
+
+      lines.forEach((line, idx) => {
+        let clean = line;
+        // Basic syntax highlight replacements
+        clean = clean.replace(/#.*$/g, (m) => `<span class="comment">${m}</span>`);
+        clean = clean.replace(/\b(import|as|from|def|return|if|else)\b/g, '<span class="keyword">$1</span>');
+        clean = clean.replace(/\b(sns|plt|pd|np)\.[a-zA-Z0-9_]+/g, '<span class="function">$&</span>');
+        clean = clean.replace(/(["'].*?["'])/g, '<span class="string">$1</span>');
+        clean = clean.replace(/\b([0-9\.]+)\b/g, '<span class="number">$1</span>');
+
+        const activeClass = idx === activeLineIndex ? 'active' : '';
+        html += `<div class="exec-line ${activeClass}">${clean || '&nbsp;'}</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    /* =========================================================================
+       DRAGGABLE ABSTRACT CONTROLLER
+       ========================================================================= */
+    let dragObj = null;
+    let offset = { x: 0, y: 0 };
+    let dropTargets = [];
+    let currentDropHover = null;
+    let dragCallback = null;
+
+    function initDraggable(element, callback) {
+      element.addEventListener('pointerdown', (e) => {
+        audio.click();
+        dragObj = element;
+        dragObj.classList.add('dragging');
+
+        offset = {
+          x: e.clientX,
+          y: e.clientY
+        };
+
+        dragCallback = callback;
+        element.setPointerCapture(e.pointerId);
+        dropTargets = Array.from(document.querySelectorAll('.drop-cell'));
+      });
+
+      element.addEventListener('pointermove', (e) => {
+        if (dragObj !== element) return;
+
+        const dx = e.clientX - offset.x;
+        const dy = e.clientY - offset.y;
+
+        element.style.transform = `translate(${dx}px, ${dy}px) scale(1.05)`;
+
+        let hovered = null;
+        for (let target of dropTargets) {
+          const rect = target.getBoundingClientRect();
+          if (e.clientX >= rect.left && e.clientX <= rect.right &&
+              e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            hovered = target;
+            break;
+          }
+        }
+
+        if (hovered !== currentDropHover) {
+          if (currentDropHover) currentDropHover.classList.remove('hovered');
+          currentDropHover = hovered;
+          if (currentDropHover) currentDropHover.classList.add('hovered');
+        }
+      });
+
+      element.addEventListener('pointerup', (e) => {
+        if (dragObj !== element) return;
+        element.releasePointerCapture(e.pointerId);
+
+        dragObj.classList.remove('dragging');
+        element.style.transform = '';
+
+        if (currentDropHover) {
+          currentDropHover.classList.remove('hovered');
+          if (dragCallback) {
+            dragCallback(element, currentDropHover);
+          }
+        } else {
+          element.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          element.style.transform = 'translate(0px, 0px)';
+          setTimeout(() => { element.style.transition = ''; }, 350);
+        }
+
+        dragObj = null;
+        currentDropHover = null;
+      });
+    }
+
+
+    /* =========================================================================
+       ACTIVITY MODULES
+       ========================================================================= */
+
+    function loadActiveActivity() {
+      document.getElementById('app-status-banner').style.display = 'none';
+      const container = document.getElementById('sandbox-content');
+      container.innerHTML = '';
+
+      const key = `${state.level}-${state.activity}`;
+      document.getElementById('activity-id-label').innerText = `Level ${state.level} — Activity ${state.activity}`;
+
+      if (key === '1-1') {
+        setupActivity11(container);
+      } else if (key === '1-2') {
+        setupActivity12(container);
+      } else if (key === '2-1') {
+        setupActivity21(container);
+      } else if (key === '2-2') {
+        setupActivity22(container);
+      } else if (key === '3-1') {
+        setupActivity31(container);
+      } else if (key === '3-2') {
+        setupActivity32(container);
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       ACTIVITY 1.1: DISTRIBUTION SCANNER
+       ------------------------------------------------------------------------- */
+    let scannerProgress11 = 0;
+    const scannerState11 = {
+      round: 0,
+      rounds: [
+        {
+          datasetName: '📊 Annual Customer Income Distribution',
+          shape: 'rightskew',
+          label: 'Right Skewed',
+          svg: `
+            <svg viewBox="0 0 240 120" style="width:100%; height:100%;">
+              <path d="M 10,110 Q 50,20 80,60 T 230,110" fill="none" stroke="var(--primary-red)" stroke-width="2.5" id="scan-path-11"/>
+              <rect x="25" y="90" width="15" height="20" fill="var(--light-red-border)"/>
+              <rect x="45" y="50" width="15" height="60" fill="var(--light-red-border)"/>
+              <rect x="65" y="30" width="15" height="80" fill="var(--light-red-border)"/>
+              <rect x="85" y="55" width="15" height="55" fill="var(--light-red-border)"/>
+              <rect x="105" y="70" width="15" height="40" fill="var(--light-red-border)"/>
+              <rect x="125" y="80" width="15" height="30" fill="var(--light-red-border)"/>
+              <rect x="145" y="85" width="15" height="25" fill="var(--light-red-border)"/>
+              <rect x="165" y="90" width="15" height="20" fill="var(--light-red-border)"/>
+            </svg>
+          `,
+          code: `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Plot right-skewed annual incomes:\nsns.histplot(data=df, x="income", kde=True)\nplt.show()`
+        },
+        {
+          datasetName: '📏 Human Heights Spread',
+          shape: 'normal',
+          label: 'Normal Distribution',
+          svg: `
+            <svg viewBox="0 0 240 120" style="width:100%; height:100%;">
+              <path d="M 10,110 Q 120,10 230,110" fill="none" stroke="var(--primary-red)" stroke-width="2.5" id="scan-path-11"/>
+              <rect x="25" y="100" width="15" height="10" fill="var(--light-red-border)"/>
+              <rect x="45" y="85" width="15" height="25" fill="var(--light-red-border)"/>
+              <rect x="65" y="65" width="15" height="45" fill="var(--light-red-border)"/>
+              <rect x="85" y="45" width="15" height="65" fill="var(--light-red-border)"/>
+              <rect x="105" y="25" width="15" height="85" fill="var(--light-red-border)"/>
+              <rect x="125" y="45" width="15" height="65" fill="var(--light-red-border)"/>
+              <rect x="145" y="65" width="15" height="45" fill="var(--light-red-border)"/>
+              <rect x="165" y="85" width="15" height="25" fill="var(--light-red-border)"/>
+            </svg>
+          `,
+          code: `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Plot normally distributed heights:\nsns.histplot(data=df, x="height", kde=True)\nplt.show()`
+        },
+        {
+          datasetName: '👵 Country X Retirement Ages',
+          shape: 'leftskew',
+          label: 'Left Skewed',
+          svg: `
+            <svg viewBox="0 0 240 120" style="width:100%; height:100%;">
+              <path d="M 10,110 Q 160,60 190,20 T 230,110" fill="none" stroke="var(--primary-red)" stroke-width="2.5" id="scan-path-11"/>
+              <rect x="25" y="90" width="15" height="20" fill="var(--light-red-border)"/>
+              <rect x="45" y="85" width="15" height="25" fill="var(--light-red-border)"/>
+              <rect x="65" y="80" width="15" height="30" fill="var(--light-red-border)"/>
+              <rect x="85" y="70" width="15" height="40" fill="var(--light-red-border)"/>
+              <rect x="105" y="55" width="15" height="55" fill="var(--light-red-border)"/>
+              <rect x="125" y="30" width="15" height="80" fill="var(--light-red-border)"/>
+              <rect x="145" y="50" width="15" height="60" fill="var(--light-red-border)"/>
+              <rect x="165" y="90" width="15" height="20" fill="var(--light-red-border)"/>
+            </svg>
+          `,
+          code: `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Plot left-skewed ages:\nsns.histplot(data=df, x="age_at_retirement", kde=True)\nplt.show()`
+        },
+        {
+          datasetName: '🍽 Restaurant Peak Dining Hours',
+          shape: 'bimodal',
+          label: 'Bimodal Distribution',
+          svg: `
+            <svg viewBox="0 0 240 120" style="width:100%; height:100%;">
+              <path d="M 10,110 Q 60,20 100,80 T 180,20 T 230,110" fill="none" stroke="var(--primary-red)" stroke-width="2.5" id="scan-path-11"/>
+              <rect x="25" y="85" width="15" height="25" fill="var(--light-red-border)"/>
+              <rect x="45" y="40" width="15" height="70" fill="var(--light-red-border)"/>
+              <rect x="65" y="30" width="15" height="80" fill="var(--light-red-border)"/>
+              <rect x="85" y="65" width="15" height="45" fill="var(--light-red-border)"/>
+              <rect x="105" y="80" width="15" height="30" fill="var(--light-red-border)"/>
+              <rect x="125" y="80" width="15" height="30" fill="var(--light-red-border)"/>
+              <rect x="145" y="65" width="15" height="45" fill="var(--light-red-border)"/>
+              <rect x="165" y="30" width="15" height="80" fill="var(--light-red-border)"/>
+              <rect x="185" y="40" width="15" height="70" fill="var(--light-red-border)"/>
+            </svg>
+          `,
+          code: `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Plot bimodal dining counts:\nsns.histplot(data=df, x="dining_hour", kde=True)\nplt.show()`
+        }
+      ]
+    };
+
+    function setupActivity11(container) {
+      document.getElementById('active-title').innerText = 'Activity 1.1 — Distribution Scanner';
+      document.getElementById('active-subtitle').innerText = 'Drag slider to scan the dataset above 80%, then select its distribution type.';
+
+      container.innerHTML = `
+        <div class="scanner-card" id="scanner-area">
+          <div style="font-size:0.75rem; font-weight:800; color:var(--primary-red); margin-bottom:0.25rem;" id="scanner-data-name">Dataset name</div>
+          <div style="height:150px; background:#ECEFF1; border-radius:var(--border-radius-sm); overflow:hidden; position:relative;" id="scanner-svg-box">
+            <!-- Loaded SVG -->
+          </div>
+          <div class="scan-beam" id="scan-beam-overlay"></div>
+          
+          <div class="slider-item-row" style="margin-top:0.5rem; width:100%;">
+            <span>AI SCAN BEAM DEPTH: <span id="scan-progress-label" style="color:var(--primary-red); font-weight:800;">0%</span></span>
+            <input type="range" min="0" max="100" value="0" id="scan-range-slider" style="width:100%; accent-color:var(--primary-red);" oninput="updateScannerDepth11(this.value)">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:0.4rem; justify-content:center; flex-wrap:wrap; margin-top:0.5rem;" id="scanner-options-row">
+          <!-- Buttons generated dynamically -->
+        </div>
+      `;
+
+      scannerState11.round = 0;
+      loadScannerRound11();
+    }
+
+    function loadScannerRound11() {
+      const active = scannerState11.rounds[scannerState11.round];
+      document.getElementById('scanner-data-name').innerText = active.datasetName;
+      document.getElementById('scanner-svg-box').innerHTML = active.svg;
+      document.getElementById('scan-progress-label').innerText = '0%';
+      document.getElementById('scan-beam-overlay').style.left = '0%';
+      const slider = document.getElementById('scan-range-slider');
+      if (slider) slider.value = 0;
+      scannerProgress11 = 0;
+
+      // Initially hide parts of the SVG to simulate scanner tracing
+      const path = document.getElementById('scan-path-11');
+      if (path) path.style.strokeDasharray = path.getTotalLength();
+      if (path) path.style.strokeDashoffset = path.getTotalLength();
+
+      // Setup jumbled multiple choice buttons
+      const rawOptions = [
+        { shape: 'normal', label: 'Normal Distribution' },
+        { shape: 'rightskew', label: 'Right Skewed' },
+        { shape: 'leftskew', label: 'Left Skewed' },
+        { shape: 'bimodal', label: 'Bimodal Dist' }
+      ];
+      const jumbledOptions = [...rawOptions].sort(() => Math.random() - 0.5);
+
+      const optBox = document.getElementById('scanner-options-row');
+      optBox.innerHTML = '';
+      jumbledOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline';
+        btn.style.padding = '0.4rem 0.8rem';
+        btn.style.fontSize = '0.75rem';
+        btn.innerText = opt.label;
+        btn.onclick = () => selectScannerOption11(opt.shape, btn);
+        optBox.appendChild(btn);
+      });
+
+      formatPythonCode(active.code, 3);
+    }
+
+    function updateScannerDepth11(val) {
+      scannerProgress11 = Number(val);
+      document.getElementById('scan-progress-label').innerText = `${val}%`;
+      document.getElementById('scan-beam-overlay').style.left = `${val}%`;
+
+      const path = document.getElementById('scan-path-11');
+      if (path) {
+        const len = path.getTotalLength();
+        const draw = len - (len * (Number(val) / 100));
+        path.style.strokeDashoffset = draw;
+      }
+    }
+
+    function selectScannerOption11(shape, btn) {
+      if (scannerProgress11 < 80) {
+        audio.error();
+        showStatusBanner("❌ Scan beam must reach at least 80% to gather enough data points for analysis!", 'error');
+        return;
+      }
+
+      const active = scannerState11.rounds[scannerState11.round];
+      if (shape === active.shape) {
+        audio.success();
+        btn.style.background = 'var(--accent-green-bg)';
+        btn.style.borderColor = 'var(--accent-green)';
+        btn.style.color = 'var(--accent-green)';
+        showStatusBanner(`✔ Correct! The dataset shape is ${active.label}.`, 'success');
+
+        setTimeout(() => {
+          scannerState11.round++;
+          if (scannerState11.round < scannerState11.rounds.length) {
+            loadScannerRound11();
+          } else {
+            concludeScanner11();
+          }
+        }, 1600);
+      } else {
+        audio.error();
+        btn.style.background = 'var(--light-red-bg)';
+        btn.style.borderColor = 'var(--primary-red)';
+        btn.style.color = 'var(--primary-red)';
+        showStatusBanner("❌ Shape mismatch! Track probability bounds to evaluate skewness direction.", 'error');
+        setTimeout(() => {
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 1000);
+      }
+    }
+
+    function concludeScanner11() {
+      confetti.start();
+      setTimeout(() => confetti.stop(), 3000);
+      awardXP(20);
+
+      document.getElementById('sandbox-content').innerHTML = `
+        <div style="text-align:center; padding:1rem;">
+          <span style="font-size:2.5rem;">🔎</span>
+          <h3 style="color:var(--accent-green); font-weight:800; margin-top:0.5rem;">Scanner Analysis Completed!</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Level 1 Activity 2 unlocked. Hit Next ▶ to proceed.</p>
+        </div>
+      `;
+      showStatusBanner("🎉 Diagnostic scanner completes. Unlocking Mystery matching puzzles!");
+    }
+
+    /* -------------------------------------------------------------------------
+       ACTIVITY 1.2: DISTRIBUTION MYSTERY PUZZLE
+       ------------------------------------------------------------------------- */
+    const puzzleState12 = {
+      round: 0,
+      connections: { cardId: null, targetId: null },
+      rounds: [
+        {
+          brief: 'Connect normal probability metrics to the correct real-world dataset scenario:',
+          cardLabel: '📏 Bell-Shaped Normal Curve',
+          correctTarget: 'heights',
+          targets: [
+            { id: 'heights', text: 'Human Heights Spread (Symmetric)' },
+            { id: 'income', text: 'Corporate Salary Distribution (Right-skewed)' },
+            { id: 'retirement', text: 'Elderly Lifespan Ages (Left-skewed)' },
+            { id: 'traffic', text: 'Commuter Highway Traffic Peaks (Bimodal)' }
+          ],
+          code: `import seaborn as sns\n\n# Representing perfect symmetric distribution:\nsns.kdeplot(df["heights"], fill=True)`
+        },
+        {
+          brief: 'Connect skewed statistics to wealth accumulation parameters:',
+          cardLabel: '💰 Long Tail Outward Right-Skewed',
+          correctTarget: 'income',
+          targets: [
+            { id: 'heights', text: 'Human Heights Spread (Symmetric)' },
+            { id: 'income', text: 'Corporate Salary Distribution (Right-skewed)' },
+            { id: 'retirement', text: 'Elderly Lifespan Ages (Left-skewed)' },
+            { id: 'traffic', text: 'Commuter Highway Traffic Peaks (Bimodal)' }
+          ],
+          code: `import seaborn as sns\n\n# Representing long right-skewed scale:\nsns.kdeplot(df["salaries"], fill=True)`
+        },
+        {
+          brief: 'Connect skewed distribution metrics to longevity/lifespan variables:',
+          cardLabel: '👵 Skewed Left (Longer Left Tail)',
+          correctTarget: 'retirement',
+          targets: [
+            { id: 'heights', text: 'Human Heights Spread (Symmetric)' },
+            { id: 'income', text: 'Corporate Salary Distribution (Right-skewed)' },
+            { id: 'retirement', text: 'Elderly Lifespan Ages (Left-skewed)' },
+            { id: 'traffic', text: 'Commuter Highway Traffic Peaks (Bimodal)' }
+          ],
+          code: `import seaborn as sns\n\n# Representing skewed left lifespan ages:\nsns.kdeplot(df["lifespan"], fill=True)`
+        },
+        {
+          brief: 'Connect two peaks distribution profile to daily commuter parameters:',
+          cardLabel: '🚗 Double Peak Bimodal Curve',
+          correctTarget: 'traffic',
+          targets: [
+            { id: 'heights', text: 'Human Heights Spread (Symmetric)' },
+            { id: 'income', text: 'Corporate Salary Distribution (Right-skewed)' },
+            { id: 'retirement', text: 'Elderly Lifespan Ages (Left-skewed)' },
+            { id: 'traffic', text: 'Commuter Highway Traffic Peaks (Bimodal)' }
+          ],
+          code: `import seaborn as sns\n\n# Representing two traffic flow spikes (8AM & 5PM):\nsns.kdeplot(df["commute_times"], fill=True)`
+        }
+      ]
+    };
+
+    function setupActivity12(container) {
+      document.getElementById('active-title').innerText = 'Activity 1.2 — Mystery Match Puzzle';
+      document.getElementById('active-subtitle').innerText = 'Tap a distribution shape card, then select its matching real-life scenario.';
+
+      container.innerHTML = `
+        <div class="active-info-box" style="width:100%; margin-bottom:0.5rem;">
+          <p id="puzzle-brief-text" style="font-size:0.75rem; line-height:1.3; font-weight:600;"></p>
+        </div>
+
+        <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+          <!-- Active Card -->
+          <div class="drag-chip" id="puzzle-source-card" style="padding:1rem; border-color:var(--primary-red); color:var(--primary-red); border-width:2px; font-weight:800; cursor:default; width:220px; text-align:center;">
+            Card Label
+          </div>
+
+          <div style="font-size:0.7rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-top:0.25rem;">Select Scenario Target:</div>
+          
+          <!-- Drop slots represented as tap buttons -->
+          <div style="display:flex; flex-direction:column; gap:0.4rem; width:100%; max-width:320px;" id="puzzle-targets-box">
+            <!-- Buttons generated dynamically -->
+          </div>
+        </div>
+      `;
+
+      puzzleState12.round = 0;
+      loadPuzzleRound12();
+    }
+
+    function loadPuzzleRound12() {
+      const active = puzzleState12.rounds[puzzleState12.round];
+      document.getElementById('puzzle-brief-text').innerText = active.brief;
+      document.getElementById('puzzle-source-card').innerText = active.cardLabel;
+
+      // Jumble targets
+      const jumbledTargets = [...active.targets].sort(() => Math.random() - 0.5);
+
+      const targetBox = document.getElementById('puzzle-targets-box');
+      targetBox.innerHTML = '';
+      jumbledTargets.forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline';
+        btn.style.padding = '0.5rem';
+        btn.style.fontSize = '0.75rem';
+        btn.innerText = t.text;
+        btn.onclick = () => selectPuzzleMatch12(t.id, btn);
+        targetBox.appendChild(btn);
+      });
+
+      formatPythonCode(active.code, 2);
+    }
+
+    function selectPuzzleMatch12(targetId, btn) {
+      const active = puzzleState12.rounds[puzzleState12.round];
+      if (targetId === active.correctTarget) {
+        audio.success();
+        btn.style.background = 'var(--accent-green-bg)';
+        btn.style.borderColor = 'var(--accent-green)';
+        btn.style.color = 'var(--accent-green)';
+        showStatusBanner("✔ Correct connection made!", 'success');
+
+        setTimeout(() => {
+          puzzleState12.round++;
+          if (puzzleState12.round < puzzleState12.rounds.length) {
+            loadPuzzleRound12();
+          } else {
+            concludePuzzle12();
+          }
+        }, 1600);
+      } else {
+        audio.error();
+        btn.style.background = 'var(--light-red-bg)';
+        btn.style.borderColor = 'var(--primary-red)';
+        btn.style.color = 'var(--primary-red)';
+        showStatusBanner("❌ Connection failed! Ensure the tail characteristics match the target distribution.", 'error');
+        setTimeout(() => {
+          btn.style.background = '';
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 1000);
+      }
+    }
+
+    function concludePuzzle12() {
+      confetti.start();
+      setTimeout(() => confetti.stop(), 3000);
+      awardXP(25);
+
+      document.getElementById('sandbox-content').innerHTML = `
+        <div style="text-align:center; padding:1rem;">
+          <span style="font-size:2.5rem;">🎉</span>
+          <h3 style="color:var(--accent-green); font-weight:800; margin-top:0.5rem;">Mystery Solved!</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Level 2 unlocked. Hit Next ▶ to proceed.</p>
+        </div>
+      `;
+      showStatusBanner("🎉 Level 1 completed successfully! Unlocked level 2 visual pattern analysis.");
+    }
+
+    /* -------------------------------------------------------------------------
+       ACTIVITY 2.1: AI TREND PREDICTOR
+       ------------------------------------------------------------------------- */
+    const predictorState21 = {
+      confidence: 95,
+      slope: 3,
+      noise: 3,
+      code: `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Configure regression with dynamic confidence bands:\nsns.regplot(data=df, x="study_hours", y="marks", ci=95)\nplt.show()`
+    };
+
+    function setupActivity21(container) {
+      document.getElementById('active-title').innerText = 'Activity 2.1 — AI Trend Predictor';
+      document.getElementById('active-subtitle').innerText = 'Balance three sliders to achieve target correlation, confidence interval, and low variance.';
+
+      container.innerHTML = `
+        <div class="target-array-hud" style="background:#E1F5FE; border-color:#81D4FA; width:100%; max-width:440px; margin-bottom:0.5rem; text-align:center;">
+          <span style="font-size:0.7rem; text-transform:uppercase; color:#01579B; font-weight:800;">Target Design Specifications:</span>
+          <span class="target-array-vals" id="reg-status-label" style="font-size:0.75rem; color:#01579B; font-weight:700;">Correlation = Strong Positive, CI = 99%, Data Noise = Low</span>
+        </div>
+
+        <div class="puzzle-plot-wrapper" style="height:170px;">
+          <!-- SVG plot representing line & confidence intervals -->
+          <svg viewBox="0 0 240 120" style="width:100%; height:100%;" id="predictor-svg">
+            <g>
+              <circle cx="30" cy="95" r="4" fill="#90A4AE"/>
+              <circle cx="70" cy="70" r="4" fill="#90A4AE"/>
+              <circle cx="110" cy="65" r="4" fill="#90A4AE"/>
+              <circle cx="150" cy="50" r="4" fill="#90A4AE"/>
+              <circle cx="190" cy="30" r="4" fill="#90A4AE"/>
+            </g>
+            <!-- Confidence Interval Shading -->
+            <path d="M 20,105 L 220,10 L 220,30 L 20,115 Z" fill="rgba(211, 47, 47, 0.15)" id="confidence-band"/>
+            <!-- Trend Line -->
+            <line x1="10" y1="110" x2="230" y2="15" stroke="var(--primary-red)" stroke-width="2" id="trend-line"/>
+          </svg>
+        </div>
+
+        <div class="workshop-sliders-box" style="width:100%; max-width:320px; display:flex; flex-direction:column; gap:0.4rem;">
+          <div class="slider-item-row">
+            <span>Slope Angle (Correlation): <span id="val-slope" style="color:var(--primary-red); font-weight:800;">Positive</span></span>
+            <input type="range" min="1" max="3" value="3" style="accent-color:var(--primary-red);" oninput="updatePredictorSlope21(this.value)">
+          </div>
+          <div class="slider-item-row">
+            <span>Confidence Level (CI): <span id="val-ci" style="color:var(--primary-red); font-weight:800;">95%</span></span>
+            <input type="range" min="80" max="99" value="95" step="1" style="accent-color:var(--primary-red);" oninput="updatePredictorCI21(this.value)">
+          </div>
+          <div class="slider-item-row">
+            <span>Data Noise (Variance): <span id="val-noise" style="color:var(--primary-red); font-weight:800;">High</span></span>
+            <input type="range" min="1" max="3" value="3" style="accent-color:var(--primary-red);" oninput="updatePredictorNoise21(this.value)">
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="submitPredictor21()" style="margin-top:0.5rem;">⚡ Save Trend Design</button>
+      `;
+
+      predictorState21.confidence = 95;
+      predictorState21.slope = 3;
+      predictorState21.noise = 3;
+      updatePredictorSVG21();
+    }
+
+    function updatePredictorSlope21(val) {
+      predictorState21.slope = Number(val);
+      updatePredictorSVG21();
+    }
+
+    function updatePredictorCI21(val) {
+      predictorState21.confidence = Number(val);
+      updatePredictorSVG21();
+    }
+
+    function updatePredictorNoise21(val) {
+      predictorState21.noise = Number(val);
+      updatePredictorSVG21();
+    }
+
+    function updatePredictorSVG21() {
+      const line = document.getElementById('trend-line');
+      const band = document.getElementById('confidence-band');
+      const ciLabel = document.getElementById('val-ci');
+      const slopeLabel = document.getElementById('val-slope');
+      const noiseLabel = document.getElementById('val-noise');
+
+      ciLabel.innerText = `${predictorState21.confidence}%`;
+
+      let yStart = 110;
+      let yEnd = 15;
+      let slopeStr = 'Strong Positive';
+
+      if (predictorState21.slope === 1) {
+        yStart = 20;
+        yEnd = 100;
+        slopeStr = 'Negative';
+      } else if (predictorState21.slope === 2) {
+        yStart = 60;
+        yEnd = 60;
+        slopeStr = 'No Correlation';
+      }
+
+      slopeLabel.innerText = slopeStr;
+
+      let noiseStr = 'High';
+      if (predictorState21.noise === 1) {
+        noiseStr = 'Low';
+      } else if (predictorState21.noise === 2) {
+        noiseStr = 'Moderate';
+      }
+      noiseLabel.innerText = noiseStr;
+
+      // Adjust trend line
+      if (line) {
+        line.setAttribute('y1', yStart);
+        line.setAttribute('y2', yEnd);
+      }
+
+      // Adjust confidence interval band width based on CI value and noise
+      const ciFactor = (100 - predictorState21.confidence) * 0.8;
+      const noiseFactor = predictorState21.noise * 5;
+      const spread = (20 - ciFactor) + noiseFactor;
+
+      let top1 = yStart - spread;
+      let bottom1 = yStart + spread;
+      let top2 = yEnd - spread;
+      let bottom2 = yEnd + spread;
+
+      if (band) {
+        band.setAttribute('d', `M 10,${top1} L 230,${top2} L 230,${bottom2} L 10,${bottom1} Z`);
+      }
+
+      // Scatter points adjust
+      const dots = document.querySelectorAll('#predictor-svg circle');
+      const offsets = [5, -8, 7, -6, 4];
+      dots.forEach((dot, idx) => {
+        const baseCy = [95, 70, 65, 50, 30][idx];
+        const noiseOffset = (predictorState21.noise - 1) * offsets[idx];
+        dot.setAttribute('cy', baseCy + noiseOffset);
+      });
+
+      const codeStr = `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Configure regression with dynamic confidence bands:\nsns.regplot(data=df, x="study_hours", y="marks", ci=${predictorState21.confidence})\nplt.show()`;
+      formatPythonCode(codeStr, 4);
+    }
+
+    function submitPredictor21() {
+      if (predictorState21.confidence === 99 && predictorState21.slope === 3 && predictorState21.noise === 1) {
+        audio.success();
+        confetti.start();
+        setTimeout(() => confetti.stop(), 3000);
+        awardXP(30);
+
+        document.getElementById('sandbox-content').innerHTML = `
+          <div style="text-align:center; padding:1rem;">
+            <span style="font-size:2.5rem;">📈</span>
+            <h3 style="color:var(--accent-green); font-weight:800; margin-top:0.5rem;">Trend Fit Calibrated!</h3>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Level 2 Activity 2 unlocked. Hit Next ▶ to proceed.</p>
+          </div>
+        `;
+        if (!state.completedActivities.includes('2-1')) {
+          state.completedActivities.push('2-1');
+          awardProgress();
+        }
+        showStatusBanner("🎉 Trend limits verified and saved successfully!");
+      } else {
+        audio.error();
+        showStatusBanner("❌ Design requirement mismatch! Required Specs: Strong Positive slope, 99% Confidence Interval, and Low Data Noise.", 'error');
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       ACTIVITY 2.2: OUTLIER HUNTER
+       ------------------------------------------------------------------------- */
+    const outlierState22 = {
+      currentRound: 0,
+      clearedCount: 0,
+      shield: 3,
+      activeTool: 'detector',
+      rounds: [
+        {
+          title: "Round 1 — Standardized Residuals",
+          subtitle: "Analyze vertical deviations from the fit line. Locate the anomaly with standardized residual > 2.0.",
+          x1: 30, y1: 92, x2: 210, y2: 28,
+          points: [
+            { x: 40, y: 88, res: -0.1, lev: 0.12, cook: 0.01 },
+            { x: 55, y: 82, res: 0.2, lev: 0.08, cook: 0.00 },
+            { x: 70, y: 75, res: -0.5, lev: 0.06, cook: 0.00 },
+            { x: 85, y: 71, res: 0.1, lev: 0.05, cook: 0.00 },
+            { x: 100, y: 68, res: 0.3, lev: 0.05, cook: 0.00 },
+            { x: 115, y: 62, res: 0.1, lev: 0.05, cook: 0.00 },
+            { x: 130, y: 55, res: -0.4, lev: 0.05, cook: 0.00 },
+            { x: 145, y: 52, res: 0.2, lev: 0.06, cook: 0.00 },
+            { x: 160, y: 47, res: 0.1, lev: 0.08, cook: 0.00 },
+            { x: 175, y: 40, res: -0.3, lev: 0.11, cook: 0.00 },
+            { x: 190, y: 35, res: -0.2, lev: 0.15, cook: 0.01 },
+            { x: 120, y: 22, res: -3.8, lev: 0.06, cook: 0.85, isOutlier: true }
+          ],
+          code: `import numpy as np\nimport statsmodels.api as sm\n\n# Round 1: Filter vertical outliers by standardized residual\nresiduals = model.resid\nstd_residuals = residuals / np.std(residuals)\noutliers = df[np.abs(std_residuals) > 2.0]\nprint(outliers)`
+        },
+        {
+          title: "Round 2 — Influence vs. High-Leverage",
+          subtitle: "Find the point distorting the model. One point has high leverage but sits on the line. Find the influential outlier (Cook's D > 4/n).",
+          x1: 30, y1: 83, x2: 210, y2: 38,
+          points: [
+            { x: 50, y: 78, res: 0.2, lev: 0.18, cook: 0.01 },
+            { x: 65, y: 74, res: 0.1, lev: 0.12, cook: 0.00 },
+            { x: 80, y: 70, res: 0.0, lev: 0.08, cook: 0.00 },
+            { x: 95, y: 66, res: -0.1, lev: 0.05, cook: 0.00 },
+            { x: 110, y: 62, res: -0.2, lev: 0.04, cook: 0.00 },
+            { x: 125, y: 59, res: 0.1, lev: 0.04, cook: 0.00 },
+            { x: 140, y: 55, res: 0.0, lev: 0.05, cook: 0.00 },
+            { x: 155, y: 51, res: -0.1, lev: 0.09, cook: 0.00 },
+            { x: 170, y: 48, res: 0.2, lev: 0.14, cook: 0.01 },
+            { x: 215, y: 36, res: 0.1, lev: 0.82, cook: 0.01, isLeverage: true },
+            { x: 210, y: 85, res: 4.2, lev: 0.78, cook: 1.45, isOutlier: true }
+          ],
+          code: `import statsmodels.api as sm\n\n# Round 2: Cook's distance measures influence on coefficient slope\ninfluence = model.get_influence()\ncooks_d = influence.cooks_distance[0]\n# Cutoff threshold = 4 / n\ninfluential = df[cooks_d > 4 / len(df)]`
+        },
+        {
+          title: "Round 3 — Multi-Anomaly Cleansing",
+          subtitle: "Cleanse the dataset! Eliminate all 3 anomalies (high residual, high Cook's D, isolated bivariate outlier).",
+          x1: 30, y1: 45, x2: 210, y2: 105,
+          points: [
+            { x: 40, y: 48, res: 0.0, lev: 0.16, cook: 0.00 },
+            { x: 55, y: 53, res: -0.1, lev: 0.11, cook: 0.00 },
+            { x: 70, y: 58, res: 0.0, lev: 0.07, cook: 0.00 },
+            { x: 85, y: 63, res: 0.0, lev: 0.05, cook: 0.00 },
+            { x: 100, y: 70, res: 0.2, lev: 0.04, cook: 0.00 },
+            { x: 115, y: 73, res: 0.0, lev: 0.04, cook: 0.00 },
+            { x: 130, y: 78, res: 0.0, lev: 0.04, cook: 0.00 },
+            { x: 145, y: 83, res: 0.0, lev: 0.04, cook: 0.00 },
+            { x: 160, y: 88, res: -0.1, lev: 0.06, cook: 0.00 },
+            { x: 175, y: 93, res: 0.0, lev: 0.09, cook: 0.00 },
+            { x: 190, y: 98, res: 0.0, lev: 0.14, cook: 0.00 },
+            { x: 205, y: 103, res: 0.0, lev: 0.20, cook: 0.01 },
+            { x: 90, y: 95, res: 3.5, lev: 0.08, cook: 0.52, isOutlier: true },
+            { x: 220, y: 50, res: -4.1, lev: 0.81, cook: 1.62, isOutlier: true },
+            { x: 150, y: 15, res: -3.8, lev: 0.25, cook: 0.72, isOutlier: true }
+          ],
+          code: `import pandas as pd\n\n# Round 3: Cleanse both residuals and high-influence anomalies\ncleaned_df = df[\n    (std_residuals.abs() <= 2.0) &\n    (cooks_d <= 4 / len(df))\n]`
+        }
+      ]
+    };
+
+    function setupActivity22(container) {
+      document.getElementById('active-title').innerText = 'Activity 2.2 — Outlier Hunter';
+      outlierState22.currentRound = 0;
+      outlierState22.activeTool = 'detector';
+      loadRound22();
+    }
+
+    function loadRound22() {
+      const active = outlierState22.rounds[outlierState22.currentRound];
+      outlierState22.clearedCount = 0;
+      outlierState22.shield = 3;
+
+      active.points.forEach(pt => pt.clicked = false);
+
+      const container = document.getElementById('sandbox-content');
+      document.getElementById('active-subtitle').innerText = active.subtitle;
+
+      const totalOutliers = active.points.filter(p => p.isOutlier).length;
+
+      container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:0.4rem;">
+          <span style="font-size:0.75rem; font-weight:800; color:var(--primary-red);" id="round-num-label">
+            ROUND ${outlierState22.currentRound + 1} OF 3
+          </span>
+          <div class="shield-container">
+            <span style="font-size:0.65rem; font-weight:800; color:var(--text-muted);">SHIELD:</span>
+            <div style="display:flex; gap:0.15rem;" id="shield-hearts-box">
+              <span class="shield-heart">❤️</span>
+              <span class="shield-heart">❤️</span>
+              <span class="shield-heart">❤️</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="outlier-hud" style="flex-wrap:wrap; gap:0.3rem;">
+          <button class="tool-btn active" id="tool-detector" onclick="selectOutlierTool22('detector')">💥 Click Detector</button>
+          <button class="tool-btn" id="tool-residual" onclick="selectOutlierTool22('residual')">📏 Residuals</button>
+          <button class="tool-btn" id="tool-leverage" onclick="selectOutlierTool22('leverage')">📐 Leverage</button>
+          <button class="tool-btn" id="tool-cook" onclick="selectOutlierTool22('cook')">🔬 Cook's D</button>
+        </div>
+
+        <div class="detective-plot-view" id="outlier-plot-box" style="height:140px; position:relative; overflow:visible;">
+          <svg viewBox="0 0 240 120" style="width:100%; height:100%; background:#ECEFF1;" id="outlier-svg">
+            <g id="outlier-residuals-grp"></g>
+            <line x1="${active.x1}" y1="${active.y1}" x2="${active.x2}" y2="${active.y2}" stroke="var(--primary-red)" stroke-width="1.5" id="outlier-regression-line"/>
+            <g id="outlier-points-grp"></g>
+          </svg>
+        </div>
+
+        <div class="inspector-panel">
+          <div style="font-size:0.6rem; font-weight:800; color:#B0BEC5; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:0.1rem; margin-bottom:0.15rem; text-transform:uppercase;">
+            🔍 Diagnostic Inspector (Hover points to audit)
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.2rem 0.6rem;">
+            <div class="inspector-row"><span class="inspector-label">Point ID:</span><span class="inspector-val" id="inspect-id">--</span></div>
+            <div class="inspector-row"><span class="inspector-label">Coords:</span><span class="inspector-val" id="inspect-coords">--</span></div>
+            <div class="inspector-row"><span class="inspector-label">Std Resid:</span><span class="inspector-val" id="inspect-residual">--</span></div>
+            <div class="inspector-row"><span class="inspector-label">Leverage:</span><span class="inspector-val" id="inspect-leverage">--</span></div>
+          </div>
+          <div class="inspector-row" style="margin-top:0.1rem;"><span class="inspector-label">Cook's D:</span><span class="inspector-val" id="inspect-cook">--</span></div>
+        </div>
+
+        <div style="font-size:0.75rem; font-weight:800; color:var(--primary-red); margin-top:0.4rem; text-align:center;" id="outlier-count-label">
+          Outliers Cleared: 0 of ${totalOutliers}
+        </div>
+      `;
+
+      renderOutlierPlot22();
+      formatPythonCode(active.code, 4);
+    }
+
+    function selectOutlierTool22(tool) {
+      audio.click();
+      outlierState22.activeTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`tool-${tool}`).classList.add('active');
+
+      applyOutlierStyles22();
+
+      if (tool === 'detector') {
+        showStatusBanner("💥 Click Detector: Hover over data points to inspect stats; click target outliers to isolate them.", 'success');
+      } else if (tool === 'residual') {
+        showStatusBanner("📏 Residual Analyzer: Vertical dashed lines show deviations. Red = Extreme, Yellow = Moderate, Green = Low.", 'success');
+      } else if (tool === 'leverage') {
+        showStatusBanner("📐 Leverage Map: Circle sizing corresponds to hat values (extremity in X space).", 'success');
+      } else if (tool === 'cook') {
+        showStatusBanner("🔬 Cook's Distance Map: Sizes and colors show model influence. Red points (>4/n) distort the model.", 'success');
+      }
+    }
+
+    function renderOutlierPlot22() {
+      const active = outlierState22.rounds[outlierState22.currentRound];
+      const ptsGroup = document.getElementById('outlier-points-grp');
+      const resGroup = document.getElementById('outlier-residuals-grp');
+
+      ptsGroup.innerHTML = '';
+      resGroup.innerHTML = '';
+
+      active.points.forEach((pt, idx) => {
+        const yPred = active.y1 + (pt.x - active.x1) * (active.y2 - active.y1) / (active.x2 - active.x1);
+
+        const rLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        rLine.setAttribute('x1', pt.x);
+        rLine.setAttribute('y1', pt.y);
+        rLine.setAttribute('x2', pt.x);
+        rLine.setAttribute('y2', yPred);
+        rLine.setAttribute('stroke', '#E53935');
+        rLine.setAttribute('stroke-width', '1');
+        rLine.setAttribute('stroke-dasharray', '2,2');
+        rLine.setAttribute('class', 'res-line');
+        rLine.setAttribute('id', `res-line-${idx}`);
+        resGroup.appendChild(rLine);
+
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', pt.x);
+        circle.setAttribute('cy', pt.y);
+        circle.setAttribute('r', '4');
+        circle.setAttribute('fill', '#78909C');
+        circle.setAttribute('stroke', '#37474F');
+        circle.setAttribute('stroke-width', '0.75');
+        circle.setAttribute('style', 'cursor:pointer; transition: all 0.2s;');
+        circle.setAttribute('onmouseover', `hoverOutlierPoint22(${idx})`);
+        circle.setAttribute('onmouseout', `clearHoverOutlierPoint22()`);
+        circle.setAttribute('onclick', `clickOutlierPoint22(${idx}, this)`);
+        circle.setAttribute('class', 'outlier-circle');
+        circle.setAttribute('id', `outlier-circle-${idx}`);
+        ptsGroup.appendChild(circle);
+      });
+
+      applyOutlierStyles22();
+    }
+
+    function applyOutlierStyles22() {
+      const active = outlierState22.rounds[outlierState22.currentRound];
+      const tool = outlierState22.activeTool;
+
+      active.points.forEach((pt, idx) => {
+        const circle = document.getElementById(`outlier-circle-${idx}`);
+        const line = document.getElementById(`res-line-${idx}`);
+
+        if (!circle) return;
+
+        if (pt.clicked) {
+          circle.setAttribute('fill', 'var(--accent-green)');
+          circle.setAttribute('r', '6');
+          circle.setAttribute('stroke', '#1B5E20');
+          if (line) line.style.display = 'none';
+          return;
+        }
+
+        if (tool === 'detector') {
+          circle.setAttribute('fill', '#78909C');
+          circle.setAttribute('r', '4');
+          circle.setAttribute('stroke', '#37474F');
+          if (line) line.style.display = 'none';
+        } else if (tool === 'residual') {
+          const absRes = Math.abs(pt.res);
+          let fill = '#4CAF50';
+          if (absRes >= 2.5) {
+            fill = '#E53935';
+          } else if (absRes >= 1.5) {
+            fill = '#FFB300';
+          }
+          circle.setAttribute('fill', fill);
+          circle.setAttribute('r', '4');
+          circle.setAttribute('stroke', '#37474F');
+          if (line) line.style.display = 'block';
+        } else if (tool === 'leverage') {
+          circle.setAttribute('fill', '#0288D1');
+          circle.setAttribute('r', 3 + pt.lev * 7);
+          circle.setAttribute('stroke', '#01579B');
+          if (line) line.style.display = 'none';
+        } else if (tool === 'cook') {
+          let fill = '#81C784';
+          if (pt.cook >= 0.5) {
+            fill = '#E53935';
+          } else if (pt.cook >= 0.1) {
+            fill = '#FFB300';
+          }
+          circle.setAttribute('fill', fill);
+          circle.setAttribute('r', 3 + pt.cook * 7);
+          circle.setAttribute('stroke', '#2E7D32');
+          if (line) line.style.display = 'none';
+        }
+      });
+    }
+
+    function hoverOutlierPoint22(idx) {
+      const active = outlierState22.rounds[outlierState22.currentRound];
+      const pt = active.points[idx];
+      if (!pt) return;
+
+      document.getElementById('inspect-id').innerText = `OBS-${idx + 1}`;
+      document.getElementById('inspect-coords').innerText = `(${pt.x}, ${pt.y})`;
+      document.getElementById('inspect-residual').innerText = `${pt.res > 0 ? '+' : ''}${pt.res} StdDev`;
+      document.getElementById('inspect-leverage').innerText = pt.lev;
+      document.getElementById('inspect-cook').innerText = pt.cook;
+    }
+
+    function clearHoverOutlierPoint22() {
+      document.getElementById('inspect-id').innerText = '--';
+      document.getElementById('inspect-coords').innerText = '--';
+      document.getElementById('inspect-residual').innerText = '--';
+      document.getElementById('inspect-leverage').innerText = '--';
+      document.getElementById('inspect-cook').innerText = '--';
+    }
+
+    function clickOutlierPoint22(idx, node) {
+      if (outlierState22.activeTool !== 'detector') {
+        showStatusBanner("❌ Return to Click Detector mode to flag and remove anomalies!", 'error');
+        return;
+      }
+
+      const active = outlierState22.rounds[outlierState22.currentRound];
+      const pt = active.points[idx];
+      if (!pt || pt.clicked) return;
+
+      if (pt.isOutlier) {
+        audio.success();
+        pt.clicked = true;
+        node.setAttribute('fill', 'var(--accent-green)');
+        node.setAttribute('r', '6');
+        outlierState22.clearedCount++;
+
+        const totalOutliers = active.points.filter(p => p.isOutlier).length;
+        document.getElementById('outlier-count-label').innerText = `Outliers Cleared: ${outlierState22.clearedCount} of ${totalOutliers}`;
+
+        confetti.start();
+        setTimeout(() => confetti.stop(), 800);
+
+        if (outlierState22.clearedCount === totalOutliers) {
+          showStatusBanner("🎉 Good job! Correct anomaly detected and parsed out.", 'success');
+          setTimeout(() => {
+            outlierState22.currentRound++;
+            if (outlierState22.currentRound < outlierState22.rounds.length) {
+              loadRound22();
+            } else {
+              concludeOutlier22();
+            }
+          }, 1500);
+        }
+      } else {
+        audio.error();
+        outlierState22.shield--;
+        updateShieldUI22();
+
+        if (pt.isLeverage) {
+          showStatusBanner("❌ False Positive! High leverage point sitting directly on regression path. Residual and influence are low.", 'error');
+        } else {
+          showStatusBanner("❌ False Positive! Point sits inside boundary range. Integrity shield damaged!", 'error');
+        }
+
+        const origColor = node.getAttribute('fill');
+        node.setAttribute('fill', 'var(--primary-red)');
+        node.setAttribute('r', '6');
+        setTimeout(() => {
+          node.setAttribute('fill', origColor);
+          node.setAttribute('r', '4');
+          applyOutlierStyles22();
+        }, 500);
+
+        if (outlierState22.shield <= 0) {
+          showStatusBanner("💀 Shield depleted! Data Integrity compromised. Restarting round...", 'error');
+          setTimeout(() => {
+            loadRound22();
+          }, 1600);
+        }
+      }
+    }
+
+    function updateShieldUI22() {
+      const box = document.getElementById('shield-hearts-box');
+      if (!box) return;
+      box.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'shield-heart' + (i >= outlierState22.shield ? ' damaged' : '');
+        heart.innerText = '❤️';
+        box.appendChild(heart);
+      }
+    }
+
+    function concludeOutlier22() {
+      awardXP(30);
+      document.getElementById('sandbox-content').innerHTML = `
+        <div style="text-align:center; padding:1.2rem 1rem;">
+          <span style="font-size:2.8rem;">🛡️</span>
+          <h3 style="color:var(--accent-green); font-weight:800; margin-top:0.4rem;">Dataset Cleaned Successfully!</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">You flagged all high-residual and high-influence anomalies.</p>
+          <p style="font-size:0.75rem; color:var(--accent-green); font-weight:700; margin-top:0.4rem;">Level 3 challenge unlocked! Click Next ▶</p>
+        </div>
+      `;
+      if (!state.completedActivities.includes('2-2')) {
+        state.completedActivities.push('2-2');
+        awardProgress();
+      }
+      showStatusBanner("🎉 Outliers parsed and excluded successfully! Level 3 challenge opened.");
+    }
+
+    /* -------------------------------------------------------------------------
+       ACTIVITY 3.1: RESEARCH LABORATORY
+       ------------------------------------------------------------------------- */
+    const researchState31 = {
+      round: 0,
+      bwValue: 1.50,
+      orderValue: 1,
+      scoreValue: 100,
+      rounds: [
+        {
+          title: "Round 1 — Bandwidth Sensitivity Tuning",
+          instruction: "Drag the Bandwidth slider to resolve the KDE density curve. Locate the true distribution pattern of customer ages.",
+          correctPlot: "Density Plot (KDE)",
+          correctInsight: "Bimodal (Two clear age cohorts)",
+          optionsPlot: ["Density Plot (KDE)", "Regression Plot", "Distribution Plot (Hist)"],
+          optionsInsight: ["Bimodal (Two clear age cohorts)", "Unimodal Normal Distribution", "Skewed Left Distribution", "Uniform Distribution"],
+          code: `import seaborn as sns\n# Tune bw_adjust to prevent over/underfitting:\nsns.kdeplot(data=df, x="age", bw_adjust=0.30, fill=True)`
+        },
+        {
+          title: "Round 2 — Polynomial Regression Fitting",
+          instruction: "Adjust the polynomial order to fit the curved yield data. Check the residual diagnostic curve.",
+          correctPlot: "Regression Plot",
+          correctInsight: "Quadratic Fit (order=2)",
+          optionsPlot: ["Density Plot (KDE)", "Regression Plot", "Distribution Plot (Hist)"],
+          optionsInsight: ["Linear Fit (order=1)", "Quadratic Fit (order=2)", "Cubic Fit (order=3)", "Exponential Fit"],
+          code: `import seaborn as sns\n# Fit polynomial regression by setting order parameter:\nsns.regplot(data=df, x="temp", y="yield", order=2)`
+        },
+        {
+          title: "Round 3 — Cumulative Density Percentile",
+          instruction: "Find the score threshold for the top 10% performance (90th percentile) by dragging the Z-score cutoff line.",
+          correctPlot: "Density Plot (KDE)",
+          correctInsight: "Score = 158 (90% Cumulative Prob)",
+          optionsPlot: ["Density Plot (KDE)", "Regression Plot", "Distribution Plot (Hist)"],
+          optionsInsight: ["Score = 120 (50% Cumulative Prob)", "Score = 158 (90% Cumulative Prob)", "Score = 175 (95% Cumulative Prob)", "Score = 145 (80% Cumulative Prob)"],
+          code: `import seaborn as sns\n# Plot distribution and evaluate cumulative percentile areas:\nsns.histplot(data=df, x="scores", kde=True, stat="density")`
+        }
+      ]
+    };
+
+    function setupActivity31(container) {
+      document.getElementById('active-title').innerText = 'Activity 3.1 — Research Laboratory';
+      researchState31.round = 0;
+      researchState31.bwValue = 1.50;
+      researchState31.orderValue = 1;
+      researchState31.scoreValue = 100;
+      loadResearchRound31();
+    }
+
+    function loadResearchRound31() {
+      const active = researchState31.rounds[researchState31.round];
+      const container = document.getElementById('sandbox-content');
+
+      let controlHTML = '';
+      if (researchState31.round === 0) {
+        controlHTML = `
+          <div style="width:100%; display:flex; flex-direction:column; gap:0.2rem; margin-top:0.4rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:800;">
+              <span>Bandwidth (bw_adjust):</span>
+              <span style="color:var(--primary-red);" id="val-bw-adjust">1.50</span>
+            </div>
+            <input type="range" min="0.05" max="1.50" step="0.05" value="${researchState31.bwValue}" style="width:100%;" oninput="updateBw31(this.value)"/>
+          </div>
+        `;
+      } else if (researchState31.round === 1) {
+        controlHTML = `
+          <div style="width:100%; display:flex; flex-direction:column; gap:0.2rem; margin-top:0.4rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:800;">
+              <span>Polynomial Regression Order:</span>
+              <span style="color:var(--primary-red);" id="val-poly-order">1 (Linear)</span>
+            </div>
+            <input type="range" min="1" max="3" step="1" value="${researchState31.orderValue}" style="width:100%;" oninput="updateOrder31(this.value)"/>
+          </div>
+        `;
+      } else if (researchState31.round === 2) {
+        controlHTML = `
+          <div style="width:100%; display:flex; flex-direction:column; gap:0.2rem; margin-top:0.4rem;">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:800;">
+              <span>Score Cut-off Threshold:</span>
+              <span style="color:var(--primary-red);" id="val-score-cutoff">100 (Shaded: 25.2%)</span>
+            </div>
+            <input type="range" min="50" max="200" step="1" value="${researchState31.scoreValue}" style="width:100%;" oninput="updateScore31(this.value)"/>
+          </div>
+        `;
+      }
+
+      const shuffledPlots = [...active.optionsPlot].sort(() => Math.random() - 0.5);
+      const shuffledInsights = [...active.optionsInsight].sort(() => Math.random() - 0.5);
+
+      container.innerHTML = `
+        <div style="font-size:0.75rem; font-weight:800; color:var(--primary-red); margin-bottom:0.3rem;">
+          ROUND ${researchState31.round + 1} OF 3: ${active.title.toUpperCase()}
+        </div>
+        <p style="font-size:0.7rem; color:var(--text-muted); line-height:1.2; margin-bottom:0.4rem;">
+          ${active.instruction}
+        </p>
+
+        <div class="detective-plot-view" style="height:120px; position:relative; overflow:visible; background:#ECEFF1;">
+          <svg viewBox="0 0 240 120" style="width:100%; height:100%;" id="research-svg-31">
+            <!-- Rendered dynamically -->
+          </svg>
+        </div>
+
+        ${controlHTML}
+
+        <div id="calibration-status" style="font-size:0.7rem; font-weight:800; color:var(--primary-red); margin-top:0.4rem; text-align:center;">
+          ⚠️ CALIBRATION REQUIRED: Adjust slider to find optimal state.
+        </div>
+
+        <div style="width:100%; display:none; flex-direction:column; gap:0.4rem; align-items:center; margin-top:0.5rem;" id="step1-container">
+          <span style="font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Step 1: Choose Visualization Type</span>
+          <div style="display:flex; gap:0.3rem; flex-wrap:wrap; justify-content:center;">
+            ${shuffledPlots.map(opt => `
+              <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.7rem;" onclick="checkPlotType31('${opt}', this)">${opt}</button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="width:100%; display:none; flex-direction:column; gap:0.4rem; align-items:center; margin-top:0.5rem;" id="step2-container">
+          <span style="font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Step 2: Select Statistical Conclusion</span>
+          <div style="display:flex; gap:0.3rem; flex-wrap:wrap; justify-content:center;">
+            ${shuffledInsights.map(opt => `
+              <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.7rem;" onclick="checkInsight31('${opt}', this)">${opt}</button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      updateResearchSVG31();
+      formatPythonCode(active.code, 3);
+    }
+
+    function updateBw31(val) {
+      researchState31.bwValue = Number(val);
+      document.getElementById('val-bw-adjust').innerText = Number(val).toFixed(2);
+      updateResearchSVG31();
+
+      const status = document.getElementById('calibration-status');
+      if (researchState31.bwValue >= 0.20 && researchState31.bwValue <= 0.40) {
+        status.innerText = "✔ Optimal Bandwidth Calibrated! Bimodal structure visible.";
+        status.style.color = "var(--accent-green)";
+        document.getElementById('step1-container').style.display = 'flex';
+      } else {
+        status.innerText = "⚠️ CALIBRATION REQUIRED: Adjust bandwidth slider.";
+        status.style.color = "var(--primary-red)";
+        document.getElementById('step1-container').style.display = 'none';
+        document.getElementById('step2-container').style.display = 'none';
+      }
+    }
+
+    function updateOrder31(val) {
+      researchState31.orderValue = Number(val);
+      const str = val == 1 ? '1 (Linear)' : val == 2 ? '2 (Quadratic)' : '3 (Cubic)';
+      document.getElementById('val-poly-order').innerText = str;
+      updateResearchSVG31();
+
+      const status = document.getElementById('calibration-status');
+      if (researchState31.orderValue > 1) {
+        status.innerText = "✔ Optimal Polynomial Order! Residual pattern balanced.";
+        status.style.color = "var(--accent-green)";
+        document.getElementById('step1-container').style.display = 'flex';
+      } else {
+        status.innerText = "⚠️ CALIBRATION REQUIRED: Find order that clears U-shaped residuals.";
+        status.style.color = "var(--primary-red)";
+        document.getElementById('step1-container').style.display = 'none';
+        document.getElementById('step2-container').style.display = 'none';
+      }
+    }
+
+    function getPercentile31(score) {
+      const mean = 120;
+      const std = 30;
+      const z = (score - mean) / std;
+      let p = 1 / (1 + Math.exp(-0.07056 * Math.pow(z, 3) - 1.5976 * z));
+      if (z < -3) return 0;
+      if (z > 3) return 1;
+      return p;
+    }
+
+    function updateScore31(val) {
+      researchState31.scoreValue = Number(val);
+      const pct = (getPercentile31(researchState31.scoreValue) * 100).toFixed(1);
+      document.getElementById('val-score-cutoff').innerText = `${val} (Cumulative: ${pct}%)`;
+      updateResearchSVG31();
+
+      const status = document.getElementById('calibration-status');
+      if (researchState31.scoreValue >= 155 && researchState31.scoreValue <= 161) {
+        status.innerText = "✔ 90th Percentile Calibration Lock Bypassed!";
+        status.style.color = "var(--accent-green)";
+        document.getElementById('step1-container').style.display = 'flex';
+      } else {
+        status.innerText = "⚠️ CALIBRATION REQUIRED: Drag slider to score representing top 10% (90th percentile).";
+        status.style.color = "var(--primary-red)";
+        document.getElementById('step1-container').style.display = 'none';
+        document.getElementById('step2-container').style.display = 'none';
+      }
+    }
+
+    function updateResearchSVG31() {
+      const svg = document.getElementById('research-svg-31');
+      if (!svg) return;
+      svg.innerHTML = '';
+
+      if (researchState31.round === 0) {
+        const pathStr = generateKdePath31(researchState31.bwValue);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathStr);
+        path.setAttribute('fill', 'var(--light-red-bg)');
+        path.setAttribute('stroke', 'var(--primary-red)');
+        path.setAttribute('stroke-width', '1.5');
+        svg.appendChild(path);
+
+        const ticks = [40, 50, 60, 70, 75, 80, 85, 90, 100, 140, 150, 155, 160, 165, 170, 180, 190];
+        ticks.forEach(x => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', x);
+          line.setAttribute('y1', 106);
+          line.setAttribute('x2', x);
+          line.setAttribute('y2', 110);
+          line.setAttribute('stroke', '#37474F');
+          line.setAttribute('stroke-width', '1');
+          svg.appendChild(line);
+        });
+
+      } else if (researchState31.round === 1) {
+        const pts = [
+          {x: 45, y: 92}, {x: 65, y: 65}, {x: 85, y: 48},
+          {x: 105, y: 35}, {x: 125, y: 30}, {x: 145, y: 33},
+          {x: 165, y: 45}, {x: 185, y: 60}, {x: 205, y: 88}
+        ];
+        pts.forEach(p => {
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', p.x);
+          circle.setAttribute('cy', p.y);
+          circle.setAttribute('r', '3');
+          circle.setAttribute('fill', '#78909C');
+          circle.setAttribute('stroke', '#37474F');
+          circle.setAttribute('stroke-width', '0.75');
+          svg.appendChild(circle);
+        });
+
+        const fitPathStr = drawRegressionPath31(researchState31.orderValue);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', fitPathStr);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', 'var(--primary-red)');
+        path.setAttribute('stroke-width', '1.5');
+        svg.appendChild(path);
+
+        const resBaseline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        resBaseline.setAttribute('x1', 160);
+        resBaseline.setAttribute('y1', 95);
+        resBaseline.setAttribute('x2', 230);
+        resBaseline.setAttribute('y2', 95);
+        resBaseline.setAttribute('stroke', '#90A4AE');
+        resBaseline.setAttribute('stroke-width', '0.75');
+        resBaseline.setAttribute('stroke-dasharray', '1,2');
+        svg.appendChild(resBaseline);
+
+        const resPts = [
+          {x: 165, dy: 15}, {x: 173, dy: -5}, {x: 181, dy: -12},
+          {x: 190, dy: -15}, {x: 199, dy: -10}, {x: 208, dy: -5},
+          {x: 216, dy: 5}, {x: 224, dy: 15}
+        ];
+        resPts.forEach((rp, idx) => {
+          let dy = rp.dy;
+          if (researchState31.orderValue > 1) {
+            const randomOffsets = [4, -6, 5, -2, 7, -4, 2, -5];
+            dy = randomOffsets[idx];
+          }
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', rp.x);
+          circle.setAttribute('cy', 95 + dy);
+          circle.setAttribute('r', '1.5');
+          circle.setAttribute('fill', researchState31.orderValue > 1 ? 'var(--accent-green)' : 'var(--primary-red)');
+          svg.appendChild(circle);
+        });
+
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', 160);
+        label.setAttribute('y', 75);
+        label.setAttribute('font-size', '5px');
+        label.setAttribute('font-weight', 'bold');
+        label.setAttribute('fill', '#546E7A');
+        label.textContent = "RESIDUAL PLOT";
+        svg.appendChild(label);
+
+      } else if (researchState31.round === 2) {
+        const fullPathStr = generateNormalPath31();
+        const fullPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        fullPath.setAttribute('d', fullPathStr);
+        fullPath.setAttribute('fill', '#CFD8DC');
+        fullPath.setAttribute('stroke', '#90A4AE');
+        fullPath.setAttribute('stroke-width', '1');
+        svg.appendChild(fullPath);
+
+        const shadedPathStr = generateShadedPath31(researchState31.scoreValue);
+        const shadedPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        shadedPath.setAttribute('d', shadedPathStr);
+        shadedPath.setAttribute('fill', 'var(--light-red-bg)');
+        shadedPath.setAttribute('stroke', 'var(--primary-red)');
+        shadedPath.setAttribute('stroke-width', '1.5');
+        svg.appendChild(shadedPath);
+
+        const cutoff = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        cutoff.setAttribute('x1', researchState31.scoreValue);
+        cutoff.setAttribute('y1', 10);
+        cutoff.setAttribute('x2', researchState31.scoreValue);
+        cutoff.setAttribute('y2', 110);
+        cutoff.setAttribute('stroke', 'var(--primary-red)');
+        cutoff.setAttribute('stroke-width', '1.5');
+        svg.appendChild(cutoff);
+      }
+    }
+
+    function generateKdePath31(bw) {
+      let points = [];
+      const baseline = 110;
+      for (let x = 10; x <= 230; x += 2) {
+        let term1 = 60 * Math.exp(-0.5 * Math.pow((x - 80) / (25 * bw), 2));
+        let term2 = 45 * Math.exp(-0.5 * Math.pow((x - 160) / (20 * bw), 2));
+        let noise = 0;
+        if (bw < 0.15) {
+          noise = 8 * Math.sin(x * 0.5) * Math.exp(-0.5 * Math.pow((x - 120) / 40, 2));
+        }
+        let y = baseline - (term1 + term2 + noise);
+        if (y < 10) y = 10;
+        if (y > 110) y = 110;
+        points.push(`${x},${y}`);
+      }
+      return `M 10,110 L ` + points.join(' L ') + ` L 230,110 Z`;
+    }
+
+    function drawRegressionPath31(order) {
+      if (order === 1) {
+        return `M 30,50 L 210,50`;
+      } else {
+        let points = [];
+        for (let x = 30; x <= 210; x += 5) {
+          let y = 30 + 0.0045 * Math.pow(x - 120, 2);
+          points.push(`${x},${y}`);
+        }
+        return `M ` + points.join(' L ');
+      }
+    }
+
+    function generateNormalPath31() {
+      let points = [];
+      for (let x = 10; x <= 230; x += 2) {
+        let y = 110 - 90 * Math.exp(-0.5 * Math.pow((x - 120) / 30, 2));
+        points.push(`${x},${y}`);
+      }
+      return `M 10,110 L ` + points.join(' L ') + ` L 230,110 Z`;
+    }
+
+    function generateShadedPath31(score) {
+      let points = [];
+      for (let x = 10; x <= score; x += 2) {
+        let y = 110 - 90 * Math.exp(-0.5 * Math.pow((x - 120) / 30, 2));
+        points.push(`${x},${y}`);
+      }
+      return `M 10,110 L ` + points.join(' L ') + ` L ${score},110 Z`;
+    }
+
+    function checkPlotType31(val, btn) {
+      const active = researchState31.rounds[researchState31.round];
+      if (val === active.correctPlot) {
+        audio.success();
+        
+        // Disable other buttons, highlight chosen
+        const btns = btn.parentNode.querySelectorAll('button');
+        btns.forEach(b => {
+          b.disabled = true;
+          b.style.opacity = 0.5;
+        });
+        btn.disabled = false;
+        btn.style.opacity = 1;
+        btn.style.background = 'var(--accent-green-bg)';
+        btn.style.borderColor = 'var(--accent-green)';
+        btn.style.color = 'var(--accent-green)';
+
+        document.getElementById('step2-container').style.display = 'flex';
+      } else {
+        audio.error();
+        btn.style.background = 'var(--light-red-bg)';
+        btn.style.borderColor = 'var(--primary-red)';
+        btn.style.color = 'var(--primary-red)';
+        showStatusBanner("❌ Visualization mismatch! Analyze dataset parameters before choosing.", 'error');
+      }
+    }
+
+    function checkInsight31(val, btn) {
+      const active = researchState31.rounds[researchState31.round];
+      if (val === active.correctInsight) {
+        audio.success();
+
+        const btns = btn.parentNode.querySelectorAll('button');
+        btns.forEach(b => {
+          b.disabled = true;
+          b.style.opacity = 0.5;
+        });
+        btn.disabled = false;
+        btn.style.opacity = 1;
+        btn.style.background = 'var(--accent-green-bg)';
+        btn.style.borderColor = 'var(--accent-green)';
+        btn.style.color = 'var(--accent-green)';
+
+        showStatusBanner("✔ Round completed! Insight verified.", 'success');
+        
+        setTimeout(() => {
+          researchState31.round++;
+          if (researchState31.round < researchState31.rounds.length) {
+            loadResearchRound31();
+          } else {
+            concludeResearch31();
+          }
+        }, 1600);
+      } else {
+        audio.error();
+        btn.style.background = 'var(--light-red-bg)';
+        btn.style.borderColor = 'var(--primary-red)';
+        btn.style.color = 'var(--primary-red)';
+        showStatusBanner("❌ Incorrect statistical insight! Re-examine plot density or residuals.", 'error');
+      }
+    }
+
+    function concludeResearch31() {
+      confetti.start();
+      setTimeout(() => confetti.stop(), 3000);
+      awardXP(35);
+
+      document.getElementById('sandbox-content').innerHTML = `
+        <div style="text-align:center; padding:1.2rem 1rem;">
+          <span style="font-size:2.8rem;">🔬</span>
+          <h3 style="color:var(--accent-green); font-weight:800; margin-top:0.4rem;">Research Complete!</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Bandwidth and polynomial constraints saved to sandbox.</p>
+          <p style="font-size:0.75rem; color:var(--accent-green); font-weight:700; margin-top:0.4rem;">Final boss fight unlocked. Hit Next ▶ to proceed.</p>
+        </div>
+      `;
+      if (!state.completedActivities.includes('3-1')) {
+        state.completedActivities.push('3-1');
+        awardProgress();
+      }
+      showStatusBanner("🎉 Capstone research approved! Proceed to the AI Championship fight.");
+    }
+
+    /* -------------------------------------------------------------------------
+       ACTIVITY 3.2: AI SCIENTIST CHAMPIONSHIP
+       ------------------------------------------------------------------------- */
+    const battleState32 = {
+      bossHP: 100,
+      playerHP: 100,
+      round: 0,
+      assembledTokens: [],
+      rounds: [
+        {
+          task: "Assemble KDE density plot of column 'age', grouped by 'group', stacked, with independent common normalization disabled:",
+          correctSequence: ["sns.kdeplot", "(", "data=df", ",", "x=\"age\"", ",", "hue=\"group\"", ",", "multiple=\"stack\"", ",", "common_norm=False", ")"],
+          tokensPool: ["sns.kdeplot", "(", "data=df", ",", "x=\"age\"", ",", "hue=\"group\"", ",", "multiple=\"stack\"", ",", "common_norm=False", ")", "y=\"age\"", "multiple=\"fill\"", "common_norm=True", "sns.histplot"],
+          code: `import seaborn as sns\n# Target Syntax:\nsns.kdeplot(data=df, x="age", hue="group", multiple="stack", common_norm=False)`
+        },
+        {
+          task: "Assemble robust regression plot of pay vs work, ignoring outliers using robust estimator, with a 95% confidence interval:",
+          correctSequence: ["sns.regplot", "(", "data=df", ",", "x=\"work\"", ",", "y=\"pay\"", ",", "robust=True", ",", "ci=95", ")"],
+          tokensPool: ["sns.regplot", "(", "data=df", ",", "x=\"work\"", ",", "y=\"pay\"", ",", "robust=True", ",", "ci=95", ")", "lowess=True", "robust=False", "ci=None", "sns.lineplot"],
+          code: `import seaborn as sns\n# Target Syntax:\nsns.regplot(data=df, x="work", y="pay", robust=True, ci=95)`
+        },
+        {
+          task: "Assemble histogram of sales showing density instead of counts, styled as step elements:",
+          correctSequence: ["sns.histplot", "(", "data=df", ",", "x=\"sales\"", ",", "stat=\"density\"", ",", "element=\"step\"", ")"],
+          tokensPool: ["sns.histplot", "(", "data=df", ",", "x=\"sales\"", ",", "stat=\"density\"", ",", "element=\"step\"", ")", "stat=\"count\"", "element=\"bars\"", "kde=True", "sns.kdeplot"],
+          code: `import seaborn as sns\n# Target Syntax:\nsns.histplot(data=df, x="sales", stat="density", element="step")`
+        },
+        {
+          task: "Assemble regression plot of crop yield vs temp using 2nd-order polynomial fit, truncated to the data range limits:",
+          correctSequence: ["sns.regplot", "(", "data=df", ",", "x=\"temp\"", ",", "y=\"yield\"", ",", "order=2", ",", "truncate=True", ")"],
+          tokensPool: ["sns.regplot", "(", "data=df", ",", "x=\"temp\"", ",", "y=\"yield\"", ",", "order=2", ",", "truncate=True", ")", "order=1", "truncate=False", "logx=True"],
+          code: `import seaborn as sns\n# Target Syntax:\nsns.regplot(data=df, x="temp", y="yield", order=2, truncate=True)`
+        },
+        {
+          task: "Assemble mathematical pipeline to filter dataframe df outliers by retaining observations with absolute Z-score of 'y' < 3:",
+          correctSequence: ["df", "[", "np.abs", "(", "stats.zscore", "(", "df['y']", ")", ")", "<", "3", "]"],
+          tokensPool: ["df", "[", "np.abs", "(", "stats.zscore", "(", "df['y']", ")", ")", "<", "3", "]", ">", "stats.zscore['y']", "df.drop"],
+          code: `import numpy as np\nfrom scipy import stats\n# Target Syntax:\ndf[np.abs(stats.zscore(df['y'])) < 3]`
+        }
+      ]
+    };
+
+    function setupActivity32(container) {
+      document.getElementById('active-title').innerText = 'Activity 3.2 — AI Championship Tournament';
+      document.getElementById('active-subtitle').innerText = 'Solve advanced statistical syntax challenges to bypass final locks.';
+
+      container.innerHTML = `
+        <div class="boss-battle-view">
+          <div class="boss-character-avatar">🤖</div>
+
+          <div class="boss-bar-row">
+            <span>AI CHAMPION SHIELD</span>
+            <div class="boss-hp-track">
+              <div class="boss-hp-fill" id="boss-hp" style="width:100%;"></div>
+            </div>
+          </div>
+
+          <div class="boss-bar-row">
+            <span>YOUR INTEGRITY</span>
+            <div class="boss-hp-track">
+              <div class="player-hp-fill" id="player-hp" style="width:100%;"></div>
+            </div>
+          </div>
+
+          <div class="target-array-hud" style="background:#FFEBEE; border-color:#FFCDD2; width:100%; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.25rem;">
+            <span style="font-size:0.75rem; text-transform:uppercase; color:var(--primary-red); font-weight:800;" id="battle-round-title">Round 1 of 5</span>
+            <span class="target-array-vals" id="battle-task-text" style="font-size:0.75rem; color:#37474F; font-weight:700; line-height:1.2;">Task description</span>
+          </div>
+
+          <div class="syntax-zone">
+            <span style="font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Assembled Command:</span>
+            <div class="assembled-box" id="assembled-code-box"></div>
+            
+            <span style="font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-top:0.25rem;">Available Tokens:</span>
+            <div class="tokens-pool" id="tokens-pool-box"></div>
+            
+            <div style="display:flex; gap:0.4rem; justify-content:center; margin-top:0.4rem; width:100%;">
+              <button class="btn btn-outline" style="padding:0.35rem 0.7rem; font-size:0.7rem;" onclick="resetAssembler32()">🔄 Reset Code</button>
+              <button class="btn btn-outline" style="padding:0.35rem 0.7rem; font-size:0.7rem; background:var(--primary-red); color:#fff; border-color:var(--primary-red);" onclick="submitAssembler32()">💥 Execute Command</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      battleState32.bossHP = 100;
+      battleState32.playerHP = 100;
+      battleState32.round = 0;
+      loadBattleRound32();
+    }
+
+    function loadBattleRound32() {
+      const active = battleState32.rounds[battleState32.round];
+      document.getElementById('battle-round-title').innerText = `Round ${battleState32.round + 1} of 5`;
+      document.getElementById('battle-task-text').innerText = active.task;
+
+      document.getElementById('boss-hp').style.width = `${battleState32.bossHP}%`;
+      document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
+
+      battleState32.assembledTokens = [];
+      renderAssembler32();
+
+      const codeStr = `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Solver Round ${battleState32.round + 1}:\n# Arrange correct code blocks to compile compiler lock...`;
+      formatPythonCode(codeStr, 3);
+    }
+
+    function renderAssembler32() {
+      const active = battleState32.rounds[battleState32.round];
+      
+      const assembledBox = document.getElementById('assembled-code-box');
+      assembledBox.innerHTML = '';
+      if (battleState32.assembledTokens.length === 0) {
+        assembledBox.innerHTML = `<span style="font-size:0.7rem; color:var(--text-muted); font-style:italic; padding:0.2rem;">Click the tokens below in syntax order to construct the Python command...</span>`;
+      } else {
+        battleState32.assembledTokens.forEach((token, idx) => {
+          const btn = document.createElement('div');
+          btn.className = 'token-active';
+          btn.innerHTML = `${token} <span style="color:#FFCDD2; font-size:0.6rem;">✖</span>`;
+          btn.onclick = () => removeToken32(idx);
+          assembledBox.appendChild(btn);
+        });
+      }
+
+      const poolBox = document.getElementById('tokens-pool-box');
+      poolBox.innerHTML = '';
+      
+      active.tokensPool.forEach((token, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'token-btn';
+        btn.innerText = token;
+        
+        const occurrenceCountInAssembled = battleState32.assembledTokens.filter(t => t === token).length;
+        const occurrenceIndexInPool = active.tokensPool.slice(0, idx + 1).filter(t => t === token).length;
+        
+        if (occurrenceIndexInPool <= occurrenceCountInAssembled) {
+          btn.classList.add('placed');
+        }
+        
+        btn.onclick = () => addToken32(token);
+        poolBox.appendChild(btn);
+      });
+    }
+
+    function addToken32(token) {
+      audio.click();
+      battleState32.assembledTokens.push(token);
+      renderAssembler32();
+
+      const codeViewStr = `import seaborn as sns\n# Under construction:\n` + battleState32.assembledTokens.join(' ') + `\n\n# Choose remaining tokens...`;
+      formatPythonCode(codeViewStr, 2);
+    }
+
+    function removeToken32(idx) {
+      audio.click();
+      battleState32.assembledTokens.splice(idx, 1);
+      renderAssembler32();
+
+      const codeViewStr = `import seaborn as sns\n# Under construction:\n` + battleState32.assembledTokens.join(' ') + `\n\n# Modify syntax blocks...`;
+      formatPythonCode(codeViewStr, 2);
+    }
+
+    function resetAssembler32() {
+      audio.click();
+      battleState32.assembledTokens = [];
+      renderAssembler32();
+      
+      const codeStr = `import seaborn as sns\n# Reset completed. Re-assemble syntax from beginning...`;
+      formatPythonCode(codeStr, 2);
+    }
+
+    function submitAssembler32() {
+      const active = battleState32.rounds[battleState32.round];
+      
+      let isCorrect = true;
+      if (battleState32.assembledTokens.length !== active.correctSequence.length) {
+        isCorrect = false;
+      } else {
+        for (let i = 0; i < active.correctSequence.length; i++) {
+          if (battleState32.assembledTokens[i] !== active.correctSequence[i]) {
+            isCorrect = false;
+            break;
+          }
+        }
+      }
+
+      if (isCorrect) {
+        audio.success();
+        battleState32.bossHP -= 20;
+        if (battleState32.bossHP < 0) battleState32.bossHP = 0;
+        showStatusBanner("💥 Direct Hit! AI Champion shield damaged. Code compiled successfully!", 'success');
+
+        const codeStr = `# Code compiled successfully:\n${active.code}\n\n# Output:\n# Lock sector ${battleState32.round + 1} bypassed successfully!`;
+        formatPythonCode(codeStr, 4);
+
+        document.getElementById('boss-hp').style.width = `${battleState32.bossHP}%`;
+      } else {
+        audio.error();
+        battleState32.playerHP -= 20;
+        if (battleState32.playerHP < 0) battleState32.playerHP = 0;
+        showStatusBanner("❌ Syntax Error! Compilation failed. Deflected shields hit you.", 'error');
+
+        const codeStr = `# Compiler Error: Syntax mismatch!\n# Code constructed:\n# ${battleState32.assembledTokens.join(' ')}\n\n# Expected parameter ordering or punctuation missing!`;
+        formatPythonCode(codeStr, 3);
+
+        document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
+      }
+
+      setTimeout(() => {
+        if (battleState32.bossHP <= 0) {
+          concludeBattle32();
+        } else if (battleState32.playerHP <= 0) {
+          audio.error();
+          showStatusBanner("💀 Defeat! System Integrity failed. Restarting tournament...", 'error');
+          setTimeout(() => {
+            setupActivity32(document.getElementById('sandbox-content'));
+          }, 1500);
+        } else {
+          if (isCorrect) {
+            battleState32.round++;
+            if (battleState32.round < battleState32.rounds.length) {
+              loadBattleRound32();
+            } else {
+              concludeBattle32();
+            }
+          }
+        }
+      }, 2000);
+    }
+
+    function concludeBattle32() {
+      document.getElementById('boss-hp').style.width = '0%';
+      document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
+
+      confetti.start();
+      setTimeout(() => confetti.stop(), 3000);
+      awardXP(50);
+
+      document.getElementById('sandbox-content').innerHTML = `
+        <div style="text-align:center; padding:1.2rem 1rem;">
+          <span style="font-size:3rem;">🎓</span>
+          <h3 style="color:#2E7D32; font-weight:800; margin-top:0.5rem;">Academic Champion Scientist!</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">You solved all advanced statistical escape rooms!</p>
+          <p style="font-size:0.75rem; color:var(--accent-green); font-weight:700; margin-top:0.4rem;">Check the victory modal and grab your master badge!</p>
+        </div>
+      `;
+      if (!state.completedActivities.includes('3-2')) {
+        state.completedActivities.push('3-2');
+        awardProgress();
+      }
+
+      document.getElementById('victory-desc').innerText = `You conquered all advanced statistical visualization modules and earned the Master Scientist badge!`;
+      document.getElementById('victory-modal').showModal();
+
+      showStatusBanner("🎉 Escape room solved! All simulation levels completed successfully!");
+    }
+
+    function awardProgress() {
+      // Stub for progress counters
+    }
+
+
+    /* --- Initialization on Load --- */
+    window.addEventListener('load', () => {
+      loadState();
+      loadActiveActivity();
+    });
+
+  </script>
+</body>
+
+</html>
