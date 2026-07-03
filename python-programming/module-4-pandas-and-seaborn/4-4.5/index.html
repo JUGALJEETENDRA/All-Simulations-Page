@@ -1,1 +1,2256 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Visualization Academy - Plots & Charts</title>
+  <!-- Google Fonts for Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* --- CSS Reset & Variables --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    :root {
+      --primary-red: #D32F2F;
+      --primary-red-hover: #B71C1C;
+      --light-red-bg: #FFEBEE;
+      --light-red-border: #FFCDD2;
+      --pure-white: #FFFFFF;
+      --off-white: #F9F9F9;
+      --text-dark: #212121;
+      --text-muted: #666666;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --border-radius-sm: 8px;
+      --border-radius-md: 16px;
+      --border-radius-lg: 24px;
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--off-white);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* --- Background Vector Grid --- */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image:
+        radial-gradient(var(--light-red-border) 1px, transparent 1px),
+        radial-gradient(var(--light-red-border) 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      opacity: 0.35;
+      z-index: -1;
+    }
+
+    /* --- Header Bar --- */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--light-red-border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-red);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pure-white);
+      font-weight: 800;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary-red);
+      letter-spacing: -0.5px;
+    }
+
+    /* Header Nav Nodes */
+    .level-nav-hud {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--off-white);
+      padding: 0.35rem;
+      border-radius: var(--border-radius-lg);
+      border: 1.5px solid var(--light-red-border);
+    }
+
+    .hud-node {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--pure-white);
+      border: 1.5px solid var(--light-red-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .hud-node.unlocked {
+      color: var(--primary-red);
+      border-color: var(--primary-red);
+    }
+
+    .hud-node.active {
+      background: var(--primary-red);
+      color: var(--pure-white);
+      border-color: var(--primary-red);
+      box-shadow: 0 3px 8px rgba(211, 47, 47, 0.25);
+    }
+
+    .hud-node-line {
+      width: 20px;
+      height: 2px;
+      background: var(--light-red-border);
+    }
+
+    .hud-node-line.unlocked {
+      background: var(--primary-red);
+    }
+
+    /* Navigation controls */
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    /* Buttons styling */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius-sm);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--primary-red);
+      color: var(--pure-white);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-red-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--pure-white);
+      color: var(--primary-red);
+      border: 1.5px solid var(--primary-red);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      background: var(--light-red-bg);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* --- Main Workspace Layout --- */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* --- Theory & Steps Card (At the top, spanning full width) --- */
+    .theory-panel {
+      background: var(--pure-white);
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-md);
+      padding: 1.25rem 1.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .theory-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary-red);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .theory-steps {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--light-red-border);
+    }
+
+    .theory-steps-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+      color: var(--text-dark);
+    }
+
+    /* --- Inline Status Banner --- */
+    #status-banner {
+      display: none;
+      background: #E8F5E9;
+      border: 2px solid #2E7D32;
+      color: #1B5E20;
+      padding: 0.9rem 1.25rem;
+      border-radius: var(--border-radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      animation: pop-in 0.3s ease-out;
+    }
+
+    /* --- Main Split Workspace --- */
+    .game-workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* Playground Left Panel */
+    .playground-panel {
+      background: var(--pure-white);
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-height: 480px;
+    }
+
+    .playground-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--light-red-border);
+      padding-bottom: 0.75rem;
+    }
+
+    .playground-title-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .playground-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+    }
+
+    .playground-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .playground-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .sandbox-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    /* Code Terminal Right Panel */
+    .terminal-panel {
+      background: #1E1E1E;
+      border-radius: var(--border-radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      min-height: 480px;
+    }
+
+    .terminal-header {
+      background: #2D2D2D;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #3C3C3C;
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red {
+      background: #FF5F56;
+    }
+
+    .terminal-dot.yellow {
+      background: #FFBD2E;
+    }
+
+    .terminal-dot.green {
+      background: #27C93F;
+    }
+
+    .terminal-title {
+      color: #A0A0A0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .terminal-body {
+      flex: 1;
+      padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #D4D4D4;
+      overflow-y: auto;
+    }
+
+    .code-line {
+      display: flex;
+      gap: 1rem;
+      opacity: 0.85;
+      transition: opacity var(--transition-fast);
+    }
+
+    .code-line.active {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 2px solid var(--primary-red);
+      padding-left: 2px;
+    }
+
+    .code-num {
+      color: #858585;
+      text-align: right;
+      width: 20px;
+      user-select: none;
+    }
+
+    .code-text {
+      white-space: pre-wrap;
+    }
+
+    /* Code Highlighting classes */
+    .token-comment {
+      color: #6A9955;
+      font-style: italic;
+    }
+
+    .token-keyword {
+      color: #C586C0;
+      font-weight: 600;
+    }
+
+    .token-string {
+      color: #CE9178;
+    }
+
+    .token-method {
+      color: #DCDCAA;
+    }
+
+    .token-number {
+      color: #B5CEA8;
+    }
+
+    .token-builtin {
+      color: #569CD6;
+    }
+
+    .terminal-explainer {
+      background: #252526;
+      border-top: 1px solid #3C3C3C;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      color: #D4D4D4;
+    }
+
+    .explainer-icon {
+      font-size: 1.2rem;
+    }
+
+    /* --- Interactive Drag & Drop --- */
+    .drag-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .drag-chip {
+      background: var(--pure-white);
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      padding: 0.5rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary-red);
+      cursor: grab;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+      touch-action: none;
+    }
+
+    .drag-chip:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .drag-chip.dragging {
+      opacity: 0.8;
+      cursor: grabbing;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+    }
+
+    .drop-cell {
+      border: 2px dashed var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--off-white);
+      transition: all var(--transition-fast);
+    }
+
+    .drop-cell.hovered {
+      background: var(--light-red-bg);
+      border-color: var(--primary-red);
+      transform: scale(1.02);
+    }
+
+    .drop-cell.filled {
+      border-style: solid;
+      border-color: var(--primary-red);
+      background: var(--pure-white);
+    }
+
+    /* --- Activity Custom Visualizers --- */
+
+    /* Activity 1.1: Plot canvas view */
+    .chart-arena-plotbox {
+      width: 100%;
+      max-width: 440px;
+      height: 220px;
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      background: #FFF;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Activity 1.2: Graph Puzzle Builder target offsets */
+    .puzzle-plot-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 240px;
+      background: #FFF;
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+    }
+
+    .puzzle-target-label {
+      position: absolute;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* Activity 2.1: Live Workshop controls */
+    .workshop-sliders-box {
+      width: 100%;
+      max-width: 440px;
+      background: var(--off-white);
+      border: 1px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .slider-item-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .slider-item-row input[type="range"] {
+      cursor: pointer;
+      accent-color: var(--primary-red);
+    }
+
+    /* Activity 2.2: Detective clicks */
+    .detective-plot-view {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 240px;
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-sm);
+      background: #FFF;
+    }
+
+    .detective-click-target {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2.5px solid transparent;
+      cursor: pointer;
+      transform: translate(-12px, 12px);
+      /* offset center placement */
+      transition: all 0.3s ease;
+    }
+
+    .detective-click-target.glow-success {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.35);
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+    }
+
+    .detective-click-target.glow-error {
+      border-color: #E53935;
+      background: rgba(229, 57, 53, 0.35);
+      box-shadow: 0 0 10px rgba(229, 57, 53, 0.7);
+    }
+
+    /* Activity 3.1: Dashboard grids */
+    .dashboard-architect-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 440px;
+      height: 200px;
+    }
+
+    .dashboard-slot-cell {
+      border: 2.5px dashed var(--light-red-border);
+      border-radius: var(--border-radius-md);
+      background: var(--off-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: all var(--transition-fast);
+    }
+
+    .dashboard-slot-cell.filled {
+      border-style: solid;
+      border-color: var(--primary-red);
+      background: #FFF;
+    }
+
+    /* Level 3: Misleading axes/scales escape room */
+    .boss-battle-view {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .boss-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .boss-hp-track {
+      flex: 1;
+      height: 14px;
+      background: #ECEFF1;
+      border-radius: 7px;
+      overflow: hidden;
+      border: 1px solid #CFD8DC;
+    }
+
+    .boss-hp-fill {
+      height: 100%;
+      width: 100%;
+      background: #E53935;
+      transition: width 0.35s ease;
+    }
+
+    .player-hp-fill {
+      height: 100%;
+      width: 100%;
+      background: #4CAF50;
+      transition: width 0.35s ease;
+    }
+
+    .battle-options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .battle-option-btn {
+      background: var(--pure-white);
+      border: 2px solid var(--light-red-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .battle-option-btn:hover {
+      border-color: var(--primary-red);
+      background: var(--light-red-bg);
+      transform: translateX(2px);
+    }
+
+    /* --- Interactive dialogues --- */
+    dialog {
+      border: 2px solid var(--light-red-border);
+      border-radius: var(--border-radius-md);
+      padding: 1.75rem;
+      max-width: 480px;
+      width: 90%;
+      margin: auto;
+      box-shadow: var(--shadow-lg);
+      outline: none;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+    }
+
+    .dialog-header {
+      font-weight: 800;
+      color: var(--primary-red);
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dialog-body {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Footer styling */
+    footer {
+      background: rgba(255, 255, 255, 0.95);
+      border-top: 1px solid var(--light-red-border);
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* --- Animations definitions --- */
+    @keyframes pop-in {
+      0% {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-grid"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Navigation header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">📊</div>
+      <div class="brand-title">Plots & Charts I</div>
+    </div>
+
+    <!-- Level switching node indicators -->
+    <div class="level-nav-hud">
+      <div class="hud-node active" id="node-1" onclick="switchLevel(1)">1</div>
+      <div class="hud-node-line" id="line-1"></div>
+      <div class="hud-node" id="node-2" onclick="switchLevel(2)">2</div>
+      <div class="hud-node-line" id="line-2"></div>
+      <div class="hud-node" id="node-3" onclick="switchLevel(3)">3</div>
+    </div>
+
+    <!-- Navigation controls -->
+    <div class="hud-stats">
+      <button class="btn btn-outline" id="btn-prev-level" onclick="changeLevel(-1)">◀ Prev Level</button>
+      <button class="btn btn-primary" id="btn-next-level" onclick="changeLevel(1)">Next Level ▶</button>
+    </div>
+  </header>
+
+  <!-- Main Grid Workspace -->
+  <main>
+
+    <!-- Dynamic Theory and Steps Panel (Full Width) -->
+    <div class="theory-panel" id="theory-panel">
+      <div class="theory-title">
+        <span>📖</span> <span id="theory-title-text">Topic Theory</span>
+      </div>
+      <p id="theory-desc-text" style="font-size:0.85rem; color:var(--text-dark); margin-bottom: 0.5rem;"></p>
+      <div class="theory-steps">
+        <div class="theory-steps-title">🛠️ Steps to Perform Simulation:</div>
+        <ul id="theory-steps-list" style="margin-left: 1.25rem; font-size: 0.8rem; color: var(--text-muted);">
+          <!-- Populated dynamically -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Status Banner for alerts and complete states -->
+    <div id="status-banner"></div>
+
+    <!-- Gameplay panels split grid -->
+    <div class="game-workspace" id="game-workspace">
+
+      <!-- Left Panel: Playground Simulator -->
+      <div class="playground-panel">
+        <div class="playground-header">
+          <div class="playground-title-wrapper">
+            <span class="playground-title" id="active-title">Activity Title</span>
+            <span class="playground-subtitle" id="active-subtitle">Select options or drag elements below</span>
+          </div>
+          <div class="playground-controls">
+            <button class="btn btn-outline" id="btn-prev-act" onclick="navigateActivity(-1)"
+              style="padding: 0.4rem 0.8rem;">◀ Prev</button>
+            <button class="btn btn-outline" id="btn-next-act" onclick="navigateActivity(1)"
+              style="padding: 0.4rem 0.8rem;">Next ▶</button>
+            <button class="btn btn-outline" onclick="showHint()" style="padding: 0.4rem 0.8rem;">💡 Hint</button>
+            <button class="btn btn-outline" onclick="resetActiveActivity()" style="padding: 0.4rem 0.8rem;">🔄
+              Reset</button>
+          </div>
+        </div>
+
+        <div class="sandbox-container" id="sandbox-content">
+          <!-- Dynamic sandbox content goes here -->
+        </div>
+      </div>
+
+      <!-- Right Panel: Python Code & Explanation -->
+      <div class="terminal-panel">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+          </div>
+          <div class="terminal-title">live_plotting_code.py</div>
+          <div style="width: 40px;"></div>
+        </div>
+
+        <div class="terminal-body" id="code-lines-container">
+          <!-- Code statements populated here -->
+        </div>
+
+        <div class="terminal-explainer">
+          <span class="explainer-icon">💡</span>
+          <p id="code-explainer-text">Actions you take on the playground will generate equivalent Matplotlib plotting
+            statements here.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Interactive Hint Dialogue -->
+  <dialog id="hint-dialog">
+    <h3 class="dialog-header">💡 Educational Insight</h3>
+    <div class="dialog-body" id="hint-dialog-text">
+      Analyze variables closely to select correct graph structures.
+    </div>
+    <div class="dialog-footer">
+      <button class="btn btn-primary" onclick="closeHint()">Got it</button>
+    </div>
+  </dialog>
+
+  <!-- Interactive Victory Badge Dialogue -->
+  <dialog id="badge-dialog">
+    <h3 class="dialog-header">🏆 Achievement Unlocked!</h3>
+    <div class="dialog-body" id="badge-dialog-text">
+      Congratulations!
+    </div>
+    <div class="dialog-footer">
+      <button class="btn btn-primary" onclick="document.getElementById('badge-dialog').close()">Awesome</button>
+    </div>
+  </dialog>
+
+  <!-- Confetti and Main Script Logic -->
+  <script>
+    /* --- Mock Audio Effects System --- */
+    const audio = {
+      click() { },
+      success() { },
+      error() { },
+      unlock() { }
+    };
+
+    /* --- Confetti Engine --- */
+    class ConfettiShower {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.active = false;
+      }
+      start() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.particles = [];
+        for (let i = 0; i < 100; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height - this.canvas.height,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * this.canvas.height,
+            color: `hsl(${Math.random() * 25 + 345}, 85%, ${Math.random() * 20 + 50}%)`, // Crimson palette
+            tilt: Math.random() * 10 - 5,
+            tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+            tiltAngle: 0
+          });
+        }
+        this.active = true;
+        this.animate();
+      }
+      stop() {
+        this.active = false;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+      animate() {
+        if (!this.active) return;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        let remaining = false;
+        this.particles.forEach((p) => {
+          p.tiltAngle += p.tiltAngleIncremental;
+          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+          p.x += Math.sin(p.tiltAngle);
+          p.tilt = Math.sin(p.tiltAngle - p.r / 2) * 5;
+
+          if (p.y <= this.canvas.height) {
+            remaining = true;
+          }
+
+          this.ctx.beginPath();
+          this.ctx.lineWidth = p.r;
+          this.ctx.strokeStyle = p.color;
+          this.ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+          this.ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+          this.ctx.stroke();
+        });
+
+        if (remaining && this.active) {
+          requestAnimationFrame(() => this.animate());
+        }
+      }
+    }
+
+    const confetti = new ConfettiShower('confetti-canvas');
+
+    /* --- Global State Management --- */
+    const state = {
+      currentLevel: 1,
+      currentActivity: null,
+      completedActivities: [],
+      unlockedLevels: [1, 2, 3]
+    };
+
+    const activitiesOrder = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2'];
+
+    function loadState() {
+      const saved = localStorage.getItem('plots_charts_progress');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          state.completedActivities = parsed.completedActivities || [];
+          state.unlockedLevels = parsed.unlockedLevels || [1, 2, 3];
+          state.currentLevel = parsed.currentLevel || 1;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      updateHUD();
+    }
+
+    function saveState() {
+      localStorage.setItem('plots_charts_progress', JSON.stringify({
+        completedActivities: state.completedActivities,
+        unlockedLevels: state.unlockedLevels,
+        currentLevel: state.currentLevel
+      }));
+    }
+
+    function updateHUD() {
+      for (let i = 1; i <= 3; i++) {
+        const node = document.getElementById(`node-${i}`);
+        node.classList.toggle('unlocked', state.unlockedLevels.includes(i));
+        node.classList.toggle('active', state.currentLevel === i);
+
+        if (i < 3) {
+          const line = document.getElementById(`line-${i}`);
+          line.classList.toggle('unlocked', state.unlockedLevels.includes(i + 1));
+        }
+      }
+
+      document.getElementById('btn-prev-level').disabled = (state.currentLevel === 1);
+      document.getElementById('btn-next-level').disabled = (state.currentLevel === 3);
+    }
+
+    /* --- Python Code Syntax Formatter --- */
+    function formatPythonCode(rawText, activeLineIndex = null) {
+      const container = document.getElementById('code-lines-container');
+      container.innerHTML = '';
+
+      const lines = rawText.split('\n');
+      lines.forEach((line, idx) => {
+        const lineWrapper = document.createElement('div');
+        lineWrapper.className = 'code-line';
+        if (idx === activeLineIndex) {
+          lineWrapper.classList.add('active');
+        }
+
+        const numSpan = document.createElement('span');
+        numSpan.className = 'code-num';
+        numSpan.innerText = idx + 1;
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'code-text';
+
+        let highlighted = line;
+
+        if (highlighted.trim().startsWith('#')) {
+          highlighted = `<span class="token-comment">${escapeHtml(highlighted)}</span>`;
+        } else {
+          highlighted = highlighted.replace(/(['"])(.*?)\1/g, '<span class="token-string">"$2"</span>');
+
+          const keywords = ['import', 'as', 'from', 'return', 'def', 'if', 'else', 'for', 'in', 'print'];
+          keywords.forEach(kw => {
+            const regex = new RegExp(`\\b${kw}\\b`, 'g');
+            highlighted = highlighted.replace(regex, `<span class="token-keyword">${kw}</span>`);
+          });
+
+          highlighted = highlighted.replace(/\b(pd|numpy|df|result|plt|sns)\b/g, '<span class="token-builtin">$1</span>');
+
+          highlighted = highlighted.replace(/\b(plot|bar|boxplot|pairplot|scatterplot|hist|pie|show|title|xlabel|ylabel|grid|legend|ylim)\b/g, '<span class="token-method">$1</span>');
+
+          highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>');
+        }
+
+        textSpan.innerHTML = highlighted;
+        lineWrapper.appendChild(numSpan);
+        lineWrapper.appendChild(textSpan);
+        container.appendChild(lineWrapper);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    /* --- Dynamic Level Instructions Database --- */
+    function updateTheoryAndSteps(actKey) {
+      const theoryTitle = document.getElementById('theory-title-text');
+      const theoryDesc = document.getElementById('theory-desc-text');
+      const theoryStepsList = document.getElementById('theory-steps-list');
+
+      const contents = {
+        '1-1': {
+          title: 'Plots & Charts Selection',
+          desc: 'Choosing correct graphs depends on variable data relationships. Use <strong>Line Plots</strong> for continuous trajectories over time, <strong>Bar Charts</strong> for categoric distributions, and <strong>Histograms</strong> to review density frequencies.',
+          steps: [
+            'Read the active dataset description on the visualizer HUD.',
+            'Drag the correct plot type block onto the dataset target card.',
+            'Verify the dynamic graph draws and reviews correct Matplotlib python syntax.'
+          ]
+        },
+        '1-2': {
+          title: 'Graph Components Setup',
+          desc: 'Professional visualizations strictly require context labels. Titles describe conclusions, axis labels define unit scales, grids align data cells, and legends clarify subsets.',
+          steps: [
+            'Observe the incomplete chart showing basic plots.',
+            'Drag labels and component chips (e.g. <code>Title</code>, <code>X-Label</code>, <code>Grid</code>) to their matching positions.',
+            'Raise the visual quality meter value to 100% to submit.'
+          ]
+        },
+        '2-1': {
+          title: 'Plot Parameters Laboratory',
+          desc: 'Plot parameter configurations alter layout dimensions. <code>linewidth</code> scales strokes, <code>markersize</code> resizes coordinates, and <code>alpha</code> changes transparency opacity.',
+          steps: [
+            'Adjust slider metrics on the parameter workbench.',
+            'Observe visual changes inside the SVG plot container instantly.',
+            'Observe modified keyword arguments inside the python code editor.'
+          ]
+        },
+        '2-2': {
+          title: 'Graph Detective Analysis',
+          desc: 'Analyzing visualizations detects hidden patterns. Outliers reside outside normal cluster paths; medians split boxplot bins; peaks define maximum distribution frequencies.',
+          steps: [
+            'Read the active detective target task at the top of the plot.',
+            'Click directly on the corresponding node variables inside the chart coordinate layout.',
+            'Spot correct targets to proceed through round queries.'
+          ]
+        },
+        '3-1': {
+          title: 'Dashboard Architect Layout',
+          desc: 'Professional dashboards organize multiple chart types into single visual grids. Placing appropriate line, bar, or pie charts conveys multiple aspects of business metrics.',
+          steps: [
+            'Verify client hospital dashboard layout requirements.',
+            'Drag plot type widgets into the 2x2 grid frames in the correct quadrants.',
+            'Satisfy the satisfaction gauge meter at 100% to complete.'
+          ]
+        },
+        '3-2': {
+          title: 'Visualization Escape Room',
+          desc: 'Put your chart configurations and syntax diagnostics to the test in a quick-fire combat simulator against an AI Visual Expert! Options are shuffled on load.',
+          steps: [
+            'Analyze visual graph challenges and query commands.',
+            'Tap correct choices quickly to damage the AI expert design bar.',
+            'Defeat the AI boss and claim the Master Visualization rank!'
+          ]
+        }
+      };
+
+      const selected = contents[actKey];
+      if (selected) {
+        theoryTitle.innerText = selected.title;
+        theoryDesc.innerHTML = selected.desc;
+        theoryStepsList.innerHTML = selected.steps.map(step => `<li>${step}</li>`).join('');
+      }
+    }
+
+    function showHint() {
+      const hints = {
+        '1-1': 'Trajectories over time fit Line Plot. Counts by product type match Bar Plot. Grade distribution fits Histogram.',
+        '1-2': 'Title sits at the top of plots. X-Label is at the bottom, Y-Label on the left. Grid lies behind data lines.',
+        '2-1': 'Increase LineWidth for thick paths. Adjust alpha below 1.0 to view stacked data lines. Toggle Grid checkbox to draw gridlines.',
+        '2-2': 'Outliers are distant points. Distribution peaks are the tallest histogram bars. Boxplot median is the line inside the box.',
+        '3-1': 'Top-Left: Line Plot. Top-Right: Pie Chart. Bottom-Left: Bar Plot. Arrange widgets according to the client brief.',
+        '3-2': 'Misleading scales often starting at non-zero points are fixed by setting ylim(0). Recall: Boxplots are drawn via sns.boxplot().'
+      };
+      document.getElementById('hint-dialog-text').innerText = hints[state.currentActivity] || 'Complete sandboxes on the playground.';
+      document.getElementById('hint-dialog').showModal();
+    }
+
+    function closeHint() {
+      document.getElementById('hint-dialog').close();
+    }
+
+    function showStatusBanner(msg, type = 'success') {
+      const banner = document.getElementById('status-banner');
+      banner.innerHTML = msg;
+      banner.style.display = 'block';
+      if (type === 'success') {
+        banner.style.background = '#E8F5E9';
+        banner.style.borderColor = '#2E7D32';
+        banner.style.color = '#1B5E20';
+      } else {
+        banner.style.background = '#FFEBEE';
+        banner.style.borderColor = '#D32F2F';
+        banner.style.color = '#C62828';
+      }
+    }
+
+    function hideStatusBanner() {
+      document.getElementById('status-banner').style.display = 'none';
+    }
+
+    function switchLevel(lvlNum) {
+      state.currentLevel = lvlNum;
+      hideStatusBanner();
+      startActivity(lvlNum, 1);
+    }
+
+    function changeLevel(dir) {
+      const target = state.currentLevel + dir;
+      if (target >= 1 && target <= 3) {
+        state.currentLevel = target;
+        hideStatusBanner();
+        startActivity(target, 1);
+      }
+    }
+
+    function navigateActivity(dir) {
+      if (!state.currentActivity) return;
+      const idx = activitiesOrder.indexOf(state.currentActivity);
+      const targetIdx = idx + dir;
+      if (targetIdx >= 0 && targetIdx < activitiesOrder.length) {
+        const parts = activitiesOrder[targetIdx].split('-');
+        const lvl = parseInt(parts[0]);
+        const act = parseInt(parts[1]);
+        hideStatusBanner();
+        startActivity(lvl, act);
+      }
+    }
+
+    function resetActiveActivity() {
+      if (!state.currentActivity) return;
+      const parts = state.currentActivity.split('-');
+      const lvl = parseInt(parts[0]);
+      const act = parseInt(parts[1]);
+      hideStatusBanner();
+      startActivity(lvl, act);
+    }
+
+    function awardProgress() {
+      saveState();
+      updateHUD();
+    }
+
+    /* --- Drag & Drop Core Pointer Engines --- */
+    let dragObj = null;
+    let offset = { x: 0, y: 0 };
+    let dropTargets = [];
+    let currentDropHover = null;
+    let dragCallback = null;
+
+    function initDraggable(element, callback) {
+      element.addEventListener('pointerdown', (e) => {
+        audio.click();
+        dragObj = element;
+        dragObj.classList.add('dragging');
+
+        offset = {
+          x: e.clientX,
+          y: e.clientY
+        };
+
+        dragCallback = callback;
+        element.setPointerCapture(e.pointerId);
+        dropTargets = Array.from(document.querySelectorAll('.drop-cell, .chart-arena-plotbox, .puzzle-target-label, .dashboard-slot-cell'));
+      });
+
+      element.addEventListener('pointermove', (e) => {
+        if (dragObj !== element) return;
+
+        const dx = e.clientX - offset.x;
+        const dy = e.clientY - offset.y;
+
+        element.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
+
+        let hovered = null;
+        for (let target of dropTargets) {
+          const rect = target.getBoundingClientRect();
+          if (e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            hovered = target;
+            break;
+          }
+        }
+
+        if (hovered !== currentDropHover) {
+          if (currentDropHover) currentDropHover.classList.remove('hovered');
+          currentDropHover = hovered;
+          if (currentDropHover) currentDropHover.classList.add('hovered');
+        }
+      });
+
+      element.addEventListener('pointerup', (e) => {
+        if (dragObj !== element) return;
+        element.releasePointerCapture(e.pointerId);
+
+        dragObj.classList.remove('dragging');
+        element.style.transform = '';
+
+        if (currentDropHover) {
+          currentDropHover.classList.remove('hovered');
+          if (dragCallback) {
+            dragCallback(element, currentDropHover);
+          }
+        } else {
+          element.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          element.style.transform = 'translate(0px, 0px)';
+          setTimeout(() => { element.style.transition = ''; }, 350);
+        }
+
+        dragObj = null;
+        currentDropHover = null;
+      });
+
+      element.addEventListener('pointercancel', (e) => {
+        if (dragObj !== element) return;
+        dragObj.classList.remove('dragging');
+        element.style.transform = 'translate(0px, 0px)';
+        dragObj = null;
+        currentDropHover = null;
+      });
+    }
+
+    /* --- Activities Setup & Initialization --- */
+    function startActivity(lvl, act) {
+      state.currentActivity = `${lvl}-${act}`;
+      state.currentLevel = lvl;
+      updateHUD();
+      updateTheoryAndSteps(state.currentActivity);
+
+      const container = document.getElementById('sandbox-content');
+      container.innerHTML = '';
+
+      const idx = activitiesOrder.indexOf(state.currentActivity);
+      document.getElementById('btn-prev-act').disabled = (idx === 0);
+      document.getElementById('btn-next-act').disabled = (idx === activitiesOrder.length - 1);
+
+      if (state.currentActivity === '1-1') {
+        setupActivity11(container);
+      } else if (state.currentActivity === '1-2') {
+        setupActivity12(container);
+      } else if (state.currentActivity === '2-1') {
+        setupActivity21(container);
+      } else if (state.currentActivity === '2-2') {
+        setupActivity22(container);
+      } else if (state.currentActivity === '3-1') {
+        setupActivity31(container);
+      } else if (state.currentActivity === '3-2') {
+        setupActivity32(container);
+      }
+    }
+
+
+    /* =========================================================================
+       ACTIVITY 1.1: CHART SELECTION ARENA (UPGRADED TO 5 ROUNDS)
+       ========================================================================= */
+    const arenaState11 = {
+      round: 0,
+      rounds: [
+        {
+          dataset: '📊 Monthly Sales Over Time (Jan ➔ Jun)',
+          correctPlot: 'lineplot',
+          label: 'Line Plot',
+          svg: `
+            <svg viewBox="0 0 200 120" style="width:100%; height:100%;">
+              <path d="M 20,100 L 60,80 L 100,90 L 140,50 L 180,20" fill="none" stroke="var(--primary-red)" stroke-width="2.5" stroke-dasharray="250" stroke-dashoffset="250">
+                <animate attributeName="stroke-dashoffset" to="0" dur="0.8s" fill="freeze" />
+              </path>
+              <circle cx="20" cy="100" r="3" fill="var(--primary-red)"/>
+              <circle cx="60" cy="80" r="3" fill="var(--primary-red)"/>
+              <circle cx="100" cy="90" r="3" fill="var(--primary-red)"/>
+              <circle cx="140" cy="50" r="3" fill="var(--primary-red)"/>
+              <circle cx="180" cy="20" r="3" fill="var(--primary-red)"/>
+            </svg>
+          `,
+          code: `import matplotlib.pyplot as plt\n\n# Line plot shows continuous trends:\nplt.plot(months, sales, marker="o")\nplt.show()`
+        },
+        {
+          dataset: '🏷️ Revenue counts grouped by Product Category',
+          correctPlot: 'barplot',
+          label: 'Bar Plot',
+          svg: `
+            <svg viewBox="0 0 200 120" style="width:100%; height:100%;">
+              <rect x="20" y="120" width="25" height="0" fill="var(--primary-red)">
+                <animate attributeName="height" to="60" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="60" dur="0.5s" fill="freeze" />
+              </rect>
+              <rect x="65" y="120" width="25" height="0" fill="var(--primary-red)">
+                <animate attributeName="height" to="90" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="30" dur="0.5s" fill="freeze" />
+              </rect>
+              <rect x="110" y="120" width="25" height="0" fill="var(--primary-red)">
+                <animate attributeName="height" to="40" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="80" dur="0.5s" fill="freeze" />
+              </rect>
+              <rect x="155" y="120" width="25" height="0" fill="var(--primary-red)">
+                <animate attributeName="height" to="110" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="10" dur="0.5s" fill="freeze" />
+              </rect>
+            </svg>
+          `,
+          code: `import matplotlib.pyplot as plt\n\n# Bar chart compares distinct categories:\nplt.bar(categories, revenue)\nplt.show()`
+        },
+        {
+          dataset: '📍 Height vs Weight coordinates of 50 patients',
+          correctPlot: 'scatterplot',
+          label: 'Scatter Plot',
+          svg: `
+            <svg viewBox="0 0 200 120" style="width:100%; height:100%;">
+              <circle cx="30" cy="90" r="0" fill="var(--primary-red)"><animate attributeName="r" to="4" dur="0.2s" fill="freeze"/></circle>
+              <circle cx="60" cy="70" r="0" fill="var(--primary-red)"><animate attributeName="r" to="4" dur="0.3s" fill="freeze"/></circle>
+              <circle cx="90" cy="80" r="0" fill="var(--primary-red)"><animate attributeName="r" to="4" dur="0.4s" fill="freeze"/></circle>
+              <circle cx="120" cy="40" r="0" fill="var(--primary-red)"><animate attributeName="r" to="4" dur="0.5s" fill="freeze"/></circle>
+              <circle cx="150" cy="50" r="0" fill="var(--primary-red)"><animate attributeName="r" to="4" dur="0.6s" fill="freeze"/></circle>
+              <circle cx="180" cy="20" r="0" fill="var(--primary-red)"><animate attributeName="r" to="4" dur="0.7s" fill="freeze"/></circle>
+            </svg>
+          `,
+          code: `import seaborn as sns\n\n# Scatter plot correlates continuous pairs:\nsns.scatterplot(x="Height", y="Weight", data=df)\nplt.show()`
+        },
+        {
+          dataset: '📈 Grade Distributions frequency across 100 students',
+          correctPlot: 'histogram',
+          label: 'Histogram',
+          svg: `
+            <svg viewBox="0 0 200 120" style="width:100%; height:100%;">
+              <rect x="25" y="120" width="30" height="0" fill="var(--primary-red)" opacity="0.8">
+                <animate attributeName="height" to="30" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="90" dur="0.5s" fill="freeze" />
+              </rect>
+              <rect x="60" y="120" width="30" height="0" fill="var(--primary-red)" opacity="0.8">
+                <animate attributeName="height" to="80" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="40" dur="0.5s" fill="freeze" />
+              </rect>
+              <rect x="95" y="120" width="30" height="0" fill="var(--primary-red)" opacity="0.8">
+                <animate attributeName="height" to="100" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="20" dur="0.5s" fill="freeze" />
+              </rect>
+              <rect x="130" y="120" width="30" height="0" fill="var(--primary-red)" opacity="0.8">
+                <animate attributeName="height" to="50" dur="0.5s" fill="freeze" />
+                <animate attributeName="y" to="70" dur="0.5s" fill="freeze" />
+              </rect>
+            </svg>
+          `,
+          code: `import matplotlib.pyplot as plt\n\n# Histogram checks values spread/frequencies:\nplt.hist(grades, bins=4)\nplt.show()`
+        },
+        {
+          dataset: '📦 Customer Age spread, ranges, and outliers',
+          correctPlot: 'boxplot',
+          label: 'Box Plot',
+          svg: `
+            <svg viewBox="0 0 200 120" style="width:100%; height:100%;">
+              <line x1="100" y1="20" x2="100" y2="100" stroke="var(--primary-red)" stroke-width="1.5"/>
+              <rect x="70" y="40" width="60" height="40" fill="var(--pure-white)" stroke="var(--primary-red)" stroke-width="1.5"/>
+              <line x1="70" y1="60" x2="130" y2="60" stroke="var(--primary-red)" stroke-width="2.5"/>
+            </svg>
+          `,
+          code: `import seaborn as sns\n\n# Boxplot evaluates ranges and outliers:\nsns.boxplot(x="Age", data=df)\nplt.show()`
+        }
+      ]
+    };
+
+    function setupActivity11(container) {
+      document.getElementById('active-title').innerText = 'Activity 1.1 — Chart Selection Arena';
+      document.getElementById('active-subtitle').innerText = 'Tap the correct plot type card below to match the target dataset characteristics.';
+
+      const rawChips = [
+        { plot: 'lineplot', label: 'Line Plot' },
+        { plot: 'barplot', label: 'Bar Plot' },
+        { plot: 'scatterplot', label: 'Scatter Plot' },
+        { plot: 'histogram', label: 'Histogram' },
+        { plot: 'boxplot', label: 'Box Plot' }
+      ];
+      const jumbledChips = [...rawChips].sort(() => Math.random() - 0.5);
+
+      container.innerHTML = `
+        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; width:100%; max-width:440px; margin-bottom:0.5rem;">
+          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100; font-weight:800;" id="arena-round-title">Round 1</span>
+          <span class="target-array-vals" id="arena-dataset-text" style="font-size:0.85rem; color:#E65100;">Monthly Sales Over Time (Jan ➔ Jun)</span>
+        </div>
+
+        <div class="chart-arena-plotbox" id="arena-target-box" style="cursor:default;">
+          <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Select a plot type below...</span>
+        </div>
+
+        <div class="drag-chips-container" id="arena-chips" style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center;">
+          ${jumbledChips.map(c => `
+            <div class="drag-chip click-chip" data-plot="${c.plot}" style="background:#FFF5F5; cursor:pointer; padding:0.5rem 1rem; border:1px solid #FFCDD2; border-radius:var(--border-radius-sm); font-weight:700; transition:all 0.2s ease;" onclick="verifyArenaChoice11('${c.plot}', this)">${c.label}</div>
+          `).join('')}
+        </div>
+      `;
+
+      loadArenaRound11();
+    }
+
+    function loadArenaRound11() {
+      const active = arenaState11.rounds[arenaState11.round];
+      document.getElementById('arena-round-title').innerText = `Round ${arenaState11.round + 1} of 5`;
+      document.getElementById('arena-dataset-text').innerText = active.dataset;
+
+      document.getElementById('arena-target-box').innerHTML = `<span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Select a plot type below...</span>`;
+
+      const codeStr = `import matplotlib.pyplot as plt\n\n# Target dataset: ${active.label}\n# Choose the correct plot type by clicking one of the buttons below...`;
+      formatPythonCode(codeStr, 3);
+    }
+
+    function verifyArenaChoice11(choice, item) {
+      const active = arenaState11.rounds[arenaState11.round];
+      if (choice === active.correctPlot) {
+        audio.success();
+        if (item) {
+          item.style.background = '#E8F5E9';
+          item.style.borderColor = '#81C784';
+          item.style.color = '#2E7D32';
+        }
+        document.getElementById('arena-target-box').innerHTML = active.svg;
+        showStatusBanner(`✔ Correct! Chosen: ${active.label}.`, 'success');
+
+        formatPythonCode(active.code, 3);
+
+        setTimeout(() => {
+          arenaState11.round++;
+          if (arenaState11.round < arenaState11.rounds.length) {
+            setupActivity11(document.getElementById('sandbox-content'));
+          } else {
+            concludeArena11();
+          }
+        }, 1800);
+      } else {
+        audio.error();
+        if (item) {
+          const oldBg = item.style.background;
+          const oldBorder = item.style.borderColor;
+          item.style.background = '#FFEBEE';
+          item.style.borderColor = '#EF5350';
+          item.style.color = '#C62828';
+          setTimeout(() => {
+            item.style.background = oldBg;
+            item.style.borderColor = oldBorder;
+            item.style.color = '';
+          }, 1000);
+        }
+        showStatusBanner("❌ Plot mismatch! Look at active dataset variables and try again.", 'error');
+      }
+    }
+
+    function concludeArena11() {
+      confetti.start();
+      setTimeout(() => confetti.stop(), 3000);
+
+      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Plot Selection Rounds Cleared!</span>`;
+      if (!state.completedActivities.includes('1-1')) {
+        state.completedActivities.push('1-1');
+        awardProgress();
+      }
+      showStatusBanner("🎉 Selection arena complete! Click <strong>Next ▶</strong> at the top to proceed.");
+    }
+
+
+    /* =========================================================================
+       ACTIVITY 1.2: GRAPH PUZZLE BUILDER (8 SLOTS UPGRADE)
+       ========================================================================= */
+    const puzzleState12 = {
+      slots: { title: null, xlabel: null, ylabel: null, grid: null, legend: null, color: null, marker: null, xlimit: null }
+    };
+
+    function setupActivity12(container) {
+      document.getElementById('active-title').innerText = 'Activity 1.2 — Graph Puzzle Builder';
+      document.getElementById('active-subtitle').innerText = 'Drag all 8 labeling, gridlines, palette, and scale attributes to complete the graph structure.';
+
+      const rawChips = [
+        { slot: 'title', val: 'Title', label: 'plt.title()' },
+        { slot: 'xlabel', val: 'X-Label', label: 'plt.xlabel()' },
+        { slot: 'ylabel', val: 'Y-Label', label: 'plt.ylabel()' },
+        { slot: 'grid', val: 'Grid', label: 'plt.grid()' },
+        { slot: 'legend', val: 'Legend', label: 'plt.legend()' },
+        { slot: 'color', val: 'Red', label: 'color="red"' },
+        { slot: 'marker', val: 'circle', label: 'marker="o"' },
+        { slot: 'xlimit', val: 'xlim', label: 'plt.xlim()' }
+      ];
+      const jumbledChips = [...rawChips].sort(() => Math.random() - 0.5);
+
+      container.innerHTML = `
+        <div class="puzzle-plot-wrapper" style="height:250px;">
+          <!-- Top Title Drop slot -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-title" data-slot="title" style="top:5px; left:50px; right:50px; height:24px; font-size:0.6rem;">
+            Title Target
+          </div>
+          <!-- Y-Label Drop slot -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-ylabel" data-slot="ylabel" style="top:45px; left:5px; width:22px; height:120px; writing-mode: vertical-rl; transform:rotate(180deg); font-size:0.6rem;">
+            Y-Label Target
+          </div>
+          <!-- Legend Target -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-legend" data-slot="legend" style="top:35px; right:15px; width:65px; height:24px; font-size:0.6rem;">
+            Legend
+          </div>
+          <!-- Color Parameter Target -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-color" data-slot="color" style="top:65px; right:15px; width:65px; height:24px; font-size:0.6rem;">
+            Color
+          </div>
+          <!-- Marker Parameter Target -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-marker" data-slot="marker" style="top:95px; right:15px; width:65px; height:24px; font-size:0.6rem;">
+            Marker
+          </div>
+          <!-- Background Grid target -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-grid" data-slot="grid" style="top:45px; left:50px; width:280px; height:130px; opacity:0.65; font-size:0.6rem;">
+            Grid Target
+          </div>
+          <!-- X-Limit Target -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-xlimit" data-slot="xlimit" style="bottom:38px; left:50px; width:80px; height:24px; font-size:0.6rem;">
+            xlim limit
+          </div>
+          <!-- X-Label Target -->
+          <div class="drop-cell puzzle-target-label" id="p-slot-xlabel" data-slot="xlabel" style="bottom:10px; left:50px; right:50px; height:24px; font-size:0.6rem;">
+            X-Label Target
+          </div>
+        </div>
+
+        <div class="drag-chips-container" id="puzzle-chips" style="margin-top:0.25rem;">
+          ${jumbledChips.map(c => `
+            <div class="drag-chip" data-slot="${c.slot}" data-val="${c.val}" style="background:#FFF5F5; padding:0.35rem; font-size:0.75rem;">${c.label}</div>
+          `).join('')}
+        </div>
+      `;
+
+      puzzleState12.slots = { title: null, xlabel: null, ylabel: null, grid: null, legend: null, color: null, marker: null, xlimit: null };
+      loadPuzzleCode12();
+
+      document.querySelectorAll('#puzzle-chips .drag-chip').forEach(chip => {
+        initDraggable(chip, (item, target) => {
+          const slot = target.dataset.slot;
+          const chipSlot = item.dataset.slot;
+
+          if (slot !== chipSlot) {
+            audio.error();
+            item.style.transform = 'translate(0px, 0px)';
+            return;
+          }
+
+          audio.success();
+          puzzleState12.slots[slot] = item.dataset.val;
+          target.innerHTML = `<span style="color:#D32F2F; font-weight:800; font-size:0.6rem;">${item.dataset.val}</span>`;
+          target.classList.add('filled');
+          item.style.display = 'none';
+
+          loadPuzzleCode12();
+          checkPuzzleCompletion12();
+        });
+      });
+    }
+
+    function loadPuzzleCode12() {
+      let codeStr = `import matplotlib.pyplot as plt\n\n`;
+      let plotParams = [];
+      if (puzzleState12.slots.color) plotParams.push(`color="red"`);
+      if (puzzleState12.slots.marker) plotParams.push(`marker="o"`);
+
+      codeStr += `plt.plot(months, sales, ${plotParams.join(', ') || '# parameters...'})\n`;
+      if (puzzleState12.slots.title) codeStr += `plt.title("Monthly Performance")\n`;
+      if (puzzleState12.slots.xlabel) codeStr += `plt.xlabel("Month")\n`;
+      if (puzzleState12.slots.ylabel) codeStr += `plt.ylabel("Revenue")\n`;
+      if (puzzleState12.slots.grid) codeStr += `plt.grid(True)\n`;
+      if (puzzleState12.slots.legend) codeStr += `plt.legend(["Sales"])\n`;
+      if (puzzleState12.slots.xlimit) codeStr += `plt.xlim(0, 12)\n`;
+      codeStr += `plt.show()`;
+      formatPythonCode(codeStr, 3);
+    }
+
+    function checkPuzzleCompletion12() {
+      if (puzzleState12.slots.title &&
+        puzzleState12.slots.xlabel &&
+        puzzleState12.slots.ylabel &&
+        puzzleState12.slots.grid &&
+        puzzleState12.slots.legend &&
+        puzzleState12.slots.color &&
+        puzzleState12.slots.marker &&
+        puzzleState12.slots.xlimit) {
+
+        confetti.start();
+        setTimeout(() => confetti.stop(), 3000);
+
+        document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Graph Puzzle Assembled Successfully!</span>`;
+        if (!state.completedActivities.includes('1-2')) {
+          state.completedActivities.push('1-2');
+          awardProgress();
+        }
+        showStatusBanner("🎉 Puzzle complete! Level 2 unlocked. Click <strong>Next ▶</strong> at the top.");
+      }
+    }
+
+
+    /* =========================================================================
+       ACTIVITY 2.1: LIVE GRAPH WORKSHOP
+       ========================================================================= */
+    const workshopState21 = {
+      linewidth: 3,
+      markersize: 6,
+      alpha: 0.8,
+      grid: false
+    };
+
+    function setupActivity21(container) {
+      document.getElementById('active-title').innerText = 'Activity 2.1 — Live Graph Workshop';
+      document.getElementById('active-subtitle').innerText = 'Adjust sliders to tune visualization params and match the target design specifications.';
+
+      container.innerHTML = `
+        <div class="target-array-hud" style="background:#E1F5FE; border-color:#81D4FA; width:100%; max-width:440px; margin-bottom:0.5rem; text-align:center;">
+          <span style="font-size:0.75rem; text-transform:uppercase; color:#01579B; font-weight:800;">Target Design:</span>
+          <span class="target-array-vals" style="font-size:0.75rem; color:#01579B;">LineWidth=5, MarkerSize=10, Opacity=0.5, Grid=Enabled</span>
+        </div>
+
+        <div class="puzzle-plot-wrapper" style="height:190px;">
+          <!-- SVG plot displaying layout parameters live -->
+          <svg viewBox="0 0 240 120" style="width:100%; height:100%;" id="workshop-svg">
+            <g id="workshop-grid-group" style="display:none;">
+              <line x1="0" y1="30" x2="240" y2="30" stroke="#CFD8DC" stroke-width="0.5"/>
+              <line x1="0" y1="60" x2="240" y2="60" stroke="#CFD8DC" stroke-width="0.5"/>
+              <line x1="0" y1="90" x2="240" y2="90" stroke="#CFD8DC" stroke-width="0.5"/>
+            </g>
+            <path d="M 20,100 L 80,60 L 140,80 L 200,30" fill="none" stroke="var(--primary-red)" stroke-dasharray="none" id="workshop-path" style="transition: all 0.3s ease;"/>
+            <circle cx="20" cy="100" class="workshop-dot" fill="var(--primary-red)" style="transition: all 0.3s ease;"/>
+            <circle cx="80" cy="60" class="workshop-dot" fill="var(--primary-red)" style="transition: all 0.3s ease;"/>
+            <circle cx="140" cy="80" class="workshop-dot" fill="var(--primary-red)" style="transition: all 0.3s ease;"/>
+            <circle cx="200" cy="30" class="workshop-dot" fill="var(--primary-red)" style="transition: all 0.3s ease;"/>
+          </svg>
+        </div>
+
+        <div class="workshop-sliders-box">
+          <div class="slider-item-row">
+            <span>LineWidth: <span id="val-lw" style="color:var(--primary-red);">3</span></span>
+            <input type="range" min="1" max="8" value="3" oninput="updateWorkshopParam21('linewidth', this.value)">
+          </div>
+          <div class="slider-item-row">
+            <span>MarkerSize: <span id="val-ms" style="color:var(--primary-red);">6</span></span>
+            <input type="range" min="2" max="12" value="6" oninput="updateWorkshopParam21('markersize', this.value)">
+          </div>
+          <div class="slider-item-row">
+            <span>Opacity (alpha): <span id="val-alpha" style="color:var(--primary-red);">0.8</span></span>
+            <input type="range" min="2" max="10" value="8" oninput="updateWorkshopParam21('alpha', this.value/10)">
+          </div>
+          <div class="slider-item-row" style="justify-content:center;">
+            <label style="display:flex; align-items:center; gap:0.25rem; cursor:pointer;">
+              <input type="checkbox" onchange="updateWorkshopParam21('grid', this.checked)"> Enable Grid
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="submitWorkshop21()">⚡ Validate Chart Design</button>
+      `;
+
+      workshopState21.linewidth = 3;
+      workshopState21.markersize = 6;
+      workshopState21.alpha = 0.8;
+      workshopState21.grid = false;
+
+      updateWorkshopElements21();
+    }
+
+    function updateWorkshopParam21(param, val) {
+      workshopState21[param] = val;
+      updateWorkshopElements21();
+    }
+
+    function updateWorkshopElements21() {
+      // Line width
+      const path = document.getElementById('workshop-path');
+      path.setAttribute('stroke-width', workshopState21.linewidth);
+      document.getElementById('val-lw').innerText = workshopState21.linewidth;
+
+      // Marker size
+      document.querySelectorAll('.workshop-dot').forEach(dot => {
+        dot.setAttribute('r', workshopState21.markersize);
+        dot.style.opacity = workshopState21.alpha;
+      });
+      document.getElementById('val-ms').innerText = workshopState21.markersize;
+
+      // Opacity
+      path.style.opacity = workshopState21.alpha;
+      document.getElementById('val-alpha').innerText = workshopState21.alpha;
+
+      // Grid
+      document.getElementById('workshop-grid-group').style.display = workshopState21.grid ? 'block' : 'none';
+
+      // Load code
+      let codeStr = `import matplotlib.pyplot as plt\n\n# Configure visual parameters:\nplt.plot(x, y, linewidth=${workshopState21.linewidth}, marker="o", markersize=${workshopState21.markersize}, alpha=${workshopState21.alpha})\n`;
+      if (workshopState21.grid) codeStr += `plt.grid(True)\n`;
+      codeStr += `plt.show()`;
+      formatPythonCode(codeStr, 3);
+    }
+
+    function submitWorkshop21() {
+      if (Number(workshopState21.linewidth) === 5 &&
+        Number(workshopState21.markersize) === 10 &&
+        Number(workshopState21.alpha) === 0.5 &&
+        workshopState21.grid === true) {
+
+        audio.success();
+        confetti.start();
+        setTimeout(() => confetti.stop(), 3000);
+
+        document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Chart Parameters Matched & Verified!</span>`;
+        if (!state.completedActivities.includes('2-1')) {
+          state.completedActivities.push('2-1');
+          awardProgress();
+        }
+        showStatusBanner("🎉 Workshop parameters verified! Click <strong>Next ▶</strong> at the top to proceed.");
+      } else {
+        audio.error();
+        showStatusBanner("❌ Parameter mismatch! Follow the specifications: LineWidth=5, MarkerSize=10, Opacity=0.5, and Gridlines enabled.", 'error');
+      }
+    }
+
+
+    /* =========================================================================
+       ACTIVITY 2.2: GRAPH REPAIR LABORATORY
+           ========================================================================= */
+        const repairState22 = {
+          round: 0,
+          rounds: [
+            {
+              task: 'Fix misleading Y-Axis starting scale (currently starts at 80):',
+              svg: `
+            <svg viewBox="0 0 240 120" style="width:100%; height:100%;">
+              <g id="repair-grid-group">
+                <line x1="0" y1="30" x2="240" y2="30" stroke="#CFD8DC" stroke-width="0.5"/>
+                <line x1="0" y1="60" x2="240" y2="60" stroke="#CFD8DC" stroke-width="0.5"/>
+                <line x1="0" y1="90" x2="240" y2="90" stroke="#CFD8DC" stroke-width="0.5"/>
+              </g>
+              <rect x="50" y="80" width="40" height="40" fill="var(--primary-red)" id="repair-bar-1"/>
+              <rect x="150" y="20" width="40" height="100" fill="var(--primary-red)" id="repair-bar-2"/>
+              <text x="5" y="15" font-size="8" fill="var(--text-muted)" id="repair-scale-text">Y-Start: 80</text>
+            </svg>
+          `,
+              toolHtml: `
+            <div class="slider-item-row" style="width:100%; max-width:320px;">
+              <span style="font-size:0.75rem;">Set Y-Axis minimum value (ylim): <span id="repair-val-1" style="color:var(--primary-red); font-weight:800;">80</span></span>
+              <input type="range" min="0" max="80" step="10" value="80" style="accent-color:var(--primary-red);" oninput="updateRepair122(this.value)">
+            </div>
+          `,
+              correctVal: 0,
+              code: `import matplotlib.pyplot as plt\n\n# Misleading Y-Axis scale correction:\nplt.ylim(ymin=0, ymax=100)\nplt.bar(["A", "B"], [85, 95])\nplt.show()`
+            },
+            {
+              task: 'Fix unreadable light-pastel low contrast pie colors:',
+              svg: `
+            <svg viewBox="0 0 240 120" style="width:100%; height:100%;">
+              <circle cx="120" cy="60" r="45" fill="#EEEEEE" stroke="#E0E0E0" id="repair-pie-base"/>
+              <path d="M120,60 L120,15 A45,45 0 0,1 165,60 Z" fill="#F5F5F5" id="repair-pie-slice"/>
+              <text x="65" y="115" font-size="8" fill="#BDBDBD" id="repair-pie-text">Contrast Status: Very Low</text>
+            </svg>
+          `,
+              toolHtml: `
+            <div style="display:flex; gap:0.5rem; justify-content:center;">
+              <button class="btn btn-outline" style="padding:0.4rem; font-size:0.7rem;" onclick="updateRepair222('low')">Light Colors</button>
+              <button class="btn btn-primary" style="padding:0.4rem; font-size:0.7rem;" onclick="updateRepair222('high')">High Contrast Cherry</button>
+            </div>
+          `,
+              correctVal: 'high',
+              code: `import matplotlib.pyplot as plt\n\n# Correcting color accessibility for contrast:\nplt.pie(sizes, colors=["#D32F2F", "#FFCDD2"])\nplt.show()`
+            }
+          ]
+        };
+
+        function setupActivity22(container) {
+          document.getElementById('active-title').innerText = 'Activity 2.2 — Graph Repair Laboratory';
+          document.getElementById('active-subtitle').innerText = 'Interact with repair widgets to fix misleading axis limits or low-contrast schemes.';
+
+          container.innerHTML = `
+        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; width:100%; max-width:440px; margin-bottom:0.5rem;">
+          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100; font-weight:800;" id="rep-round-label">Round 1</span>
+          <span class="target-array-vals" id="rep-task-text" style="font-size:0.85rem; color:#E65100;">Fix misleading Y-Axis scale</span>
+        </div>
+
+        <div class="detective-plot-view" id="rep-plot-box" style="height:170px;">
+          <!-- SVG plot -->
+        </div>
+
+        <div id="rep-tools-box" style="width:100%; display:flex; justify-content:center; margin-top:0.5rem;">
+          <!-- Repair options -->
+        </div>
+      `;
+
+          repairState22.round = 0;
+          loadRepairRound22();
+        }
+
+        function loadRepairRound22() {
+          const active = repairState22.rounds[repairState22.round];
+          document.getElementById('rep-round-label').innerText = `Round ${repairState22.round + 1} of 2`;
+          document.getElementById('rep-task-text').innerText = active.task;
+
+          document.getElementById('rep-plot-box').innerHTML = active.svg;
+          document.getElementById('rep-tools-box').innerHTML = active.toolHtml;
+
+          formatPythonCode(active.code, 3);
+        }
+
+        function updateRepair122(val) {
+          document.getElementById('repair-val-1').innerText = val;
+          document.getElementById('repair-scale-text').textContent = `Y-Start: ${val}`;
+          const b1 = document.getElementById('repair-bar-1');
+
+          if (b1) {
+            const pct = (80 - Number(val)) / 80;
+            const h1 = 40 + (pct * 50);
+            b1.setAttribute('height', h1);
+            b1.setAttribute('y', 120 - h1);
+          }
+
+          if (Number(val) === 0) {
+            setTimeout(() => verifyRepair22(0), 1000);
+          }
+        }
+
+        function updateRepair222(choice) {
+          if (choice === 'high') {
+            const base = document.getElementById('repair-pie-base');
+            const slice = document.getElementById('repair-pie-slice');
+            const text = document.getElementById('repair-pie-text');
+            if (base) base.setAttribute('fill', '#D32F2F');
+            if (slice) slice.setAttribute('fill', '#FFCDD2');
+            if (text) {
+              text.textContent = 'Contrast Status: Verified';
+              text.setAttribute('fill', '#2E7D32');
+            }
+            setTimeout(() => verifyRepair22('high'), 1000);
+          } else {
+            audio.error();
+            showStatusBanner("❌ Poor contrast remains! Use high contrast colors.", 'error');
+          }
+        }
+
+        function verifyRepair22(val) {
+          const active = repairState22.rounds[repairState22.round];
+          if (val === active.correctVal) {
+            audio.success();
+            showStatusBanner("✔ Correct! Graph repaired successfully.", 'success');
+
+            formatPythonCode(active.code, 3);
+
+            setTimeout(() => {
+              repairState22.round++;
+              if (repairState22.round < repairState22.rounds.length) {
+                loadRepairRound22();
+              } else {
+                concludeRepair22();
+              }
+            }, 1600);
+          }
+        }
+
+        function concludeRepair22() {
+          confetti.start();
+          setTimeout(() => confetti.stop(), 3000);
+
+          document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Misleading Visualization Pitfalls Corrected!</span>`;
+          if (!state.completedActivities.includes('2-2')) {
+            state.completedActivities.push('2-2');
+            awardProgress();
+          }
+          showStatusBanner("🎉 Repair laboratory cleared! Click <strong>Next ▶</strong> at the top to proceed.");
+        }
+
+
+        /* =========================================================================
+           ACTIVITY 3.1: DASHBOARD DESIGNER
+           ========================================================================= */
+        const dashboardState31 = {
+          slots: { tl: null, tr: null, ml: null, mr: null, bl: null }
+        };
+
+        function setupActivity31(container) {
+          document.getElementById('active-title').innerText = 'Activity 3.1 — Dashboard Designer';
+          document.getElementById('active-subtitle').innerText = 'Drag and drop all 5 visualization widgets to assemble the complex medical dashboard grid.';
+
+          const rawChips = [
+            { slot: 'tl', val: 'Line Plot', label: 'Line widget' },
+            { slot: 'tr', val: 'Pie Chart', label: 'Pie widget' },
+            { slot: 'ml', val: 'Bar Plot', label: 'Bar widget' },
+            { slot: 'mr', val: 'Box Plot', label: 'Box widget' },
+            { slot: 'bl', val: 'Scatter Plot', label: 'Scatter widget' }
+          ];
+          const jumbledChips = [...rawChips].sort(() => Math.random() - 0.5);
+
+          container.innerHTML = `
+        <div class="client-card-box" style="margin-bottom:0.5rem; width:100%; max-width:440px;">
+          <h4 style="font-weight:800; color:var(--primary-red); font-size:0.9rem;">Hospital Patient Board Brief</h4>
+          <p style="font-size:0.65rem; color:var(--text-muted); line-height:1.25;">Wants: Heart rates (Top-Left), age slices (Top-Right), recovery days compare (Middle-Left), age outliers spread (Middle-Right), and height vs weight correlation (Bottom-Left).</p>
+        </div>
+
+        <div class="dashboard-architect-grid" style="grid-template-rows: repeat(3, 1fr); height: 260px;">
+          <div class="drop-cell dashboard-slot-cell" id="dash-slot-tl" data-slot="tl" style="padding:0.25rem;">
+            <span style="font-size:0.6rem;">Top Left (Line)</span>
+            <span style="font-size:0.55rem; color:var(--text-muted);">Drop here</span>
+          </div>
+          <div class="drop-cell dashboard-slot-cell" id="dash-slot-tr" data-slot="tr" style="padding:0.25rem;">
+            <span style="font-size:0.6rem;">Top Right (Pie)</span>
+            <span style="font-size:0.55rem; color:var(--text-muted);">Drop here</span>
+          </div>
+          <div class="drop-cell dashboard-slot-cell" id="dash-slot-ml" data-slot="ml" style="padding:0.25rem;">
+            <span style="font-size:0.6rem;">Middle Left (Bar)</span>
+            <span style="font-size:0.55rem; color:var(--text-muted);">Drop here</span>
+          </div>
+          <div class="drop-cell dashboard-slot-cell" id="dash-slot-mr" data-slot="mr" style="padding:0.25rem;">
+            <span style="font-size:0.6rem;">Middle Right (Box)</span>
+            <span style="font-size:0.55rem; color:var(--text-muted);">Drop here</span>
+          </div>
+          <div class="drop-cell dashboard-slot-cell" id="dash-slot-bl" data-slot="bl" style="padding:0.25rem;">
+            <span style="font-size:0.6rem;">Bottom Left (Scatter)</span>
+            <span style="font-size:0.55rem; color:var(--text-muted);">Drop here</span>
+          </div>
+          <div style="background:#ECEFF1; border-radius:var(--border-radius-md); display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700; color:var(--text-muted);">
+            Info Card
+          </div>
+        </div>
+
+        <div class="drag-chips-container" id="dashboard-chips" style="margin-top:0.25rem;">
+          ${jumbledChips.map(c => `
+            <div class="drag-chip" data-slot="${c.slot}" data-val="${c.val}" style="background:#FFF5F5; padding:0.4rem; font-size:0.75rem;">${c.label}</div>
+          `).join('')}
+        </div>
+      `;
+
+          dashboardState31.slots = { tl: null, tr: null, ml: null, mr: null, bl: null };
+          loadDashboardCode31();
+
+          document.querySelectorAll('#dashboard-chips .drag-chip').forEach(chip => {
+            initDraggable(chip, (item, target) => {
+              const slot = target.dataset.slot;
+              const chipSlot = item.dataset.slot;
+
+              if (slot !== chipSlot) {
+                audio.error();
+                item.style.transform = 'translate(0px, 0px)';
+                return;
+              }
+
+              audio.success();
+              dashboardState31.slots[slot] = item.dataset.val;
+              target.innerHTML = `
+            <span class="filter-port-label" style="color:var(--primary-red); font-size:0.5rem; font-weight:800;">${slot}</span>
+            <span style="font-weight:800; font-size:0.65rem;">${item.dataset.val}</span>
+          `;
+              target.classList.add('filled');
+              item.style.display = 'none';
+
+              loadDashboardCode31();
+              checkDashboardCompletion31();
+            });
+          });
+        }
+
+        function loadDashboardCode31() {
+          let codeStr = `import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Configure 3x2 medical dashboard layout:\nfig, axes = plt.subplots(3, 2)\n`;
+          if (dashboardState31.slots.tl) codeStr += `axes[0, 0].plot(months, heart_rate)\n`;
+          if (dashboardState31.slots.tr) codeStr += `axes[0, 1].pie(age_slices)\n`;
+          if (dashboardState31.slots.ml) codeStr += `axes[1, 0].bar(treatment, recovery_days)\n`;
+          if (dashboardState31.slots.mr) codeStr += `sns.boxplot(ax=axes[1, 1], data=df, x="Age")\n`;
+          if (dashboardState31.slots.bl) codeStr += `sns.scatterplot(ax=axes[2, 0], data=df, x="Height", y="Weight")\n`;
+          codeStr += `plt.show()`;
+          formatPythonCode(codeStr, 4);
+        }
+
+        function checkDashboardCompletion31() {
+          if (dashboardState31.slots.tl &&
+            dashboardState31.slots.tr &&
+            dashboardState31.slots.ml &&
+            dashboardState31.slots.mr &&
+            dashboardState31.slots.bl) {
+
+            confetti.start();
+            setTimeout(() => confetti.stop(), 3000);
+
+            document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Dashboard Configured & Approved!</span>`;
+            if (!state.completedActivities.includes('3-1')) {
+              state.completedActivities.push('3-1');
+              awardProgress();
+            }
+            showStatusBanner("🎉 Dashboard designer complete! Click <strong>Next ▶</strong> at the top to proceed.");
+          }
+        }
+
+
+        /* =========================================================================
+           ACTIVITY 3.2: VISUALIZATION ESCAPE ROOM (5 ROUNDS)
+           ========================================================================= */
+        const escapeState32 = {
+          bossHP: 100,
+          playerHP: 100,
+          round: 0,
+          rounds: [
+            {
+              task: 'Choose equivalent command to construct a Boxplot:',
+              options: [
+                { text: 'sns.boxplot(x="Dept", y="Age", data=df)', correct: true },
+                { text: 'plt.hist(df["Age"])', correct: false },
+                { text: 'sns.pairplot(df)', correct: false }
+              ],
+              code: `sns.boxplot(x="Dept", y="Age", data=df)`
+            },
+            {
+              task: 'Fix misleading Y-axis scales starting at 50 instead of 0:',
+              options: [
+                { text: 'plt.ylim(0, 100)', correct: true },
+                { text: 'plt.grid(True)', correct: false },
+                { text: 'plt.despine()', correct: false }
+              ],
+              code: `plt.ylim(0, 100)`
+            },
+            {
+              task: 'Select wrapper function to plot pair dependencies:',
+              options: [
+                { text: 'sns.pairplot(df)', correct: true },
+                { text: 'sns.scatterplot(x, y)', correct: false },
+                { text: 'plt.hist(data)', correct: false }
+              ],
+              code: `sns.pairplot(df)`
+            },
+            {
+              task: 'Configure histogram to use precisely 15 value bins:',
+              options: [
+                { text: 'plt.hist(data, bins=15)', correct: true },
+                { text: 'plt.hist(data, range=15)', correct: false },
+                { text: 'sns.histplot(data, width=15)', correct: false }
+              ],
+              code: `plt.hist(data, bins=15)`
+            },
+            {
+              task: 'Specify pie chart percentage label formatter for 1 decimal float:',
+              options: [
+                { text: 'plt.pie(data, autopct="%1.1f%%")', correct: true },
+                { text: 'plt.pie(data, labels=True)', correct: false },
+                { text: 'plt.pie(data, format="float")', correct: false }
+              ],
+              code: `plt.pie(data, autopct="%1.1f%%")`
+            }
+          ]
+        };
+
+        function setupActivity32(container) {
+          document.getElementById('active-title').innerText = 'Activity 3.2 — Escape Room Tournament';
+          document.getElementById('active-subtitle').innerText = 'Solve visualization puzzles quickly to exit the final room chamber.';
+
+          container.innerHTML = `
+        <div class="boss-battle-view">
+          <div class="boss-character-avatar">🔒</div>
+
+          <div class="boss-bar-row">
+            <span>AI LOCK HP</span>
+            <div class="boss-hp-track">
+              <div class="boss-hp-fill" id="boss-hp"></div>
+            </div>
+          </div>
+
+          <div class="boss-bar-row">
+            <span>YOUR SHIELD</span>
+            <div class="boss-hp-track">
+              <div class="player-hp-fill" id="player-hp"></div>
+            </div>
+          </div>
+
+          <div class="target-array-hud" style="background:#FFEBEE; border-color:#FFCDD2; width:100%; margin-top:0.5rem;">
+            <span style="font-size:0.75rem; text-transform:uppercase; color:var(--primary-red);" id="battle-round-title">Chamber Round 1</span>
+            <span class="target-array-vals" id="battle-task-text" style="font-size:0.85rem; color:var(--primary-red);">Choose command:</span>
+          </div>
+
+          <div class="battle-options-grid" id="battle-options-box">
+            <!-- Options loaded dynamically -->
+          </div>
+        </div>
+      `;
+
+          escapeState32.bossHP = 100;
+          escapeState32.playerHP = 100;
+          escapeState32.round = 0;
+          loadEscapeRound32();
+        }
+
+        function loadEscapeRound32() {
+          const active = escapeState32.rounds[escapeState32.round];
+          document.getElementById('battle-round-title').innerText = `Chamber Round ${escapeState32.round + 1} of 5`;
+          document.getElementById('battle-task-text').innerText = active.task;
+
+          document.getElementById('boss-hp').style.width = `${escapeState32.bossHP}%`;
+          document.getElementById('player-hp').style.width = `${escapeState32.playerHP}%`;
+
+          const optionsBox = document.getElementById('battle-options-box');
+          optionsBox.innerHTML = '';
+          const shuffledOptions = [...active.options].sort(() => Math.random() - 0.5);
+          shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'battle-option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => verifyEscapeHit32(opt.correct, active.code);
+            optionsBox.appendChild(btn);
+          });
+
+          const codeStr = `import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Solver Round ${escapeState32.round + 1}:\n# Match candidate commands to bypass lock...`;
+          formatPythonCode(codeStr, 3);
+        }
+
+        function verifyEscapeHit32(isCorrect, codeLine) {
+          if (isCorrect) {
+            audio.success();
+            escapeState32.bossHP -= 20;
+            if (escapeState32.bossHP < 0) escapeState32.bossHP = 0;
+            showStatusBanner("💥 Direct Hit! Lock integrity decreased.", 'success');
+
+            const codeStr = `import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Syntax accepted:\n${codeLine}\n\n# Security bypass verified successfully!`;
+            formatPythonCode(codeStr, 4);
+          } else {
+            audio.error();
+            escapeState32.playerHP -= 20;
+            if (escapeState32.playerHP < 0) escapeState32.playerHP = 0;
+            showStatusBanner("❌ Block deflected! Incorrect syntax selection.", 'error');
+
+            const codeStr = `import matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Parse evaluation error!\n# Incorrect parameter layout chosen.`;
+            formatPythonCode(codeStr, 3);
+          }
+
+          setTimeout(() => {
+            if (escapeState32.bossHP <= 0) {
+              concludeEscape32();
+            } else if (escapeState32.playerHP <= 0) {
+              audio.error();
+              showStatusBanner("💀 Defeat! HP depleted. Tapping reset restarts the tournament.", 'error');
+              setTimeout(() => {
+                setupActivity32(document.getElementById('sandbox-content'));
+              }, 1500);
+            } else {
+              escapeState32.round++;
+              if (escapeState32.round < escapeState32.rounds.length) {
+                loadEscapeRound32();
+              } else {
+                concludeEscape32();
+              }
+            }
+          }, 1600);
+        }
+
+        function concludeEscape32() {
+          document.getElementById('boss-hp').style.width = '0%';
+          document.getElementById('player-hp').style.width = `${escapeState32.playerHP}%`;
+
+          confetti.start();
+          setTimeout(() => confetti.stop(), 3000);
+
+          document.getElementById('sandbox-content').innerHTML = `
+        <div style="text-align:center;">
+          <span style="font-size:3rem;">🏆</span>
+          <h3 style="color:#2E7D32; font-weight:800; margin-bottom:0.5rem;">Escape Room Solved!</h3>
+          <p style="font-size:0.8rem; color:var(--text-muted);">Rank Gained: Master Visualization Engineer</p>
+        </div>
+      `;
+
+          if (!state.completedActivities.includes('3-2')) {
+            state.completedActivities.push('3-2');
+            awardProgress();
+          }
+
+          document.getElementById('badge-dialog-text').innerHTML = `
+        <p style="margin-bottom:0.5rem;">🎉 <strong>VICTORY!</strong> You solved all visualization escape room chambers!</p>
+        <p>You unlocked the <strong>Master Visualization Engineer</strong> rank! Plots & Charts modules are complete.</p>
+      `;
+          document.getElementById('badge-dialog').showModal();
+
+          showStatusBanner("🎉 Escape room solved! All simulation levels completed successfully!");
+        }
+
+
+        /* --- Initialization on Load --- */
+        window.addEventListener('load', () => {
+          loadState();
+          startActivity(1, 1);
+        });
+
+  </script>
+</body>
+
+</html>
