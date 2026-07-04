@@ -4,38 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Functions — Parameters, *args &amp; **kwargs</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    <title>PyFunc Lab — Parameters & Return Values</title>
 
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
         :root {
+            --primary-accent: #e10600;
+            --primary-accent-hover: #b30500;
+            --primary-glow: rgba(225, 6, 0, 0.08);
             --bg-main: #fffcfc;
             --bg-card: #ffffff;
             --bg-card-hover: #fffefe;
             --border-color: #ffd1d5;
-            --border-glow: rgba(225, 6, 0, 0.15);
-            --red: #e10600;
-            --red-dark: #b30500;
-            --red-deep: #7a0000;
-            --white: #ffffff;
-            --off: #fff8f8;
             --ink: #1a0808;
-            --mono: 'JetBrains Mono', 'Fira Code', monospace;
-            --display: 'Archivo Black', sans-serif;
-            --body: 'Inter', sans-serif;
+            --text-secondary: #5a4b4b;
 
-            /* Level badge colors */
-            --l1: #0057b7;
-            --l2: #2e7d32;
-            --l3: #e65100;
-            --l4: #6a1b9a;
-            --l5: #b71c1c;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
 
-            /* Game Colors */
-            --correct: #2e7d32;
-            --correct-bg: rgba(46, 125, 50, 0.06);
-            --wrong: #b71c1c;
-            --wrong-bg: rgba(183, 28, 28, 0.06);
+            --code-bg: #0b0f19;
+            --code-keyword: #f43f5e;
+            --code-string: #10b981;
+            --code-number: #f472b6;
+            --code-comment: #64748b;
+            --code-builtin: #3b82f6;
+
+            --border-radius-lg: 16px;
+            --border-radius-md: 10px;
+            --border-radius-sm: 6px;
+
+            --success-green: #2e7d32;
+            --success-bg: rgba(46, 125, 50, 0.06);
+            --error-red: #b71c1c;
+            --error-bg: rgba(183, 28, 28, 0.06);
         }
 
         * {
@@ -44,1441 +52,2490 @@
             padding: 0;
         }
 
-        html,
         body {
-            font-family: var(--body);
-            background: var(--bg-main);
+            font-family: var(--font-body);
+            background-color: var(--bg-main);
             color: var(--ink);
-            scroll-behavior: smooth;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             background-image:
-                radial-gradient(at 0% 0%, rgba(225, 6, 0, 0.02) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(0, 87, 183, 0.02) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(225, 6, 0, 0.02) 0px, transparent 50%);
+                radial-gradient(circle at 10% 20%, rgba(225, 6, 0, 0.02) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(225, 6, 0, 0.02) 0%, transparent 40%);
             background-attachment: fixed;
         }
 
-        /* ===== HERO ===== */
-        .hero {
-            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-            color: var(--white);
-            padding: 80px 24px 80px;
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-            border-bottom: 4px solid var(--red-deep);
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            top: -300px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-
-        .hero h1 {
-            font-family: var(--display);
-            font-size: clamp(2.2rem, 7vw, 4.5rem);
-            line-height: 1.05;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, #ffffff, #ffccd0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero h1 span {
-            -webkit-text-fill-color: initial;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--white);
-        }
-
-        .hero p.sub {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            max-width: 680px;
-            margin-inline: auto;
-            color: #ffeaea;
-            line-height: 1.6;
-        }
-
-        main {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px 100px;
-        }
-
-        /* ===== SECTION HEADER ===== */
-        .sec-head {
-            margin-bottom: 32px;
-        }
-
-        .sec-num {
-            font-family: var(--mono);
-            color: var(--red);
-            font-weight: 700;
-            letter-spacing: 3px;
-            font-size: 0.85rem;
-        }
-
-        .sec-head h2 {
-            font-family: var(--display);
-            font-size: clamp(1.6rem, 4vw, 2.5rem);
-            text-transform: uppercase;
-            margin-top: 8px;
-            color: var(--red-deep);
-            border-bottom: 4px solid var(--red);
-            display: inline-block;
-            padding-bottom: 8px;
-        }
-
-        .sec-head p {
-            margin-top: 16px;
-            color: #5a4b4b;
-            max-width: 720px;
-            line-height: 1.65;
-            font-size: 1.05rem;
-        }
-
-        /* ===== LEVEL STRIP ===== */
-        .level-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 32px;
-        }
-
-        .lvl-pill {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 8px 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            color: #4b5563;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .lvl-pill:hover {
-            background: rgba(0, 0, 0, 0.04);
-            border-color: rgba(0, 0, 0, 0.1);
-            color: #111827;
-            transform: translateY(-2px);
-        }
-
-        .lvl-pill.active.l1 {
-            background: var(--l1);
-            color: #fff;
-            border-color: var(--l1);
-            box-shadow: 0 4px 12px rgba(0, 87, 183, 0.25);
-        }
-
-        .lvl-pill.active.l2 {
-            background: var(--l2);
-            color: #fff;
-            border-color: var(--l2);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-        }
-
-        .lvl-pill.active.l3 {
-            background: var(--l3);
-            color: #fff;
-            border-color: var(--l3);
-            box-shadow: 0 4px 12px rgba(230, 81, 0, 0.25);
-        }
-
-        .lvl-pill.active.l4 {
-            background: var(--l4);
-            color: #fff;
-            border-color: var(--l4);
-            box-shadow: 0 4px 12px rgba(106, 27, 154, 0.25);
-        }
-
-        .lvl-pill.active.l5 {
-            background: var(--l5);
-            color: #fff;
-            border-color: var(--l5);
-            box-shadow: 0 4px 12px rgba(183, 28, 28, 0.25);
-        }
-
-        .level-panel {
-            display: none;
-        }
-
-        .level-panel.active {
-            display: block;
-            animation: fadeIn .4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== CARD ===== */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid #ffd1d5;
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 28px;
-            box-shadow: 6px 6px 0 #ffebeb;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .card:hover {
-            border-color: var(--red);
-            transform: translateY(-2px);
-            box-shadow: 8px 8px 0 #ffd1d5;
-        }
-
-        .card h3 {
-            font-family: var(--display);
-            font-size: 1.15rem;
-            color: var(--ink);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .card h3 .tag {
-            font-family: var(--mono);
-            background: var(--red);
-            color: white;
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-right: 12px;
-            font-weight: 700;
-        }
-
-        .card h3 .lvl-tag {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-right: 12px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .card h3 .lvl-tag.l1 {
-            background: var(--l1);
-        }
-
-        .card h3 .lvl-tag.l2 {
-            background: var(--l2);
-        }
-
-        .card h3 .lvl-tag.l3 {
-            background: var(--l3);
-        }
-
-        .card h3 .lvl-tag.l4 {
-            background: var(--l4);
-        }
-
-        .card h3 .lvl-tag.l5 {
-            background: var(--l5);
-        }
-
-        .level-desc {
-            background: rgba(225, 6, 0, 0.02);
-            border-left: 4px solid var(--red);
-            border-radius: 0 10px 10px 0;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            color: #374151;
-            line-height: 1.7;
-            font-size: 0.95rem;
-            border-top: 1px solid rgba(225, 6, 0, 0.04);
-            border-right: 1px solid rgba(225, 6, 0, 0.04);
-            border-bottom: 1px solid rgba(225, 6, 0, 0.04);
-        }
-
-        .level-desc strong {
-            color: var(--red-deep);
-        }
-
-        .level-desc ul,
-        .level-desc ol {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-
-        /* ===== INPUTS ===== */
-        label {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #5a4b4b;
-            display: block;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input[type=text],
-        input[type=number],
-        select,
-        textarea {
-            font-family: var(--mono);
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #ffd1d5;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            background: #ffffff;
-            color: var(--ink);
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--red);
-            box-shadow: 0 0 10px rgba(225, 6, 0, 0.08);
-        }
-
-        .row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .row>div {
-            flex: 1;
-            min-width: 140px;
-        }
-
-        /* ===== BUTTONS ===== */
-        button.action {
-            font-family: var(--display);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--red);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(225, 6, 0, 0.2);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        button.action:hover {
-            background: var(--red-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(225, 6, 0, 0.3);
-        }
-
-        button.action:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 6px rgba(225, 6, 0, 0.2);
-        }
-
-        button.action.ghost {
-            background: transparent;
-            color: var(--red);
-            border: 2px solid var(--red);
-            box-shadow: none;
-        }
-
-        button.action.ghost:hover {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--red-dark);
-            border-color: var(--red-dark);
-        }
-
-        /* ===== OUTPUT ===== */
-        .output {
-            margin-top: 20px;
-            background: #fff8f8;
-            color: #1a0808;
-            font-family: var(--mono);
-            font-size: 0.9rem;
-            border-radius: 10px;
-            padding: 20px;
-            min-height: 60px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            border-left: 4px solid var(--red);
-            border: 1px solid #ffd1d5;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
-        }
-
-        .output .err {
-            color: #b30500;
-            font-weight: bold;
-        }
-
-        .output .com {
-            color: #7f8e9f;
-        }
-
-        .output .lbl {
-            color: #0057b7;
-            font-weight: bold;
-        }
-
-        .output .ok {
-            color: #1e7e34;
-            font-weight: bold;
-        }
-
-        /* ===== TABLE ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ffd1d5;
-            padding: 12px 14px;
-            text-align: left;
-        }
-
-        th {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--red-deep);
-            text-transform: uppercase;
-            font-size: 0.72rem;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        tr:nth-child(even) {
-            background: rgba(225, 6, 0, 0.01);
-        }
-
-        .progress-bar-wrap {
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 20px;
-            height: 8px;
-            margin-bottom: 32px;
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 20px;
-            background: linear-gradient(to right, var(--red), #ff7b7b);
-            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .challenge-box {
-            background: rgba(230, 81, 0, 0.02);
-            border: 1px dashed rgba(230, 81, 0, 0.3);
-            border-radius: 12px;
-            padding: 18px;
-            margin-top: 20px;
-        }
-
-        .challenge-box .ch-label {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--l3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .challenge-box p {
-            color: #374151;
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .indent-demo {
-            font-family: var(--mono);
-            background: #fff8f8;
-            color: #1a0808;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            overflow: auto;
-            border: 1px solid #ffd1d5;
-            margin-top: 10px;
-        }
-
-        .indent-demo .lvl0 {
-            color: #b30500;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl1 {
-            color: #15803d;
-            padding-left: 20px;
-            display: block;
-            font-weight: bold;
-        }
-
-        /* ================= VISUALIZERS ================= */
-        .func-vis {
-            background: #fff8f8;
-            border: 1px solid #ffd1d5;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 16px;
-            font-family: var(--mono);
-            font-size: 0.9rem;
-        }
-
-        .func-vis .func-name {
-            color: var(--ink);
-            font-weight: 700;
-            font-size: 1.05rem;
-        }
-
-        .func-vis .param-tag {
-            display: inline-block;
-            background: var(--ink);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin: 4px;
-        }
-
-        .func-vis .return-val {
-            background: rgba(225, 6, 0, 0.03);
-            color: var(--red);
-            font-weight: 600;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            border: 1px dashed var(--red);
-        }
-
-        /* ================= DRAG AND DROP CUSTOM STYLES ================= */
-        .game-container {
-            background: #fffafa;
-            color: var(--ink);
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 18px;
-            border: 1px solid #ffd1d5;
-            font-family: var(--mono);
-            box-shadow: inset 0 2px 8px rgba(225, 6, 0, 0.03), 6px 6px 0 #ffebeb;
-        }
-
-        .game-header {
+        /* HEADER & LEVEL SELECTOR */
+        .app-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
-            padding-bottom: 12px;
-            margin-bottom: 18px;
-            font-size: 0.85rem;
-            color: #5a4b4b;
+            box-shadow: 0 4px 30px rgba(225, 6, 0, 0.02);
         }
 
-        .game-score {
-            color: var(--red-deep);
-            font-weight: bold;
-        }
-
-        .items-pool {
-            background: rgba(0, 0, 0, 0.01);
-            padding: 18px;
-            border-radius: 10px;
-            min-height: 80px;
-            margin: 18px 0;
-            border: 1px dashed rgba(0, 0, 0, 0.1);
+        .brand-section {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
             align-items: center;
-            transition: all 0.2s;
+            gap: 0.75rem;
         }
 
-        .items-pool.hovered {
-            background: rgba(225, 6, 0, 0.02);
-            border-color: rgba(225, 6, 0, 0.25);
-        }
-
-        .draggable-item {
-            background: linear-gradient(135deg, var(--red) 0%, #ff5e6d 100%);
-            color: #fff;
-            border: 1px solid var(--red-dark);
-            padding: 10px 18px;
+        .brand-logo {
+            background: var(--primary-accent);
+            color: white;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
-            cursor: grab;
-            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        .brand-title h1 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
             font-weight: 700;
-            font-size: 0.8rem;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.15);
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .draggable-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(225, 6, 0, 0.25);
-        }
-
-        .draggable-item:active {
-            cursor: grabbing;
-            transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(225, 6, 0, 0.15);
-        }
-
-        .draggable-item.dragging {
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
-
-        .drop-zone {
-            border: 2px dashed rgba(225, 6, 0, 0.2);
-            border-radius: 8px;
-            min-height: 40px;
-            min-width: 140px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.02);
-            vertical-align: middle;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-left: 10px;
-            padding: 3px;
-            color: var(--red-deep);
-        }
-
-        .drop-zone.hovered {
-            border-color: var(--red);
-            background: rgba(225, 6, 0, 0.08);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(225, 6, 0, 0.1);
-        }
-
-        .drop-zone .draggable-item {
-            margin: 0;
-            box-shadow: none;
-            padding: 6px 14px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .game-feedback {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            padding: 16px;
-            border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.3s;
-            border: 1px solid transparent;
-        }
-
-        .game-feedback.correct {
-            display: block;
-            background: var(--correct-bg);
-            border-color: var(--correct);
-            color: var(--correct);
-            box-shadow: 0 0 20px rgba(46, 125, 50, 0.05);
-        }
-
-        .game-feedback.wrong {
-            display: block;
-            background: var(--wrong-bg);
-            border-color: var(--wrong);
-            color: var(--wrong);
-            box-shadow: 0 0 20px rgba(183, 28, 28, 0.05);
-        }
-
-        .formula-builder {
-            background: #fffafa;
-            border: 1px solid #ffd1d5;
-            padding: 18px;
-            border-radius: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 1.05rem;
-            font-weight: bold;
             color: var(--ink);
         }
 
-        .footer-note {
-            text-align: center;
-            font-family: var(--mono);
+        .brand-title p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .level-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(225, 6, 0, 0.03);
+            padding: 0.25rem;
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(225, 6, 0, 0.05);
+        }
+
+        .level-tab {
+            background: none;
+            border: none;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .level-tab:hover {
+            color: var(--primary-accent);
+            background: rgba(225, 6, 0, 0.02);
+        }
+
+        .level-tab.active {
+            background: var(--primary-accent);
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* MAIN CONTAINER */
+        .main-container {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .workspace-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* GLASS CARDS */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(225, 6, 0, 0.02);
+            transition: border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-color);
+        }
+
+        /* BUTTONS */
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.25rem;
+            border-radius: var(--border-radius-md);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-accent);
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(225, 6, 0, 0.04);
+            color: var(--primary-accent);
+            border: 1px solid rgba(225, 6, 0, 0.08);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(225, 6, 0, 0.08);
+        }
+
+        .btn-ghost {
+            background: none;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            color: var(--primary-accent);
+            background: rgba(225, 6, 0, 0.02);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ACTIVITY SELECTOR BAR */
+        .activity-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+        }
+
+        .activity-pills {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .activity-pill {
+            background: none;
+            border: none;
+            font-family: var(--font-display);
             font-size: 0.8rem;
-            color: #5a4b4b;
-            margin-top: 80px;
-            padding-top: 24px;
-            border-top: 1px dashed #ffd1d5;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 0.4rem 1rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .activity-pill.active {
+            background: rgba(225, 6, 0, 0.08);
+            color: var(--primary-accent);
+        }
+
+        /* SIMULATOR CORE CONTAINER */
+        .simulator-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(225, 6, 0, 0.03);
+        }
+
+        .simulator-header {
+            margin-bottom: 1.25rem;
+            border-bottom: 1px dashed rgba(225, 6, 0, 0.08);
+            padding-bottom: 0.75rem;
+        }
+
+        .simulator-title h2 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .simulator-title p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .simulator-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* LOOP CONTROL BAR */
+        .loop-control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 0.75rem 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .control-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .speed-select {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-color);
+            outline: none;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* NAVIGATION FOOTER */
+        .nav-footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(10px);
+        }
+
+        #nav-footer-status {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* SIDEBAR SECTIONS */
+        .sidebar-section-title {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* HINT STAGE DOTS */
+        .hint-stages {
+            display: flex;
+            gap: 4px;
+        }
+
+        .hint-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.08);
+            transition: background 0.3s ease;
+        }
+
+        .hint-dot.active {
+            background: var(--primary-accent);
+        }
+
+        .hint-box {
+            background: rgba(225, 6, 0, 0.02);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            margin-top: 0.75rem;
+            min-height: 50px;
+        }
+
+        /* VARIABLE INSPECTOR */
+        .variable-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .var-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(225, 6, 0, 0.02);
+            border: 1px solid rgba(225, 6, 0, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-md);
+        }
+
+        .var-card.pulsing {
+            animation: varPulse 0.4s ease;
+        }
+
+        @keyframes varPulse {
+            0% {
+                background-color: rgba(225, 6, 0, 0.2);
+            }
+
+            100% {
+                background-color: rgba(225, 6, 0, 0.02);
+            }
+        }
+
+        .var-name {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-accent);
+        }
+
+        .var-val {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        /* SYNTAX HIGHLIGHT CODE PANEL */
+        .code-panel {
+            background-color: var(--code-bg);
+            border-radius: var(--border-radius-md);
+            padding: 1rem;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-line {
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #9cdcfe;
+            display: flex;
+            padding: 0.1rem 0.25rem;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .code-line.active-exec {
+            background: rgba(244, 63, 94, 0.25);
+            border-left: 3px solid var(--code-keyword);
+        }
+
+        .code-line-num {
+            color: #565656;
+            width: 24px;
+            user-select: none;
+            text-align: right;
+            margin-right: 12px;
+        }
+
+        .code-keyword {
+            color: var(--code-keyword);
+            font-weight: 700;
+        }
+
+        .code-string {
+            color: var(--code-string);
+        }
+
+        .code-number {
+            color: var(--code-number);
+        }
+
+        .code-comment {
+            color: var(--code-comment);
+            font-style: italic;
+        }
+
+        .code-builtin {
+            color: var(--code-builtin);
+        }
+
+        /* MOCK TERMINAL */
+        .terminal-console {
+            background: #090d16;
+            border-radius: var(--border-radius-md);
+            padding: 0.75rem 1rem;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            height: 120px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+        }
+
+        .terminal-prompt {
+            color: var(--primary-accent);
+            margin-right: 0.5rem;
+            user-select: none;
+        }
+
+        .terminal-success {
+            color: #10b981;
+        }
+
+        .terminal-warning {
+            color: #f59e0b;
+        }
+
+        /* POPUP WARNINGS / ALERTS */
+        .popup-alert {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(225, 6, 0, 0.08);
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .popup-alert.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .popup-alert.success {
+            border-color: #10b981;
+            color: #047857;
+            background: #ecfdf5;
+        }
+
+        .popup-alert.error {
+            border-color: #ef4444;
+            color: #b91c1c;
+            background: #fef2f2;
+        }
+
+        .popup-alert.info {
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            background: #eff6ff;
+        }
+
+        /* DRAG CHIPS AND SLOTS */
+        .chips-bank {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            background: rgba(225, 6, 0, 0.02);
+            padding: 0.75rem;
+            border-radius: var(--border-radius-md);
+            border: 1px dashed rgba(225, 6, 0, 0.1);
+        }
+
+        .chip {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.85rem;
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(225, 6, 0, 0.02);
+        }
+
+        .chip:hover {
+            border-color: var(--primary-accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px var(--primary-glow);
+        }
+
+        .chip.selected {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+        }
+
+        .slot {
+            border: 2px dashed rgba(225, 6, 0, 0.25);
+            border-radius: var(--border-radius-sm);
+            background: rgba(225, 6, 0, 0.01);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-code);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .slot.hovered {
+            background: rgba(225, 6, 0, 0.08);
+            border-color: var(--primary-accent);
+        }
+
+        .slot.filled {
+            background: var(--primary-accent);
+            color: white;
+            border-style: solid;
+            border-color: var(--primary-accent);
+            font-weight: 700;
+        }
+
+        /* LEVEL 1: PIPELINE ANIMATIONS */
+        .pipeline-visualizer {
+            width: 100%;
+            height: 140px;
+            background: #f1f5f9;
+            border-radius: var(--border-radius-lg);
+            border: 1px solid #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .pipeline-chamber {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            z-index: 10;
+            position: relative;
+        }
+
+        .pipeline-chamber.active {
+            border-color: var(--primary-accent);
+            color: var(--primary-accent);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .pipeline-pathway {
+            flex: 1;
+            height: 12px;
+            background: #cbd5e1;
+            position: relative;
+        }
+
+        .pipeline-pathway.active {
+            background: var(--primary-accent);
+        }
+
+        .pipeline-ball {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-accent);
+            position: absolute;
+            top: -6px;
+            left: 0;
+            transition: left 1s linear;
+            z-index: 15;
+            display: none;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* LEVEL 2: CONVEYOR BELT */
+        .conveyor-belt-wrapper {
+            width: 100%;
+            background: #f8fafc;
+            border-radius: var(--border-radius-lg);
+            border: 1px solid #cbd5e1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .argument-conveyor {
+            width: 100%;
+            height: 60px;
+            background: #475569;
+            border-bottom: 4px solid #1e293b;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 1rem;
+        }
+
+        .argument-package {
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            padding: 0.4rem 0.75rem;
+            border-radius: 4px;
+            font-family: var(--font-code);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .argument-package.processing {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* LEVEL 2: WAREHOUSE ROUTING */
+        .warehouse-bay {
+            width: 100%;
+            height: 180px;
+            background: #cbd5e1;
+            border-radius: var(--border-radius-lg);
+            position: relative;
+            margin-top: 1rem;
+            border: 2px solid #94a3b8;
+        }
+
+        .bay-zone {
+            width: 70px;
+            height: 44px;
+            background: white;
+            border-radius: 4px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border: 2px solid #64748b;
+        }
+
+        .bay-zone.active {
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .delivery-robot-svg {
+            position: absolute;
+            top: 75px;
+            left: 10px;
+            transition: all 0.8s ease-in-out;
+            z-index: 10;
+        }
+
+        /* LEVEL 3: ESCAPE PANEL CARDS */
+        .escape-panels-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .escape-panel-card {
+            background: rgba(225, 6, 0, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .escape-panel-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-accent);
+        }
+
+        .escape-panel-card.active {
+            background: rgba(225, 6, 0, 0.08);
+            border-color: var(--primary-accent);
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .escape-status-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .escape-status-badge.solved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .challenge-card {
+            background: rgba(225, 6, 0, 0.02);
+            border: 1px dashed var(--border-color);
+            padding: 1rem;
+            border-radius: var(--border-radius-lg);
+            width: 100%;
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-card h4 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            color: var(--primary-accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .challenge-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
         }
     </style>
 </head>
 
 <body>
 
-    <header class="hero">
-        <h1>Python <span>Functions</span></h1>
-        <p class="sub">Encapsulate code and build abstractions. Master the details of parameter binding, variable scopes
-            (*args / **kwargs), validation stubs, and return values.</p>
+    <!-- TOP APP HEADER -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-logo">⚙️</div>
+            <div class="brand-title">
+                <h1>PyFunc Lab</h1>
+                <p>Interactive Python Functions Simulator</p>
+            </div>
+        </div>
+
+        <!-- Level switching tabs -->
+        <div class="level-tabs">
+            <button class="level-tab active" onclick="switchLevel(1)">Level 1: Workshop</button>
+            <button class="level-tab" onclick="switchLevel(2)">Level 2: Parameters</button>
+            <button class="level-tab" onclick="switchLevel(3)">Level 3: Architect</button>
+        </div>
     </header>
 
-    <main>
-        <div class="sec-head">
-            <div class="sec-num">// SUBTOPIC 2.3</div>
-            <h2>Functions · Parameters · Argument Types</h2>
-            <p>Master Python's functional scope boundaries. Work through the 5 progression levels from defining
-                functions to advanced unpacking of tuples and dict bindings.</p>
+    <!-- MAIN WORKSPACE -->
+    <main class="main-container">
+
+        <!-- LEFT SIDE: DYNAMIC WORKSPACE -->
+        <div class="workspace-wrapper">
+
+            <!-- SUB-ACTIVITIES pills -->
+            <div class="activity-bar">
+                <div class="activity-pills" id="activity-pills-container">
+                    <!-- pills loaded dynamically -->
+                </div>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="replaySimulation()">
+                        🔄 Replay
+                    </button>
+                    <button class="btn btn-primary" id="run-btn" onclick="runExecution()">
+                        ▶ Run Code
+                    </button>
+                </div>
+            </div>
+
+            <!-- MAIN SIMULATOR CARD -->
+            <div class="simulator-card">
+                <div class="popup-alert" id="sim-alert">Warning Message</div>
+
+                <div class="simulator-header">
+                    <div class="simulator-title">
+                        <h2 id="sim-title">Activity Title</h2>
+                        <p id="sim-subtitle">Short description of parameters</p>
+                    </div>
+                </div>
+
+                <div class="simulator-content" id="sim-content-area">
+                    <!-- Simulator content injected dynamically -->
+                </div>
+            </div>
+
+            <!-- HINT SYSTEM & VARIABLE INSPECTOR ROW -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- HINT SYSTEM -->
+                <div class="glass-card" style="margin: 0; padding: 1rem;">
+                    <div class="sidebar-section-title" style="margin-bottom: 0.5rem;">
+                        <span>Logical Clues</span>
+                        <div class="hint-stages" id="hint-dots-wrapper">
+                            <span class="hint-dot"></span>
+                            <span class="hint-dot"></span>
+                            <span class="hint-dot"></span>
+                            <span class="hint-dot"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.4rem 1rem; font-size: 0.75rem;" onclick="revealNextHint()">
+                        Get Nudge Hint
+                    </button>
+                    <div class="hint-box" id="hint-feedback-box" style="margin-top: 0.5rem; min-height: 45px; font-size: 0.75rem; padding: 0.5rem 0.75rem;">
+                        Click the button above to request progressive clues without giving away the full logic!
+                    </div>
+                </div>
+
+                <!-- VARIABLE INSPECTOR -->
+                <div class="glass-card" style="margin: 0; padding: 1rem;">
+                    <div class="sidebar-section-title" style="margin-bottom: 0.5rem;">
+                        <span>Variable Inspector</span>
+                        <span style="font-size: 0.7rem; color: var(--primary-accent); font-family: var(--font-code);">[live]</span>
+                    </div>
+                    <div class="variable-grid" id="var-inspector-grid" style="font-size: 0.75rem;">
+                        <!-- Variables updated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPEED CONTROLLER -->
+            <div class="loop-control-bar">
+                <div class="control-actions">
+                    <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">EXECUTION FLOW:</span>
+                </div>
+                <div class="control-actions">
+                    <label
+                        style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin:0;">SPEED:</label>
+                    <select class="speed-select" id="speed-selector" onchange="updateSpeed()">
+                        <option value="1000">1x Normal</option>
+                        <option value="1800">0.5x Slow</option>
+                        <option value="400">2x Fast</option>
+                    </select>
+                    <button class="btn btn-ghost" id="pause-btn" onclick="togglePause()"
+                        style="padding: 0.4rem 0.75rem;">
+                        ⏸ Pause
+                    </button>
+                </div>
+            </div>
+
+            <!-- NAVIGATION FOOTER -->
+            <div class="nav-footer-bar">
+                <button class="btn btn-secondary" onclick="navigatePrev()">&larr; Previous</button>
+                <span id="nav-footer-status">Level 1 - Activity 1</span>
+                <button class="btn btn-secondary" onclick="navigateNext()">Next &rarr;</button>
+            </div>
+
         </div>
 
-        <div class="level-strip" id="s3-levels"></div>
-        <div class="progress-bar-wrap">
-            <div class="progress-bar" id="s3-bar" style="width:20%"></div>
+        <!-- RIGHT SIDE: CODE & TERMINAL PANELS -->
+        <div class="sidebar-wrapper">
+
+            <!-- CODE SYNC PANEL -->
+            <div class="glass-card">
+                <div class="sidebar-section-title">Python Code Synchronizer</div>
+                <div class="code-panel" id="code-synced-panel">
+                    <!-- code segments updated here -->
+                </div>
+            </div>
+
+            <!-- CONSOLE LOG -->
+            <div class="glass-card">
+                <div class="sidebar-section-title">Execution Console Output</div>
+                <div class="terminal-console" id="terminal-console-log">
+                    <div class="terminal-line"><span class="terminal-prompt">>>></span> System ready. Propose a function
+                        block to execute.</div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- S3 L1 -->
-        <div class="level-panel active" id="s3-l1">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Defining &amp; Invoking Functions</h3>
-                <div class="level-desc" style="background: rgba(0, 87, 183, 0.02); border-left-color: var(--l1);">
-                    <strong>Core Concepts:</strong>
-                    <p>Functions are named, modular blocks of code that perform specific tasks:</p>
-                    <ul>
-                        <li><strong>def Keyword:</strong> Declares functions: <code>def function_name(params):</code>.
-                        </li>
-                        <li><strong>return Keyword:</strong> Exits scope and sends value back. Defaults to
-                            <code>None</code>.</li>
-                    </ul>
-                </div>
-                <h4>Function Anatomy</h4>
-                <div class="indent-demo">
-                    <span class="lvl0"><span style="color:#b30500">def</span> greet(name):</span>
-                    <span class="lvl1">message = "Hello, " + name</span>
-                    <span class="lvl1"><span style="color:#b30500">return</span> message</span>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l1">LEVEL 1</span>Custom Function Builder</h3>
-                <div class="row">
-                    <div><label>Function name</label><input type="text" id="s3l1-name" value="greet"></div>
-                    <div><label>Parameter</label><input type="text" id="s3l1-param" value="name"></div>
-                    <div><label>Call with argument</label><input type="text" id="s3l1-arg" value="Alice"></div>
-                </div>
-                <button class="action" onclick="s3l1Run()">▶ Define &amp; Call</button>
-                <div class="output" id="s3l1-out">com: fill in the function builder above</div>
-                <div class="func-vis" id="s3l1-vis" style="display:none;"></div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Parameter Delimiter Matcher</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct syntax delimiters to define a function where
-                    parameters <code>a</code> and <code>b</code> are positional-only, and parameter <code>d</code> is
-                    keyword-only.
-                </div>
-                <div class="game-container" id="l1-game">
-                    <div class="game-header">
-                        <span>🎯 Delimiter Enforcer (/ and *)</span>
-                        <span class="game-score">Score: <span id="l1-score">0</span>/2</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="code-line" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <span>def process_data(a, b,</span>
-                            <div class="drop-zone" id="l1-zone-0" data-expected="/" data-pool-id="l1-pool"></div>
-                            <span>, c,</span>
-                            <div class="drop-zone" id="l1-zone-1" data-expected="*" data-pool-id="l1-pool"></div>
-                            <span>, d=10):</span>
-                        </div>
-                        <div class="code-line"
-                            style="display:block; padding-left:20px; margin-top:6px; color:var(--red-deep);">
-                            <span>return (a + b) * c - d</span>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l1-pool">
-                        <div class="draggable-item" id="l1-item-slash" draggable="true" data-val="/">/</div>
-                        <div class="draggable-item" id="l1-item-star" draggable="true" data-val="*">*</div>
-                        <div class="draggable-item" id="l1-item-backslash" draggable="true" data-val="\">\</div>
-                        <div class="draggable-item" id="l1-item-amp" draggable="true" data-val="&">&amp;</div>
-                        <div class="draggable-item" id="l1-item-def" draggable="true" data-val="def">def</div>
-                        <div class="draggable-item" id="l1-item-lambda" draggable="true" data-val="lambda">lambda</div>
-                    </div>
-                    <button class="action" onclick="l1Verify()">Verify Delimiters</button>
-                    <div class="game-feedback" id="l1-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S3 L2 -->
-        <div class="level-panel" id="s3-l2">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Required vs Keyword vs Default Arguments</h3>
-                <div class="level-desc" style="background: rgba(46, 125, 50, 0.02); border-left-color: var(--l2);">
-                    <strong>Core Concepts:</strong>
-                    <p>Binding parameters dynamically during calls:</p>
-                    <ul>
-                        <li><strong>Required variables:</strong> Must be supplied by positional inputs.</li>
-                        <li><strong>Default values:</strong> Fallbacks. Must be declared *after* required parameters.
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l2">LEVEL 2</span>Argument Binding Sandbox</h3>
-                <div class="row">
-                    <div><label>item (required)</label><input type="text" id="s3l2-item" value="coffee"></div>
-                    <div><label>qty (default=1)</label><input type="number" id="s3l2-qty" value="1"></div>
-                    <div><label>currency (default="INR")</label><input type="text" id="s3l2-curr" value="INR"></div>
-                    <div><label>price (required)</label><input type="number" id="s3l2-price" value="150"></div>
-                </div>
-                <button class="action" onclick="s3l2Run()">▶ Call Function</button>
-                <div class="output" id="s3l2-out">com: fill the parameters above</div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Mixed Constraints Call Binder</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Call the <code>configure</code> function for host
-                    <code>'localhost'</code> on port <code>8080</code> securely (<code>True</code>) with a timeout of
-                    <code>30</code>. Remember, positional arguments cannot follow keyword arguments, and keyword-only
-                    parameters must be passed with keyword names.
-                </div>
-                <div class="game-container" id="l2-game">
-                    <div class="game-header">
-                        <span>🎯 Mixed Ordering Check</span>
-                        <span class="game-score">Score: <span id="l2-score">0</span>/4</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <span class="lvl0">def configure(host, port=80, *, secure=True, timeout=10):</span>
-                        <span class="lvl1">pass</span>
-                        <span class="lvl0"
-                            style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <span>configure(</span>
-                            <div class="drop-zone" id="l2-zone-0" data-expected="&quot;localhost&quot;"
-                                data-pool-id="l2-pool"></div>
-                            <span>,</span>
-                            <div class="drop-zone" id="l2-zone-1" data-expected="8080" data-pool-id="l2-pool"></div>
-                            <span>,</span>
-                            <div class="drop-zone" id="l2-zone-2" data-expected="secure=True" data-pool-id="l2-pool">
-                            </div>
-                            <span>,</span>
-                            <div class="drop-zone" id="l2-zone-3" data-expected="timeout=30" data-pool-id="l2-pool">
-                            </div>
-                            <span>)</span>
-                        </span>
-                    </div>
-                    <div class="items-pool" id="l2-pool">
-                        <div class="draggable-item" id="l2-item-hostval" draggable="true"
-                            data-val="&quot;localhost&quot;">"localhost"</div>
-                        <div class="draggable-item" id="l2-item-portval" draggable="true" data-val="8080">8080</div>
-                        <div class="draggable-item" id="l2-item-secval" draggable="true" data-val="secure=True">
-                            secure=True</div>
-                        <div class="draggable-item" id="l2-item-timeval" draggable="true" data-val="timeout=30">
-                            timeout=30</div>
-                        <div class="draggable-item" id="l2-item-hostkw" draggable="true"
-                            data-val="host=&quot;localhost&quot;">host="localhost"</div>
-                        <div class="draggable-item" id="l2-item-sectru" draggable="true" data-val="True">True</div>
-                        <div class="draggable-item" id="l2-item-timevalraw" draggable="true" data-val="30">30</div>
-                    </div>
-                    <button class="action" onclick="l2Verify()">Verify Function Call</button>
-                    <div class="game-feedback" id="l2-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S3 L3 -->
-        <div class="level-panel" id="s3-l3">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Variable-Length Arguments: *args &amp; **kwargs</h3>
-                <div class="level-desc" style="background: rgba(230, 81, 0, 0.02); border-left-color: var(--l3);">
-                    <strong>Core Concepts:</strong>
-                    <p>Arguments collectors pack arbitrary bounds:</p>
-                    <ul>
-                        <li><strong>*args:</strong> Packs extra positional arguments into a **tuple**.</li>
-                        <li><strong>**kwargs:</strong> Packs extra keyword arguments into a **dictionary**.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l3">LEVEL 3</span>Collection Collector</h3>
-                <div class="row">
-                    <div><label>*args — comma-separated numbers</label><input type="text" id="s3l3-args"
-                            value="10, 20, 30, 40"></div>
-                </div>
-                <div class="row">
-                    <div><label>**kwargs — key=value pairs (e.g. name=Alice, city=Mumbai)</label><input type="text"
-                            id="s3l3-kwargs" value="name=Alice, city=Mumbai"></div>
-                </div>
-                <button class="action" onclick="s3l3Run()">▶ Unpack Arguments</button>
-                <div class="output" id="s3l3-out">com: enter values and run</div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Unpacking Operator Binds</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Complete the call to <code>display(x, y, z)</code> by unpacking the
-                    coordinates list (for positional parameters <code>x</code> and <code>y</code>) and the configuration
-                    dictionary (for keyword parameter <code>z</code>).
-                </div>
-                <div class="game-container" id="l3-game">
-                    <div class="game-header">
-                        <span>🎯 Unpacking Operators (* and **)</span>
-                        <span class="game-score">Score: <span id="l3-score">0</span>/2</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <span class="lvl0">def display(x, y, z):</span>
-                        <span class="lvl1">return x + y + z</span>
-                        <span class="lvl0" style="margin-top:10px;">coords = [10, 20]</span>
-                        <span class="lvl0">config = {"z": 30}</span>
-                        <span class="lvl0"
-                            style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <span>result = display(</span>
-                            <div class="drop-zone" id="l3-zone-0" data-expected="*coords" data-pool-id="l3-pool"></div>
-                            <span>,</span>
-                            <div class="drop-zone" id="l3-zone-1" data-expected="**config" data-pool-id="l3-pool"></div>
-                            <span>)</span>
-                        </span>
-                    </div>
-                    <div class="items-pool" id="l3-pool">
-                        <div class="draggable-item" id="l3-item-unpcoords" draggable="true" data-val="*coords">*coords
-                        </div>
-                        <div class="draggable-item" id="l3-item-unpconfig" draggable="true" data-val="**config">**config
-                        </div>
-                        <div class="draggable-item" id="l3-item-coords" draggable="true" data-val="coords">coords</div>
-                        <div class="draggable-item" id="l3-item-config" draggable="true" data-val="config">config</div>
-                        <div class="draggable-item" id="l3-item-starconfig" draggable="true" data-val="*config">*config
-                        </div>
-                        <div class="draggable-item" id="l3-item-ampcoords" draggable="true" data-val="&amp;coords">
-                            &amp;coords</div>
-                    </div>
-                    <button class="action" onclick="l3Verify()">Verify Unpacking</button>
-                    <div class="game-feedback" id="l3-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S3 L4 -->
-        <div class="level-panel" id="s3-l4">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Input Guards, Type Hints &amp; PEP 484</h3>
-                <div class="level-desc" style="background: rgba(106, 27, 154, 0.02); border-left-color: var(--l4);">
-                    <strong>Core Concepts:</strong>
-                    <p>Assertions and typing structures protect variables:</p>
-                    <ul>
-                        <li><strong>Type hints:</strong> Optional metadata annotations used by static analysis tools.
-                            Ignored at runtime.</li>
-                        <li><strong>Guards:</strong> Raise errors programmatically to stop math calculations on invalid
-                            objects.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l4">LEVEL 4</span>Interest Guard Calculator</h3>
-                <div class="row">
-                    <div><label>Principal (₹)</label><input type="number" id="s3l4-p" value="10000"></div>
-                    <div><label>Rate (%)</label><input type="number" id="s3l4-r" value="8.5"></div>
-                    <div><label>Years</label><input type="number" id="s3l4-t" value="5"></div>
-                </div>
-                <button class="action" onclick="s3l4Run()">▶ Calculate Interest</button>
-                <div class="output" id="s3l4-out">com: enter values — try negative rate or 0 years</div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Callable &amp; Union Annotations</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct type hint annotations and error guards to complete
-                    the implementation of the <code>execute</code> function which accepts a callback parameter.
-                </div>
-                <div class="game-container" id="l4-game">
-                    <div class="game-header">
-                        <span>🎯 Callback &amp; Union Type Hinting</span>
-                        <span class="game-score">Score: <span id="l4-score">0</span>/4</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <span class="lvl0" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                            <span>def execute(func:</span>
-                            <div class="drop-zone" id="l4-zone-0" data-expected="Callable[[int],int]"
-                                data-pool-id="l4-pool"></div>
-                            <span>, val:</span>
-                            <div class="drop-zone" id="l4-zone-1" data-expected="int" data-pool-id="l4-pool"></div>
-                            <span>)</span>
-                            <div class="drop-zone" id="l4-zone-2" data-expected="-&gt;Union[int,str]"
-                                data-pool-id="l4-pool"></div>
-                            <span>:</span>
-                        </span>
-                        <span class="lvl1">if val &lt; 0:</span>
-                        <span class="lvl2" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                            <span>return</span>
-                            <div class="drop-zone" id="l4-zone-3" data-expected="&quot;Error: Negative value&quot;"
-                                data-pool-id="l4-pool"></div>
-                        </span>
-                        <span class="lvl1">return func(val)</span>
-                    </div>
-                    <div class="items-pool" id="l4-pool">
-                        <div class="draggable-item" id="l4-item-callable" draggable="true"
-                            data-val="Callable[[int],int]">Callable[[int], int]</div>
-                        <div class="draggable-item" id="l4-item-int" draggable="true" data-val="int">int</div>
-                        <div class="draggable-item" id="l4-item-union" draggable="true" data-val="-&gt;Union[int,str]">
-                            -&gt; Union[int, str]</div>
-                        <div class="draggable-item" id="l4-item-errstr" draggable="true"
-                            data-val="&quot;Error: Negative value&quot;">"Error: Negative value"</div>
-                        <div class="draggable-item" id="l4-item-callable-simple" draggable="true" data-val="Callable">
-                            Callable</div>
-                        <div class="draggable-item" id="l4-item-intarrow" draggable="true" data-val="int-&gt;int">int
-                            -&gt; int</div>
-                        <div class="draggable-item" id="l4-item-orhint" draggable="true" data-val="int|str">int | str
-                        </div>
-                        <div class="draggable-item" id="l4-item-raiseerr" draggable="true" data-val="raiseValueError">
-                            raise ValueError</div>
-                    </div>
-                    <button class="action" onclick="l4Verify()">Verify Annotations</button>
-                    <div class="game-feedback" id="l4-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S3 L5 -->
-        <div class="level-panel" id="s3-l5">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Tuple Packing &amp; Multiple Return Values</h3>
-                <div class="level-desc" style="background: rgba(183, 28, 28, 0.02); border-left-color: var(--l5);">
-                    <strong>Core Concepts:</strong>
-                    <p>Unpacking packed tuples from function returns:</p>
-                    <ul>
-                        <li><strong>Implicit Packing:</strong> Commas pack outputs: <code>return min, max</code>.</li>
-                        <li><strong>Unpacking:</strong> Multiple variables match index structures directly:
-                            <code>mn, mx = analyze(nums)</code>.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l5">LEVEL 5</span>Statistical Pack Unpacker</h3>
-                <div class="row">
-                    <div><label>Comma-separated numbers</label><input type="text" id="s3l5-nums"
-                            value="4, 9, 2, 15, 7, 11"></div>
-                </div>
-                <button class="action" onclick="s3l5Run()">▶ Analyse &amp; Unpack</button>
-                <div class="output" id="s3l5-out">com: enter a list of numbers</div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Extended Starred Unpacker</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Unpack the tuple returned by <code>stats()</code>. Extract the first
-                    item into <code>first</code>, all middle items (as a list) into <code>middle</code>, and the last
-                    item into <code>last</code>.
-                </div>
-                <div class="game-container" id="l5-game">
-                    <div class="game-header">
-                        <span>🎯 Starred Remainder (*rest) Unpacking</span>
-                        <span class="game-score">Score: <span id="l5-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <span class="lvl0">def stats():</span>
-                        <span class="lvl1">return 1, 2, 3, 4, 5</span>
-                        <span class="lvl0"
-                            style="margin-top:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <div class="drop-zone" id="l5-zone-0" data-expected="first" data-pool-id="l5-pool"></div>
-                            <span>,</span>
-                            <div class="drop-zone" id="l5-zone-1" data-expected="*middle" data-pool-id="l5-pool"></div>
-                            <span>,</span>
-                            <div class="drop-zone" id="l5-zone-2" data-expected="last" data-pool-id="l5-pool"></div>
-                            <span>= stats()</span>
-                        </span>
-                    </div>
-                    <div class="items-pool" id="l5-pool">
-                        <div class="draggable-item" id="l5-item-first" draggable="true" data-val="first">first</div>
-                        <div class="draggable-item" id="l5-item-starmiddle" draggable="true" data-val="*middle">*middle
-                        </div>
-                        <div class="draggable-item" id="l5-item-last" draggable="true" data-val="last">last</div>
-                        <div class="draggable-item" id="l5-item-middle" draggable="true" data-val="middle">middle</div>
-                        <div class="draggable-item" id="l5-item-starfirst" draggable="true" data-val="*first">*first
-                        </div>
-                        <div class="draggable-item" id="l5-item-lastval" draggable="true" data-val="last_val">last_val
-                        </div>
-                    </div>
-                    <button class="action" onclick="l5Verify()">Verify Unpacking</button>
-                    <div class="game-feedback" id="l5-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-note">Module 2 · Decision Making &amp; Functions · Section 2.3</div>
     </main>
 
     <script>
-        const SUBTOPIC = 's3';
-        const LEVEL_LABELS = [
-            { cls: 'l1', label: 'Level 1 · Parameter Delimiters' },
-            { cls: 'l2', label: 'Level 2 · Mixed Call Ordering' },
-            { cls: 'l3', label: 'Level 3 · Unpacking Operators' },
-            { cls: 'l4', label: 'Level 4 · Callable &amp; Union Hints' },
-            { cls: 'l5', label: 'Level 5 · Starred Remainder Unpack' },
+        // State management
+        const state = {
+            level: 1,
+            activity: 1,
+            hintIndex: 0,
+            isExecuting: false,
+            isPaused: false,
+            speedMs: 1000,
+
+            // Level 1 Act 1 slots
+            l1a1_slots: ["", "", "", "", "", ""],
+            // Level 1 Act 2 scenario index
+            l1a2_scenario: 0, // 0: Square, 1: Area, 2: Greet, 3: Temp
+
+            // Level 2 Act 1 slots
+            l2a1_slots: ["", "", "", ""], // item, qty, currency, price args
+
+            // Level 2 Act 2 scenario index
+            l2a2_scenario: 0, // 0: Required, 1: Default, 2: Keyword
+            l2a2_answer: "",
+
+            // Level 3 Act 1 scenario index
+            l3a1_scenario: 0, // 0: BMI, 1: Salary, 2: Discount
+            l3a1_slots: ["", "", "", "", ""], // def, name, params, body, return
+
+            // Level 3 Act 2 scenario index
+            activeEscapePanel: 0,
+            escapePanelsSolved: [false, false, false],
+            l3a2_slots: ["", ""] // parameters / return debug triggers
+        };
+
+        const levelsData = {
+            1: {
+                title: "Level 1: Function Workshop",
+                activities: [
+                    { id: 1, title: "Function Builder Studio", desc: "Drag blocks to assemble a complete Python function definition and watch inputs convert to output." },
+                    { id: 2, title: "Function Machine Simulator", desc: "Select custom parameter inputs and watch variables update inside visual function processors." }
+                ]
+            },
+            2: {
+                title: "Level 2: Parameter Laboratory",
+                activities: [
+                    { id: 1, title: "Parameter Matching", desc: "Align positional, required, and default values to ensure function argument calls resolve." },
+                    { id: 2, title: "Delivery Robot", desc: "Deliver parameters to target machines using PyBot deliveries." }
+                ]
+            },
+            3: {
+                title: "Level 3: Function Architect",
+                activities: [
+                    { id: 1, title: "Smart Function Designer", desc: "Assemble complete computational structures for real-world mathematical calculators." },
+                    { id: 2, title: "Function Escape Room", desc: "Investigate broken panels, repair incorrect calls or missing returns, and escape." }
+                ]
+            }
+        };
+
+        // Hints database
+        const hintsDB = {
+            "1-1": [
+                "A function definition must start with the `def` keyword, followed by the function name.",
+                "Parameters go inside parenthesis in the function header, followed by a colon.",
+                "The indented body processes values, and the `return` statement exits and sends a result back.",
+                "Place: 1.`def`, 2.`square`, 3.`(x):`, 4.`result = x * x`, 5.`return result`, and 6.`square(4)` to complete the call."
+            ],
+            "1-2": [
+                "Select any of the 4 machines (Square, Area, Greet, Temp) and type custom input parameters.",
+                "The input values are bound to the function parameter variables when the call is made.",
+                "Inside the machine body, processing statements compute values and load them to local variables.",
+                "The `return` statement sends the final result back out of the function. Watch the visual flow!"
+            ],
+            "2-1": [
+                "Required arguments must be supplied and must appear before any default arguments.",
+                "Default arguments (like `tax=18`) use their default fallback value if they are omitted in the call.",
+                "Positional arguments cannot follow keyword arguments in a function call! Watch argument ordering.",
+                "Match: price = 150 (required), item = 'coffee' (required). Supply these first before configuring default modifiers."
+            ],
+            "2-2": [
+                "Required arguments have no default values in the definition and must be supplied.",
+                "Default arguments have default values (e.g. `currency='INR'`) and are optional.",
+                "Keyword arguments are specified by name (e.g. `price=150`) during function execution calls.",
+                "Determine the category of the package shown, select the corresponding bay, and run the robot to deliver."
+            ],
+            "3-1": [
+                "Read the real-world prompt. Identify the calculation logic needed for the calculators.",
+                "Arrange: def header, parameter variables inside brackets, computing body, and return keyword.",
+                "Ensure variable names inside the body match the parameters defined in the header.",
+                "For BMI: header `def calculate_bmi(w, h):`, body `bmi = w / (h * h)`, and statement `return bmi`."
+            ],
+            "3-2": [
+                "Panel 1 has a Syntax Error. Check if the function definition header or calls are missing key symbols.",
+                "Panel 2 has a Parameter mismatch. Check if the call specifies all required arguments correctly.",
+                "Panel 3 has a Return mismatch. A function returns None if it lacks a return statement! Add the return chip."
+            ]
+        };
+
+        // Escape room panel configurations
+        const escapePanelsData = [
+            {
+                title: "Panel 1: Syntax Repair",
+                desc: "The function definition is missing the defining keyword or call colon. Drag chips to fix it.",
+                slots: ["def_slot", "colon_slot"],
+                chips: ["def", ":", "return", "pass", "()"],
+                targets: ["def", ":"],
+                code: (arr) => `${arr[0]} multiply(a, b)${arr[1]}\n    return a * b\n\nval = multiply(3, 4)`
+            },
+            {
+                title: "Panel 2: Required Arguments Check",
+                desc: "The function calculate_bill requires two positional arguments. Add missing values to the call.",
+                slots: ["arg1", "arg2"],
+                chips: ["price", "tax", "150", "18", "0"],
+                targets: ["150", "18"],
+                code: (arr) => `def calculate_bill(price, tax):\n    return price + (price * tax / 100)\n\ntotal = calculate_bill(${arr[0]}, ${arr[1]})`
+            },
+            {
+                title: "Panel 3: Return Value Injection",
+                desc: "The function computes total score but returns None! Insert the return keyword and variable name.",
+                slots: ["ret_kw", "ret_var"],
+                chips: ["return", "score", "pass", "def", "total"],
+                targets: ["return", "score"],
+                code: (arr) => `def get_score(correct, penalty):\n    score = (correct * 4) - penalty\n    ${arr[0]} ${arr[1]}\n\nres = get_score(10, 2)`
+            }
         ];
 
-        const strip = document.getElementById(`${SUBTOPIC}-levels`);
-        LEVEL_LABELS.forEach((lv, i) => {
-            const btn = document.createElement('button');
-            btn.className = `lvl-pill ${lv.cls}${i === 0 ? ' active' : ''}`;
-            btn.innerHTML = lv.label;
-            btn.onclick = () => switchLevel(SUBTOPIC, i + 1, btn);
-            strip.appendChild(btn);
-        });
+        // Notification Alerts
+        function triggerAlert(msg, type = "info") {
+            const alertBox = document.getElementById("sim-alert");
+            alertBox.textContent = msg;
+            alertBox.className = `popup-alert show ${type}`;
 
-        function switchLevel(st, num, btn) {
-            document.querySelectorAll(`#${st}-levels .lvl-pill`).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll(`.level-panel`).forEach(p => p.classList.remove('active'));
-            document.getElementById(`${st}-l${num}`).classList.add('active');
-            document.getElementById(`${st}-bar`).style.width = (num * 20) + '%';
+            setTimeout(() => {
+                alertBox.classList.remove("show");
+            }, 3000);
         }
 
-        // ===================== DRAG & DROP UTILITIES =====================
-        function dragStart(e) {
-            e.dataTransfer.setData("text/plain", e.target.id);
-            e.target.classList.add("dragging");
+        // Terminal Logger
+        function appendTerminal(msg, status = null) {
+            const log = document.getElementById("terminal-console-log");
+            const line = document.createElement("div");
+            line.className = "terminal-line";
+
+            let prefix = `<span class="terminal-prompt">>>></span>`;
+            let textClass = "";
+            if (status === true) textClass = "terminal-success";
+            else if (status === false) textClass = "terminal-warning";
+
+            line.innerHTML = `${prefix}<span class="${textClass}">${msg}</span>`;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
         }
-        function dragEnd(e) {
-            e.target.classList.remove("dragging");
+
+        function clearTerminal() {
+            const log = document.getElementById("terminal-console-log");
+            log.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">>>></span> Workspace active. Propose a functional sequence.</div>`;
         }
-        function dragOver(e) {
-            e.preventDefault();
+
+        // Variable updates
+        function updateInspector(vars) {
+            const grid = document.getElementById("var-inspector-grid");
+            grid.innerHTML = "";
+            if (Object.keys(vars).length === 0) {
+                grid.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:0.5rem;">No local variables active.</div>`;
+                return;
+            }
+            for (const [key, value] of Object.entries(vars)) {
+                const card = document.createElement("div");
+                card.className = "var-card pulsing";
+                card.innerHTML = `<span class="var-name">${key}</span><span class="var-val">${value}</span>`;
+                grid.appendChild(card);
+            }
         }
-        function dragEnter(e) {
+
+        // HINTS DISPATCHER
+        function revealNextHint() {
+            const hintKey = `${state.level}-${state.activity}`;
+            const hints = hintsDB[hintKey];
+            if (!hints) return;
+
+            const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
+            if (state.hintIndex < hints.length) {
+                document.getElementById("hint-feedback-box").textContent = hints[state.hintIndex];
+                dots[state.hintIndex].classList.add("active");
+                state.hintIndex++;
+            } else {
+                triggerAlert("All clues revealed! Experiment with parameter placements.", "info");
+            }
+        }
+
+        function resetHints() {
+            state.hintIndex = 0;
+            document.getElementById("hint-feedback-box").textContent = "Click the button above to request progressive clues without giving away the full logic!";
+            const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
+            dots.forEach(dot => dot.classList.remove("active"));
+        }
+
+        // SPEED CONTROLLER
+        function updateSpeed() {
+            const val = document.getElementById("speed-selector").value;
+            state.speedMs = parseInt(val);
+            appendTerminal(`Speed modifier set to ${val}ms.`);
+        }
+
+        function togglePause() {
+            state.isPaused = !state.isPaused;
+            const btn = document.getElementById("pause-btn");
+            if (state.isPaused) {
+                btn.textContent = "▶ Resume";
+                appendTerminal("Function execution suspended.");
+            } else {
+                btn.textContent = "⏸ Pause";
+                appendTerminal("Function execution resumed.");
+            }
+        }
+
+        // DRAG AND DROP HANDLERS
+        let selectedDragVal = null;
+        let clickedChipElement = null;
+
+        function handleDragStart(e, value) {
+            e.dataTransfer.setData("text/plain", value);
+            selectedDragVal = value;
+            e.currentTarget.style.opacity = "0.5";
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.style.opacity = "1";
+            selectedDragVal = null;
+        }
+
+        function allowDrop(e) {
             e.preventDefault();
             e.currentTarget.classList.add("hovered");
         }
-        function dragLeave(e) {
+
+        function dragLeaveSlot(e) {
             e.currentTarget.classList.remove("hovered");
         }
-        function dropItem(e) {
+
+        function selectChipForPlacement(element) {
+            document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
+            clickedChipElement = element;
+            element.classList.add("selected");
+            selectedDragVal = element.textContent.trim();
+            triggerAlert("Chip selected. Click a target slot to place it!", "info");
+        }
+
+        function handleSlotClick(e) {
+            if (selectedDragVal) {
+                const slotEl = e.currentTarget;
+                slotEl.textContent = selectedDragVal;
+                slotEl.classList.add("filled");
+
+                const idx = slotEl.getAttribute("data-index");
+
+                if (state.level === 1 && state.activity === 1) {
+                    state.l1a1_slots[idx] = selectedDragVal;
+                    updateL1A1CodeSync();
+                } else if (state.level === 2 && state.activity === 1) {
+                    state.l2a1_slots[idx] = selectedDragVal;
+                    updateL2A1CodeSync();
+                } else if (state.level === 3 && state.activity === 1) {
+                    state.l3a1_slots[idx] = selectedDragVal;
+                    updateL3A1CodeSync();
+                } else if (state.level === 3 && state.activity === 2) {
+                    state.l3a2_slots[idx] = selectedDragVal;
+                    updateL3A2CodeSync();
+                }
+
+                if (clickedChipElement) {
+                    clickedChipElement.classList.remove("selected");
+                    clickedChipElement = null;
+                }
+                selectedDragVal = null;
+                slotEl.classList.remove("hovered");
+            }
+        }
+
+        function handleDrop(e) {
             e.preventDefault();
-            e.currentTarget.classList.remove("hovered");
-            const id = e.dataTransfer.getData("text/plain");
-            const draggable = document.getElementById(id);
-            let target = e.currentTarget;
+            const slotEl = e.currentTarget;
+            slotEl.classList.remove("hovered");
 
-            if (target.classList.contains("drop-zone") || target.classList.contains("items-pool") || target.classList.contains("bucket")) {
-                if (target.classList.contains("drop-zone") && target.children.length > 0) {
-                    const existing = target.children[0];
-                    document.getElementById(existing.dataset.poolId || target.dataset.poolId).appendChild(existing);
-                }
-                target.appendChild(draggable);
-                if (target.classList.contains("drop-zone")) {
-                    draggable.dataset.poolId = target.dataset.poolId;
+            const val = e.dataTransfer.getData("text/plain") || selectedDragVal;
+            if (val) {
+                slotEl.textContent = val;
+                slotEl.classList.add("filled");
+
+                const idx = slotEl.getAttribute("data-index");
+                if (state.level === 1 && state.activity === 1) {
+                    state.l1a1_slots[idx] = val;
+                    updateL1A1CodeSync();
+                } else if (state.level === 2 && state.activity === 1) {
+                    state.l2a1_slots[idx] = val;
+                    updateL2A1CodeSync();
+                } else if (state.level === 3 && state.activity === 1) {
+                    state.l3a1_slots[idx] = val;
+                    updateL3A1CodeSync();
+                } else if (state.level === 3 && state.activity === 2) {
+                    state.l3a2_slots[idx] = val;
+                    updateL3A2CodeSync();
                 }
             }
         }
-        function shufflePools() {
-            document.querySelectorAll(".items-pool").forEach(pool => {
-                const items = Array.from(pool.children);
-                for (let i = items.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [items[i], items[j]] = [items[j], items[i]];
-                }
-                items.forEach(item => pool.appendChild(item));
+
+        // LEVEL ROUTING
+        function switchLevel(lvlNum) {
+            if (state.isExecuting) return;
+            state.level = lvlNum;
+            state.activity = 1;
+
+            document.querySelectorAll(".level-tab").forEach((tab, idx) => {
+                if (idx + 1 === lvlNum) tab.classList.add("active");
+                else tab.classList.remove("active");
             });
+
+            renderActivityPills();
+            loadActivity();
+            updateNavFooterStatus();
         }
-        function initDragAndDrop() {
-            document.querySelectorAll(".draggable-item").forEach(item => {
-                item.addEventListener("dragstart", dragStart);
-                item.addEventListener("dragend", dragEnd);
-            });
-            document.querySelectorAll(".drop-zone, .items-pool, .bucket").forEach(zone => {
-                zone.addEventListener("dragover", dragOver);
-                zone.addEventListener("dragenter", dragEnter);
-                zone.addEventListener("dragleave", dragLeave);
-                zone.addEventListener("drop", dropItem);
+
+        function renderActivityPills() {
+            const container = document.getElementById("activity-pills-container");
+            container.innerHTML = "";
+
+            const acts = levelsData[state.level].activities;
+            acts.forEach(act => {
+                const pill = document.createElement("button");
+                pill.className = `activity-pill ${state.activity === act.id ? 'active' : ''}`;
+                pill.textContent = act.title;
+                pill.onclick = () => {
+                    if (state.isExecuting) return;
+                    state.activity = act.id;
+                    document.querySelectorAll(".activity-pill").forEach(p => p.classList.remove("active"));
+                    pill.classList.add("active");
+                    loadActivity();
+                    updateNavFooterStatus();
+                };
+                container.appendChild(pill);
             });
         }
 
-        // ===================== PUZZLE VERIFICATIONS =====================
-        function l1Verify() {
-            const slots = ['l1-zone-0', 'l1-zone-1'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l1-score').textContent = score;
-            const feedback = document.getElementById('l1-feedback');
-            if (score === 2) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Correct! Preceding / enforces positional-only parameters, and succeeding * enforces keyword-only arguments!';
+        function updateNavFooterStatus() {
+            const footerStatus = document.getElementById("nav-footer-status");
+            footerStatus.textContent = `Level ${state.level} - Activity ${state.activity}`;
+        }
+
+        function navigatePrev() {
+            if (state.isExecuting) return;
+            if (state.activity === 2) {
+                state.activity = 1;
             } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Incorrect parameter delimiters. Remember that / marks positional-only parameters and * marks keyword-only parameters. Reshuffling pool!';
-                shufflePools();
-            }
-        }
-
-        function l2Verify() {
-            const slots = ['l2-zone-0', 'l2-zone-1', 'l2-zone-2', 'l2-zone-3'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
+                if (state.level > 1) {
+                    state.level--;
+                    state.activity = 2;
+                } else {
+                    triggerAlert("You are at the very beginning of Level 1!", "info");
+                    return;
                 }
-            });
-            document.getElementById('l2-score').textContent = score;
-            const feedback = document.getElementById('l2-feedback');
-            if (score === 4) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Excellent! Positional arguments are passed first, followed by default/keyword overrides, and keyword-only parameters must be named.';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Incorrect call arguments. Check positional ordering vs keyword-only requirements. Reshuffling pool!';
-                shufflePools();
             }
+            syncPillsAndLoad();
         }
 
-        function l3Verify() {
-            const slots = ['l3-zone-0', 'l3-zone-1'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
+        function navigateNext() {
+            if (state.isExecuting) return;
+            if (state.activity === 1) {
+                state.activity = 2;
+            } else {
+                if (state.level < 3) {
+                    state.level++;
+                    state.activity = 1;
+                } else {
+                    triggerAlert("You reached the end of PyFunc Lab! Fantastic work.", "success");
+                    return;
                 }
+            }
+            syncPillsAndLoad();
+        }
+
+        function syncPillsAndLoad() {
+            document.querySelectorAll(".level-tab").forEach((tab, idx) => {
+                if (idx + 1 === state.level) tab.classList.add("active");
+                else tab.classList.remove("active");
             });
-            document.getElementById('l3-score').textContent = score;
-            const feedback = document.getElementById('l3-feedback');
-            if (score === 2) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Correct mapping! The single asterisk * unpacks lists/iterables, and the double asterisk ** unpacks dictionary mappings!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Unpacking mismatch. Verify the correct use of * and ** operators for list and dictionary unpacking. Reshuffling pool!';
-                shufflePools();
+            renderActivityPills();
+            loadActivity();
+            updateNavFooterStatus();
+        }
+
+        function loadActivity() {
+            state.isExecuting = false;
+            state.isPaused = false;
+            document.getElementById("pause-btn").textContent = "⏸ Pause";
+            resetHints();
+            clearTerminal();
+            updateInspector({});
+
+            const contentArea = document.getElementById("sim-content-area");
+            contentArea.innerHTML = "";
+
+            const actInfo = levelsData[state.level].activities[state.activity - 1];
+            document.getElementById("sim-title").textContent = actInfo.title;
+            document.getElementById("sim-subtitle").textContent = actInfo.desc;
+
+            if (state.level === 1 && state.activity === 1) {
+                loadL1A1(contentArea);
+            } else if (state.level === 1 && state.activity === 2) {
+                loadL1A2(contentArea);
+            } else if (state.level === 2 && state.activity === 1) {
+                loadL2A1(contentArea);
+            } else if (state.level === 2 && state.activity === 2) {
+                loadL2A2(contentArea);
+            } else if (state.level === 3 && state.activity === 1) {
+                loadL3A1(contentArea);
+            } else if (state.level === 3 && state.activity === 2) {
+                loadL3A2(contentArea);
             }
         }
 
-        function l4Verify() {
-            const slots = ['l4-zone-0', 'l4-zone-1', 'l4-zone-2', 'l4-zone-3'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
+        // -------------------------------------------------------------
+        // LEVEL 1 ACTIVITY 1: Function Builder Studio
+        // -------------------------------------------------------------
+        function loadL1A1(container) {
+            // 1. Indented drag-and-drop slots
+            const editor = document.createElement("div");
+            editor.style.width = "100%";
+            editor.style.display = "flex";
+            editor.style.flexDirection = "column";
+            editor.style.gap = "0.5rem";
+            editor.style.margin = "1rem 0";
+
+            const s0 = state.l1a1_slots[0] || "def";
+            const s1 = state.l1a1_slots[1] || "name";
+            const s2 = state.l1a1_slots[2] || "(param):";
+            const s3 = state.l1a1_slots[3] || "processing_body";
+            const s4 = state.l1a1_slots[4] || "return_statement";
+            const s5 = state.l1a1_slots[5] || "call_statement";
+
+            editor.innerHTML = `
+        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <div class="slot ${state.l1a1_slots[0] ? 'filled' : ''}" data-slot-type="def" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
+            <div class="slot ${state.l1a1_slots[1] ? 'filled' : ''}" data-slot-type="name" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s1}</div>
+            <div class="slot ${state.l1a1_slots[2] ? 'filled' : ''}" data-slot-type="param" data-index="2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s2}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
+            <div class="slot ${state.l1a1_slots[3] ? 'filled' : ''}" data-slot-type="body" data-index="3" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s3}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
+            <div class="slot ${state.l1a1_slots[4] ? 'filled' : ''}" data-slot-type="return" data-index="4" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s4}</div>
+          </div>
+          <div style="margin-top: 12px; display:flex; align-items:center; gap:0.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+            <div class="slot ${state.l1a1_slots[5] ? 'filled' : ''}" data-slot-type="call" data-index="5" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 120px; height: 28px;">${s5}</div>
+          </div>
+        </div>
+      `;
+            container.appendChild(editor);
+
+            // 2. Chip pool bank
+            const bank = document.createElement("div");
+            bank.className = "chips-bank";
+            const chips = ["def", "square", "(x):", "result = x * x", "return result", "square(4)", "return", "(4)", "x"];
+            chips.forEach((cVal, idx) => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.draggable = true;
+                chip.textContent = cVal;
+                chip.id = `chip-l1a1-${idx}`;
+                chip.ondragstart = (e) => handleDragStart(e, cVal);
+                chip.ondragend = handleDragEnd;
+                chip.onclick = () => selectChipForPlacement(chip);
+                bank.appendChild(chip);
+            });
+            container.appendChild(bank);
+
+            // 3. Pipeline visual animation chamber
+            const pipeline = document.createElement("div");
+            pipeline.className = "pipeline-visualizer";
+            pipeline.innerHTML = `
+        <div class="pipeline-chamber" id="chamber-input"><span>Input</span><strong style="margin-top:2px;">4</strong></div>
+        <div class="pipeline-pathway" id="path-in">
+          <div class="pipeline-ball" id="path-ball"></div>
+        </div>
+        <div class="pipeline-chamber" id="chamber-core"><span>Core</span><strong style="font-size:0.65rem; margin-top:2px;">x * x</strong></div>
+        <div class="pipeline-pathway" id="path-out"></div>
+        <div class="pipeline-chamber" id="chamber-output"><span>Output</span><strong id="visual-out-val" style="margin-top:2px; color:var(--primary-accent);">?</strong></div>
+      `;
+            container.appendChild(pipeline);
+
+            updateL1A1CodeSync();
+        }
+
+        function updateL1A1CodeSync() {
+            const s0 = state.l1a1_slots[0] || "___";
+            const s1 = state.l1a1_slots[1] || "___";
+            const s2 = state.l1a1_slots[2] || "___";
+            const s3 = state.l1a1_slots[3] || "___";
+            const s4 = state.l1a1_slots[4] || "___";
+            const s5 = state.l1a1_slots[5] || "___";
+
+            const codePanel = document.getElementById("code-synced-panel");
+            codePanel.innerHTML = `
+        <div class="code-line" id="l1a1-line1"><span class="code-line-num">1</span><span class="code-keyword">${s0}</span> ${s1}${s2}</div>
+        <div class="code-line" id="l1a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;${s3}</div>
+        <div class="code-line" id="l1a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;${s4}</div>
+        <div class="code-line" id="l1a1-line4"><span class="code-line-num">4</span>${s5}</div>
+      `;
+        }
+
+        function runL1A1Execution() {
+            const t = ["def", "square", "(x):", "result = x * x", "return result", "square(4)"];
+            let correct = true;
+            state.l1a1_slots.forEach((val, idx) => {
+                if (val !== t[idx]) correct = false;
+            });
+
+            if (!correct) {
+                triggerAlert("Assembly incorrect! Check syntax ordering.", "error");
+                appendTerminal(">>> SyntaxError: Invalid syntax header/body layout.", false);
+                return;
+            }
+
+            state.isExecuting = true;
+            appendTerminal(">>> Call stack created. Executing square(4)...");
+
+            const ball = document.getElementById("path-ball");
+            const pathIn = document.getElementById("path-in");
+            const pathOut = document.getElementById("path-out");
+            const chInput = document.getElementById("chamber-input");
+            const chCore = document.getElementById("chamber-core");
+            const chOutput = document.getElementById("chamber-output");
+            const visVal = document.getElementById("visual-out-val");
+
+            // Reset
+            ball.style.display = "none";
+            ball.style.left = "0px";
+            chInput.classList.remove("active");
+            chCore.classList.remove("active");
+            chOutput.classList.remove("active");
+            visVal.textContent = "?";
+
+            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+            // Line 4: Call
+            document.getElementById("l1a1-line4").classList.add("active-exec");
+            chInput.classList.add("active");
+            appendTerminal("Calling function square() with parameter x = 4.");
+            updateInspector({ "x": 4 });
+
+            setTimeout(() => {
+                if (state.isPaused) return; // simple pause check
+
+                document.getElementById("l1a1-line4").classList.remove("active-exec");
+                document.getElementById("l1a1-line1").classList.add("active-exec");
+                appendTerminal("Header matches definition. Binding argument 4 to parameter x.");
+
+                // Animate input package entering core
+                ball.style.display = "block";
+                ball.style.left = `${pathIn.offsetWidth - 24}px`;
+
+                setTimeout(() => {
+                    document.getElementById("l1a1-line1").classList.remove("active-exec");
+                    document.getElementById("l1a1-line2").classList.add("active-exec");
+                    chCore.classList.add("active");
+
+                    appendTerminal("Processing: result = 4 * 4");
+                    updateInspector({ "x": 4, "result": 16 });
+
+                    setTimeout(() => {
+                        document.getElementById("l1a1-line2").classList.remove("active-exec");
+                        document.getElementById("l1a1-line3").classList.add("active-exec");
+
+                        appendTerminal("Exiting function. Returning result = 16 to stack.");
+
+                        // Animate package to return output
+                        ball.style.display = "none";
+                        pathOut.appendChild(ball);
+                        ball.style.display = "block";
+                        ball.style.left = `${pathOut.offsetWidth - 24}px`;
+
+                        setTimeout(() => {
+                            document.getElementById("l1a1-line3").classList.remove("active-exec");
+                            chOutput.classList.add("active");
+                            visVal.textContent = "16";
+                            appendTerminal("Function execution completed. Return value: 16", true);
+                            triggerAlert("Success! Function output matched.", "success");
+                            state.isExecuting = false;
+                        }, state.speedMs);
+
+                    }, state.speedMs);
+
+                }, state.speedMs);
+
+            }, state.speedMs);
+        }
+
+        // -------------------------------------------------------------
+        // LEVEL 1 ACTIVITY 2: Function Machine Simulator
+        // -------------------------------------------------------------
+        const machinesData = [
+            { name: "Square Machine", formula: "x * x", desc: "Computes square of a number.", inputs: ["x"], defs: [5], run: (v) => v[0] * v[0] },
+            { name: "Area Calculator", formula: "w * h", desc: "Computes area of a rectangle.", inputs: ["width", "height"], defs: [10, 5], run: (v) => v[0] * v[1] },
+            { name: "Greeting Generator", formula: "'Hello, ' + name", desc: "Prints custom welcome messages.", inputs: ["name"], defs: ["Alice"], run: (v) => `Hello, ${v[0]}` },
+            { name: "Temperature Converter", formula: "(c * 9/5) + 32", desc: "Converts Celsius to Fahrenheit.", inputs: ["celsius"], defs: [25], run: (v) => (v[0] * 9 / 5) + 32 }
+        ];
+
+        function loadL1A2(container) {
+            const mac = machinesData[state.l1a2_scenario];
+
+            // 1. Selectors
+            const selector = document.createElement("div");
+            selector.className = "escape-panels-grid";
+            machinesData.forEach((m, idx) => {
+                selector.innerHTML += `
+          <div class="escape-panel-card ${state.l1a2_scenario === idx ? 'active' : ''}" onclick="setL1A2Scenario(${idx})">
+            <span style="font-size:1.25rem;">🖥️</span>
+            <div style="font-weight:700; font-size:0.8rem; margin-top:4px;">${m.name}</div>
+          </div>
+        `;
+            });
+            container.appendChild(selector);
+
+            // 2. Input parameter boxes
+            const inputsWrapper = document.createElement("div");
+            inputsWrapper.style.width = "100%";
+            inputsWrapper.style.display = "flex";
+            inputsWrapper.style.flexDirection = "column";
+            inputsWrapper.style.gap = "0.75rem";
+            inputsWrapper.style.margin = "1rem 0";
+
+            let inputsHTML = '';
+            mac.inputs.forEach((inp, idx) => {
+                const val = mac.defs[idx];
+                inputsHTML += `
+          <div class="slider-group">
+            <label>${inp} (Input Parameter)</label>
+            <input type="text" class="slider-control" id="mac-input-${idx}" value="${val}" style="padding: 0.5rem; border:1px solid var(--border-color); border-radius:6px; font-family:var(--font-code);">
+          </div>
+        `;
+            });
+            inputsWrapper.innerHTML = inputsHTML;
+            container.appendChild(inputsWrapper);
+
+            // 3. Animated machine diagram
+            const pipeline = document.createElement("div");
+            pipeline.className = "pipeline-visualizer";
+            pipeline.innerHTML = `
+        <div class="pipeline-chamber" id="ch-input"><span>Inputs</span></div>
+        <div class="pipeline-pathway" id="pa-in">
+          <div class="pipeline-ball" id="pa-ball"></div>
+        </div>
+        <div class="pipeline-chamber" id="ch-core" style="width:90px; height:90px;"><span>${mac.formula}</span></div>
+        <div class="pipeline-pathway" id="pa-out"></div>
+        <div class="pipeline-chamber" id="ch-output"><span>Return</span><strong id="pa-out-val" style="margin-top:2px; color:var(--primary-accent);">?</strong></div>
+      `;
+            container.appendChild(pipeline);
+
+            updateL1A2CodeSync();
+        }
+
+        function setL1A2Scenario(idx) {
+            if (state.isExecuting) return;
+            state.l1a2_scenario = idx;
+            loadActivity();
+        }
+
+        function updateL1A2CodeSync() {
+            const mac = machinesData[state.l1a2_scenario];
+            const params = mac.inputs.join(", ");
+
+            const codePanel = document.getElementById("code-synced-panel");
+            codePanel.innerHTML = `
+        <div class="code-line" id="l1a2-line1"><span class="code-line-num">1</span><span class="code-keyword">def</span> compute(${params}):</div>
+        <div class="code-line" id="l1a2-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;res = ${mac.formula}</div>
+        <div class="code-line" id="l1a2-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> res</div>
+      `;
+        }
+
+        function runL1A2Execution() {
+            state.isExecuting = true;
+            const mac = machinesData[state.l1a2_scenario];
+
+            let vals = [];
+            mac.inputs.forEach((_, idx) => {
+                let rawVal = document.getElementById(`mac-input-${idx}`).value.trim();
+                // try parsing float/int
+                if (!isNaN(rawVal)) rawVal = parseFloat(rawVal);
+                vals.push(rawVal);
+            });
+
+            appendTerminal(`>>> Invoking compute(${vals.join(', ')})`);
+
+            const ball = document.getElementById("pa-ball");
+            const pathIn = document.getElementById("pa-in");
+            const pathOut = document.getElementById("pa-out");
+            const chInput = document.getElementById("ch-input");
+            const chCore = document.getElementById("ch-core");
+            const chOutput = document.getElementById("ch-output");
+            const visVal = document.getElementById("pa-out-val");
+
+            // Reset
+            ball.style.display = "none";
+            ball.style.left = "0px";
+            chInput.classList.remove("active");
+            chCore.classList.remove("active");
+            chOutput.classList.remove("active");
+            visVal.textContent = "?";
+
+            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+            // Line 1: Call
+            document.getElementById("l1a2-line1").classList.add("active-exec");
+            chInput.classList.add("active");
+
+            let vars = {};
+            mac.inputs.forEach((name, idx) => {
+                vars[name] = vals[idx];
+            });
+            updateInspector(vars);
+
+            setTimeout(() => {
+                document.getElementById("l1a2-line1").classList.remove("active-exec");
+                document.getElementById("l1a2-line2").classList.add("active-exec");
+                chCore.classList.add("active");
+
+                // Animate input moving
+                ball.style.display = "block";
+                ball.style.left = `${pathIn.offsetWidth - 24}px`;
+
+                const outVal = mac.run(vals);
+
+                setTimeout(() => {
+                    document.getElementById("l1a2-line2").classList.remove("active-exec");
+                    document.getElementById("l1a2-line3").classList.add("active-exec");
+
+                    vars["res"] = outVal;
+                    updateInspector(vars);
+                    appendTerminal(`Processing formula... returned: ${outVal}`);
+
+                    // Output animation
+                    ball.style.display = "none";
+                    pathOut.appendChild(ball);
+                    ball.style.display = "block";
+                    ball.style.left = `${pathOut.offsetWidth - 24}px`;
+
+                    setTimeout(() => {
+                        document.getElementById("l1a2-line3").classList.remove("active-exec");
+                        chOutput.classList.add("active");
+                        visVal.textContent = outVal;
+                        appendTerminal(`Function complete. Output: ${outVal}`, true);
+                        state.isExecuting = false;
+                    }, state.speedMs);
+
+                }, state.speedMs);
+
+            }, state.speedMs);
+        }
+
+        // -------------------------------------------------------------
+        // LEVEL 2 ACTIVITY 1: Parameter Matching Challenge
+        // -------------------------------------------------------------
+        function loadL2A1(container) {
+            // 1. Prompt description
+            const challengeCard = document.createElement("div");
+            challengeCard.className = "challenge-card";
+            challengeCard.innerHTML = `
+        <h4>FUNCTION PROMPT</h4>
+        <p>Supply arguments to call <code>calculate(price, tax=18)</code>. One required price parameter and one default tax parameter.</p>;
+      `;
+            container.appendChild(challengeCard);
+
+            // 2. Conveyor layout showing parameter buckets
+            const conveyor = document.createElement("div");
+            conveyor.className = "conveyor-belt-wrapper";
+
+            const s0 = state.l2a1_slots[0] || "arg_1";
+            const s1 = state.l2a1_slots[1] || "arg_2";
+
+            conveyor.innerHTML = `
+        <div style="font-family:var(--font-code); font-size:0.8rem; font-weight:700;">FUNCTION DEFINITION: def calculate(price, tax=18):</div>
+        <div class="argument-conveyor" id="conveyor-bays">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+            <span style="font-size:0.7rem; color:white;">price (Required)</span>
+            <div class="slot ${state.l2a1_slots[0] ? 'filled' : ''}" data-slot-type="arg1" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s0}</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
+            <span style="font-size:0.7rem; color:white;">tax (Default=18)</span>
+            <div class="slot ${state.l2a1_slots[1] ? 'filled' : ''}" data-slot-type="arg2" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s1}</div>
+          </div>
+        </div>
+      `;
+            container.appendChild(conveyor);
+
+            // 3. Chips bank
+            const bank = document.createElement("div");
+            bank.className = "chips-bank";
+            const chips = ["150", "200", "tax=5", "price=100", "18", "tax=12"];
+            chips.forEach((cVal, idx) => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.draggable = true;
+                chip.textContent = cVal;
+                chip.id = `chip-l2a1-${idx}`;
+                chip.ondragstart = (e) => handleDragStart(e, cVal);
+                chip.ondragend = handleDragEnd;
+                chip.onclick = () => selectChipForPlacement(chip);
+                bank.appendChild(chip);
+            });
+            container.appendChild(bank);
+
+            updateL2A1CodeSync();
+        }
+
+        function updateL2A1CodeSync() {
+            const s0 = state.l2a1_slots[0] || "___";
+            const s1 = state.l2a1_slots[1] || "";
+            const comma = s1 ? ", " : "";
+
+            const codePanel = document.getElementById("code-synced-panel");
+            codePanel.innerHTML = `
+        <div class="code-line" id="l2a1-line1"><span class="code-line-num">1</span><span class="code-keyword">def</span> calculate(price, tax=18):</div>
+        <div class="code-line" id="l2a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;total = price + (price * tax / 100)</div>
+        <div class="code-line" id="l2a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> total</div>
+        <div class="code-line" id="l2a1-line4"><span class="code-line-num">4</span>res = calculate(${s0}${comma}${s1})</div>
+      `;
+        }
+
+        function runL2A1Execution() {
+            if (!state.l2a1_slots[0]) {
+                triggerAlert("Fill in the price argument slot first!", "error");
+                return;
+            }
+
+            state.isExecuting = true;
+            appendTerminal(">>> Evaluating function call matching...");
+
+            // Positional args check logic
+            let priceVal = 0;
+            let taxVal = 18; // Default value
+
+            let s0 = state.l2a1_slots[0];
+            let s1 = state.l2a1_slots[1];
+
+            // Parse argument 1
+            if (s0.startsWith("price=")) priceVal = parseFloat(s0.split("=")[1]);
+            else if (s0.startsWith("tax=")) {
+                triggerAlert("Error: Positional argument cannot follow keyword argument!", "error");
+                appendTerminal(">>> SyntaxError: positional argument follows keyword argument", false);
+                state.isExecuting = false;
+                return;
+            } else {
+                priceVal = parseFloat(s0);
+            }
+
+            // Parse argument 2
+            if (s1) {
+                if (s1.startsWith("tax=")) taxVal = parseFloat(s1.split("=")[1]);
+                else if (s1.startsWith("price=")) {
+                    // Double assign price
+                    triggerAlert("TypeError: calculate() got multiple values for argument 'price'", "error");
+                    appendTerminal(">>> TypeError: calculate() got multiple values for argument 'price'", false);
+                    state.isExecuting = false;
+                    return;
+                } else {
+                    taxVal = parseFloat(s1);
                 }
-            });
-            document.getElementById('l4-score').textContent = score;
-            const feedback = document.getElementById('l4-feedback');
-            if (score === 4) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Excellent! The function signature specifies a Callable argument and Union return type, guarded by a boundary check.';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Annotation or guard mismatch. Verify Callable syntax and Union return types. Reshuffling pool!';
-                shufflePools();
             }
+
+            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+            // Line 4: Call
+            document.getElementById("l2a1-line4").classList.add("active-exec");
+            appendTerminal(`Calling calculate() with price = ${priceVal}, tax = ${taxVal}`);
+            updateInspector({ "price": priceVal, "tax": taxVal });
+
+            setTimeout(() => {
+                document.getElementById("l2a1-line4").classList.remove("active-exec");
+                document.getElementById("l2a1-line2").classList.add("active-exec");
+
+                const totalVal = priceVal + (priceVal * taxVal / 100);
+
+                setTimeout(() => {
+                    document.getElementById("l2a1-line2").classList.remove("active-exec");
+                    document.getElementById("l2a1-line3").classList.add("active-exec");
+                    updateInspector({ "price": priceVal, "tax": taxVal, "total": totalVal });
+                    appendTerminal(`Returning total bill: ${totalVal}`);
+
+                    setTimeout(() => {
+                        document.getElementById("l2a1-line3").classList.remove("active-exec");
+                        appendTerminal(`Execution complete. Bill total: ${totalVal}`, true);
+                        triggerAlert("Verification success!", "success");
+                        state.isExecuting = false;
+                    }, state.speedMs);
+
+                }, state.speedMs);
+
+            }, state.speedMs);
         }
 
-        function l5Verify() {
-            const slots = ['l5-zone-0', 'l5-zone-1', 'l5-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
+        // -------------------------------------------------------------
+        // LEVEL 2 ACTIVITY 2: Delivery Robot Simulator
+        // -------------------------------------------------------------
+        const robotScenarios = [
+            {
+                order: "Fulfil Order #104: Ship package to 'Alice', weighing 10kg, marked as fragile.",
+                funcDef: 'def ship(recipient, weight, speed="Standard", fragile=False):',
+                packages: [
+                    { name: '"Alice"', type: "Required", slotIdx: 0, val: '"Alice"', syncCode: '"Alice"', label: "recipient" },
+                    { name: "10", type: "Required", slotIdx: 1, val: "10", syncCode: "10", label: "weight" },
+                    { name: "speed (Omitted)", type: "Default", slotIdx: 2, val: '"Standard"', syncCode: null, label: "speed", isOmitted: true },
+                    { name: "fragile=True", type: "Keyword", slotIdx: 3, val: "True", syncCode: "fragile=True", label: "fragile" }
+                ],
+                targetCall: 'ship("Alice", 10, fragile=True)'
+            },
+            {
+                order: "Fulfil Order #105: Ship package to 'Bob', weighing 5kg, default speed & default safety.",
+                funcDef: 'def ship(recipient, weight, speed="Standard", fragile=False):',
+                packages: [
+                    { name: 'recipient="Bob"', type: "Keyword", slotIdx: 0, val: '"Bob"', syncCode: 'recipient="Bob"', label: "recipient" },
+                    { name: "weight=5", type: "Keyword", slotIdx: 1, val: "5", syncCode: "weight=5", label: "weight" },
+                    { name: "speed (Omitted)", type: "Default", slotIdx: 2, val: '"Standard"', syncCode: null, label: "speed", isOmitted: true },
+                    { name: "fragile (Omitted)", type: "Default", slotIdx: 3, val: "False", syncCode: null, label: "fragile", isOmitted: true }
+                ],
+                targetCall: 'ship(recipient="Bob", weight=5)'
+            },
+            {
+                order: "Fulfil Order #106: Ship package to 'Charlie', weighing 12kg, Priority delivery speed.",
+                funcDef: 'def ship(recipient, weight, speed="Standard", fragile=False):',
+                packages: [
+                    { name: '"Charlie"', type: "Required", slotIdx: 0, val: '"Charlie"', syncCode: '"Charlie"', label: "recipient" },
+                    { name: "12", type: "Required", slotIdx: 1, val: "12", syncCode: "12", label: "weight" },
+                    { name: 'speed="Priority"', type: "Keyword", slotIdx: 2, val: '"Priority"', syncCode: 'speed="Priority"', label: "speed" },
+                    { name: "fragile (Omitted)", type: "Default", slotIdx: 3, val: "False", syncCode: null, label: "fragile", isOmitted: true }
+                ],
+                targetCall: 'ship("Charlie", 12, speed="Priority")'
+            }
+        ];
+
+        function loadL2A2(container) {
+            if (state.l2a2_step === undefined) {
+                state.l2a2_step = 0;
+            }
+            if (state.l2a2_placed === undefined || state.l2a2_placed.length === 0) {
+                state.l2a2_placed = ["___", "___", '"Standard"', "False"];
+            }
+
+            const sc = robotScenarios[state.l2a2_scenario];
+            const currentPkg = sc.packages[state.l2a2_step];
+
+            // 1. Order Briefing Card
+            const challengeCard = document.createElement("div");
+            challengeCard.className = "challenge-card";
+            challengeCard.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <h4 style="margin:0;">ORDER FULFILLMENT</h4>
+                    <span style="font-size:0.75rem; font-weight:700; background:var(--primary-accent); color:white; padding:2px 8px; border-radius:10px;">Order ${state.l2a2_scenario + 1} of 3</span>
+                </div>
+                <p><strong>${sc.order}</strong></p>
+                <div style="font-family:var(--font-code); font-size:0.75rem; margin-top:0.5rem; color:var(--text-secondary);">
+                    Function Signature: <code>${sc.funcDef}</code>
+                </div>
+            `;
+            container.appendChild(challengeCard);
+
+            // 2. Robot SVG map layout (Centered & Spaced out dynamically)
+            const bayWrapper = document.createElement("div");
+            bayWrapper.className = "warehouse-bay";
+            bayWrapper.style.height = "200px";
+            bayWrapper.style.display = "flex";
+            bayWrapper.style.flexDirection = "column";
+            bayWrapper.style.justifyContent = "space-between";
+            bayWrapper.style.padding = "10px";
+            bayWrapper.style.position = "relative";
+            bayWrapper.style.background = "#cbd5e1";
+            bayWrapper.style.borderRadius = "var(--border-radius-lg)";
+            bayWrapper.style.border = "2px solid #94a3b8";
+
+            bayWrapper.innerHTML = `
+                <!-- 4 Parameter bays at the top -->
+                <div style="display: flex; justify-content: space-around; width: 100%; gap: 6px;">
+                    <div class="bay-zone" id="bay-0" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">recipient<br><strong id="bay-val-0">${state.l2a2_placed[0]}</strong></div>
+                    <div class="bay-zone" id="bay-1" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">weight<br><strong id="bay-val-1">${state.l2a2_placed[1]}</strong></div>
+                    <div class="bay-zone" id="bay-2" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">speed<br><strong id="bay-val-2">${state.l2a2_placed[2]}</strong></div>
+                    <div class="bay-zone" id="bay-3" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">fragile<br><strong id="bay-val-3">${state.l2a2_placed[3]}</strong></div>
+                </div>
+                
+                <!-- Robot starts at pickup bay at the bottom center -->
+                <div class="delivery-robot-svg" id="py-robot" style="position: absolute; bottom: 10px; left: calc(50% - 20px); transition: all 1s ease-in-out;">
+                    <svg viewBox="0 0 100 100" width="40" height="40">
+                        <circle cx="50" cy="50" r="40" fill="#e10600" />
+                        <circle cx="35" cy="45" r="8" fill="#fff" />
+                        <circle cx="65" cy="45" r="8" fill="#fff" />
+                        <rect x="40" y="65" width="20" height="6" fill="white" />
+                        <circle cx="50" cy="15" r="10" fill="#cbd5e1" />
+                    </svg>
+                </div>
+            `;
+            container.appendChild(bayWrapper);
+
+            // 3. Package details area
+            const pkgBox = document.createElement("div");
+            pkgBox.style.width = "100%";
+            pkgBox.style.background = "rgba(0,0,0,0.02)";
+            pkgBox.style.border = "1px solid var(--border-color)";
+            pkgBox.style.borderRadius = "8px";
+            pkgBox.style.padding = "0.75rem";
+            pkgBox.style.textAlign = "center";
+            pkgBox.style.marginTop = "0.75rem";
+
+            if (currentPkg) {
+                pkgBox.innerHTML = `
+                    <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-secondary);">Active Package to Route:</div>
+                    <div style="font-family:var(--font-code); font-size:1.1rem; font-weight:800; color:var(--primary-accent); margin-top:4px; padding:4px 12px; display:inline-block; border:2px solid var(--primary-accent); border-radius:6px; background:white; box-shadow:2px 2px 0 var(--border-color);">${currentPkg.name}</div>
+                `;
+            } else {
+                pkgBox.innerHTML = `
+                    <div style="color:var(--success-green); font-weight:700; font-size:0.9rem;">🎉 All packages routed! Click [Run Code] to fulfill shipment.</div>
+                `;
+            }
+            container.appendChild(pkgBox);
+
+            // 4. Selection choices buttons (Route selectors)
+            if (currentPkg) {
+                const choices = document.createElement("div");
+                choices.style.display = "flex";
+                choices.style.gap = "0.5rem";
+                choices.style.marginTop = "0.75rem";
+                choices.style.width = "100%";
+                choices.style.justifyContent = "center";
+
+                const routes = [
+                    { name: "Required", label: "Required / Positional" },
+                    { name: "Default", label: "Default / Omit" },
+                    { name: "Keyword", label: "Keyword" }
+                ];
+                routes.forEach(r => {
+                    const btn = document.createElement("button");
+                    btn.className = `btn btn-secondary ${state.l2a2_selection === r.name ? 'btn-primary' : ''}`;
+                    btn.style.fontSize = "0.75rem";
+                    btn.style.padding = "0.4rem 0.75rem";
+                    btn.textContent = r.label;
+                    btn.onclick = () => {
+                        if (state.isExecuting) return;
+                        state.l2a2_selection = r.name;
+                        loadActivity();
+                    };
+                    choices.appendChild(btn);
+                });
+                container.appendChild(choices);
+            }
+
+            updateL2A2CodeSync();
+        }
+
+        function updateL2A2CodeSync() {
+            const sc = robotScenarios[state.l2a2_scenario];
+            let codeArgs = [];
+            sc.packages.slice(0, state.l2a2_step).forEach(pkg => {
+                if (pkg.syncCode) codeArgs.push(pkg.syncCode);
+            });
+            const codePanel = document.getElementById("code-synced-panel");
+            codePanel.innerHTML = `
+                <div class="code-line"><span class="code-line-num">1</span><span class="code-keyword">def</span> ship(recipient, weight, speed="Standard", fragile=False):</div>
+                <div class="code-line"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;print(f"Shipping order: {recipient}, weight={weight}, speed={speed}, fragile={fragile}")</div>
+                <div class="code-line"><span class="code-line-num">3</span>ship(${codeArgs.join(", ")})</div>
+            `;
+        }
+
+        function runL2A2Execution() {
+            const sc = robotScenarios[state.l2a2_scenario];
+            const currentPkg = sc.packages[state.l2a2_step];
+
+            if (!currentPkg) {
+                state.isExecuting = true;
+                appendTerminal(">>> Shipping label generated successfully!");
+                updateInspector({
+                    recipient: sc.packages.find(p => p.label === 'recipient').val,
+                    weight: sc.packages.find(p => p.label === 'weight').val,
+                    speed: sc.packages.find(p => p.label === 'speed').val,
+                    fragile: sc.packages.find(p => p.label === 'fragile').val
+                });
+                setTimeout(() => {
+                    triggerAlert(`Order fulfilled successfully!`, "success");
+                    appendTerminal(`>>> Order completed and dispatched.`, true);
+                    state.isExecuting = false;
+
+                    if (state.l2a2_scenario < robotScenarios.length - 1) {
+                        state.l2a2_scenario++;
+                        state.l2a2_step = 0;
+                        state.l2a2_placed = ["___", "___", '"Standard"', "False"];
+                        loadActivity();
+                    } else {
+                        triggerAlert("All warehouse shipping orders completed!", "success");
+                    }
+                }, 1000);
+                return;
+            }
+
+            if (!state.l2a2_selection) {
+                triggerAlert("Select package delivery route class first!", "error");
+                return;
+            }
+
+            state.isExecuting = true;
+            appendTerminal(`>>> Programming robot path for: ${currentPkg.name}...`);
+
+            const robot = document.getElementById("py-robot");
+            const route = state.l2a2_selection;
+            const correctRoute = currentPkg.type;
+
+            const targetBay = document.getElementById("bay-" + currentPkg.slotIdx);
+            const targetX = targetBay.offsetLeft + (targetBay.offsetWidth - 40) / 2;
+            const targetY = targetBay.offsetTop + targetBay.offsetHeight;
+
+            robot.style.top = targetY + "px";
+            robot.style.left = targetX + "px";
+
+            setTimeout(() => {
+                if (route === correctRoute) {
+                    triggerAlert(`Robot routed correctly!`, "success");
+                    appendTerminal(`>>> Package ${currentPkg.name} successfully delivered to parameter '${currentPkg.label}'.`, true);
+                    
+                    state.l2a2_placed[currentPkg.slotIdx] = currentPkg.val;
+                    state.l2a2_step++;
+                    state.l2a2_selection = "";
+
+                    setTimeout(() => {
+                        robot.style.top = "";
+                        robot.style.bottom = "10px";
+                        robot.style.left = "calc(50% - 20px)";
+                        loadActivity();
+                    }, 1000);
+                } else {
+                    triggerAlert(`Delivery crash! Route mismatch.`, "error");
+                    let errMsg = `TypeError: ship() missing required positional argument: '${currentPkg.label}'`;
+                    if (route === "Keyword" && correctRoute === "Required") {
+                        errMsg = `SyntaxError: positional argument follows keyword argument`;
+                    }
+                    appendTerminal(`>>> Mismatch. Expected route: ${correctRoute}, Routed via: ${route}. ${errMsg}`, false);
+
+                    setTimeout(() => {
+                        robot.style.top = "";
+                        robot.style.bottom = "10px";
+                        robot.style.left = "calc(50% - 20px)";
+                        state.isExecuting = false;
+                    }, 1200);
                 }
+            }, 1000);
+        }
+
+        // -------------------------------------------------------------
+        // LEVEL 3 ACTIVITY 1: Smart Function Designer
+        // -------------------------------------------------------------
+        const architectScenarios = [
+            {
+                title: "BMI Calculator",
+                desc: "Assemble a function compute_bmi(w, h) that returns body mass index (w / h^2).",
+                slots: ["def", "name", "param", "body", "return"],
+                chips: ["def", "compute_bmi", "(w, h):", "bmi = w / (h * h)", "return bmi", "return", "pass", "w", "h"],
+                targets: ["def", "compute_bmi", "(w, h):", "bmi = w / (h * h)", "return bmi"]
+            },
+            {
+                title: "Discount Calculator",
+                desc: "Assemble a function get_discount(price, rate=10) that returns discounted price.",
+                slots: ["def", "name", "param", "body", "return"],
+                chips: ["def", "get_discount", "(price, rate=10):", "val = price * (rate/100)", "return val", "return", "price", "rate"],
+                targets: ["def", "get_discount", "(price, rate=10):", "val = price * (rate/100)", "return val"]
+            }
+        ];
+
+        function loadL3A1(container) {
+            const sc = architectScenarios[state.l3a1_scenario];
+
+            // 1. Selector tabs
+            const selector = document.createElement("div");
+            selector.style.display = "flex";
+            selector.style.gap = "0.5rem";
+            selector.style.marginBottom = "1rem";
+
+            architectScenarios.forEach((s, idx) => {
+                selector.innerHTML += `
+          <button class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="setL3A1Scenario(${idx})">${s.title}</button>
+        `;
             });
-            document.getElementById('l5-score').textContent = score;
-            const feedback = document.getElementById('l5-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Correct unpacking! *middle acts as a starred expression collecting the leftover sequence items into a list!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Unpacking mismatch. Confirm the placement of the asterisk * operator on the remainder variable. Reshuffling pool!';
-                shufflePools();
+            container.appendChild(selector);
+
+            // 2. Prompt Card
+            const challengeCard = document.createElement("div");
+            challengeCard.className = "challenge-card";
+            challengeCard.innerHTML = `
+        <h4>DESIGN MISSION</h4>
+        <p>${sc.desc}</p>
+      `;
+            container.appendChild(challengeCard);
+
+            // 3. Indented layout slots
+            const editor = document.createElement("div");
+            editor.style.width = "100%";
+            editor.style.margin = "1rem 0";
+
+            const s0 = state.l3a1_slots[0] || "def";
+            const s1 = state.l3a1_slots[1] || "name";
+            const s2 = state.l3a1_slots[2] || "(params):";
+            const s3 = state.l3a1_slots[3] || "body_expression";
+            const s4 = state.l3a1_slots[4] || "return_expression";
+
+            editor.innerHTML = `
+        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <div class="slot ${state.l3a1_slots[0] ? 'filled' : ''}" data-slot-type="def" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
+            <div class="slot ${state.l3a1_slots[1] ? 'filled' : ''}" data-slot-type="name" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s1}</div>
+            <div class="slot ${state.l3a1_slots[2] ? 'filled' : ''}" data-slot-type="param" data-index="2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s2}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
+            <div class="slot ${state.l3a1_slots[3] ? 'filled' : ''}" data-slot-type="body" data-index="3" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s3}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
+            <div class="slot ${state.l3a1_slots[4] ? 'filled' : ''}" data-slot-type="return" data-index="4" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s4}</div>
+          </div>
+        </div>
+      `;
+            container.appendChild(editor);
+
+            // 4. Chip bank
+            const bank = document.createElement("div");
+            bank.className = "chips-bank";
+            sc.chips.forEach((cVal, idx) => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.draggable = true;
+                chip.textContent = cVal;
+                chip.id = `chip-l3a1-${idx}`;
+                chip.ondragstart = (e) => handleDragStart(e, cVal);
+                chip.ondragend = handleDragEnd;
+                chip.onclick = () => selectChipForPlacement(chip);
+                bank.appendChild(chip);
+            });
+            container.appendChild(bank);
+
+            updateL3A1CodeSync();
+        }
+
+        function setL3A1Scenario(idx) {
+            if (state.isExecuting) return;
+            state.l3a1_scenario = idx;
+            state.l3a1_slots = ["", "", "", "", ""];
+            loadActivity();
+        }
+
+        function updateL3A1CodeSync() {
+            const s0 = state.l3a1_slots[0] || "___";
+            const s1 = state.l3a1_slots[1] || "___";
+            const s2 = state.l3a1_slots[2] || "___";
+            const s3 = state.l3a1_slots[3] || "___";
+            const s4 = state.l3a1_slots[4] || "___";
+
+            const codePanel = document.getElementById("code-synced-panel");
+            codePanel.innerHTML = `
+        <div class="code-line"><span class="code-line-num">1</span><span class="code-keyword">${s0}</span> ${s1}${s2}</div>
+        <div class="code-line"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;${s3}</div>
+        <div class="code-line"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;${s4}</div>
+      `;
+        }
+
+        function runL3A1Execution() {
+            const sc = architectScenarios[state.l3a1_scenario];
+            let correct = true;
+            state.l3a1_slots.forEach((val, idx) => {
+                if (val !== sc.targets[idx]) correct = false;
+            });
+
+            if (!correct) {
+                triggerAlert("Function architecture incomplete or invalid!", "error");
+                appendTerminal(">>> LogicError: parameters / return mismatch.", false);
+                return;
+            }
+
+            state.isExecuting = true;
+            appendTerminal(">>> Verifying architectural computations...");
+
+            setTimeout(() => {
+                triggerAlert("Calculation validated successfully!", "success");
+                appendTerminal(">>> Success! Function computes and returns correct outputs.", true);
+                state.isExecuting = false;
+            }, 1000);
+        }
+
+        // -------------------------------------------------------------
+        // LEVEL 3 ACTIVITY 2: Function Escape Room
+        // -------------------------------------------------------------
+        function loadL3A2(container) {
+            // 1. Selector panels
+            const grid = document.createElement("div");
+            grid.className = "escape-panels-grid";
+
+            escapePanelsData.forEach((panel, idx) => {
+                const solved = state.escapePanelsSolved[idx];
+                grid.innerHTML += `
+          <div class="escape-panel-card ${solved ? 'solved' : ''} ${state.activeEscapePanel === idx ? 'active' : ''}" onclick="selectEscapePanel(${idx})">
+            <div class="escape-status-badge ${solved ? 'solved' : ''}">${solved ? 'Solved' : 'Room ' + (idx + 1)}</div>
+            <div style="font-weight:700; font-size:0.8rem; color:var(--text-secondary);">${panel.title}</div>
+          </div>
+        `;
+            });
+            container.appendChild(grid);
+
+            // 2. Active editor sandbox
+            const sandbox = document.createElement("div");
+            sandbox.className = "challenge-card";
+            sandbox.style.marginTop = "1rem";
+            sandbox.id = "escape-sandbox";
+            container.appendChild(sandbox);
+
+            loadEscapeRoomPanel();
+        }
+
+        function selectEscapePanel(idx) {
+            if (state.isExecuting) return;
+            state.activeEscapePanel = idx;
+            state.l3a2_slots = ["", ""];
+            loadL3A2(document.getElementById("sim-content-area"));
+        }
+
+        function loadEscapeRoomPanel() {
+            const panel = escapePanelsData[state.activeEscapePanel];
+            const box = document.getElementById("escape-sandbox");
+
+            let inlineCodeHTML = '';
+            if (state.activeEscapePanel === 0) {
+                // Syntax Repair
+                const s0 = state.l3a2_slots[0] || "keyword";
+                const s1 = state.l3a2_slots[1] || "delimiter";
+                inlineCodeHTML = `
+          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1rem; border-radius: 8px; text-align: left; line-height: 1.8;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <div class="slot ${state.l3a2_slots[0] ? 'filled' : ''}" data-slot-type="def" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
+              multiply(a, b)
+              <div class="slot ${state.l3a2_slots[1] ? 'filled' : ''}" data-slot-type="colon" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 50px; height: 28px;">${s1}</div>
+            </div>
+            <div style="padding-left:24px;">return a * b</div>
+            <div style="margin-top:10px; color:#64748b;">val = multiply(3, 4)</div>
+          </div>
+        `;
+            } else if (state.activeEscapePanel === 1) {
+                // Required Arguments
+                const s0 = state.l3a2_slots[0] || "arg1";
+                const s1 = state.l3a2_slots[1] || "arg2";
+                inlineCodeHTML = `
+          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1rem; border-radius: 8px; text-align: left; line-height: 1.8;">
+            <div><span class="code-keyword">def</span> calculate_bill(price, tax):</div>
+            <div style="padding-left:24px;">return price + (price * tax / 100)</div>
+            <div style="margin-top:10px; display:flex; align-items:center; gap:0.25rem;">
+              total = calculate_bill(
+              <div class="slot ${state.l3a2_slots[0] ? 'filled' : ''}" data-slot-type="a1" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
+              ,
+              <div class="slot ${state.l3a2_slots[1] ? 'filled' : ''}" data-slot-type="a2" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s1}</div>
+              )
+            </div>
+          </div>
+        `;
+            } else if (state.activeEscapePanel === 2) {
+                // Return Value
+                const s0 = state.l3a2_slots[0] || "keyword";
+                const s1 = state.l3a2_slots[1] || "variable";
+                inlineCodeHTML = `
+          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1rem; border-radius: 8px; text-align: left; line-height: 1.8;">
+            <div><span class="code-keyword">def</span> get_score(correct, penalty):</div>
+            <div style="padding-left:24px;">score = (correct * 4) - penalty</div>
+            <div style="padding-left:24px; display:flex; align-items:center; gap:0.5rem; margin-top:4px;">
+              <div class="slot ${state.l3a2_slots[0] ? 'filled' : ''}" data-slot-type="ret" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s0}</div>
+              <div class="slot ${state.l3a2_slots[1] ? 'filled' : ''}" data-slot-type="var" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s1}</div>
+            </div>
+            <div style="margin-top:10px; color:#64748b;">res = get_score(10, 2)</div>
+          </div>
+        `;
+            }
+
+            box.innerHTML = `
+        <div style="background:rgba(225, 6, 0, 0.02); padding:0.75rem; border-radius:6px; margin-bottom:1rem; border:1px solid rgba(225, 6, 0, 0.05);">
+          <strong style="font-size:0.8rem; text-transform:uppercase; color:var(--primary-accent);">Task description:</strong>
+          <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.25rem;">${panel.desc}</p>
+        </div>
+        
+        <div style="margin: 1rem 0;">
+          ${inlineCodeHTML}
+        </div>
+
+        <div class="chips-bank" id="escape-chips-bank"></div>
+      `;
+
+            // Load chips
+            const chipBank = document.getElementById("escape-chips-bank");
+            panel.chips.forEach((cVal, idx) => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.draggable = true;
+                chip.textContent = cVal;
+                chip.id = `chip-escape-${idx}`;
+                chip.ondragstart = (e) => handleDragStart(e, cVal);
+                chip.ondragend = handleDragEnd;
+                chip.onclick = () => selectChipForPlacement(chip);
+                chipBank.appendChild(chip);
+            });
+
+            updateL3A2CodeSync();
+        }
+
+        function updateL3A2CodeSync() {
+            const panel = escapePanelsData[state.activeEscapePanel];
+            const slots = document.querySelectorAll(".slot");
+            let vals = new Array(panel.slots.length).fill("___");
+
+            if (slots.length > 0) {
+                slots.forEach(slot => {
+                    let text = slot.textContent.trim();
+                    const idx = parseInt(slot.getAttribute("data-index"));
+                    if (text.startsWith("Drop") || text === "keyword" || text === "delimiter" || text === "arg1" || text === "arg2" || text === "variable") {
+                        text = "___";
+                    }
+                    vals[idx] = text;
+                });
+            }
+
+            const codePanel = document.getElementById("code-synced-panel");
+            const rawLines = panel.code(vals).split("\n");
+            let html = "";
+            rawLines.forEach((line, idx) => {
+                html += `<div class="code-line" id="esc-line${idx + 1}"><span class="code-line-num">${idx + 1}</span><span class="code-line-text">${line}</span></div>`;
+            });
+            codePanel.innerHTML = html;
+        }
+
+        function runL3A2Execution() {
+            const panel = escapePanelsData[state.activeEscapePanel];
+            const slots = document.querySelectorAll(".slot");
+            let userVals = new Array(panel.slots.length);
+            let filledAll = true;
+
+            slots.forEach(slot => {
+                const text = slot.textContent.trim();
+                const idx = parseInt(slot.getAttribute("data-index"));
+                if (text.startsWith("Drop") || text === "keyword" || text === "delimiter" || text === "arg1" || text === "arg2" || text === "variable" || text === "___") {
+                    filledAll = false;
+                }
+                userVals[idx] = text;
+            });
+
+            if (!filledAll) {
+                triggerAlert("Fill in all missing slots inside the code block first!", "error");
+                return;
+            }
+
+            state.isExecuting = true;
+            let correct = true;
+            panel.targets.forEach((val, idx) => {
+                if (userVals[idx] !== val) correct = false;
+            });
+
+            appendTerminal(`Verifying panel ${state.activeEscapePanel + 1} validation loop...`);
+
+            setTimeout(() => {
+                if (correct) {
+                    state.escapePanelsSolved[state.activeEscapePanel] = true;
+                    appendTerminal(`Panel ${state.activeEscapePanel + 1} successfully repaired!`, true);
+                    triggerAlert(`Panel ${state.activeEscapePanel + 1} solved successfully!`, "success");
+
+                    // Check if all solved
+                    const allSolved = state.escapePanelsSolved.every(r => r === true);
+                    if (allSolved) {
+                        appendTerminal(">>> Success! All escape terminal panels repaired. Room unlocked.", true);
+                        triggerAlert("Escape Complete! Room Solved.", "success");
+                    }
+
+                    state.isExecuting = false;
+                    loadL3A2(document.getElementById("sim-content-area"));
+                } else {
+                    appendTerminal("Verification Failed! Incorrect replacement tokens.", false);
+                    triggerAlert("Verification failed! Output mismatches target parameters.", "error");
+                    state.isExecuting = false;
+                }
+            }, 1000);
+        }
+
+        // MAIN RUN DISPATCHER
+        function runExecution() {
+            if (state.isExecuting) return;
+
+            if (state.level === 1 && state.activity === 1) {
+                runL1A1Execution();
+            } else if (state.level === 1 && state.activity === 2) {
+                runL1A2Execution();
+            } else if (state.level === 2 && state.activity === 1) {
+                runL2A1Execution();
+            } else if (state.level === 2 && state.activity === 2) {
+                runL2A2Execution();
+            } else if (state.level === 3 && state.activity === 1) {
+                runL3A1Execution();
+            } else if (state.level === 3 && state.activity === 2) {
+                runL3A2Execution();
             }
         }
 
-        // ===================== SIMULATION LOGIC =====================
-        function s3l1Run() {
-            const name = document.getElementById('s3l1-name').value.trim() || 'greet';
-            const param = document.getElementById('s3l1-param').value.trim() || 'name';
-            const arg = document.getElementById('s3l1-arg').value.trim() || 'Alice';
-            const out = document.getElementById('s3l1-out');
-            const vis = document.getElementById('s3l1-vis');
-            out.innerHTML =
-                `<span class="com">>>> def ${name}(${param}):</span>
-        message = "Hello, " + ${param}
-        return message
-
-${name}(<span class="lbl">"${arg}"</span>)
-<span class="ok">→ "Hello, ${arg}"</span>
-
-<span class="com"># Without return: ${name}("${arg}") → None</span>`;
-            vis.style.display = 'block';
-            vis.innerHTML = `<div class="func-name">def ${name}(<span style="color:#b30500">${param}</span>):</div>
-<div style="margin-top:8px;">Parameters: <span class="param-tag">${param}</span></div>
-<div style="margin-top:8px;">Called with: <span class="param-tag" style="background:var(--red);">${arg}</span></div>
-<div class="return-val">return "Hello, ${arg}"</div>`;
+        function replaySimulation() {
+            if (state.isExecuting) return;
+            loadActivity();
         }
 
-        function s3l2Run() {
-            const item = document.getElementById('s3l2-item').value.trim() || 'coffee';
-            const qty = parseInt(document.getElementById('s3l2-qty').value) || 1;
-            const curr = document.getElementById('s3l2-curr').value.trim() || 'INR';
-            const price = parseFloat(document.getElementById('s3l2-price').value) || 0;
-            const out = document.getElementById('s3l2-out');
-            const total = (qty * price).toFixed(2);
-            out.innerHTML =
-                `<span class="com">>>> def order(item, price, qty=1, currency="INR"):</span>
-        total = qty * price
-        return f"{qty}x {item} @ {currency} {price} = {currency} {total}"
-
-<span class="com"># Required args: item="${item}", price=${price}</span>
-<span class="com"># Default/keyword: qty=${qty}, currency="${curr}"</span>
-
-order("${item}", ${price}, qty=${qty}, currency="${curr}")
-<span class="ok">→ "${qty}x ${item} @ ${curr} ${price} = ${curr} ${total}"</span>
-
-<span class="com"># Default args must come AFTER required args in def</span>
-<span class="com"># Keyword args can be passed in any order</span>`;
-        }
-
-        function s3l3Run() {
-            const argsRaw = document.getElementById('s3l3-args').value;
-            const kwargsRaw = document.getElementById('s3l3-kwargs').value;
-            const out = document.getElementById('s3l3-out');
-            const nums = argsRaw.split(',').map(s => s.trim()).filter(Boolean);
-            const total = nums.reduce((a, b) => a + parseFloat(b), 0);
-            const pairs = kwargsRaw.split(',').map(s => {
-                const [k, v] = s.split('=').map(x => x.trim());
-                return { k, v };
-            }).filter(p => p.k && p.v);
-            const kdict = pairs.map(p => `'${p.k}': '${p.v}'`).join(', ');
-            out.innerHTML =
-                `<span class="com">>>> def demo(*args, **kwargs):</span>
-        print(args)
-        print(kwargs)
-
-demo(${nums.join(', ')}, ${pairs.map(p => `${p.k}="${p.v}"`).join(', ')})
-
-args   →  (${nums.join(', ')})
-         <span class="com"># tuple of ${nums.length} positional arg(s)</span>
-
-kwargs →  {${kdict}}
-         <span class="com"># dict of ${pairs.length} keyword arg(s)</span>
-
-<span class="lbl">sum(*args):</span>  ${total.toFixed(2)}
-<span class="lbl">keys:</span>       [${pairs.map(p => `'${p.k}'`).join(', ')}]`;
-        }
-
-        function s3l4Run() {
-            const p = parseFloat(document.getElementById('s3l4-p').value);
-            const r = parseFloat(document.getElementById('s3l4-r').value);
-            const t = parseFloat(document.getElementById('s3l4-t').value);
-            const out = document.getElementById('s3l4-out');
-            if (isNaN(p) || p <= 0) { out.innerHTML = '<span class="err">ValueError: principal must be a positive number</span>'; return; }
-            if (isNaN(r) || r < 0) { out.innerHTML = '<span class="err">ValueError: rate cannot be negative</span>'; return; }
-            if (isNaN(t) || t <= 0) { out.innerHTML = '<span class="err">ValueError: time must be greater than 0</span>'; return; }
-            const si = (p * r * t / 100).toFixed(2);
-            const total = (p + parseFloat(si)).toFixed(2);
-            out.innerHTML =
-                `<span class="com">>>> def calc_interest(principal: float, rate: float, years: int) -> float:</span>
-        if principal <= 0: raise ValueError("principal must be positive")
-        if rate < 0:       raise ValueError("rate cannot be negative")
-        if years <= 0:     raise ValueError("years must be > 0")
-        return principal * rate * years / 100
-
-calc_interest(${p}, ${r}, ${t})
-
-<span class="lbl">Formula:</span>    SI = P × R × T / 100
-<span class="lbl">         </span>    SI = ${p} × ${r} × ${t} / 100
-<span class="ok">Simple Interest: ₹${si}</span>
-<span class="ok">Total Amount:    ₹${total}</span>
-<span class="com"># Type hints (:float, ->float) are documentation only</span>
-<span class="com"># Python won't error if you pass wrong types at runtime</span>`;
-        }
-
-        function s3l5Run() {
-            const raw = document.getElementById('s3l5-nums').value;
-            const nums = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-            const out = document.getElementById('s3l5-out');
-            if (!nums.length) { out.innerHTML = '<span class="err">Enter valid comma-separated numbers</span>'; return; }
-            const mn = Math.min(...nums);
-            const mx = Math.max(...nums);
-            const avg = (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2);
-            const med = [...nums].sort((a, b) => a - b);
-            const midMed = med.length % 2 === 0 ? (med[med.length / 2 - 1] + med[med.length / 2]) / 2 : med[Math.floor(med.length / 2)];
-            out.innerHTML =
-                `<span class="com">>>> def analyse(numbers):</span>
-        mn  = min(numbers)
-        mx  = max(numbers)
-        avg = sum(numbers) / len(numbers)
-        med = sorted(numbers)[len//2]
-        return mn, mx, avg, med   <span class="com"># tuple</span>
-
-analyse([${nums.join(', ')}])
-
-<span class="com"># Unpacking the returned tuple:</span>
-mn, mx, avg, med = analyse(numbers)
-
-<span class="lbl">mn  =</span>  ${mn}
-<span class="lbl">mx  =</span>  ${mx}
-<span class="lbl">avg =</span>  ${avg}
-<span class="lbl">med =</span>  ${midMed}
-<span class="ok">→ 4 values returned as one tuple, unpacked into 4 variables</span>`;
-        }
-
-        // Init
-        initDragAndDrop();
-        shufflePools();
-        s3l1Run();
+        // Start application
+        window.onload = () => {
+            switchLevel(1);
+        };
     </script>
 </body>
 
