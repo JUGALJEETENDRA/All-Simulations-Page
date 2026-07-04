@@ -1,1539 +1,2617 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Loops — while, for &amp; range()</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
-
-        :root {
-            --bg-main: #fffcfc;
-            --bg-card: #ffffff;
-            --bg-card-hover: #fffefe;
-            --border-color: #ffd1d5;
-            --border-glow: rgba(225, 6, 0, 0.15);
-            --red: #e10600;
-            --red-dark: #b30500;
-            --red-deep: #7a0000;
-            --white: #ffffff;
-            --off: #fff8f8;
-            --ink: #1a0808;
-            --mono: 'JetBrains Mono', 'Fira Code', monospace;
-            --display: 'Archivo Black', sans-serif;
-            --body: 'Inter', sans-serif;
-
-            /* Level badge colors */
-            --l1: #0057b7;
-            --l2: #2e7d32;
-            --l3: #e65100;
-            --l4: #6a1b9a;
-            --l5: #b71c1c;
-
-            /* Game Colors */
-            --correct: #2e7d32;
-            --correct-bg: rgba(46, 125, 50, 0.06);
-            --wrong: #b71c1c;
-            --wrong-bg: rgba(183, 28, 28, 0.06);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            font-family: var(--body);
-            background: var(--bg-main);
-            color: var(--ink);
-            scroll-behavior: smooth;
-            background-image:
-                radial-gradient(at 0% 0%, rgba(225, 6, 0, 0.02) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(0, 87, 183, 0.02) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(225, 6, 0, 0.02) 0px, transparent 50%);
-            background-attachment: fixed;
-        }
-
-        /* ===== HERO ===== */
-        .hero {
-            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-            color: var(--white);
-            padding: 80px 24px 80px;
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-            border-bottom: 4px solid var(--red-deep);
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            top: -300px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-
-        .hero h1 {
-            font-family: var(--display);
-            font-size: clamp(2.2rem, 7vw, 4.5rem);
-            line-height: 1.05;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, #ffffff, #ffccd0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero h1 span {
-            -webkit-text-fill-color: initial;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--white);
-        }
-
-        .hero p.sub {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            max-width: 680px;
-            margin-inline: auto;
-            color: #ffeaea;
-            line-height: 1.6;
-        }
-
-        main {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px 100px;
-        }
-
-        /* ===== SECTION HEADER ===== */
-        .sec-head {
-            margin-bottom: 32px;
-        }
-
-        .sec-num {
-            font-family: var(--mono);
-            color: var(--red);
-            font-weight: 700;
-            letter-spacing: 3px;
-            font-size: 0.85rem;
-        }
-
-        .sec-head h2 {
-            font-family: var(--display);
-            font-size: clamp(1.6rem, 4vw, 2.5rem);
-            text-transform: uppercase;
-            margin-top: 8px;
-            color: var(--red-deep);
-            border-bottom: 4px solid var(--red);
-            display: inline-block;
-            padding-bottom: 8px;
-        }
-
-        .sec-head p {
-            margin-top: 16px;
-            color: #5a4b4b;
-            max-width: 720px;
-            line-height: 1.65;
-            font-size: 1.05rem;
-        }
-
-        /* ===== LEVEL STRIP ===== */
-        .level-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 32px;
-        }
-
-        .lvl-pill {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 8px 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            color: #4b5563;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .lvl-pill:hover {
-            background: rgba(0, 0, 0, 0.04);
-            border-color: rgba(0, 0, 0, 0.1);
-            color: #111827;
-            transform: translateY(-2px);
-        }
-
-        .lvl-pill.active.l1 {
-            background: var(--l1);
-            color: #fff;
-            border-color: var(--l1);
-            box-shadow: 0 4px 12px rgba(0, 87, 183, 0.25);
-        }
-
-        .lvl-pill.active.l2 {
-            background: var(--l2);
-            color: #fff;
-            border-color: var(--l2);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-        }
-
-        .lvl-pill.active.l3 {
-            background: var(--l3);
-            color: #fff;
-            border-color: var(--l3);
-            box-shadow: 0 4px 12px rgba(230, 81, 0, 0.25);
-        }
-
-        .lvl-pill.active.l4 {
-            background: var(--l4);
-            color: #fff;
-            border-color: var(--l4);
-            box-shadow: 0 4px 12px rgba(106, 27, 154, 0.25);
-        }
-
-        .lvl-pill.active.l5 {
-            background: var(--l5);
-            color: #fff;
-            border-color: var(--l5);
-            box-shadow: 0 4px 12px rgba(183, 28, 28, 0.25);
-        }
-
-        .level-panel {
-            display: none;
-        }
-
-        .level-panel.active {
-            display: block;
-            animation: fadeIn .4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== CARD ===== */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid #ffd1d5;
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 28px;
-            box-shadow: 6px 6px 0 #ffebeb;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .card:hover {
-            border-color: var(--red);
-            transform: translateY(-2px);
-            box-shadow: 8px 8px 0 #ffd1d5;
-        }
-
-        .card h3 {
-            font-family: var(--display);
-            font-size: 1.15rem;
-            color: var(--ink);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .card h3 .tag {
-            font-family: var(--mono);
-            background: var(--red);
-            color: white;
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-right: 12px;
-            font-weight: 700;
-        }
-
-        .card h3 .lvl-tag {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-right: 12px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .card h3 .lvl-tag.l1 {
-            background: var(--l1);
-        }
-
-        .card h3 .lvl-tag.l2 {
-            background: var(--l2);
-        }
-
-        .card h3 .lvl-tag.l3 {
-            background: var(--l3);
-        }
-
-        .card h3 .lvl-tag.l4 {
-            background: var(--l4);
-        }
-
-        .card h3 .lvl-tag.l5 {
-            background: var(--l5);
-        }
-
-        .level-desc {
-            background: rgba(225, 6, 0, 0.02);
-            border-left: 4px solid var(--red);
-            border-radius: 0 10px 10px 0;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            color: #374151;
-            line-height: 1.7;
-            font-size: 0.95rem;
-            border-top: 1px solid rgba(225, 6, 0, 0.04);
-            border-right: 1px solid rgba(225, 6, 0, 0.04);
-            border-bottom: 1px solid rgba(225, 6, 0, 0.04);
-        }
-
-        .level-desc strong {
-            color: var(--red-deep);
-        }
-
-        .level-desc ul,
-        .level-desc ol {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-
-        /* ===== INPUTS ===== */
-        label {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #5a4b4b;
-            display: block;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input[type=text],
-        input[type=number],
-        select,
-        textarea {
-            font-family: var(--mono);
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #ffd1d5;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            background: #ffffff;
-            color: var(--ink);
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--red);
-            box-shadow: 0 0 10px rgba(225, 6, 0, 0.08);
-        }
-
-        .row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .row>div {
-            flex: 1;
-            min-width: 140px;
-        }
-
-        /* ===== BUTTONS ===== */
-        button.action {
-            font-family: var(--display);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--red);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(225, 6, 0, 0.2);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        button.action:hover {
-            background: var(--red-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(225, 6, 0, 0.3);
-        }
-
-        button.action:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 6px rgba(225, 6, 0, 0.2);
-        }
-
-        button.action.ghost {
-            background: transparent;
-            color: var(--red);
-            border: 2px solid var(--red);
-            box-shadow: none;
-        }
-
-        button.action.ghost:hover {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--red-dark);
-            border-color: var(--red-dark);
-        }
-
-        /* ===== OUTPUT ===== */
-        .output {
-            margin-top: 20px;
-            background: #fff8f8;
-            color: #1a0808;
-            font-family: var(--mono);
-            font-size: 0.9rem;
-            border-radius: 10px;
-            padding: 20px;
-            min-height: 60px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            border-left: 4px solid var(--red);
-            border: 1px solid #ffd1d5;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
-        }
-
-        .output .err {
-            color: #b30500;
-            font-weight: bold;
-        }
-
-        .output .com {
-            color: #7f8e9f;
-        }
-
-        .output .lbl {
-            color: #0057b7;
-            font-weight: bold;
-        }
-
-        .output .ok {
-            color: #1e7e34;
-            font-weight: bold;
-        }
-
-        /* ===== TABLE ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ffd1d5;
-            padding: 12px 14px;
-            text-align: left;
-        }
-
-        th {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--red-deep);
-            text-transform: uppercase;
-            font-size: 0.72rem;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        tr:nth-child(even) {
-            background: rgba(225, 6, 0, 0.01);
-        }
-
-        .progress-bar-wrap {
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 20px;
-            height: 8px;
-            margin-bottom: 32px;
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 20px;
-            background: linear-gradient(to right, var(--red), #ff7b7b);
-            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .challenge-box {
-            background: rgba(230, 81, 0, 0.02);
-            border: 1px dashed rgba(230, 81, 0, 0.3);
-            border-radius: 12px;
-            padding: 18px;
-            margin-top: 20px;
-        }
-
-        .challenge-box .ch-label {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--l3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .challenge-box p {
-            color: #374151;
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .indent-demo {
-            font-family: var(--mono);
-            background: #fff8f8;
-            color: #1a0808;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            overflow: auto;
-            border: 1px solid #ffd1d5;
-            margin-top: 10px;
-        }
-
-        .indent-demo .lvl0 {
-            color: #b30500;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl1 {
-            color: #15803d;
-            padding-left: 20px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl2 {
-            color: #b45309;
-            padding-left: 40px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl3 {
-            color: #6a1b9a;
-            padding-left: 60px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl4 {
-            color: #b71c1c;
-            padding-left: 80px;
-            display: block;
-            font-weight: bold;
-        }
-
-
-        /* ================= VISUALIZERS ================= */
-        .loop-track {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 16px;
-            min-height: 40px;
-        }
-
-        .loop-item {
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            background: var(--red);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            animation: pop .2s ease;
-            box-shadow: 2px 2px 0 var(--red-dark);
-        }
-
-        .loop-item.skip {
-            background: var(--bg-main);
-            color: #5a4b4b;
-            border: 1px solid var(--border-color);
-            box-shadow: none;
-        }
-
-        .loop-item.brk {
-            background: var(--ink);
-            color: #FFF;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        @keyframes pop {
-            from {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* ================= DRAG AND DROP CUSTOM STYLES ================= */
-        .game-container {
-            background: #fffafa;
-            color: var(--ink);
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 18px;
-            border: 1px solid #ffd1d5;
-            font-family: var(--mono);
-            box-shadow: inset 0 2px 8px rgba(225, 6, 0, 0.03), 6px 6px 0 #ffebeb;
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
-            padding-bottom: 12px;
-            margin-bottom: 18px;
-            font-size: 0.85rem;
-            color: #5a4b4b;
-        }
-
-        .game-score {
-            color: var(--red-deep);
-            font-weight: bold;
-        }
-
-        .items-pool {
-            background: rgba(0, 0, 0, 0.01);
-            padding: 18px;
-            border-radius: 10px;
-            min-height: 80px;
-            margin: 18px 0;
-            border: 1px dashed rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s;
-        }
-
-        .items-pool.hovered {
-            background: rgba(225, 6, 0, 0.02);
-            border-color: rgba(225, 6, 0, 0.25);
-        }
-
-        .draggable-item {
-            background: linear-gradient(135deg, var(--red) 0%, #ff5e6d 100%);
-            color: #fff;
-            border: 1px solid var(--red-dark);
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: grab;
-            user-select: none;
-            font-weight: 700;
-            font-size: 0.8rem;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.15);
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .draggable-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(225, 6, 0, 0.25);
-        }
-
-        .draggable-item:active {
-            cursor: grabbing;
-            transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(225, 6, 0, 0.15);
-        }
-
-        .draggable-item.dragging {
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
-
-        .drop-zone {
-            border: 2px dashed rgba(225, 6, 0, 0.2);
-            border-radius: 8px;
-            min-height: 40px;
-            min-width: 140px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.02);
-            vertical-align: middle;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-left: 10px;
-            padding: 3px;
-            color: var(--red-deep);
-        }
-
-        .drop-zone.hovered {
-            border-color: var(--red);
-            background: rgba(225, 6, 0, 0.08);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(225, 6, 0, 0.1);
-        }
-
-        .drop-zone .draggable-item {
-            margin: 0;
-            box-shadow: none;
-            padding: 6px 14px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .game-feedback {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            padding: 16px;
-            border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.3s;
-            border: 1px solid transparent;
-        }
-
-        .game-feedback.correct {
-            display: block;
-            background: var(--correct-bg);
-            border-color: var(--correct);
-            color: var(--correct);
-            box-shadow: 0 0 20px rgba(46, 125, 50, 0.05);
-        }
-
-        .game-feedback.wrong {
-            display: block;
-            background: var(--wrong-bg);
-            border-color: var(--wrong);
-            color: var(--wrong);
-            box-shadow: 0 0 20px rgba(183, 28, 28, 0.05);
-        }
-
-        .footer-note {
-            text-align: center;
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            color: #5a4b4b;
-            margin-top: 80px;
-            padding-top: 24px;
-            border-top: 1px dashed #ffd1d5;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyLoop Lab — Repetition & Iteration</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-accent: #e10600;
+      --primary-accent-hover: #b30500;
+      --primary-glow: rgba(225, 6, 0, 0.08);
+      --bg-main: #fffcfc;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fffefe;
+      --border-color: #ffd1d5;
+      --ink: #1a0808;
+      --text-secondary: #5a4b4b;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+      
+      --code-bg: #0b0f19;
+      --code-keyword: #f43f5e;
+      --code-string: #10b981;
+      --code-number: #f472b6;
+      --code-comment: #64748b;
+      --code-builtin: #3b82f6;
+      
+      --border-radius-lg: 16px;
+      --border-radius-md: 10px;
+      --border-radius-sm: 6px;
+      
+      --success-green: #2e7d32;
+      --success-bg: rgba(46, 125, 50, 0.06);
+      --error-red: #b71c1c;
+      --error-bg: rgba(183, 28, 28, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-main);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(225, 6, 0, 0.02) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(225, 6, 0, 0.02) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* HEADER & LEVEL SELECTOR */
+    .app-header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 30px rgba(225, 6, 0, 0.02);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      background: var(--primary-accent);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      box-shadow: 0 4px 10px var(--primary-glow);
+    }
+
+    .brand-title h1 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .level-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(225, 6, 0, 0.03);
+      padding: 0.25rem;
+      border-radius: var(--border-radius-md);
+      border: 1px solid rgba(225, 6, 0, 0.05);
+    }
+
+    .level-tab {
+      background: none;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 0.5rem 1.25rem;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .level-tab:hover {
+      color: var(--primary-accent);
+      background: rgba(225, 6, 0, 0.02);
+    }
+
+    .level-tab.active {
+      background: var(--primary-accent);
+      color: white;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* MAIN CONTAINER */
+    .main-container {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .workspace-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .sidebar-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* GLASS CARDS */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px rgba(225, 6, 0, 0.02);
+      transition: border-color 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: var(--border-color);
+    }
+
+    /* BUTTONS */
+    .btn {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--border-radius-md);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary-accent);
+      color: white;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(225, 6, 0, 0.04);
+      color: var(--primary-accent);
+      border: 1px solid rgba(225, 6, 0, 0.08);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(225, 6, 0, 0.08);
+    }
+
+    .btn-ghost {
+      background: none;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      color: var(--primary-accent);
+      background: rgba(225, 6, 0, 0.02);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ACTIVITY SELECTOR BAR */
+    .activity-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 0.75rem 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+    }
+
+    .activity-pills {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .activity-pill {
+      background: none;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 0.4rem 1rem;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .activity-pill.active {
+      background: rgba(225, 6, 0, 0.08);
+      color: var(--primary-accent);
+    }
+
+    /* SIMULATOR CORE CONTAINER */
+    .simulator-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(225, 6, 0, 0.03);
+    }
+
+    .simulator-header {
+      margin-bottom: 1.25rem;
+      border-bottom: 1px dashed rgba(225, 6, 0, 0.08);
+      padding-bottom: 0.75rem;
+    }
+
+    .simulator-title h2 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .simulator-title p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .simulator-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* LOOP CONTROL BAR */
+    .loop-control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 0.75rem 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .control-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .speed-select {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--border-color);
+      outline: none;
+      background: white;
+      cursor: pointer;
+    }
+
+    /* NAVIGATION FOOTER */
+    .nav-footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+      backdrop-filter: blur(10px);
+    }
+
+    #nav-footer-status {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* SIDEBAR SECTIONS */
+    .sidebar-section-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* HINT STAGE DOTS */
+    .hint-stages {
+      display: flex;
+      gap: 4px;
+    }
+
+    .hint-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.08);
+      transition: background 0.3s ease;
+    }
+
+    .hint-dot.active {
+      background: var(--primary-accent);
+    }
+
+    .hint-box {
+      background: rgba(225, 6, 0, 0.02);
+      border: 1px dashed var(--border-color);
+      border-radius: var(--border-radius-md);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+      min-height: 50px;
+    }
+
+    /* VARIABLE INSPECTOR */
+    .variable-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .var-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(225, 6, 0, 0.02);
+      border: 1px solid rgba(225, 6, 0, 0.05);
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius-md);
+    }
+
+    .var-card.pulsing {
+      animation: varPulse 0.4s ease;
+    }
+
+    @keyframes varPulse {
+      0% { background-color: rgba(225, 6, 0, 0.2); }
+      100% { background-color: rgba(225, 6, 0, 0.02); }
+    }
+
+    .var-name {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary-accent);
+    }
+
+    .var-val {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* SYNTAX HIGHLIGHT CODE PANEL */
+    .code-panel {
+      background-color: var(--code-bg);
+      border-radius: var(--border-radius-md);
+      padding: 1rem;
+      overflow-x: auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .code-line {
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #9cdcfe;
+      display: flex;
+      padding: 0.1rem 0.25rem;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .code-line.active-exec {
+      background: rgba(244, 63, 94, 0.25);
+      border-left: 3px solid var(--code-keyword);
+    }
+
+    .code-line-num {
+      color: #565656;
+      width: 24px;
+      user-select: none;
+      text-align: right;
+      margin-right: 12px;
+    }
+
+    .code-keyword { color: var(--code-keyword); font-weight: 700; }
+    .code-string { color: var(--code-string); }
+    .code-number { color: var(--code-number); }
+    .code-comment { color: var(--code-comment); font-style: italic; }
+    .code-builtin { color: var(--code-builtin); }
+
+    /* MOCK TERMINAL */
+    .terminal-console {
+      background: #090d16;
+      border-radius: var(--border-radius-md);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      height: 120px;
+      overflow-y: auto;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .terminal-line {
+      line-height: 1.4;
+    }
+
+    .terminal-prompt {
+      color: var(--primary-accent);
+      margin-right: 0.5rem;
+      user-select: none;
+    }
+
+    .terminal-success {
+      color: #10b981;
+    }
+
+    .terminal-warning {
+      color: #f59e0b;
+    }
+
+    /* POPUP WARNINGS / ALERTS */
+    .popup-alert {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 0.5rem 1.5rem;
+      border-radius: 30px;
+      box-shadow: 0 10px 30px rgba(225, 6, 0, 0.08);
+      z-index: 10;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .popup-alert.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .popup-alert.success {
+      border-color: #10b981;
+      color: #047857;
+      background: #ecfdf5;
+    }
+
+    .popup-alert.error {
+      border-color: #ef4444;
+      color: #b91c1c;
+      background: #fef2f2;
+    }
+
+    .popup-alert.info {
+      border-color: #3b82f6;
+      color: #1d4ed8;
+      background: #eff6ff;
+    }
+
+    /* ========================================================
+       LEVEL SPECIFIC SIMULATIONS STYLING
+       ======================================================== */
+       
+    /* DRAG CHIPS AND SLOTS */
+    .chips-bank {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      background: rgba(225, 6, 0, 0.02);
+      padding: 0.75rem;
+      border-radius: var(--border-radius-md);
+      border: 1px dashed rgba(225, 6, 0, 0.1);
+    }
+
+    .chip {
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--border-radius-sm);
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(225, 6, 0, 0.02);
+    }
+
+    .chip:hover {
+      border-color: var(--primary-accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px var(--primary-glow);
+    }
+
+    .chip.selected {
+      background: var(--primary-accent);
+      color: white;
+      border-color: var(--primary-accent);
+    }
+
+    .slot {
+      border: 2px dashed rgba(225, 6, 0, 0.25);
+      border-radius: var(--border-radius-sm);
+      background: rgba(225, 6, 0, 0.01);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    .slot.hovered {
+      background: rgba(225, 6, 0, 0.08);
+      border-color: var(--primary-accent);
+    }
+
+    .slot.filled {
+      background: var(--primary-accent);
+      color: white;
+      border-style: solid;
+      border-color: var(--primary-accent);
+      font-weight: 700;
+    }
+
+    /* LEVEL 1: GRID TILES & PATHWAYS */
+    .tile-track {
+      display: flex;
+      gap: 0.25rem;
+      background: rgba(0,0,0,0.02);
+      padding: 0.5rem;
+      border-radius: var(--border-radius-md);
+      width: 100%;
+      justify-content: space-between;
+      position: relative;
+      margin: 1.5rem 0;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .floor-tile {
+      flex: 1;
+      height: 48px;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .floor-tile.active-step {
+      background: rgba(225, 6, 0, 0.08);
+      border-color: var(--primary-accent);
+      color: var(--primary-accent);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .robot-svg {
+      transition: all 0.3s ease;
+      position: absolute;
+      z-index: 5;
+    }
+
+    /* LEVEL 2: MAZE CELLS */
+    .maze-track {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      position: relative;
+      margin: 1.5rem 0;
+      background: #f1f5f9;
+      padding: 0.75rem;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid #cbd5e1;
+    }
+
+    .maze-cell {
+      width: 44px;
+      height: 44px;
+      background: white;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .maze-cell.barrier-wall::after {
+      content: '🛑';
+      font-size: 1.25rem;
+      position: absolute;
+    }
+
+    .maze-cell.coin-cell::after {
+      content: '🪙';
+      font-size: 1rem;
+      position: absolute;
+    }
+
+    .maze-cell.portal-cell::after {
+      content: '🌀';
+      font-size: 1.25rem;
+      position: absolute;
+    }
+
+    /* TRAFFIC SIMULATION CARS */
+    .traffic-lane {
+      display: flex;
+      gap: 1rem;
+      background: #334155;
+      padding: 1rem;
+      border-radius: var(--border-radius-lg);
+      width: 100%;
+      min-height: 80px;
+      align-items: center;
+      position: relative;
+      margin: 1rem 0;
+      border: 2px solid #1e293b;
+    }
+
+    .traffic-car {
+      width: 54px;
+      height: 32px;
+      background: #ef4444;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .traffic-car.warning-car {
+      background: #f59e0b;
+    }
+
+    .traffic-car.warning-car::after {
+      content: '⚠️';
+      font-size: 0.65rem;
+      position: absolute;
+      top: -6px;
+      right: -6px;
+    }
+
+    .traffic-car.faded-out {
+      opacity: 0.15;
+      transform: scale(0.9) translateY(-10px);
+    }
+
+    /* LEVEL 3: GRID CELLS PAINTER */
+    .grid-painter-canvas {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 4px;
+      background: rgba(0,0,0,0.03);
+      padding: 6px;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid rgba(0,0,0,0.05);
+      width: 240px;
+      height: 240px;
+      margin: 1rem 0;
+    }
+
+    .grid-cell {
+      background: white;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+    }
+
+    .grid-cell.painted {
+      background: var(--primary-accent);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+      animation: cellPaint 0.3s ease;
+    }
+
+    @keyframes cellPaint {
+      0% { transform: scale(0.8); background-color: #fca5a5; }
+      100% { transform: scale(1); background-color: var(--primary-accent); }
+    }
+
+    /* CONVEYOR AUTOMATION BELT */
+    .conveyor-belt-container {
+      width: 100%;
+      background: #f1f5f9;
+      border-radius: var(--border-radius-lg);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      border: 1px solid #cbd5e1;
+      margin: 1rem 0;
+    }
+
+    .conveyor-belt {
+      display: flex;
+      justify-content: space-between;
+      background: #475569;
+      height: 48px;
+      width: 100%;
+      align-items: center;
+      padding: 0 1rem;
+      border-radius: var(--border-radius-sm);
+      position: relative;
+      overflow: hidden;
+      border-bottom: 4px solid #1e293b;
+    }
+
+    .conveyor-package {
+      width: 36px;
+      height: 36px;
+      background: #d97706;
+      border: 2px solid #b45309;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: white;
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .conveyor-package.defective {
+      background: #ef4444;
+      border-color: #b91c1c;
+    }
+
+    .conveyor-package.defective::after {
+      content: '❌';
+      font-size: 0.65rem;
+      position: absolute;
+    }
+
+    .conveyor-package.stamped::before {
+      content: '✅';
+      font-size: 0.75rem;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+    }
+
+    /* LOOP TIMELINE */
+    .loop-timeline {
+      display: flex;
+      gap: 0.25rem;
+      width: 100%;
+      margin-top: 1rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .timeline-node {
+      flex: 1;
+      min-width: 70px;
+      background: rgba(225, 6, 0, 0.02);
+      border: 1px solid rgba(225, 6, 0, 0.05);
+      padding: 0.35rem;
+      border-radius: var(--border-radius-sm);
+      text-align: center;
+      font-family: var(--font-code);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .timeline-node.active {
+      background: var(--primary-accent);
+      color: white;
+      border-color: var(--primary-accent);
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    /* SLIDERS STYLING */
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .slider-group label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .slider-control {
+      width: 100%;
+      accent-color: var(--primary-accent);
+    }
+
+    .slider-val {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink);
+      align-self: flex-end;
+    }
+
+    /* CHALLENGE PROMPT CARD */
+    .challenge-card {
+      background: rgba(225, 6, 0, 0.02);
+      border: 1px dashed var(--border-color);
+      padding: 1rem;
+      border-radius: var(--border-radius-lg);
+      width: 100%;
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+
+    .challenge-card h4 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--primary-accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .challenge-card p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+  </style>
 </head>
-
 <body>
 
-    <header class="hero">
-        <h1>Loops &amp; <span>Range Sequences</span></h1>
-        <p class="sub">Repetition is programming power. Master Python's two loop structures, sequence generation via
-            range(), and execution modifiers like break and continue.</p>
-    </header>
+  <!-- TOP APP HEADER -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">🔁</div>
+      <div class="brand-title">
+        <h1>PyLoop Lab</h1>
+        <p>Interactive Python Loops Simulator</p>
+      </div>
+    </div>
 
-    <main>
-        <div class="sec-head">
-            <div class="sec-num">// SUBTOPIC 2.2</div>
-            <h2>Loops · while · for · range · break · continue</h2>
-            <p>Master Python's iteration patterns. Work through the 5 progression levels from simple while logic
-                counters to zip mappings and for-else fallback loops.</p>
+    <!-- Level switching buttons (immediately unlocked) -->
+    <div class="level-tabs">
+      <button class="level-tab active" onclick="switchLevel(1)">Level 1: Explorer</button>
+      <button class="level-tab" onclick="switchLevel(2)">Level 2: Control Lab</button>
+      <button class="level-tab" onclick="switchLevel(3)">Level 3: Architect</button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="main-container">
+    
+    <!-- LEFT SIDE: ACTIVE SIMULATOR -->
+    <div class="workspace-wrapper">
+      
+      <!-- SUB-ACTIVITIES PILLS BAR -->
+      <div class="activity-bar">
+        <div class="activity-pills" id="activity-pills-container">
+          <!-- pills loaded dynamically -->
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary" onclick="replaySimulation()">
+            🔄 Replay
+          </button>
+          <button class="btn btn-primary" id="run-btn" onclick="runExecution()">
+            ▶ Run Loop
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN DYNAMIC WORKSPACE CARD -->
+      <div class="simulator-card">
+        <!-- popup warning indicators -->
+        <div class="popup-alert" id="sim-alert">Warning Message</div>
+        
+        <div class="simulator-header">
+          <div class="simulator-title">
+            <h2 id="sim-title">Activity Title</h2>
+            <p id="sim-subtitle">Short description of parameters</p>
+          </div>
         </div>
 
-        <div class="level-strip" id="s2-levels"></div>
-        <div class="progress-bar-wrap">
-            <div class="progress-bar" id="s2-bar" style="width:20%"></div>
+        <div class="simulator-content" id="sim-content-area">
+          <!-- Simulator elements injected here dynamically -->
         </div>
+      </div>
 
-        <!-- S2 L1 -->
-        <div class="level-panel active" id="s2-l1">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>The while Loop Counter</h3>
-                <div class="level-desc" style="background: rgba(0, 87, 183, 0.02); border-left-color: var(--l1);">
-                    <strong>Core Concepts:</strong>
-                    <p>A <code>while</code> loop repeatedly executes a block as long as its target condition remains
-                        <code>True</code>:</p>
-                    <ul>
-                        <li><strong>Pre-Evaluation:</strong> The condition is evaluated *before* entering the loop
-                            block. If it is initially <code>False</code>, the block never executes.</li>
-                        <li><strong>Infinite Loop Risk:</strong> If the condition variables are not updated within the
-                            loop body to eventually yield <code>False</code>, the loop will run forever, locking up
-                            interpreter memory.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l1">LEVEL 1</span>while Loop Controller</h3>
-                <div class="row">
-                    <div><label>Start value</label><input type="number" id="s2l1-start" value="1"></div>
-                    <div><label>Count up to ≤</label><input type="number" id="s2l1-end" value="8"></div>
-                    <div><label>Step by</label><input type="number" id="s2l1-step" value="1" min="1"></div>
-                </div>
-                <button class="action" onclick="s2l1Run()">▶ Run while Loop</button>
-                <div class="output" id="s2l1-out">com: set parameters and run</div>
-                <div class="loop-track" id="s2l1-track"></div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Collatz Conjecture Loop</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct statements to construct a while loop executing the
-                    Collatz Conjecture step logic until n reaches 1!
-                </div>
-                <div class="game-container" id="l1-game">
-                    <div class="game-header">
-                        <span>🎯 Collatz loop steps</span>
-                        <span class="game-score">Score: <span id="l1-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height: 2.2;">
-                        <div class="code-line" style="display:flex; align-items:center; gap:8px;">
-                            <div class="drop-zone" id="l1-zone-0" data-expected="while n > 1:" data-pool-id="l1-pool">
-                            </div>
-                        </div>
-                        <div class="code-line" style="display:block; padding-left:20px;">
-                            <span>if n % 2 == 0:</span>
-                        </div>
-                        <div class="code-line" style="display:flex; align-items:center; gap:8px; padding-left:40px;">
-                            <div class="drop-zone" id="l1-zone-1" data-expected="n = n // 2" data-pool-id="l1-pool">
-                            </div>
-                        </div>
-                        <div class="code-line" style="display:block; padding-left:20px;">
-                            <span>else:</span>
-                        </div>
-                        <div class="code-line" style="display:flex; align-items:center; gap:8px; padding-left:40px;">
-                            <div class="drop-zone" id="l1-zone-2" data-expected="n = 3 * n + 1" data-pool-id="l1-pool">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l1-pool">
-                        <div class="draggable-item" id="l1-item-while" draggable="true" data-val="while n > 1:">while n
-                            > 1:</div>
-                        <div class="draggable-item" id="l1-item-evenstep" draggable="true" data-val="n = n // 2">n = n
-                            // 2</div>
-                        <div class="draggable-item" id="l1-item-oddstep" draggable="true" data-val="n = 3 * n + 1">n = 3
-                            * n + 1</div>
-                        <div class="draggable-item" id="l1-item-while-wrong" draggable="true" data-val="while n >= 0:">
-                            while n >= 0:</div>
-                        <div class="draggable-item" id="l1-item-evenstep-wrong" draggable="true" data-val="n = n / 2">n
-                            = n / 2</div>
-                        <div class="draggable-item" id="l1-item-oddstep-wrong" draggable="true"
-                            data-val="n = 3 * n - 1">n = 3 * n - 1</div>
-                    </div>
-                    <button class="action" onclick="l1Verify()">Verify Code Block</button>
-                    <div class="game-feedback" id="l1-feedback"></div>
-                </div>
-            </div>
+      <!-- LOOP CONTROLS & TIMELINE -->
+      <div class="loop-control-bar">
+        <div class="control-actions">
+          <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">LOOP TIMELINE:</span>
         </div>
-
-        <!-- S2 L2 -->
-        <div class="level-panel" id="s2-l2">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>The for Loop &amp; range() Generator</h3>
-                <div class="level-desc" style="background: rgba(46, 125, 50, 0.02); border-left-color: var(--l2);">
-                    <strong>Core Concepts:</strong>
-                    <p>The <code>for</code> loop iterates over members of an iterable sequence:</p>
-                    <ul>
-                        <li><strong>range(start, stop, step):</strong> Generates a sequence of integers. Crucially, the
-                            <code>stop</code> boundary is **exclusive**.</li>
-                    </ul>
-                </div>
-                <h4>range() Signatures</h4>
-                <table>
-                    <tr>
-                        <th>Syntax</th>
-                        <th>Sequence Generated</th>
-                    </tr>
-                    <tr>
-                        <td><code>range(5)</code></td>
-                        <td>0, 1, 2, 3, 4 (implied start=0, step=1)</td>
-                    </tr>
-                    <tr>
-                        <td><code>range(2, 8)</code></td>
-                        <td>2, 3, 4, 5, 6, 7</td>
-                    </tr>
-                </table>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l2">LEVEL 2</span>range() Sequence Simulator</h3>
-                <div class="row">
-                    <div><label>range start</label><input type="number" id="s2l2-start" value="0"></div>
-                    <div><label>range stop (exclusive)</label><input type="number" id="s2l2-stop" value="10"></div>
-                    <div><label>step</label><input type="number" id="s2l2-step" value="1"></div>
-                </div>
-                <button class="action" onclick="s2l2Run()">▶ Run for Loop</button>
-                <div class="output" id="s2l2-out">com: configure range and run</div>
-                <div class="loop-track" id="s2l2-track"></div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>range() Step Parameterizer</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct integers into the <code>range()</code> parameters
-                    to generate the descending stepping sequence: <code>[15, 11, 7, 3]</code>.
-                </div>
-                <div class="game-container" id="l2-game">
-                    <div class="game-header">
-                        <span>🎯 Range Sequence Parameterizer</span>
-                        <span class="game-score">Score: <span id="l2-score">0</span>/3</span>
-                    </div>
-                    <div class="formula-builder"
-                        style="display:flex; gap:8px; align-items:center; font-family:var(--mono); flex-wrap:wrap;">
-                        <span>for i in range(</span>
-                        <div class="drop-zone" id="l2-zone-0" data-expected="15" data-pool-id="l2-pool"></div>
-                        <span>,</span>
-                        <div class="drop-zone" id="l2-zone-1" data-expected="1" data-pool-id="l2-pool"></div>
-                        <span>,</span>
-                        <div class="drop-zone" id="l2-zone-2" data-expected="-4" data-pool-id="l2-pool"></div>
-                        <span>):</span>
-                    </div>
-                    <div class="items-pool" id="l2-pool">
-                        <div class="draggable-item" id="l2-item-15" draggable="true" data-val="15">15</div>
-                        <div class="draggable-item" id="l2-item-1" draggable="true" data-val="1">1</div>
-                        <div class="draggable-item" id="l2-item-neg4" draggable="true" data-val="-4">-4</div>
-                        <div class="draggable-item" id="l2-item-3" draggable="true" data-val="3">3</div>
-                        <div class="draggable-item" id="l2-item-0" draggable="true" data-val="0">0</div>
-                        <div class="draggable-item" id="l2-item-neg1" draggable="true" data-val="-1">-1</div>
-                        <div class="draggable-item" id="l2-item-4" draggable="true" data-val="4">4</div>
-                    </div>
-                    <button class="action" onclick="l2Verify()">Verify Parameters</button>
-                    <div class="game-feedback" id="l2-feedback"></div>
-                </div>
-            </div>
+        <div class="control-actions">
+          <label style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin:0;">SPEED:</label>
+          <select class="speed-select" id="speed-selector" onchange="updateSpeed()">
+            <option value="1000">1x Normal</option>
+            <option value="1800">0.5x Slow</option>
+            <option value="400">2x Fast</option>
+          </select>
+          <button class="btn btn-ghost" id="pause-btn" onclick="togglePause()" style="padding: 0.4rem 0.75rem;">
+            ⏸ Pause
+          </button>
         </div>
+      </div>
 
-        <!-- S2 L3 -->
-        <div class="level-panel" id="s2-l3">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Loop Modifiers: break &amp; continue</h3>
-                <div class="level-desc" style="background: rgba(230, 81, 0, 0.02); border-left-color: var(--l3);">
-                    <strong>Core Concepts:</strong>
-                    <p>Altering iteration scopes dynamically:</p>
-                    <ul>
-                        <li><strong>break:</strong> Exits the enclosing loop block immediately.</li>
-                        <li><strong>continue:</strong> Skips current block statement logic and proceeds to the next
-                            iteration.</li>
-                    </ul>
-                </div>
-            </div>
+      <!-- PREV/NEXT FOOTER NAVIGATOR -->
+      <div class="nav-footer-bar">
+        <button class="btn btn-secondary" onclick="navigatePrev()">&larr; Previous</button>
+        <span id="nav-footer-status">Level 1 - Activity 1</span>
+        <button class="btn btn-secondary" onclick="navigateNext()">Next &rarr;</button>
+      </div>
 
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l3">LEVEL 3</span>Control Modifiers Sandbox</h3>
-                <div class="row">
-                    <div><label>Loop from 1 to</label><input type="number" id="s2l3-end" value="10"></div>
-                    <div>
-                        <label>Control statement</label>
-                        <select id="s2l3-mode">
-                            <option value="break">break at number</option>
-                            <option value="continue">continue (skip) at number</option>
-                        </select>
-                    </div>
-                    <div><label>Target number</label><input type="number" id="s2l3-target" value="5"></div>
-                </div>
-                <button class="action" onclick="s2l3Run()">▶ Run Loop</button>
-                <div class="output" id="s2l3-out">com: pick break or continue and a target number</div>
-                <div class="loop-track" id="s2l3-track"></div>
-            </div>
+    </div>
 
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Prime Search &amp; loop-else Guard</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct statements to construct a prime-checking loop. The
-                    loop should stop searching immediately when a divisor is found, and set <code>is_prime = True</code>
-                    only if the loop finishes entirely without any divisors!
-                </div>
-                <div class="game-container" id="l3-game">
-                    <div class="game-header">
-                        <span>🎯 Loop Else Verification</span>
-                        <span class="game-score">Score: <span id="l3-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0">for i in range(2, n):</div>
-                        <div class="lvl1">if n % i == 0:</div>
-                        <div class="lvl2" style="display:flex; align-items:center; gap:8px;">
-                            <div class="drop-zone" id="l3-zone-0" data-expected="break" data-pool-id="l3-pool"></div>
-                        </div>
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-                            <div class="drop-zone" id="l3-zone-1" data-expected="else:" data-pool-id="l3-pool"></div>
-                        </div>
-                        <div class="lvl1" style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-                            <div class="drop-zone" id="l3-zone-2" data-expected="is_prime = True"
-                                data-pool-id="l3-pool"></div>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l3-pool">
-                        <div class="draggable-item" id="l3-item-break" draggable="true" data-val="break">break</div>
-                        <div class="draggable-item" id="l3-item-else" draggable="true" data-val="else:">else:</div>
-                        <div class="draggable-item" id="l3-item-istrue" draggable="true" data-val="is_prime = True">
-                            is_prime = True</div>
-                        <div class="draggable-item" id="l3-item-continue" draggable="true" data-val="continue">continue
-                        </div>
-                        <div class="draggable-item" id="l3-item-elif" draggable="true" data-val="elif:">elif:</div>
-                        <div class="draggable-item" id="l3-item-isfalse" draggable="true" data-val="is_prime = False">
-                            is_prime = False</div>
-                    </div>
-                    <button class="action" onclick="l3Verify()">Verify Loop Flow</button>
-                    <div class="game-feedback" id="l3-feedback"></div>
-                </div>
-            </div>
+    <!-- RIGHT SIDE: FEEDBACK & CODE SYNC PANEL -->
+    <div class="sidebar-wrapper">
+      
+      <!-- PROGRESSIVE HINT SYSTEM -->
+      <div class="glass-card">
+        <div class="sidebar-section-title">
+          <span>Logical Clues</span>
+          <div class="hint-stages" id="hint-dots-wrapper">
+            <span class="hint-dot"></span>
+            <span class="hint-dot"></span>
+            <span class="hint-dot"></span>
+            <span class="hint-dot"></span>
+          </div>
         </div>
-
-        <!-- S2 L4 -->
-        <div class="level-panel" id="s2-l4">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Nested Loops &amp; Outer-Inner Grid Traversal</h3>
-                <div class="level-desc" style="background: rgba(106, 27, 154, 0.02); border-left-color: var(--l4);">
-                    <strong>Core Concepts:</strong>
-                    <p>For every step in the outer loop, the inner loop completes fully:</p>
-                    <ul>
-                        <li><strong>Total cycles:</strong> Size of Outer loop (N) multiplied by size of Inner loop (M) =
-                            <code>N × M</code>.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l4">LEVEL 4</span>Nested Grid Star Generator</h3>
-                <div class="row">
-                    <div><label>Table size (n × n)</label><input type="number" id="s2l4-n" value="5" min="2" max="10">
-                    </div>
-                    <div><label>Pattern</label>
-                        <select id="s2l4-mode">
-                            <option value="table">Multiplication table</option>
-                            <option value="triangle">Star triangle</option>
-                            <option value="pyramid">Star pyramid</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="action" onclick="s2l4Run()">▶ Generate Pattern</button>
-                <div class="output" id="s2l4-out" style="font-family: var(--mono); font-size:0.8rem; line-height:1.4;">
-                    com: choose size and pattern</div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Identity Matrix Diagonal Check</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct conditions and boundaries to complete a nested grid
-                    traversal function that validates if a square matrix is an identity matrix (diagonal elements are 1,
-                    all others are 0).
-                </div>
-                <div class="game-container" id="l4-game">
-                    <div class="game-header">
-                        <span>🎯 Identity Matrix Validator</span>
-                        <span class="game-score">Score: <span id="l4-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0">is_identity = True</div>
-                        <div class="lvl0">for r in range(size):</div>
-                        <div class="lvl1">for c in range(size):</div>
-                        <div class="lvl2" style="display:flex; align-items:center; gap:8px;">
-                            <span>if </span>
-                            <div class="drop-zone" id="l4-zone-0" data-expected="r == c" data-pool-id="l4-pool"></div>
-                            <span>:</span>
-                        </div>
-                        <div class="lvl3" style="display:flex; align-items:center; gap:8px;">
-                            <span>if matrix[r][c] != </span>
-                            <div class="drop-zone" id="l4-zone-1" data-expected="1" data-pool-id="l4-pool"></div>
-                            <span>:</span>
-                        </div>
-                        <div class="lvl4">is_identity = False</div>
-                        <div class="lvl2">else:</div>
-                        <div class="lvl3" style="display:flex; align-items:center; gap:8px;">
-                            <span>if matrix[r][c] != </span>
-                            <div class="drop-zone" id="l4-zone-2" data-expected="0" data-pool-id="l4-pool"></div>
-                            <span>:</span>
-                        </div>
-                        <div class="lvl4">is_identity = False</div>
-                    </div>
-                    <div class="items-pool" id="l4-pool">
-                        <div class="draggable-item" id="l4-item-diag" draggable="true" data-val="r == c">r == c</div>
-                        <div class="draggable-item" id="l4-item-one" draggable="true" data-val="1">1</div>
-                        <div class="draggable-item" id="l4-item-zero" draggable="true" data-val="0">0</div>
-                        <div class="draggable-item" id="l4-item-nodiag" draggable="true" data-val="r != c">r != c</div>
-                        <div class="draggable-item" id="l4-item-size" draggable="true" data-val="size">size</div>
-                        <div class="draggable-item" id="l4-item-rvar" draggable="true" data-val="r">r</div>
-                    </div>
-                    <button class="action" onclick="l4Verify()">Verify Matrix Check</button>
-                    <div class="game-feedback" id="l4-feedback"></div>
-                </div>
-            </div>
+        <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="revealNextHint()">
+          Get Nudge Hint
+        </button>
+        <div class="hint-box" id="hint-feedback-box">
+          Click the button above to request progressive clues without giving away the full logic!
         </div>
+      </div>
 
-        <!-- S2 L5 -->
-        <div class="level-panel" id="s2-l5">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Parallel Streams &amp; Nested Unpacking</h3>
-                <div class="level-desc" style="background: rgba(183, 28, 28, 0.02); border-left-color: var(--l5);">
-                    <strong>Core Concepts:</strong>
-                    <p>Unlocking advanced sequence traversal patterns in Python:</p>
-                    <ul>
-                        <li><strong>enumerate(iterable):</strong> Yields index-element pairs:
-                            <code>(index, item)</code>.</li>
-                        <li><strong>zip(*iterables):</strong> Pairs corresponding items from multiple sequences. It
-                            terminates at the length of the shortest iterable.</li>
-                        <li><strong>Zipped Tuple Unpacking:</strong> Combining them as <code>enumerate(zip(A, B))</code>
-                            yields nested structures like <code>(idx, (itemA, itemB))</code>, requiring parentheses for
-                            correct syntax unpacking in the loop header.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l5">LEVEL 5</span>Iteration Helpers Sandbox</h3>
-                <div class="row">
-                    <div><label>List A (comma-separated)</label><input type="text" id="s2l5-a"
-                            value="Python,Java,C++,Rust"></div>
-                    <div><label>List B (comma-separated)</label><input type="text" id="s2l5-b" value="90,78,65,88">
-                    </div>
-                </div>
-                <button class="action" onclick="s2l5Enum()">▶ enumerate()</button>
-                <button class="action ghost" onclick="s2l5Zip()">▶ zip()</button>
-                <button class="action ghost" onclick="s2l5ForElse()">▶ for-else search</button>
-                <div class="output" id="s2l5-out">com: enter two lists and try each operation</div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Zipped Stream Unpacker</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct components to unpack the index and parallel items
-                    correctly in the loop header to process names and scores together!
-                </div>
-                <div class="game-container" id="l5-game">
-                    <div class="game-header">
-                        <span>🎯 Zipped Stream Unpacking</span>
-                        <span class="game-score">Score: <span id="l5-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <span>for </span>
-                            <div class="drop-zone" id="l5-zone-0" data-expected="idx" data-pool-id="l5-pool"></div>
-                            <span>, </span>
-                            <div class="drop-zone" id="l5-zone-1" data-expected="(name, score)" data-pool-id="l5-pool">
-                            </div>
-                            <span> in </span>
-                            <div class="drop-zone" id="l5-zone-2" data-expected="enumerate" data-pool-id="l5-pool">
-                            </div>
-                            <span>(zip(names, scores)):</span>
-                        </div>
-                        <div class="lvl1">if idx % 2 == 0:</div>
-                        <div class="lvl2">print(f"{idx}: {name} scored {score}")</div>
-                    </div>
-                    <div class="items-pool" id="l5-pool">
-                        <div class="draggable-item" id="l5-item-idx" draggable="true" data-val="idx">idx</div>
-                        <div class="draggable-item" id="l5-item-zipped" draggable="true" data-val="(name, score)">(name,
-                            score)</div>
-                        <div class="draggable-item" id="l5-item-enum" draggable="true" data-val="enumerate">enumerate
-                        </div>
-                        <div class="draggable-item" id="l5-item-unparenthesized" draggable="true"
-                            data-val="name, score">name, score</div>
-                        <div class="draggable-item" id="l5-item-zip" draggable="true" data-val="zip">zip</div>
-                        <div class="draggable-item" id="l5-item-index" draggable="true" data-val="index">index</div>
-                    </div>
-                    <button class="action" onclick="l5Verify()">Verify Loop Structure</button>
-                    <div class="game-feedback" id="l5-feedback"></div>
-                </div>
-            </div>
+      <!-- LIVE VARIABLES INSPECTOR -->
+      <div class="glass-card">
+        <div class="sidebar-section-title">
+          <span>Variable Inspector</span>
+          <span style="font-size: 0.7rem; color: var(--primary-accent); font-family: var(--font-code);">[live]</span>
         </div>
+        <div class="variable-grid" id="var-inspector-grid">
+          <!-- Live variable updates -->
+        </div>
+      </div>
 
-        <div class="footer-note">Module 2 · Decision Making &amp; Functions · Section 2.2</div>
-    </main>
+      <!-- SYNTAX-HIGHLIGHTED CODE -->
+      <div class="glass-card">
+        <div class="sidebar-section-title">Python Code Synchronizer</div>
+        <div class="code-panel" id="code-synced-panel">
+          <!-- Code view updates line by line -->
+        </div>
+      </div>
 
-    <script>
-        const SUBTOPIC = 's2';
-        const LEVEL_LABELS = [
-            { cls: 'l1', label: 'Level 1 · Collatz Conjecture Loop' },
-            { cls: 'l2', label: 'Level 2 · Custom Step range()' },
-            { cls: 'l3', label: 'Level 3 · Prime Search loop-else' },
-            { cls: 'l4', label: 'Level 4 · Identity Matrix Traversal' },
-            { cls: 'l5', label: 'Level 5 · Zipped Stream Unpacking' },
-        ];
+      <!-- INTERACTIVE TERMINAL -->
+      <div class="glass-card">
+        <div class="sidebar-section-title">Execution Console Output</div>
+        <div class="terminal-console" id="terminal-console-log">
+          <div class="terminal-line"><span class="terminal-prompt">>>></span> Loop sandbox ready. Click Run to begin simulation.</div>
+        </div>
+      </div>
 
-        const strip = document.getElementById(`${SUBTOPIC}-levels`);
-        LEVEL_LABELS.forEach((lv, i) => {
-            const btn = document.createElement('button');
-            btn.className = `lvl-pill ${lv.cls}${i === 0 ? ' active' : ''}`;
-            btn.innerHTML = lv.label;
-            btn.onclick = () => switchLevel(SUBTOPIC, i + 1, btn);
-            strip.appendChild(btn);
+    </div>
+
+  </main>
+
+  <script>
+    // State management
+    const state = {
+      level: 1,
+      activity: 1,
+      hintIndex: 0,
+      isExecuting: false,
+      isPaused: false,
+      speedMs: 1000,
+      
+      // Level 1 ranges
+      l1_start: 1,
+      l1_end: 6,
+      l1_step: 1,
+      
+      // Activity targets
+      activeL1A2Scenario: 0, // 0: 2 4 6 8, 1: 10 8 6 4, 2: 5 10 15 20
+      l1a2_slots: ["", "", ""], // start, stop, step
+      
+      // Level 2
+      l2a1_slot: "", // break, continue, pass
+      activeL2A2Scenario: 0, // traffic obstacle
+      l2a2_slot: "",
+      
+      // Level 3
+      l3a1_slots: ["", "", ""], // Outer range, inner range, statement
+      activeL3A2Scenario: 0,
+      l3a2_slots: ["", ""] // machine automation loop checks
+    };
+
+    const levelsData = {
+      1: {
+        title: "Level 1: Loop Explorer",
+        activities: [
+          { id: 1, title: "Loop Animation Studio", desc: "Build loops visually using Start, End, and Step sliders and see how the robot walks." },
+          { id: 2, title: "Range Builder Challenge", desc: "Build ranges using parameters to generate target sequences." }
+        ]
+      },
+      2: {
+        title: "Level 2: Loop Control Lab",
+        activities: [
+          { id: 1, title: "Robot Navigation Simulator", desc: "Guide PyBot through a barrier obstacle using break, continue, or pass statement chips." },
+          { id: 2, title: "Traffic Signal Controller", desc: "Control car queues at an intersection lane by dropping loops controllers." }
+        ]
+      },
+      3: {
+        title: "Level 3: Loop Architect",
+        activities: [
+          { id: 1, title: "Grid Painter", desc: "Use outer and inner nested loops to paint coordinate grid canvas cells." },
+          { id: 2, title: "Factory Automation", desc: "Configure machine loops to stamp package boxes while handling defective ones." }
+        ]
+      }
+    };
+
+    // Range sequences database
+    const l1a2Targets = [
+      { text: "Generate sequence: [2, 4, 6, 8]", sequence: [2, 4, 6, 8], hint: "Start at 2, increase by 2, end before 10." },
+      { text: "Generate sequence: [10, 8, 6, 4]", sequence: [10, 8, 6, 4], hint: "Start at 10, decrease by -2, stop before 2." },
+      { text: "Generate sequence: [5, 10, 15, 20]", sequence: [5, 10, 15, 20], hint: "Start at 5, step by 5, stop before 25." }
+    ];
+
+    // Progressive Hint Data
+    const hintsDB = {
+      "1-1": [
+        "Use the sliders to adjust parameters. Start is the beginning tile, End is the stop boundary (exclusive), and Step is the stride.",
+        "Remember: Python's loop starts at Start and increments by Step. It exits *before* it reaches the End tile.",
+        "Code view on the right updates to: for i in range(start, end, step). Line 2 prints values as long as i < end.",
+        "Set Start = 1, End = 6, Step = 1 to walk tile-by-tile from 1 up to exactly tile 5."
+      ],
+      "1-2": [
+        "Drag and drop numbers from the bank into range(start, stop, step) slots.",
+        "Look at the first number in the target sequence: that is your Start parameter. Look at the delta between adjacent numbers: that is your Step.",
+        "Remember the Stop parameter is exclusive. It must be greater than your final target number but not include the next step.",
+        "For sequence [2, 4, 6, 8]: Set start = 2, stop = 10 (or 9), step = 2. Try placing those chips!"
+      ],
+      "2-1": [
+        "At cell 5, there is a stop barrier wall obstacle. How should the robot behave when it checks cell == 5?",
+        "If you want to immediately exit the loop and stop moving, drag 'break' to the slot.",
+        "If you want to skip cell 5 (teleport over the wall) and resume coin collections on cell 6, use 'continue'.",
+        "If you want to do nothing and proceed standardly (which hits the wall), use 'pass'."
+      ],
+      "2-2": [
+        "Vehicles with yellow flags are warning hazards. Drag the control chips to check them.",
+        "If you encounter a warning vehicle, you want to bypass/ignore it and check the next car. Use 'continue'.",
+        "If you want to halt all traffic queue cars immediately, use 'break'. Use 'pass' to ignore blocks and process regardless.",
+        "Drag 'continue' in the warning condition block to skip checking the warning car and continue processing normal cars."
+      ],
+      "3-1": [
+        "Nested loops paint row by row. Outer loop iterates over rows (y-axis), inner loop iterates over columns (x-axis).",
+        "For each row index r, the inner loop c completes a full iteration sweep across the columns.",
+        "Drop range(0, 5) into the outer row generator, and range(0, 5) in the inner column generator.",
+        "Drag: Outer = 'range(0, 5)', Inner = 'range(0, 5)', and Statement = 'paint_cell(r, c)'. This visits all coordinates."
+      ],
+      "3-2": [
+        "conveyor packages index through items. Red 'X' boxes represent defective packaging.",
+        "You want the robotic stamp arm to skip stamping defective packages. What statement skips the current loop step?",
+        "Drag 'continue' into the 'if box.is_defective:' block. Drag 'stamp_box()' into the normal branch.",
+        "Use 'continue' to ignore defective items and keep moving, or 'break' to shut down if the conveyor jams."
+      ]
+    };
+
+    // UI Toast Notification helper
+    function triggerAlert(msg, type = "info") {
+      const alertBox = document.getElementById("sim-alert");
+      alertBox.textContent = msg;
+      alertBox.className = `popup-alert show ${type}`;
+      
+      setTimeout(() => {
+        alertBox.classList.remove("show");
+      }, 3000);
+    }
+
+    // Terminal logging helper
+    function appendTerminal(msg, status = null) {
+      const consoleLog = document.getElementById("terminal-console-log");
+      const line = document.createElement("div");
+      line.className = "terminal-line";
+      
+      let prefix = `<span class="terminal-prompt">>>></span>`;
+      let textClass = "";
+      if (status === true) textClass = "terminal-success";
+      else if (status === false) textClass = "terminal-warning";
+      
+      line.innerHTML = `${prefix}<span class="${textClass}">${msg}</span>`;
+      consoleLog.appendChild(line);
+      consoleLog.scrollTop = consoleLog.scrollHeight;
+    }
+
+    function clearTerminal() {
+      const consoleLog = document.getElementById("terminal-console-log");
+      consoleLog.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">>>></span> Console cleared. Sandbox ready.</div>`;
+    }
+
+    // Live variables inspector updating
+    function updateInspector(vars) {
+      const grid = document.getElementById("var-inspector-grid");
+      grid.innerHTML = "";
+      if (Object.keys(vars).length === 0) {
+        grid.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:0.5rem;">No active variables.</div>`;
+        return;
+      }
+      for (const [key, value] of Object.entries(vars)) {
+        const card = document.createElement("div");
+        card.className = "var-card pulsing";
+        card.innerHTML = `<span class="var-name">${key}</span><span class="var-val">${value}</span>`;
+        grid.appendChild(card);
+      }
+    }
+
+    // HINTS DISPATCHER
+    function revealNextHint() {
+      const hintKey = `${state.level}-${state.activity}`;
+      const hints = hintsDB[hintKey];
+      
+      if (!hints) return;
+      
+      const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
+      
+      if (state.hintIndex < hints.length) {
+        document.getElementById("hint-feedback-box").textContent = hints[state.hintIndex];
+        dots[state.hintIndex].classList.add("active");
+        state.hintIndex++;
+      } else {
+        triggerAlert("All hints revealed! Try evaluating structural sequences again.", "info");
+      }
+    }
+
+    function resetHints() {
+      state.hintIndex = 0;
+      document.getElementById("hint-feedback-box").textContent = "Click the button above to request progressive clues without giving away the full logic!";
+      const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
+      dots.forEach(dot => dot.classList.remove("active"));
+    }
+
+    // SPEED CONTROLLER
+    function updateSpeed() {
+      const val = document.getElementById("speed-selector").value;
+      state.speedMs = parseInt(val);
+      appendTerminal(`Execution step speed set to ${val}ms.`);
+    }
+
+    function togglePause() {
+      state.isPaused = !state.isPaused;
+      const btn = document.getElementById("pause-btn");
+      if (state.isPaused) {
+        btn.textContent = "▶ Resume";
+        appendTerminal("Simulation execution paused.");
+      } else {
+        btn.textContent = "⏸ Pause";
+        appendTerminal("Simulation execution resumed.");
+      }
+    }
+
+    // DRAG AND DROP ENGINE (Also supports click-to-place)
+    let selectedDragVal = null;
+    let clickedChipElement = null;
+
+    function handleDragStart(e, value) {
+      e.dataTransfer.setData("text/plain", value);
+      selectedDragVal = value;
+      e.currentTarget.style.opacity = "0.5";
+    }
+
+    function handleDragEnd(e) {
+      e.currentTarget.style.opacity = "1";
+      selectedDragVal = null;
+    }
+
+    function allowDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add("hovered");
+    }
+
+    function dragLeaveSlot(e) {
+      e.currentTarget.classList.remove("hovered");
+    }
+
+    function selectChipForPlacement(element) {
+      // Clear previous selection
+      document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
+      
+      clickedChipElement = element;
+      element.classList.add("selected");
+      selectedDragVal = element.textContent.trim();
+      triggerAlert("Chip selected. Click a target slot to place it!", "info");
+    }
+
+    function handleSlotClick(e) {
+      if (selectedDragVal) {
+        const slotEl = e.currentTarget;
+        slotEl.textContent = selectedDragVal;
+        slotEl.classList.add("filled");
+        
+        // Save to state based on slot attributes
+        const idx = slotEl.getAttribute("data-index");
+        const type = slotEl.getAttribute("data-slot-type");
+        
+        if (state.level === 1 && state.activity === 2) {
+          state.l1a2_slots[idx] = selectedDragVal;
+          updateRangeBuilderCodeSync();
+        } else if (state.level === 2 && state.activity === 1) {
+          state.l2a1_slot = selectedDragVal;
+          updateL2A1CodeSync();
+        } else if (state.level === 2 && state.activity === 2) {
+          state.l2a2_slot = selectedDragVal;
+          updateL2A2CodeSync();
+        } else if (state.level === 3 && state.activity === 1) {
+          state.l3a1_slots[idx] = selectedDragVal;
+          updateGridPainterCodeSync();
+        } else if (state.level === 3 && state.activity === 2) {
+          state.l3a2_slots[idx] = selectedDragVal;
+          updateFactoryCodeSync();
+        }
+
+        // Clean selection state
+        if (clickedChipElement) {
+          clickedChipElement.classList.remove("selected");
+          clickedChipElement = null;
+        }
+        selectedDragVal = null;
+        slotEl.classList.remove("hovered");
+      }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const slotEl = e.currentTarget;
+      slotEl.classList.remove("hovered");
+      
+      const val = e.dataTransfer.getData("text/plain") || selectedDragVal;
+      if (val) {
+        slotEl.textContent = val;
+        slotEl.classList.add("filled");
+        
+        const idx = slotEl.getAttribute("data-index");
+        if (state.level === 1 && state.activity === 2) {
+          state.l1a2_slots[idx] = val;
+          updateRangeBuilderCodeSync();
+        } else if (state.level === 2 && state.activity === 1) {
+          state.l2a1_slot = val;
+          updateL2A1CodeSync();
+        } else if (state.level === 2 && state.activity === 2) {
+          state.l2a2_slot = val;
+          updateL2A2CodeSync();
+        } else if (state.level === 3 && state.activity === 1) {
+          state.l3a1_slots[idx] = val;
+          updateGridPainterCodeSync();
+        } else if (state.level === 3 && state.activity === 2) {
+          state.l3a2_slots[idx] = val;
+          updateFactoryCodeSync();
+        }
+      }
+    }
+
+    // LEVEL SWITCHER
+    function switchLevel(lvlNum) {
+      if (state.isExecuting) {
+        triggerAlert("Execution in progress! Please wait or pause first.", "error");
+        return;
+      }
+      state.level = lvlNum;
+      state.activity = 1;
+      
+      // Update top header level tabs
+      document.querySelectorAll(".level-tab").forEach((tab, idx) => {
+        if (idx + 1 === lvlNum) tab.classList.add("active");
+        else tab.classList.remove("active");
+      });
+
+      renderActivityPills();
+      loadActivity();
+      updateNavFooterStatus();
+    }
+
+    function renderActivityPills() {
+      const container = document.getElementById("activity-pills-container");
+      container.innerHTML = "";
+      
+      const acts = levelsData[state.level].activities;
+      acts.forEach(act => {
+        const pill = document.createElement("button");
+        pill.className = `activity-pill ${state.activity === act.id ? 'active' : ''}`;
+        pill.textContent = act.title;
+        pill.onclick = () => {
+          if (state.isExecuting) return;
+          state.activity = act.id;
+          document.querySelectorAll(".activity-pill").forEach(p => p.classList.remove("active"));
+          pill.classList.add("active");
+          loadActivity();
+          updateNavFooterStatus();
+        };
+        container.appendChild(pill);
+      });
+    }
+
+    function updateNavFooterStatus() {
+      const footerStatus = document.getElementById("nav-footer-status");
+      footerStatus.textContent = `Level ${state.level} - Activity ${state.activity}`;
+    }
+
+    function navigatePrev() {
+      if (state.isExecuting) return;
+      if (state.activity === 2) {
+        state.activity = 1;
+      } else {
+        if (state.level > 1) {
+          state.level--;
+          state.activity = 2;
+        } else {
+          triggerAlert("You are at the very beginning of Level 1!", "info");
+          return;
+        }
+      }
+      syncPillsAndLoad();
+    }
+
+    function navigateNext() {
+      if (state.isExecuting) return;
+      if (state.activity === 1) {
+        state.activity = 2;
+      } else {
+        if (state.level < 3) {
+          state.level++;
+          state.activity = 1;
+        } else {
+          triggerAlert("You reached the end of PyLoop Lab! Fantastic work.", "success");
+          return;
+        }
+      }
+      syncPillsAndLoad();
+    }
+
+    function syncPillsAndLoad() {
+      document.querySelectorAll(".level-tab").forEach((tab, idx) => {
+        if (idx + 1 === state.level) tab.classList.add("active");
+        else tab.classList.remove("active");
+      });
+      renderActivityPills();
+      loadActivity();
+      updateNavFooterStatus();
+    }
+
+    // MAIN ROUTER TO LOAD DYNAMIC CONTENT
+    function loadActivity() {
+      state.isExecuting = false;
+      state.isPaused = false;
+      document.getElementById("pause-btn").textContent = "⏸ Pause";
+      resetHints();
+      clearTerminal();
+      updateInspector({});
+      
+      const contentArea = document.getElementById("sim-content-area");
+      contentArea.innerHTML = "";
+      
+      const actInfo = levelsData[state.level].activities[state.activity - 1];
+      document.getElementById("sim-title").textContent = actInfo.title;
+      document.getElementById("sim-subtitle").textContent = actInfo.desc;
+
+      if (state.level === 1 && state.activity === 1) {
+        loadL1A1(contentArea);
+      } else if (state.level === 1 && state.activity === 2) {
+        loadL1A2(contentArea);
+      } else if (state.level === 2 && state.activity === 1) {
+        loadL2A1(contentArea);
+      } else if (state.level === 2 && state.activity === 2) {
+        loadL2A2(contentArea);
+      } else if (state.level === 3 && state.activity === 1) {
+        loadL3A1(contentArea);
+      } else if (state.level === 3 && state.activity === 2) {
+        loadL3A2(contentArea);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LEVEL 1 ACTIVITY 1: Loop Animation Studio
+    // -------------------------------------------------------------
+    function loadL1A1(container) {
+      // 1. Sliders wrapper
+      const sliderContainer = document.createElement("div");
+      sliderContainer.style.width = "100%";
+      sliderContainer.style.display = "grid";
+      sliderContainer.style.gridTemplateColumns = "repeat(3, 1fr)";
+      sliderContainer.style.gap = "1rem";
+      sliderContainer.style.marginBottom = "1.5rem";
+
+      sliderContainer.innerHTML = `
+        <div class="slider-group">
+          <label>Start Index</label>
+          <input type="range" class="slider-control" id="l1a1-start-val" min="0" max="5" value="1" oninput="updateL1A1Sliders()">
+          <span class="slider-val" id="lbl-start">1</span>
+        </div>
+        <div class="slider-group">
+          <label>End Index (Exclusive)</label>
+          <input type="range" class="slider-control" id="l1a1-end-val" min="1" max="10" value="6" oninput="updateL1A1Sliders()">
+          <span class="slider-val" id="lbl-end">6</span>
+        </div>
+        <div class="slider-group">
+          <label>Step stride</label>
+          <input type="range" class="slider-control" id="l1a1-step-val" min="1" max="4" value="1" oninput="updateL1A1Sliders()">
+          <span class="slider-val" id="lbl-step">1</span>
+        </div>
+      `;
+      container.appendChild(sliderContainer);
+
+      // 2. Graphic tiles pathway
+      const track = document.createElement("div");
+      track.className = "tile-track";
+      track.id = "l1a1-track";
+      
+      let tilesHTML = "";
+      for (let i = 0; i <= 10; i++) {
+        tilesHTML += `<div class="floor-tile" id="tile-${i}">${i}</div>`;
+      }
+      track.innerHTML = `
+        <div class="robot-svg" id="l1a1-robot" style="left: 0px; top: 12px;">
+          <svg viewBox="0 0 100 100" width="36" height="36">
+            <circle cx="50" cy="50" r="40" fill="#e10600" />
+            <circle cx="35" cy="45" r="8" fill="#fff" />
+            <circle cx="65" cy="45" r="8" fill="#fff" />
+            <circle cx="35" cy="45" r="3" fill="#000" />
+            <circle cx="65" cy="45" r="3" fill="#000" />
+            <rect x="35" y="65" width="30" height="8" rx="4" fill="#white" />
+            <line x1="50" y1="10" x2="50" y2="2" stroke="#e10600" stroke-width="4" />
+            <circle cx="50" cy="2" r="4" fill="#ff7b7b" />
+          </svg>
+        </div>
+        ${tilesHTML}
+      `;
+      container.appendChild(track);
+
+      // Initialize sliders and code view
+      updateL1A1Sliders();
+    }
+
+    function updateL1A1Sliders() {
+      state.l1_start = parseInt(document.getElementById("l1a1-start-val").value);
+      state.l1_end = parseInt(document.getElementById("l1a1-end-val").value);
+      state.l1_step = parseInt(document.getElementById("l1a1-step-val").value);
+
+      document.getElementById("lbl-start").textContent = state.l1_start;
+      document.getElementById("lbl-end").textContent = state.l1_end;
+      document.getElementById("lbl-step").textContent = state.l1_step;
+
+      // Update position of robot immediately to starting tile
+      const firstTile = document.getElementById(`tile-${state.l1_start}`);
+      const robot = document.getElementById("l1a1-robot");
+      if (firstTile && robot) {
+        robot.style.left = `${firstTile.offsetLeft}px`;
+      }
+
+      // Update Python Code view
+      const codePanel = document.getElementById("code-synced-panel");
+      codePanel.innerHTML = `
+        <div class="code-line" id="l1a1-line1"><span class="code-line-num">1</span><span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(${state.l1_start}, ${state.l1_end}, ${state.l1_step}):</div>
+        <div class="code-line" id="l1a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-builtin">print</span>(f<span class="code-string">"Robot stands on tile {i}"</span>)</div>
+        <div class="code-line" id="l1a1-line3"><span class="code-line-num">3</span><span class="code-builtin">print</span>(<span class="code-string">"Loop finished!"</span>)</div>
+      `;
+
+      // Update Variables preview
+      updateInspector({
+        "i": "not defined",
+        "start": state.l1_start,
+        "end": state.l1_end,
+        "step": state.l1_step
+      });
+    }
+
+    function runL1A1Execution() {
+      state.isExecuting = true;
+      appendTerminal(">>> Loop execution initiated...");
+      
+      let currentVal = state.l1_start;
+      let iterations = [];
+      
+      while (currentVal < state.l1_end) {
+        iterations.push(currentVal);
+        currentVal += state.l1_step;
+      }
+
+      let step = 0;
+      function executeStep() {
+        if (state.isPaused) {
+          setTimeout(executeStep, 200);
+          return;
+        }
+
+        // Clean styles
+        document.querySelectorAll(".floor-tile").forEach(t => t.classList.remove("active-step"));
+        document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+        if (step >= iterations.length) {
+          // Finished loop
+          document.getElementById("l1a1-line3").classList.add("active-exec");
+          appendTerminal("Loop iteration condition check returned False. Exiting loop block.", true);
+          appendTerminal("Loop finished!");
+          updateInspector({
+            "i": iterations.length > 0 ? iterations[iterations.length - 1] : "None",
+            "status": "Loop Finished"
+          });
+          state.isExecuting = false;
+          return;
+        }
+
+        const tileVal = iterations[step];
+        
+        // Highlight active line 1: range check
+        document.getElementById("l1a1-line1").classList.add("active-exec");
+        appendTerminal(`Checking range condition: is ${tileVal} < ${state.l1_end}? True`);
+        
+        setTimeout(() => {
+          if (state.isPaused) {
+            executeStep();
+            return;
+          }
+          
+          document.getElementById("l1a1-line1").classList.remove("active-exec");
+          document.getElementById("l1a1-line2").classList.add("active-exec");
+          
+          // Move robot to tile
+          const tileEl = document.getElementById(`tile-${tileVal}`);
+          const robot = document.getElementById("l1a1-robot");
+          if (tileEl && robot) {
+            tileEl.classList.add("active-step");
+            robot.style.left = `${tileEl.offsetLeft}px`;
+          }
+
+          appendTerminal(`Robot stands on tile ${tileVal}`);
+          updateInspector({
+            "i": tileVal,
+            "iteration": step + 1,
+            "status": "Inside Loop"
+          });
+
+          step++;
+          setTimeout(executeStep, state.speedMs);
+        }, state.speedMs / 2);
+      }
+
+      executeStep();
+    }
+
+    // -------------------------------------------------------------
+    // LEVEL 1 ACTIVITY 2: Range Builder Challenge
+    // -------------------------------------------------------------
+    function loadL1A2(container) {
+      const scenario = l1a2Targets[state.activeL1A2Scenario];
+      
+      // 1. Challenge display card
+      const challengeCard = document.createElement("div");
+      challengeCard.className = "challenge-card";
+      challengeCard.innerHTML = `
+        <h4>MISSION TARGET</h4>
+        <p><strong>${scenario.text}</strong></p>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">Select different scenarios:</span>
+        <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+          <button class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="setL1A2Scenario(0)">Scenario A</button>
+          <button class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="setL1A2Scenario(1)">Scenario B</button>
+          <button class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="setL1A2Scenario(2)">Scenario C</button>
+        </div>
+      `;
+      container.appendChild(challengeCard);
+
+      // 2. Interactive drop parameters
+      const formulaWrapper = document.createElement("div");
+      formulaWrapper.style.margin = "1rem 0";
+      formulaWrapper.style.fontSize = "0.9rem";
+      formulaWrapper.style.fontWeight = "700";
+      formulaWrapper.style.fontFamily = "var(--font-code)";
+      
+      const s0 = state.l1a2_slots[0] || "start";
+      const s1 = state.l1a2_slots[1] || "stop";
+      const s2 = state.l1a2_slots[2] || "step";
+
+      formulaWrapper.innerHTML = `
+        <span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(
+          <div class="slot ${state.l1a2_slots[0] ? 'filled':''}" data-slot-type="start" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 32px;">${s0}</div> ,
+          <div class="slot ${state.l1a2_slots[1] ? 'filled':''}" data-slot-type="stop" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 32px;">${s1}</div> ,
+          <div class="slot ${state.l1a2_slots[2] ? 'filled':''}" data-slot-type="step" data-index="2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 32px;">${s2}</div>
+        ):
+      `;
+      container.appendChild(formulaWrapper);
+
+      // 3. Number bank chips
+      const bank = document.createElement("div");
+      bank.className = "chips-bank";
+      bank.innerHTML = "";
+      
+      // Numbers to generate combinations
+      const nums = [2, 10, 8, 6, 4, 0, 5, 25, 20, 3, -2, 2, 5];
+      nums.forEach((val, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.draggable = true;
+        chip.textContent = val;
+        chip.id = `chip-l1-${idx}`;
+        chip.ondragstart = (e) => handleDragStart(e, val);
+        chip.ondragend = handleDragEnd;
+        chip.onclick = () => selectChipForPlacement(chip);
+        bank.appendChild(chip);
+      });
+      container.appendChild(bank);
+
+      // 4. Tiles preview pathway
+      const track = document.createElement("div");
+      track.className = "tile-track";
+      
+      let tilesHTML = "";
+      for (let i = 0; i <= 25; i += 2) {
+        tilesHTML += `<div class="floor-tile" id="tile2-${i}">${i}</div>`;
+      }
+      track.innerHTML = tilesHTML;
+      container.appendChild(track);
+
+      updateRangeBuilderCodeSync();
+    }
+
+    function setL1A2Scenario(idx) {
+      if (state.isExecuting) return;
+      state.activeL1A2Scenario = idx;
+      state.l1a2_slots = ["", "", ""];
+      loadActivity();
+    }
+
+    function updateRangeBuilderCodeSync() {
+      const s0 = state.l1a2_slots[0] || "___";
+      const s1 = state.l1a2_slots[1] || "___";
+      const s2 = state.l1a2_slots[2] || "___";
+
+      const codePanel = document.getElementById("code-synced-panel");
+      codePanel.innerHTML = `
+        <div class="code-line"><span class="code-line-num">1</span><span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(${s0}, ${s1}, ${s2}):</div>
+        <div class="code-line"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;values.append(i)</div>
+      `;
+    }
+
+    function runL1A2Execution() {
+      if (!state.l1a2_slots[0] || !state.l1a2_slots[1] || !state.l1a2_slots[2]) {
+        triggerAlert("Fill in all range parameters (start, stop, step) first!", "error");
+        return;
+      }
+
+      state.isExecuting = true;
+      const start = parseInt(state.l1a2_slots[0]);
+      const stop = parseInt(state.l1a2_slots[1]);
+      const step = parseInt(state.l1a2_slots[2]);
+
+      appendTerminal(`Evaluating: for i in range(${start}, ${stop}, ${step})...`);
+      
+      let generated = [];
+      let current = start;
+
+      if (step > 0) {
+        while (current < stop) {
+          generated.push(current);
+          current += step;
+          if (generated.length > 20) break; // Overflow protection
+        }
+      } else if (step < 0) {
+        while (current > stop) {
+          generated.push(current);
+          current += step;
+          if (generated.length > 20) break; // Overflow protection
+        }
+      }
+
+      // Visualise walking tiles step-by-step
+      let idx = 0;
+      function animatePath() {
+        if (idx >= generated.length) {
+          // Finished animation, verify
+          const target = l1a2Targets[state.activeL1A2Scenario].sequence;
+          const match = JSON.stringify(generated) === JSON.stringify(target);
+          
+          if (match) {
+            triggerAlert("Fantastic! Range parameters generate the target sequence exactly.", "success");
+            appendTerminal(">>> Success! Target sequence matched.", true);
+          } else {
+            triggerAlert("Sequence mismatch! Preview drawn path doesn't match targets.", "error");
+            appendTerminal(`>>> Failed. Target: ${JSON.stringify(target)}, Generated: ${JSON.stringify(generated)}`, false);
+          }
+          state.isExecuting = false;
+          return;
+        }
+
+        const num = generated[idx];
+        const tileEl = document.getElementById(`tile2-${num}`);
+        if (tileEl) {
+          tileEl.classList.add("active-step");
+          appendTerminal(`Generated value: ${num}`);
+        } else {
+          appendTerminal(`Generated value ${num} is out of visual bounds!`, false);
+        }
+
+        updateInspector({
+          "i": num,
+          "sequence": JSON.stringify(generated.slice(0, idx + 1))
         });
 
-        function switchLevel(st, num, btn) {
-            document.querySelectorAll(`#${st}-levels .lvl-pill`).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll(`.level-panel`).forEach(p => p.classList.remove('active'));
-            document.getElementById(`${st}-l${num}`).classList.add('active');
-            document.getElementById(`${st}-bar`).style.width = (num * 20) + '%';
+        idx++;
+        setTimeout(animatePath, state.speedMs);
+      }
+
+      animatePath();
+    }
+
+    // -------------------------------------------------------------
+    // LEVEL 2 ACTIVITY 1: Robot Navigation Simulator
+    // -------------------------------------------------------------
+    function loadL2A1(container) {
+      // 1. Maze linear path
+      const track = document.createElement("div");
+      track.className = "maze-track";
+      
+      let cellsHTML = "";
+      for (let i = 1; i <= 10; i++) {
+        let cls = "maze-cell";
+        if (i === 5) cls += " barrier-wall";
+        else if (i === 10) cls += " portal-cell";
+        else cls += " coin-cell";
+        cellsHTML += `<div class="${cls}" id="maze-${i}">${i}</div>`;
+      }
+      track.innerHTML = `
+        <div class="robot-svg" id="l2a1-robot" style="left: 10px; top: 18px;">
+          <svg viewBox="0 0 100 100" width="32" height="32">
+            <circle cx="50" cy="50" r="40" fill="#e10600" />
+            <circle cx="35" cy="45" r="8" fill="#fff" />
+            <circle cx="65" cy="45" r="8" fill="#fff" />
+            <circle cx="35" cy="45" r="3" fill="#000" />
+            <circle cx="65" cy="45" r="3" fill="#000" />
+            <rect x="35" y="65" width="30" height="8" rx="4" fill="#white" />
+            <line x1="50" y1="10" x2="50" y2="2" stroke="#e10600" stroke-width="4" />
+            <circle cx="50" cy="2" r="4" fill="#ff7b7b" />
+          </svg>
+        </div>
+        ${cellsHTML}
+      `;
+      container.appendChild(track);
+
+      // 2. Chip slot block
+      const inlineWrapper = document.createElement("div");
+      inlineWrapper.style.width = "100%";
+      inlineWrapper.style.margin = "1rem 0";
+      
+      const slotVal = state.l2a1_slot || "modifier";
+      inlineWrapper.innerHTML = `
+        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
+          <div><span class="code-keyword">for</span> cell <span class="code-keyword">in</span> <span class="code-builtin">range</span>(1, 11):</div>
+          <div style="padding-left: 24px;"><span class="code-keyword">if</span> cell == <span class="code-number">5</span>:</div>
+          <div style="padding-left: 48px; display:flex; align-items:center; gap:0.5rem; margin-top: 4px;">
+            <div class="slot ${state.l2a1_slot ? 'filled':''}" data-slot-type="l2a1-mod" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${slotVal}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 4px;">collect_coins()</div>
+        </div>
+      `;
+      container.appendChild(inlineWrapper);
+
+      // 3. Bank chips
+      const bank = document.createElement("div");
+      bank.className = "chips-bank";
+      const options = ["break", "continue", "pass"];
+      options.forEach((opt, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.draggable = true;
+        chip.textContent = opt;
+        chip.id = `chip-l2a1-${idx}`;
+        chip.ondragstart = (e) => handleDragStart(e, opt);
+        chip.ondragend = handleDragEnd;
+        chip.onclick = () => selectChipForPlacement(chip);
+        bank.appendChild(chip);
+      });
+      container.appendChild(bank);
+
+      updateL2A1CodeSync();
+    }
+
+    function updateL2A1CodeSync() {
+      const modifier = state.l2a1_slot || "___";
+      const codePanel = document.getElementById("code-synced-panel");
+      codePanel.innerHTML = `
+        <div class="code-line" id="l2a1-line1"><span class="code-line-num">1</span><span class="code-keyword">for</span> cell <span class="code-keyword">in</span> <span class="code-builtin">range</span>(1, 11):</div>
+        <div class="code-line" id="l2a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> cell == 5:</div>
+        <div class="code-line" id="l2a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">${modifier}</span></div>
+        <div class="code-line" id="l2a1-line4"><span class="code-line-num">4</span>&nbsp;&nbsp;&nbsp;&nbsp;collect_coins()</div>
+      `;
+    }
+
+    function runL2A1Execution() {
+      if (!state.l2a1_slot) {
+        triggerAlert("Drag loop modifier (break/continue/pass) into the slot first!", "error");
+        return;
+      }
+
+      state.isExecuting = true;
+      appendTerminal(">>> Initiating maze navigation check...");
+
+      let cell = 1;
+      let coins = 0;
+
+      function stepMove() {
+        if (state.isPaused) {
+          setTimeout(stepMove, 200);
+          return;
         }
 
-        // ===================== DRAG & DROP UTILITIES =====================
-        function dragStart(e) {
-            e.dataTransfer.setData("text/plain", e.target.id);
-            e.target.classList.add("dragging");
-        }
-        function dragEnd(e) {
-            e.target.classList.remove("dragging");
-        }
-        function dragOver(e) {
-            e.preventDefault();
-        }
-        function dragEnter(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add("hovered");
-        }
-        function dragLeave(e) {
-            e.currentTarget.classList.remove("hovered");
-        }
-        function dropItem(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove("hovered");
-            const id = e.dataTransfer.getData("text/plain");
-            const draggable = document.getElementById(id);
-            let target = e.currentTarget;
+        document.querySelectorAll(".maze-cell").forEach(c => c.style.background = "white");
+        document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
 
-            if (target.classList.contains("drop-zone") || target.classList.contains("items-pool") || target.classList.contains("bucket")) {
-                if (target.classList.contains("drop-zone") && target.children.length > 0) {
-                    const existing = target.children[0];
-                    document.getElementById(existing.dataset.poolId || target.dataset.poolId).appendChild(existing);
-                }
-                target.appendChild(draggable);
-                if (target.classList.contains("drop-zone")) {
-                    draggable.dataset.poolId = target.dataset.poolId;
-                }
+        if (cell > 10) {
+          // Reached portal exit
+          appendTerminal(`>>> Exit reached. Total coins gathered: ${coins}`, true);
+          triggerAlert(`Exit reached! Bypassed successfully with ${coins} coins collected.`, "success");
+          state.isExecuting = false;
+          return;
+        }
+
+        // Highlight line 1: loop evaluation
+        document.getElementById("l2a1-line1").classList.add("active-exec");
+        appendTerminal(`Evaluation loop step. Current cell: ${cell}`);
+
+        setTimeout(() => {
+          if (state.isPaused) {
+            stepMove();
+            return;
+          }
+          
+          document.getElementById("l2a1-line1").classList.remove("active-exec");
+          document.getElementById("l2a1-line2").classList.add("active-exec");
+
+          // Robot visuals
+          const cellEl = document.getElementById(`maze-${cell}`);
+          const robot = document.getElementById("l2a1-robot");
+          if (cellEl && robot) {
+            cellEl.style.background = "#e2e8f0";
+            robot.style.left = `${cellEl.offsetLeft + 6}px`;
+          }
+
+          if (cell === 5) {
+            setTimeout(() => {
+              if (state.isPaused) {
+                stepMove();
+                return;
+              }
+              document.getElementById("l2a1-line2").classList.remove("active-exec");
+              document.getElementById("l2a1-line3").classList.add("active-exec");
+              
+              if (state.l2a1_slot === "break") {
+                appendTerminal("Hit cell 5 barrier! break executed. Exiting loop block immediately.", false);
+                triggerAlert("Obstacle hit! break stops loop immediately.", "info");
+                updateInspector({ "cell": cell, "status": "Loop Aborted" });
+                state.isExecuting = false;
+              } else if (state.l2a1_slot === "continue") {
+                appendTerminal("Hit cell 5 barrier! continue executed. Skipping coin collection & jumps to next cell.", true);
+                triggerAlert("Obstacle skipped! continue increments step.", "info");
+                cell++;
+                updateInspector({ "cell": cell, "coins": coins, "status": "Step Skipped" });
+                setTimeout(stepMove, state.speedMs);
+              } else if (state.l2a1_slot === "pass") {
+                appendTerminal("Hit cell 5 barrier! pass statement does nothing. Proceeding to print statement...", false);
+                triggerAlert("pass has no operational effect. Wall collision triggers!", "error");
+                // Visual vibration on warning wall
+                const wallEl = document.getElementById("maze-5");
+                wallEl.style.transform = "translateX(5px)";
+                setTimeout(() => wallEl.style.transform = "translateX(0)", 100);
+                
+                cell++;
+                coins++;
+                updateInspector({ "cell": cell, "coins": coins, "status": "Pass (Wall Collision)" });
+                setTimeout(stepMove, state.speedMs);
+              }
+            }, state.speedMs / 2);
+          } else {
+            setTimeout(() => {
+              if (state.isPaused) {
+                stepMove();
+                return;
+              }
+              document.getElementById("l2a1-line2").classList.remove("active-exec");
+              document.getElementById("l2a1-line4").classList.add("active-exec");
+
+              coins++;
+              appendTerminal(`Gathered coin from cell ${cell}. Total coins: ${coins}`);
+              updateInspector({
+                "cell": cell,
+                "coins": coins,
+                "status": "Running"
+              });
+
+              cell++;
+              setTimeout(stepMove, state.speedMs);
+            }, state.speedMs / 2);
+          }
+
+        }, state.speedMs / 2);
+      }
+
+      stepMove();
+    }
+
+    // -------------------------------------------------------------
+    // LEVEL 2 ACTIVITY 2: Traffic Signal Controller
+    // -------------------------------------------------------------
+    function loadL2A2(container) {
+      // 1. Queue lane of cars
+      const track = document.createElement("div");
+      track.className = "traffic-lane";
+      track.id = "traffic-lane-wrapper";
+      
+      let carsHTML = "";
+      const queue = [
+        { name: "Car 1", warning: false },
+        { name: "Car 2", warning: false },
+        { name: "Car 3", warning: true }, // Defective/Warning car
+        { name: "Car 4", warning: false },
+        { name: "Car 5", warning: false }
+      ];
+      
+      queue.forEach((car, idx) => {
+        let cls = "traffic-car";
+        if (car.warning) cls += " warning-car";
+        carsHTML += `<div class="${cls}" id="car-${idx}">${car.name}</div>`;
+      });
+      
+      track.innerHTML = carsHTML;
+      container.appendChild(track);
+
+      // 2. Chip slots
+      const inlineWrapper = document.createElement("div");
+      inlineWrapper.style.width = "100%";
+      inlineWrapper.style.margin = "1rem 0";
+      
+      const slotVal = state.l2a2_slot || "modifier";
+      inlineWrapper.innerHTML = `
+        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
+          <div><span class="code-keyword">for</span> car <span class="code-keyword">in</span> incoming_vehicles:</div>
+          <div style="padding-left: 24px;"><span class="code-keyword">if</span> car.has_warning:</div>
+          <div style="padding-left: 48px; display:flex; align-items:center; gap:0.5rem; margin-top: 4px;">
+            <div class="slot ${state.l2a2_slot ? 'filled':''}" data-slot-type="l2a2-mod" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${slotVal}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 4px;">process_vehicle(car)</div>
+        </div>
+      `;
+      container.appendChild(inlineWrapper);
+
+      // 3. Bank chips
+      const bank = document.createElement("div");
+      bank.className = "chips-bank";
+      const options = ["break", "continue", "pass"];
+      options.forEach((opt, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.draggable = true;
+        chip.textContent = opt;
+        chip.id = `chip-l2a2-${idx}`;
+        chip.ondragstart = (e) => handleDragStart(e, opt);
+        chip.ondragend = handleDragEnd;
+        chip.onclick = () => selectChipForPlacement(chip);
+        bank.appendChild(chip);
+      });
+      container.appendChild(bank);
+
+      updateL2A2CodeSync();
+    }
+
+    function updateL2A2CodeSync() {
+      const modifier = state.l2a2_slot || "___";
+      const codePanel = document.getElementById("code-synced-panel");
+      codePanel.innerHTML = `
+        <div class="code-line" id="l2a2-line1"><span class="code-line-num">1</span><span class="code-keyword">for</span> car <span class="code-keyword">in</span> incoming_vehicles:</div>
+        <div class="code-line" id="l2a2-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> car.has_warning:</div>
+        <div class="code-line" id="l2a2-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">${modifier}</span></div>
+        <div class="code-line" id="l2a2-line4"><span class="code-line-num">4</span>&nbsp;&nbsp;&nbsp;&nbsp;process_vehicle(car)</div>
+      `;
+    }
+
+    function runL2A2Execution() {
+      if (!state.l2a2_slot) {
+        triggerAlert("Drag loop modifier (break/continue/pass) into the slot first!", "error");
+        return;
+      }
+
+      state.isExecuting = true;
+      appendTerminal(">>> Traffic signal queue supervisor initiated...");
+
+      let carIdx = 0;
+      const totalCars = 5;
+
+      function stepCar() {
+        if (state.isPaused) {
+          setTimeout(stepCar, 200);
+          return;
+        }
+
+        document.querySelectorAll(".traffic-car").forEach(c => c.style.border = "none");
+        document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+        if (carIdx >= totalCars) {
+          appendTerminal(">>> All vehicles checked. Queue complete.", true);
+          triggerAlert("Queue processing finished successfully!", "success");
+          state.isExecuting = false;
+          return;
+        }
+
+        // Highlight line 1: range check
+        document.getElementById("l2a2-line1").classList.add("active-exec");
+        appendTerminal(`Evaluating queue vehicle: Car ${carIdx + 1}`);
+
+        setTimeout(() => {
+          if (state.isPaused) {
+            stepCar();
+            return;
+          }
+          
+          document.getElementById("l2a2-line1").classList.remove("active-exec");
+          document.getElementById("l2a2-line2").classList.add("active-exec");
+
+          const carEl = document.getElementById(`car-${carIdx}`);
+          if (carEl) {
+            carEl.style.border = "2px solid white";
+          }
+
+          const hasWarning = carIdx === 2; // Index 2 is the warning car
+
+          if (hasWarning) {
+            setTimeout(() => {
+              if (state.isPaused) {
+                stepCar();
+                return;
+              }
+              document.getElementById("l2a2-line2").classList.remove("active-exec");
+              document.getElementById("l2a2-line3").classList.add("active-exec");
+
+              if (state.l2a2_slot === "break") {
+                appendTerminal("Defective/Warning car encountered! break executed. Queue processing stopped.", false);
+                triggerAlert("Traffic stopped! break terminates queue loop.", "info");
+                carEl.style.background = "#000";
+                state.isExecuting = false;
+              } else if (state.l2a2_slot === "continue") {
+                appendTerminal("Defective/Warning car encountered! continue executed. Skipping current vehicle.", true);
+                triggerAlert("Car skipped! continue moves to next loop step.", "info");
+                carEl.classList.add("faded-out");
+                
+                carIdx++;
+                setTimeout(stepCar, state.speedMs);
+              } else if (state.l2a2_slot === "pass") {
+                appendTerminal("Defective/Warning car encountered! pass executed. Vehicle processed with active warning!", false);
+                triggerAlert("pass warning! Vehicle collision risk at intersection.", "error");
+                carEl.style.animation = "varPulse 0.3s infinite";
+                
+                carIdx++;
+                setTimeout(stepCar, state.speedMs);
+              }
+            }, state.speedMs / 2);
+          } else {
+            setTimeout(() => {
+              if (state.isPaused) {
+                stepCar();
+                return;
+              }
+              document.getElementById("l2a2-line2").classList.remove("active-exec");
+              document.getElementById("l2a2-line4").classList.add("active-exec");
+
+              appendTerminal(`Car ${carIdx + 1} processed and passed through signal.`);
+              carEl.style.background = "#10b981";
+
+              updateInspector({
+                "current_car": `Car ${carIdx + 1}`,
+                "status": "Clear"
+              });
+
+              carIdx++;
+              setTimeout(stepCar, state.speedMs);
+            }, state.speedMs / 2);
+          }
+
+        }, state.speedMs / 2);
+      }
+
+      stepCar();
+    }
+
+    // -------------------------------------------------------------
+    // LEVEL 3 ACTIVITY 1: Grid Painter
+    // -------------------------------------------------------------
+    function loadL3A1(container) {
+      // 1. Grid visual
+      const grid = document.createElement("div");
+      grid.className = "grid-painter-canvas";
+      
+      let cellsHTML = "";
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+          cellsHTML += `<div class="grid-cell" id="cell-${r}-${c}"></div>`;
+        }
+      }
+      grid.innerHTML = cellsHTML;
+      container.appendChild(grid);
+
+      // 2. Drag targets wrapper
+      const inlineWrapper = document.createElement("div");
+      inlineWrapper.style.width = "100%";
+      inlineWrapper.style.margin = "1rem 0";
+      
+      const s0 = state.l3a1_slots[0] || "outer_range";
+      const s1 = state.l3a1_slots[1] || "inner_range";
+      const s2 = state.l3a1_slots[2] || "action";
+
+      inlineWrapper.innerHTML = `
+        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
+          <div><span class="code-keyword">for</span> r <span class="code-keyword">in</span> 
+            <div class="slot ${state.l3a1_slots[0] ? 'filled':''}" data-slot-type="outer" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s0}</div>:
+          </div>
+          <div style="padding-left: 24px; margin-top: 4px;">
+            <span class="code-keyword">for</span> c <span class="code-keyword">in</span> 
+            <div class="slot ${state.l3a1_slots[1] ? 'filled':''}" data-slot-type="inner" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s1}</div>:
+          </div>
+          <div style="padding-left: 48px; margin-top: 4px;">
+            <div class="slot ${state.l3a1_slots[2] ? 'filled':''}" data-slot-type="body" data-index="2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 130px; height: 28px;">${s2}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(inlineWrapper);
+
+      // 3. Bank chips
+      const bank = document.createElement("div");
+      bank.className = "chips-bank";
+      const options = ["range(0, 5)", "range(0, 5)", "paint_cell(r, c)", "range(0, 3)", "paint_cell(c, r)", "pass"];
+      options.forEach((opt, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.draggable = true;
+        chip.textContent = opt;
+        chip.id = `chip-l3a1-${idx}`;
+        chip.ondragstart = (e) => handleDragStart(e, opt);
+        chip.ondragend = handleDragEnd;
+        chip.onclick = () => selectChipForPlacement(chip);
+        bank.appendChild(chip);
+      });
+      container.appendChild(bank);
+
+      updateGridPainterCodeSync();
+    }
+
+    function updateGridPainterCodeSync() {
+      const s0 = state.l3a1_slots[0] || "___";
+      const s1 = state.l3a1_slots[1] || "___";
+      const s2 = state.l3a1_slots[2] || "___";
+      const codePanel = document.getElementById("code-synced-panel");
+      codePanel.innerHTML = `
+        <div class="code-line" id="l3a1-line1"><span class="code-line-num">1</span><span class="code-keyword">for</span> r <span class="code-keyword">in</span> ${s0}:</div>
+        <div class="code-line" id="l3a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> c <span class="code-keyword">in</span> ${s1}:</div>
+        <div class="code-line" id="l3a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${s2}</div>
+      `;
+    }
+
+    function runL3A1Execution() {
+      if (!state.l3a1_slots[0] || !state.l3a1_slots[1] || !state.l3a1_slots[2]) {
+        triggerAlert("Fill in outer range, inner range, and paint body statement slots first!", "error");
+        return;
+      }
+
+      state.isExecuting = true;
+      appendTerminal(">>> Initiating Nested Loops Grid Painting simulation...");
+      document.querySelectorAll(".grid-cell").forEach(cell => cell.classList.remove("painted"));
+
+      let rMax = 5;
+      let cMax = 5;
+
+      if (state.l3a1_slots[0] === "range(0, 3)") rMax = 3;
+      if (state.l3a1_slots[1] === "range(0, 3)") cMax = 3;
+
+      let r = 0;
+      let c = 0;
+
+      function stepNested() {
+        if (state.isPaused) {
+          setTimeout(stepNested, 200);
+          return;
+        }
+
+        document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+        if (r >= rMax) {
+          // Finished
+          appendTerminal("Nested loops traversal complete. Grid painting finished.", true);
+          triggerAlert("Painting finished successfully!", "success");
+          state.isExecuting = false;
+          return;
+        }
+
+        // Highlight Outer line
+        document.getElementById("l3a1-line1").classList.add("active-exec");
+        
+        setTimeout(() => {
+          if (state.isPaused) {
+            stepNested();
+            return;
+          }
+          document.getElementById("l3a1-line1").classList.remove("active-exec");
+          document.getElementById("l3a1-line2").classList.add("active-exec");
+          
+          appendTerminal(`Outer iteration row (r) = ${r}. Initiating inner column traversal (c) up to ${cMax}...`);
+
+          setTimeout(() => {
+            if (state.isPaused) {
+              stepNested();
+              return;
             }
-        }
-        function shufflePools() {
-            document.querySelectorAll(".items-pool").forEach(pool => {
-                const items = Array.from(pool.children);
-                for (let i = items.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [items[i], items[j]] = [items[j], items[i]];
-                }
-                items.forEach(item => pool.appendChild(item));
-            });
-        }
-        function initDragAndDrop() {
-            document.querySelectorAll(".draggable-item").forEach(item => {
-                item.addEventListener("dragstart", dragStart);
-                item.addEventListener("dragend", dragEnd);
-            });
-            document.querySelectorAll(".drop-zone, .items-pool, .bucket").forEach(zone => {
-                zone.addEventListener("dragover", dragOver);
-                zone.addEventListener("dragenter", dragEnter);
-                zone.addEventListener("dragleave", dragLeave);
-                zone.addEventListener("drop", dropItem);
-            });
-        }
+            document.getElementById("l3a1-line2").classList.remove("active-exec");
+            document.getElementById("l3a1-line3").classList.add("active-exec");
 
-        // ===================== PUZZLE VERIFICATIONS =====================
-        function l1Verify() {
-            const slots = ['l1-zone-0', 'l1-zone-1', 'l1-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l1-score').textContent = score;
-            const feedback = document.getElementById('l1-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Excellent! You have correctly structured the Collatz Conjecture branching while loop!';
+            // Perform cell paint
+            if (state.l3a1_slots[2] === "paint_cell(r, c)") {
+              const cellEl = document.getElementById(`cell-${r}-${c}`);
+              if (cellEl) cellEl.classList.add("painted");
+              appendTerminal(`Painted grid coordinate (${r}, ${c})`);
+            } else if (state.l3a1_slots[2] === "paint_cell(c, r)") {
+              const cellEl = document.getElementById(`cell-${c}-${r}`);
+              if (cellEl) cellEl.classList.add("painted");
+              appendTerminal(`Painted grid coordinate (${c}, ${r})`);
             } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Loop statements out of order. Verify evaluation check and increment blocks. Reshuffling pool!';
-                shufflePools();
+              appendTerminal(`Pass statement called. Skipped painting coordinate (${r}, ${c})`);
             }
-        }
 
-        function l2Verify() {
-            const slots = ['l2-zone-0', 'l2-zone-1', 'l2-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
+            updateInspector({
+              "r": r,
+              "c": c,
+              "coordinate": `(${r}, ${c})`
             });
-            document.getElementById('l2-score').textContent = score;
-            const feedback = document.getElementById('l2-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Match correct! Starting at 15, stopping exclusively at 1 with a step of -4 correctly generates the sequence [15, 11, 7, 3]!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Mismatched parameters. Verify range start, stop exclusive, and negative step variables. Reshuffling!';
-                shufflePools();
+
+            c++;
+            if (c >= cMax) {
+              c = 0;
+              r++;
             }
+            
+            setTimeout(stepNested, state.speedMs);
+          }, state.speedMs / 2);
+
+        }, state.speedMs / 2);
+      }
+
+      stepNested();
+    }
+
+    // -------------------------------------------------------------
+    // LEVEL 3 ACTIVITY 2: Factory Automation Challenge
+    // -------------------------------------------------------------
+    function loadL3A2(container) {
+      // 1. Conveyor Belt items
+      const wrapper = document.createElement("div");
+      wrapper.className = "conveyor-belt-container";
+      
+      let packagesHTML = "";
+      const items = [
+        { name: "P1", defective: false },
+        { name: "P2", defective: false },
+        { name: "P3", defective: true },
+        { name: "P4", defective: false },
+        { name: "P5", defective: false }
+      ];
+
+      items.forEach((item, idx) => {
+        let cls = "conveyor-package";
+        if (item.defective) cls += " defective";
+        packagesHTML += `<div class="${cls}" id="pkg-${idx}">${item.name}</div>`;
+      });
+
+      wrapper.innerHTML = `
+        <div style="font-size:0.75rem; font-weight:700; color:var(--text-secondary);">CONVEYOR BELT:</div>
+        <div class="conveyor-belt" id="conveyor-wrapper">
+          ${packagesHTML}
+        </div>
+      `;
+      container.appendChild(wrapper);
+
+      // 2. Drag targets code block
+      const inlineWrapper = document.createElement("div");
+      inlineWrapper.style.width = "100%";
+      inlineWrapper.style.margin = "1rem 0";
+      
+      const s0 = state.l3a2_slots[0] || "warning_check";
+      const s1 = state.l3a2_slots[1] || "normal_action";
+
+      inlineWrapper.innerHTML = `
+        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
+          <div><span class="code-keyword">for</span> package <span class="code-keyword">in</span> conveyor_belt:</div>
+          <div style="padding-left: 24px;"><span class="code-keyword">if</span> package.is_defective:</div>
+          <div style="padding-left: 48px; display:flex; align-items:center; gap:0.5rem; margin-top: 4px;">
+            <div class="slot ${state.l3a2_slots[0] ? 'filled':''}" data-slot-type="factory-check" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s0}</div>
+          </div>
+          <div style="padding-left: 24px; margin-top: 4px;">
+            <div class="slot ${state.l3a2_slots[1] ? 'filled':''}" data-slot-type="factory-action" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 120px; height: 28px;">${s1}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(inlineWrapper);
+
+      // 3. Bank chips
+      const bank = document.createElement("div");
+      bank.className = "chips-bank";
+      const options = ["continue", "stamp_package()", "break", "pass"];
+      options.forEach((opt, idx) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.draggable = true;
+        chip.textContent = opt;
+        chip.id = `chip-l3a2-${idx}`;
+        chip.ondragstart = (e) => handleDragStart(e, opt);
+        chip.ondragend = handleDragEnd;
+        chip.onclick = () => selectChipForPlacement(chip);
+        bank.appendChild(chip);
+      });
+      container.appendChild(bank);
+
+      updateFactoryCodeSync();
+    }
+
+    function updateFactoryCodeSync() {
+      const condition = state.l3a2_slots[0] || "___";
+      const action = state.l3a2_slots[1] || "___";
+      
+      const codePanel = document.getElementById("code-synced-panel");
+      codePanel.innerHTML = `
+        <div class="code-line" id="l3a2-line1"><span class="code-line-num">1</span><span class="code-keyword">for</span> package <span class="code-keyword">in</span> conveyor_belt:</div>
+        <div class="code-line" id="l3a2-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> package.is_defective:</div>
+        <div class="code-line" id="l3a2-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">${condition}</span></div>
+        <div class="code-line" id="l3a2-line4"><span class="code-line-num">4</span>&nbsp;&nbsp;&nbsp;&nbsp;${action}</div>
+      `;
+    }
+
+    function runL3A2Execution() {
+      if (!state.l3a2_slots[0] || !state.l3a2_slots[1]) {
+        triggerAlert("Fill in warning check and normal action slots first!", "error");
+        return;
+      }
+
+      state.isExecuting = true;
+      appendTerminal(">>> Factory loop conveyor inspection starting...");
+
+      let idx = 0;
+      const totalPackages = 5;
+
+      function stepFactory() {
+        if (state.isPaused) {
+          setTimeout(stepFactory, 200);
+          return;
         }
 
-        function l3Verify() {
-            const slots = ['l3-zone-0', 'l3-zone-1', 'l3-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l3-score').textContent = score;
-            const feedback = document.getElementById('l3-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Perfect! The loop-else guard executes its block only if the loop finishes entirely without triggering a break!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Loop-else block incorrectly constructed. Ensure break is hit on factor discovery, and the else clause triggers the prime assignment. Reshuffling!';
-                shufflePools();
-            }
+        document.querySelectorAll(".conveyor-package").forEach(p => p.style.border = "2px solid #b45309");
+        document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
+
+        if (idx >= totalPackages) {
+          appendTerminal(">>> Factory production run finished successfully.", true);
+          triggerAlert("Production automation successful!", "success");
+          state.isExecuting = false;
+          return;
         }
 
-        function l4Verify() {
-            const slots = ['l4-zone-0', 'l4-zone-1', 'l4-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l4-score').textContent = score;
-            const feedback = document.getElementById('l4-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Excellent! Diagonal coordinates (r == c) must match 1, and non-diagonal coordinates must match 0!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Identity matrix check incorrect. Ensure diagonal cells evaluate to 1 and off-diagonals evaluate to 0. Reshuffling!';
-                shufflePools();
-            }
-        }
+        // Highlight line 1: loop check
+        document.getElementById("l3a2-line1").classList.add("active-exec");
+        appendTerminal(`Inspecting package: P${idx + 1}...`);
 
-        function l5Verify() {
-            const slots = ['l5-zone-0', 'l5-zone-1', 'l5-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l5-score').textContent = score;
-            const feedback = document.getElementById('l5-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Flawless unpacking! enumerate yields the index first, and zip unpacks names and scores in parallel!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Zipped unpacker mismatch. Verify how tuple elements align within the enumerate index wrapping. Reshuffling!';
-                shufflePools();
-            }
-        }
+        setTimeout(() => {
+          if (state.isPaused) {
+            stepFactory();
+            return;
+          }
+          document.getElementById("l3a2-line1").classList.remove("active-exec");
+          document.getElementById("l3a2-line2").classList.add("active-exec");
 
-        // ===================== SIMULATION LOGIC =====================
-        function s2l1Run() {
-            const start = parseInt(document.getElementById('s2l1-start').value);
-            const end = parseInt(document.getElementById('s2l1-end').value);
-            const step = parseInt(document.getElementById('s2l1-step').value) || 1;
-            const out = document.getElementById('s2l1-out');
-            const track = document.getElementById('s2l1-track');
-            if (step <= 0) { out.innerHTML = '<span class="err">Step must be > 0 (else infinite loop in Python!)</span>'; track.innerHTML = ''; return; }
-            if (end < start) { out.innerHTML = '<span class="err">End must be >= Start for this while loop</span>'; track.innerHTML = ''; return; }
-            const iters = [];
-            let i = start;
-            while (i <= end && iters.length < 50) { iters.push(i); i += step; }
-            out.innerHTML =
-                `<span class="com">>>> i = ${start}</span>
-while i <= ${end}:
-    print(i)
-    i += ${step}
+          const pkgEl = document.getElementById(`pkg-${idx}`);
+          if (pkgEl) {
+            pkgEl.style.border = "2px solid white";
+          }
 
-<span class="lbl">Iterations:</span>  ${iters.length}
-<span class="lbl">Values:</span>      [${iters.slice(0, 15).join(', ')}${iters.length > 15 ? ', ...' : ''}]
-<span class="lbl">Final i:</span>     ${iters[iters.length - 1] + step} <span class="com">(condition fails)</span>`;
-            track.innerHTML = iters.slice(0, 20).map(v => `<div class="loop-item">${v}</div>`).join('');
-        }
+          const isDefective = idx === 2; // Index 2 is the defective item
 
-        function s2l2Run() {
-            const start = parseInt(document.getElementById('s2l2-start').value);
-            const stop = parseInt(document.getElementById('s2l2-stop').value);
-            const step = parseInt(document.getElementById('s2l2-step').value) || 1;
-            const out = document.getElementById('s2l2-out');
-            const track = document.getElementById('s2l2-track');
-            if (step === 0) { out.innerHTML = '<span class="err">ValueError: range() step cannot be zero</span>'; track.innerHTML = ''; return; }
-            const vals = [];
-            if (step > 0) { for (let i = start; i < stop && vals.length < 50; i += step)vals.push(i); }
-            else { for (let i = start; i > stop && vals.length < 50; i += step)vals.push(i); }
-            out.innerHTML =
-                `<span class="com">>>> for i in range(${start}, ${stop}, ${step}):</span>
-<span class="com">...     print(i)</span>
+          if (isDefective) {
+            setTimeout(() => {
+              if (state.isPaused) {
+                stepFactory();
+                return;
+              }
+              document.getElementById("l3a2-line2").classList.remove("active-exec");
+              document.getElementById("l3a2-line3").classList.add("active-exec");
 
-range(${start}, ${stop}, ${step})
-→ [${vals.slice(0, 15).join(', ')}${vals.length > 15 ? ', ...' : ''}]
+              if (state.l3a2_slots[0] === "break") {
+                appendTerminal("Defect package found! break statement triggered. Conveyor line halted.", false);
+                triggerAlert("Conveyor stopped! break terminates processing loop.", "info");
+                pkgEl.style.background = "#000";
+                state.isExecuting = false;
+              } else if (state.l3a2_slots[0] === "continue") {
+                appendTerminal("Defect package found! continue statement skips package stamp operation.", true);
+                triggerAlert("Defect bypassed! continue moves to next item.", "info");
+                pkgEl.classList.add("faded-out");
+                
+                idx++;
+                setTimeout(stepFactory, state.speedMs);
+              } else if (state.l3a2_slots[0] === "pass") {
+                appendTerminal("Defect package found! pass statements does nothing. Executing stamp operation anyway...", false);
+                triggerAlert("Defect package stamped! Factory collision alert fired.", "error");
+                pkgEl.classList.add("stamped");
+                pkgEl.style.background = "#e11d48";
+                
+                idx++;
+                setTimeout(stepFactory, state.speedMs);
+              }
+            }, state.speedMs / 2);
+          } else {
+            setTimeout(() => {
+              if (state.isPaused) {
+                stepFactory();
+                return;
+              }
+              document.getElementById("l3a2-line2").classList.remove("active-exec");
+              document.getElementById("l3a2-line4").classList.add("active-exec");
 
-<span class="lbl">Total iterations:</span> ${vals.length}
-<span class="com"># stop value (${stop}) is EXCLUDED</span>`;
-            track.innerHTML = vals.slice(0, 20).map(v => `<div class="loop-item">${v}</div>`).join('');
-        }
+              if (state.l3a2_slots[1] === "stamp_package()") {
+                appendTerminal(`Package P${idx + 1} stamped successfully.`);
+                pkgEl.classList.add("stamped");
+              } else {
+                appendTerminal(`package P${idx + 1} passed through unstamped.`);
+              }
 
-        function s2l3Run() {
-            const end = parseInt(document.getElementById('s2l3-end').value) || 10;
-            const mode = document.getElementById('s2l3-mode').value;
-            const target = parseInt(document.getElementById('s2l3-target').value) || 5;
-            const out = document.getElementById('s2l3-out');
-            const track = document.getElementById('s2l3-track');
-            const printed = [], skipped = [], stopped = [];
-            let brokeAt = null;
-            for (let i = 1; i <= end; i++) {
-                if (mode === 'break' && i === target) { stopped.push(i); brokeAt = i; break; }
-                if (mode === 'continue' && i === target) { skipped.push(i); continue; }
-                printed.push(i);
-            }
-            if (mode === 'break') {
-                out.innerHTML =
-                    `<span class="com">>>> for i in range(1, ${end + 1}):</span>
-    if i == ${target}:
-        break        <span class="ok">← exits loop entirely</span>
-    print(i)
+              updateInspector({
+                "package": `P${idx + 1}`,
+                "status": "Processed"
+              });
 
-<span class="lbl">Printed:</span> [${printed.join(', ')}]
-<span class="err">Break at:</span> ${brokeAt} (loop stopped here)
-<span class="com"># ${end - brokeAt} values after ${brokeAt} were NEVER reached</span>`;
-                track.innerHTML = printed.map(v => `<div class="loop-item">${v}</div>`).join('') + `<div class="loop-item brk">BREAK@${brokeAt}</div>`;
-            } else {
-                out.innerHTML =
-                    `<span class="com">>>> for i in range(1, ${end + 1}):</span>
-    if i == ${target}:
-        continue     <span class="ok">← skips to next iteration</span>
-    print(i)
+              idx++;
+              setTimeout(stepFactory, state.speedMs);
+            }, state.speedMs / 2);
+          }
 
-<span class="lbl">Printed:</span>  [${printed.join(', ')}]
-<span class="warn">Skipped:</span>  [${skipped.join(', ')}]
-<span class="com"># Loop still ran all ${end} iterations</span>`;
-                track.innerHTML = [...Array(end)].map((_, idx) => {
-                    const v = idx + 1;
-                    if (v === target) return `<div class="loop-item skip">skip(${v})</div>`;
-                    return `<div class="loop-item">${v}</div>`;
-                }).join('');
-            }
-        }
+        }, state.speedMs / 2);
+      }
 
-        function s2l4Run() {
-            const n = parseInt(document.getElementById('s2l4-n').value) || 5;
-            const mode = document.getElementById('s2l4-mode').value;
-            const out = document.getElementById('s2l4-out');
-            let result = '';
-            if (mode === 'table') {
-                const header = '    ' + [...Array(n)].map((_, j) => String(j + 1).padStart(4)).join('');
-                result = header + '\n' + '    ' + '-'.repeat(n * 4) + '\n';
-                for (let i = 1; i <= n; i++) {
-                    result += String(i).padStart(2) + ' | ';
-                    for (let j = 1; j <= n; j++)result += String(i * j).padStart(4);
-                    result += '\n';
-                }
-                result += `\nTotal iterations: ${n}×${n} = ${n * n}`;
-            } else if (mode === 'triangle') {
-                for (let i = 1; i <= n; i++)result += '* '.repeat(i) + '\n';
-                result += `\nfor i in range(1,${n + 1}):\n    print('* ' * i)`;
-            } else {
-                for (let i = 1; i <= n; i++) {
-                    const spaces = ' '.repeat(n - i);
-                    result += spaces + '* '.repeat(i) + '\n';
-                }
-                result += `\nfor i in range(1,${n + 1}):\n    print(' '*(${n}-i) + '* '*i)`;
-            }
-            out.textContent = result;
-        }
+      stepFactory();
+    }
 
-        function s2l5Enum() {
-            const a = document.getElementById('s2l5-a').value.split(',').map(s => s.trim());
-            const out = document.getElementById('s2l5-out');
-            out.innerHTML = `<span class="com">>>> for i, lang in enumerate(langs):</span>\n` +
-                a.map((v, i) => `    (${i}, "${v}")`).join('\n') +
-                `\n\n<span class="lbl">enumerate()</span> gives index + value pairs\nUseful when you need both position and content`;
-        }
-        function s2l5Zip() {
-            const a = document.getElementById('s2l5-a').value.split(',').map(s => s.trim());
-            const b = document.getElementById('s2l5-b').value.split(',').map(s => s.trim());
-            const out = document.getElementById('s2l5-out');
-            const pairs = [];
-            const len = Math.min(a.length, b.length);
-            for (let i = 0; i < len; i++)pairs.push(`    ("${a[i]}", ${b[i]})`);
-            out.innerHTML = `<span class="com">>>> for lang, score in zip(langs, scores):</span>\n` +
-                pairs.join('\n') +
-                (a.length !== b.length ? `\n\n<span class="warn">⚠ Lists have different lengths (${a.length} vs ${b.length})\nzip() stops at the shorter one — ${Math.abs(a.length - b.length)} item(s) dropped!</span>` : `\n\n<span class="ok">✅ Both lists same length — no data lost</span>`);
-        }
-        function s2l5ForElse() {
-            const a = document.getElementById('s2l5-a').value.split(',').map(s => s.trim());
-            const search = 'Java';
-            const found = a.includes(search);
-            const out = document.getElementById('s2l5-out');
-            out.innerHTML = `<span class="com">>>> Searching for "${search}" in ${JSON.stringify(a)}</span>
-for lang in langs:
-    if lang == "${search}":
-        print("Found!")
-        break
-else:
-    print("Not found")   <span class="com"># runs only if no break</span>
+    // RUN ROUTER CONTROLLER FOR ACTIONS
+    function runExecution() {
+      if (state.isExecuting) return;
 
-<span class="${found ? 'ok' : 'warn'}">${found ? `"${search}" was found → break fired → else SKIPPED` : `"${search}" not found → loop completed → else RUNS`}</span>`;
-        }
+      if (state.level === 1 && state.activity === 1) {
+        runL1A1Execution();
+      } else if (state.level === 1 && state.activity === 2) {
+        runL1A2Execution();
+      } else if (state.level === 2 && state.activity === 1) {
+        runL2A1Execution();
+      } else if (state.level === 2 && state.activity === 2) {
+        runL2A2Execution();
+      } else if (state.level === 3 && state.activity === 1) {
+        runL3A1Execution();
+      } else if (state.level === 3 && state.activity === 2) {
+        runL3A2Execution();
+      }
+    }
 
-        // Init
-        initDragAndDrop();
-        shufflePools();
-        s2l1Run();
-    </script>
+    function replaySimulation() {
+      if (state.isExecuting) return;
+      loadActivity();
+    }
+
+    // Start application
+    window.onload = () => {
+      switchLevel(1);
+    };
+  </script>
 </body>
-
 </html>
