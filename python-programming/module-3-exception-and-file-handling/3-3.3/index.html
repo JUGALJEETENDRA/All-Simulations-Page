@@ -1,841 +1,3299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Python Binary Files &amp; File Exceptions</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary File Workshop & Exceptions Rescue</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
-    :root {
-      --primary: #E63946;
-      --primary-hover: #D62828;
-      --primary-light: #FFF0F1;
-      --bg-page: #F8F9FA;
-      --bg-card: #FFFFFF;
-      --text-main: #1D1D1F;
-      --text-muted: #6E6E73;
-      --border-light: #EBEBEB;
-      --code-bg: #1E1E1E;
-      --code-text: #E6E6E6;
-      --code-ok: #34C759;
-      --code-err: #FF3B30;
-      --code-warn: #FFCC00;
-      --code-com: #8E8E93;
-      --mono: 'JetBrains Mono', 'Fira Code', monospace;
-      --display: 'Archivo Black', sans-serif;
-      --body: 'Inter', sans-serif;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
-      --shadow-float: 0 14px 40px rgba(230,57,70,0.15);
-    }
+        :root {
+            --primary: #cc0000;
+            --primary-hover: #b30000;
+            --primary-glow: rgba(204, 0, 0, 0.12);
+            --bg: #ffffff;
+            --bg-dark: #f8f9fa;
+            --text: #0d1117;
+            --text-muted: #57606a;
+            --border: #d0d7de;
+            --border-primary: #cc0000;
+            --code-bg: #0d1117;
+            --code-text: #c9d1d9;
+            --hl-keyword: #ff7b72;
+            --hl-string: #a5d6ff;
+            --hl-builtin: #79c0ff;
+            --hl-number: #56d364;
+            --hl-comment: #8b949e;
+            --font-ui: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    html, body {
-      font-family: var(--body);
-      background: var(--bg-page);
-      color: var(--text-main);
-      scroll-behavior: smooth;
-      line-height: 1.5;
-    }
+        body {
+            font-family: var(--font-ui);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    /* ===== HERO ===== */
-    .hero {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-      color: #fff;
-      padding: 60px 24px;
-      text-align: center;
-      overflow: hidden;
-      position: relative;
-    }
-    .eyebrow {
-      font-family: var(--mono);
-      letter-spacing: 3px;
-      font-size: 12px;
-      text-transform: uppercase;
-      opacity: 0.8;
-      margin-bottom: 16px;
-    }
-    .hero h1 {
-      font-family: var(--display);
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      line-height: 1.1;
-      text-transform: uppercase;
-      letter-spacing: -0.5px;
-    }
-    .hero p.sub {
-      margin-top: 16px;
-      font-size: 1.05rem;
-      max-width: 640px;
-      margin-inline: auto;
-      opacity: 0.9;
-    }
+        /* HEADER HUD */
+        header {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border-primary);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
 
-    main { max-width: 1000px; margin: 0 auto; padding: 40px 20px 80px; }
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    /* ===== SECTION HEADER ===== */
-    .sec-head { margin-bottom: 32px; text-align: center; }
-    .sec-num { font-family: var(--mono); color: var(--primary); font-weight: 700; letter-spacing: 2px; font-size: 0.85rem; }
-    .sec-head h2 { font-family: var(--display); font-size: clamp(1.5rem, 4vw, 2.2rem); margin-top: 8px; }
-    .sec-head p { margin-top: 12px; color: var(--text-muted); max-width: 600px; margin-inline: auto; }
+        .header-badge {
+            background: var(--primary);
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
 
-    /* ===== LEVEL STRIP ===== */
-    .level-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; justify-content: center; }
-    .lvl-pill {
-      font-family: var(--body); font-size: 0.8rem; font-weight: 600;
-      padding: 8px 18px; border-radius: 30px; cursor: pointer;
-      background: var(--bg-card); color: var(--text-muted);
-      border: 1px solid var(--border-light); transition: all .2s;
-    }
-    .lvl-pill:hover { border-color: var(--primary); color: var(--primary); }
-    .lvl-pill.active {
-      background: var(--primary-light); color: var(--primary);
-      border-color: var(--primary); font-weight: 700;
-    }
-    .level-panel { display: none; }
-    .level-panel.active { display: block; animation: fadeIn .35s ease; }
+        .header-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .header-nav {
+            display: flex;
+            gap: 8px;
+        }
 
-    /* ===== CARDS ===== */
-    .card {
-      background: var(--bg-card); border: 1px solid var(--border-light);
-      border-radius: 16px; padding: 32px; margin-bottom: 24px;
-      box-shadow: var(--shadow-md); transition: transform 0.2s ease;
-    }
-    .card:hover { transform: translateY(-2px); }
-    .card h3 {
-      font-family: var(--body); font-size: 1.1rem; color: var(--text-main);
-      margin-bottom: 16px; font-weight: 700; display: flex; align-items: center;
-    }
-    .card h3 .tag, .card h3 .lvl-tag {
-      font-family: var(--mono); background: var(--primary); color: #fff;
-      font-size: 0.7rem; padding: 4px 10px; border-radius: 6px;
-      margin-right: 12px; font-weight: 700;
-    }
-    .level-desc {
-      background: var(--primary-light); border-radius: 8px;
-      padding: 16px 20px; margin-bottom: 24px;
-      color: var(--text-main); font-size: 0.95rem;
-    }
-    .level-desc strong { color: var(--primary); }
+        .level-btn {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
 
-    /* ===== INPUTS ===== */
-    label {
-      font-family: var(--body); font-size: 0.85rem; font-weight: 600;
-      color: var(--text-muted); display: block; margin-bottom: 8px;
-    }
-    input[type=text], input[type=number], select, textarea {
-      font-family: var(--mono); width: 100%; padding: 12px 16px;
-      border: 1px solid var(--border-light); border-radius: 10px;
-      font-size: 0.95rem; background: var(--bg-page);
-      color: var(--text-main); outline: none; transition: all .2s;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary); background: #fff;
-      box-shadow: 0 0 0 3px rgba(230,57,70,0.15);
-    }
-    textarea { resize: vertical; min-height: 80px; }
-    .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-    .row > div { flex: 1; min-width: 150px; }
+        .level-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(204,0,0,0.02);
+        }
 
-    /* ===== BUTTONS ===== */
-    button.action {
-      font-family: var(--body); font-weight: 600;
-      background: var(--primary); color: #fff; border: none;
-      padding: 12px 24px; border-radius: 10px; cursor: pointer;
-      font-size: 0.9rem; transition: all .2s;
-      margin-right: 10px; margin-bottom: 10px;
-    }
-    button.action:hover {
-      background: var(--primary-hover); transform: translateY(-1px);
-      box-shadow: var(--shadow-float);
-    }
-    button.action:active { transform: translateY(1px); box-shadow: none; }
-    button.action.ghost {
-      background: var(--bg-card); color: var(--text-main);
-      border: 1px solid var(--border-light); box-shadow: var(--shadow-sm);
-    }
-    button.action.ghost:hover { border-color: var(--primary); color: var(--primary); }
+        .level-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
 
-    /* ===== OUTPUT TERMINAL ===== */
-    .output {
-      margin-top: 20px; background: var(--code-bg); color: var(--code-text);
-      font-family: var(--mono); font-size: 0.9rem; border-radius: 12px;
-      padding: 20px; min-height: 60px; white-space: pre-wrap;
-      word-break: break-word; border-left: 4px solid var(--primary);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .output .err { color: var(--code-err); }
-    .output .com { color: var(--code-com); }
-    .output .ok { color: var(--code-ok); }
-    .output .warn { color: var(--code-warn); }
-    .output .lbl { color: #A2A2A2; }
+        /* MAIN WORKSPACE */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1440px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
 
-    /* ===== TABLE ===== */
-    table {
-      width: 100%; border-collapse: separate; border-spacing: 0;
-      font-family: var(--mono); font-size: 0.85rem;
-      border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden;
-    }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-light); }
-    th { background: var(--bg-page); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
-    tr:last-child td { border-bottom: none; }
+        .activity-tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
 
-    /* ===== PROGRESS BAR ===== */
-    .progress-bar-wrap {
-      background: var(--border-light); border-radius: 20px;
-      height: 6px; margin-bottom: 32px; overflow: hidden;
-    }
-    .progress-bar { height: 100%; border-radius: 20px; background: var(--primary); transition: width .4s ease; }
+        .activity-tab {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 6px 16px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
 
-    /* ===== CHALLENGE BOX ===== */
-    .challenge-box {
-      background: #FAFAFA; border: 1px solid var(--border-light);
-      border-left: 4px solid var(--text-main);
-      border-radius: 8px; padding: 20px; margin-top: 24px;
-    }
-    .challenge-box .ch-label {
-      font-family: var(--body); font-size: 0.75rem; font-weight: 700;
-      color: var(--text-main); text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 10px;
-    }
-    .challenge-box p { color: var(--text-muted); font-size: 0.95rem; }
+        .activity-tab:hover {
+            color: var(--primary);
+            background: rgba(204,0,0,0.04);
+        }
 
-    .footer-note {
-      text-align: center; font-family: var(--mono); font-size: 0.85rem;
-      color: var(--text-muted); margin-top: 60px; padding-top: 24px;
-      border-top: 1px solid var(--border-light);
-    }
+        .activity-tab.active {
+            color: var(--primary);
+            background: var(--primary-glow);
+        }
 
-    /* ===== VISUALIZERS ===== */
-    .exc-stack {
-      display: flex; flex-direction: column; gap: 8px; margin-top: 16px;
-    }
-    .exc-frame {
-      font-family: var(--mono); font-size: 0.85rem;
-      padding: 12px 16px; border-radius: 8px;
-      border-left: 4px solid var(--primary);
-      background: #fff; border: 1px solid var(--border-light);
-      box-shadow: var(--shadow-sm);
-    }
-    .exc-frame.caught { border-left-color: var(--code-ok); background: #F0FFF4; }
-    .exc-frame.error { border-left-color: var(--code-err); background: #FFF5F5; }
-    .exc-frame.finally { border-left-color: var(--code-warn); background: #FFFDF0; }
+        /* SCREEN SPLIT */
+        .case-panel {
+            display: none;
+            animation: paneFadeIn 0.3s ease forwards;
+        }
 
-    /* ===== FILE MODE VISUALIZER ===== */
-    .file-vis {
-      background: var(--bg-page); border: 1px solid var(--border-light);
-      border-radius: 12px; padding: 20px; margin-top: 16px;
-      font-family: var(--mono); font-size: 0.9rem;
-    }
-    .file-mode-badge {
-      display: inline-block; padding: 4px 12px; border-radius: 20px;
-      font-size: 0.75rem; font-weight: 700; margin: 4px;
-    }
-    .file-mode-badge.r  { background: #E3F2FF; color: #1565C0; }
-    .file-mode-badge.w  { background: #FFF3E0; color: #E65100; }
-    .file-mode-badge.a  { background: #F3E5F5; color: #6A1B9A; }
-    .file-mode-badge.rb { background: #E8F5E9; color: #1B5E20; }
-    .file-mode-badge.wb { background: #FCE4EC; color: #880E4F; }
+        .case-panel.active {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 20px;
+        }
 
-    /* Binary visualizer */
-    .binary-vis {
-      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
-    }
-    .byte-block {
-      font-family: var(--mono); font-size: 0.75rem;
-      background: var(--text-main); color: #fff;
-      padding: 6px 10px; border-radius: 6px; text-align: center;
-      min-width: 48px;
-    }
-    .byte-block.sep { background: var(--primary); }
+        @media (max-width: 1024px) {
+            .case-panel.active {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    .indent-demo {
-      background: var(--code-bg); color: var(--code-text);
-      font-family: var(--mono); font-size: 0.9rem; border-radius: 12px;
-      padding: 20px; line-height: 1.8; border-left: 4px solid var(--text-muted);
-      margin-top: 16px;
-    }
-    .indent-demo .lvl0 { display: block; }
-    .indent-demo .lvl1 { display: block; padding-left: 2rem; }
-    .indent-demo .lvl2 { display: block; padding-left: 4rem; }
-    .indent-demo .hl-ok { color: var(--code-ok); }
-    .indent-demo .hl-err { color: var(--code-err); }
-    .indent-demo .hl-warn { color: var(--code-warn); }
-    .indent-demo .hl-com { color: var(--code-com); }
-  </style>
+        @keyframes paneFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* GLASS CARDS */
+        .glass-card {
+            background: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .glass-card.interactive-panel {
+            border-color: var(--text);
+            min-height: 520px;
+        }
+
+        .card-header-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* HELPERS & TERMINAL */
+        .code-editor-panel {
+            background: var(--code-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .editor-tab-bar {
+            background: #161b22;
+            padding: 6px 12px;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .editor-tab {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--hl-keyword);
+            background: #0d1117;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+
+        .editor-content-area {
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--code-text);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .code-line {
+            display: block;
+            padding-left: 24px;
+            position: relative;
+            white-space: pre;
+            border-radius: 3px;
+            transition: background 0.15s ease;
+        }
+
+        .code-line::before {
+            content: attr(data-line);
+            position: absolute;
+            left: 0;
+            color: #484f58;
+            font-size: 0.75rem;
+            text-align: right;
+            width: 16px;
+            user-select: none;
+        }
+
+        .code-line.active-pointer {
+            background: rgba(204, 0, 0, 0.15);
+            box-shadow: inset 3px 0 0 var(--primary);
+        }
+
+        /* Syntax Highlighter Tokens */
+        .hl-keyword { color: var(--hl-keyword); font-weight: 500; }
+        .hl-string { color: var(--hl-string); }
+        .hl-builtin { color: var(--hl-builtin); }
+        .hl-number { color: var(--hl-number); }
+        .hl-comment { color: var(--hl-comment); font-style: italic; }
+
+        .terminal-box {
+            background: #050505;
+            border: 2px solid #222;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #33ff33;
+            padding: 12px;
+            min-height: 140px;
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .terminal-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .terminal-prompt {
+            color: #ff3333;
+            font-weight: bold;
+        }
+
+        .terminal-error {
+            color: #ff3333;
+            font-weight: 500;
+        }
+
+        .terminal-success {
+            color: #33ff33;
+            font-weight: 500;
+        }
+
+        /* HEX VIEWER COMPONENT */
+        .hex-viewer-container {
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-dark);
+        }
+
+        .hex-header {
+            background: #f0f2f5;
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: grid;
+            grid-template-columns: 80px 1.5fr 1fr;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .hex-rows {
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 180px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        .hex-row {
+            display: grid;
+            grid-template-columns: 80px 1.5fr 1fr;
+            line-height: 1.5;
+        }
+
+        .hex-offset {
+            color: #8c95a6;
+            font-weight: 700;
+        }
+
+        .hex-bytes {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .hex-byte {
+            padding: 0 2px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.15s ease;
+        }
+
+        .hex-byte:hover {
+            background: var(--primary-glow);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .hex-byte.selected {
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .hex-ascii-text {
+            color: #2e8b57;
+            letter-spacing: 1px;
+        }
+
+        .hex-inspector-bar {
+            background: #f0f2f5;
+            border-top: 1px solid var(--border);
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .hex-inspect-val {
+            color: var(--primary);
+            font-family: var(--font-mono);
+        }
+
+        /* TEXT VS BINARY SLIDER */
+        .slider-section {
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comparison-slider {
+            flex: 1;
+            margin: 0 16px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+        }
+
+        .comparison-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(204,0,0,0.3);
+            transition: transform 0.1s ease;
+        }
+
+        .comparison-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .slider-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .comparison-display-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            min-height: 90px;
+            word-break: break-all;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+
+        /* HINT SYSTEM */
+        .hint-accordion {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .hint-summary {
+            padding: 10px 16px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            cursor: pointer;
+            user-select: none;
+            outline: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hint-summary::after {
+            content: '▼';
+            font-size: 0.7rem;
+            transition: transform 0.2s ease;
+        }
+
+        details[open] .hint-summary::after {
+            transform: rotate(180deg);
+        }
+
+        .hint-body-content {
+            padding: 0 16px 16px 16px;
+            border-top: 1px solid var(--border);
+            background: #ffffff;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        .hint-text {
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+
+        .hint-stage-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .hint-stage-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .hint-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: background 0.2s ease;
+        }
+
+        .hint-dot.active {
+            background: var(--primary);
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px var(--primary-glow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(204,0,0,0.25);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-dark);
+            border-color: var(--text-muted);
+        }
+
+        /* NAVIGATION BAR */
+        .activity-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            margin-top: 10px;
+        }
+
+        #nav-status {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* CONFETTI & SPARKS */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* CUSTOM ANIMATIONS */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scanningPulse {
+            0% { transform: translateY(0); opacity: 0.8; }
+            50% { transform: translateY(220px); opacity: 0.8; }
+            100% { transform: translateY(0); opacity: 0.8; }
+        }
+
+        /* -------------------------------------------------------------
+           LEVEL 1 ACTIVITY 1: BINARY SCANNER SPECIFIC UI
+           ------------------------------------------------------------- */
+        .scanner-explore-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            height: 270px;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .mystery-file-card {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .mystery-file-card:hover {
+            border-color: var(--text);
+            transform: scale(1.02);
+        }
+
+        .mystery-file-card.active {
+            border-color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        .mystery-file-icon {
+            font-size: 2.2rem;
+        }
+
+        .mystery-file-name {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .scanner-hud-panel {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 12px;
+        }
+
+        .scanner-lens-target {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--text);
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 10;
+            transition: border-color 0.2s ease;
+        }
+
+        .scanner-lens-target:active {
+            cursor: grabbing;
+        }
+
+        .scanner-hud-panel.drag-over .scanner-lens-target {
+            border-color: var(--primary);
+        }
+
+        .scanning-beam {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .scanner-hud-panel.scanning .scanning-beam {
+            opacity: 1;
+            animation: scanningPulse 2s linear infinite;
+        }
+
+        .scanner-meta-rows {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+        }
+
+        .scanner-meta-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 4px;
+        }
+
+        .scanner-meta-label {
+            color: var(--text-muted);
+        }
+
+        .scanner-meta-val {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* -------------------------------------------------------------
+           LEVEL 1 ACTIVITY 2: MAGIC BYTE PUZZLE
+           ------------------------------------------------------------- */
+        .puzzle-columns {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 12px;
+            min-height: 280px;
+        }
+
+        .puzzle-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .puzzle-col-title {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .puzzle-card {
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .puzzle-card:hover:not(.locked) {
+            border-color: var(--text);
+            background: var(--bg-dark);
+        }
+
+        .puzzle-card.selected {
+            border-color: var(--primary);
+            background: var(--primary-glow);
+            color: var(--primary);
+        }
+
+        .puzzle-card.locked {
+            border-color: #56d364;
+            background: rgba(86, 211, 100, 0.08);
+            color: #2e8b57;
+            cursor: default;
+        }
+
+        .puzzle-feedback-alert {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.8rem;
+            background: var(--bg-dark);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* -------------------------------------------------------------
+           LEVEL 2 ACTIVITY 1: BYTE BUILDER
+           ------------------------------------------------------------- */
+        .builder-workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .builder-pool {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            min-height: 60px;
+        }
+
+        .builder-byte-tag {
+            background: #ffffff;
+            border: 2px solid var(--text);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: grab;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .builder-byte-tag:active {
+            cursor: grabbing;
+        }
+
+        .builder-slots-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .builder-slot-card {
+            width: 60px;
+            height: 70px;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .builder-slot-card.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        .builder-slot-card.filled {
+            border-style: solid;
+            border-color: var(--text);
+        }
+
+        .builder-slot-num {
+            position: absolute;
+            top: 2px;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .builder-slot-val {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .builder-slot-char {
+            font-size: 0.65rem;
+            color: #2e8b57;
+            font-weight: 700;
+        }
+
+        /* -------------------------------------------------------------
+           LEVEL 2 ACTIVITY 2: BINARY COPY SIMULATOR
+           ------------------------------------------------------------- */
+        .copy-simulator-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .copy-sectors-row {
+            display: grid;
+            grid-template-columns: 1fr 12px 1.2fr 12px 1fr;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .copy-sector-box {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 120px;
+        }
+
+        .copy-sector-title {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+
+        .copy-sector-bytes {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            height: 80px;
+            overflow-y: auto;
+        }
+
+        .copy-sector-arrow {
+            font-size: 1.2rem;
+            color: var(--border);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .copy-buffer-box {
+            border: 2px solid var(--text);
+            border-radius: 8px;
+            padding: 8px;
+            background: var(--bg-dark);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .copy-buffer-grid {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+        }
+
+        .copy-buffer-byte {
+            background: var(--primary);
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 6px;
+            border-radius: 4px;
+            animation: slideDown 0.2s ease forwards;
+        }
+
+        .copy-flow-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .copy-mode-selectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: var(--bg-dark);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .copy-mode-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .copy-mode-select-group label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .copy-select {
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: bold;
+            outline: none;
+        }
+
+        /* -------------------------------------------------------------
+           LEVEL 3 ACTIVITY 1: EXCEPTION RESCUE
+           ------------------------------------------------------------- */
+        .rescue-scenarios-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .rescue-scenario-card {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rescue-scenario-card:hover {
+            border-color: var(--text);
+            background: var(--bg-dark);
+        }
+
+        .rescue-scenario-card.active {
+            border-color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        .rescue-scenario-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .rescue-scenario-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .rescue-status-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #ffebe9;
+            color: #cf222e;
+        }
+
+        .rescue-status-badge.rescued {
+            background: #dafbe1;
+            color: #1a7f37;
+        }
+
+        .rescue-drop-zone {
+            display: inline-block;
+            min-width: 140px;
+            height: 24px;
+            border: 2px dashed var(--primary);
+            border-radius: 4px;
+            background: rgba(204, 0, 0, 0.05);
+            vertical-align: middle;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .rescue-drop-zone.drag-over {
+            background: var(--primary-glow);
+            transform: scale(1.05);
+        }
+
+        .rescue-drop-zone.filled {
+            border-style: solid;
+            border-color: var(--text);
+            background: #f0f2f5;
+            color: var(--text);
+            padding: 0 8px;
+        }
+
+        .rescue-pool {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px;
+            background: var(--bg-dark);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            min-height: 50px;
+            margin-top: 10px;
+        }
+
+        .rescue-block-tag {
+            background: #ffffff;
+            border: 2px solid var(--text);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: grab;
+            transition: all 0.15s ease;
+        }
+
+        /* -------------------------------------------------------------
+           LEVEL 3 ACTIVITY 2: BINARY REPAIR LAB
+           ------------------------------------------------------------- */
+        .repair-lab-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .repair-scenario-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .repair-select-box {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 2px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: bold;
+            outline: none;
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+        .repair-select-box:focus {
+            border-color: var(--primary);
+        }
+    </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="eyebrow">Python Course · Subtopic 3.3</div>
-  <h1>Binary Files &amp; Exceptions</h1>
-  <p class="sub">Binary mode unlocks images, audio, and custom formats. Master file exception handling and context manager with statement blocks.</p>
-</div>
+    <!-- HEADER HUD -->
+    <header>
+        <div class="header-title-group">
+            <span class="header-badge">M3.3</span>
+            <div class="header-title">Binary File Workshop & Exceptions</div>
+        </div>
+        <div class="header-nav">
+            <button class="level-btn active" id="btn-lvl-1" onclick="switchLevel(1)">1. Binary Explorer</button>
+            <button class="level-btn" id="btn-lvl-2" onclick="switchLevel(2)">2. File Workshop</button>
+            <button class="level-btn" id="btn-lvl-3" onclick="switchLevel(3)">3. Exceptions Lab</button>
+        </div>
+    </header>
 
-<main>
-  <div class="sec-head">
-    <div class="sec-num">SUBTOPIC 3.3</div>
-    <h2>Binary Files · File Exceptions · with Statement</h2>
-    <p>Work through the 5 progression levels to master binary formats, reading headers (magic bytes), writing binary streams, robust file exception handlers, and context managers.</p>
-  </div>
-  <div class="level-strip" id="s3-levels"></div>
-  <div class="progress-bar-wrap"><div class="progress-bar" id="s3-bar" style="width:20%"></div></div>
+    <!-- MAIN WORKSPACE -->
+    <main class="workspace">
+        
+        <!-- LEVEL 1: BINARY EXPLORER -->
+        <div class="lvl-wrapper" id="lvl-1-wrapper">
+            <div class="activity-tabs">
+                <button class="activity-tab active" id="tab-l1a1" onclick="switchActivity(1, 1)">1.1 Vision Scanner</button>
+                <button class="activity-tab" id="tab-l1a2" onclick="switchActivity(1, 2)">1.2 Magic Byte Puzzle</button>
+            </div>
 
-  <!-- S3 L1 -->
-  <div class="level-panel active" id="s3-l1">
-    <div class="card">
-      <h3><span class="lvl-tag">LEVEL 1</span>Absolute Basics — Text vs Binary Files</h3>
-      <div class="level-desc"><strong>What you learn:</strong> Text files store characters as human-readable strings with encoding (UTF-8). Binary files store raw bytes — images, audio, executables. Opening a binary file in text mode gives garbled output or errors. Mode "rb"/"wb" is required for binary.</div>
-      <label>Choose a file type to compare</label>
-      <select id="s3l1-type" onchange="s3l1Show()">
-        <option value="text_txt">Text file (.txt) — opened as text</option>
-        <option value="text_bin">Text file (.txt) — opened as binary (bytes)</option>
-        <option value="image">Image file (.png) — binary bytes (header)</option>
-        <option value="audio">Audio file (.mp3) — binary bytes (header)</option>
-        <option value="csv">CSV file — text, comma-separated</option>
-      </select>
-      <div class="output" id="s3l1-out" style="margin-top:16px;">Select a file type above</div>
-      <div class="binary-vis" id="s3l1-bytes" style="margin-top:12px;"></div>
-      <div class="challenge-box">
-        <div class="ch-label">🎯 Mini-Challenge</div>
-        <p>What do the first bytes of a PNG file represent? Why can't you read an image as text? What encoding does Python use by default when opening text files? Try: open("file.png", "r") in your head — what error would you get?</p>
-      </div>
-    </div>
-    <div class="card">
-      <h3><span class="tag">REFERENCE</span>Text vs Binary Mode</h3>
-      <table>
-        <tr><th>Aspect</th><th>Text Mode (r/w)</th><th>Binary Mode (rb/wb)</th></tr>
-        <tr><td>Data type</td><td>str</td><td>bytes</td></tr>
-        <tr><td>Newlines</td><td>Auto-converted (\r\n → \n)</td><td>No conversion</td></tr>
-        <tr><td>Encoding</td><td>UTF-8 (default)</td><td>None (raw bytes)</td></tr>
-        <tr><td>Use for</td><td>.txt, .csv, .json, .html</td><td>.png, .mp3, .exe, .pdf</td></tr>
-        <tr><td>Read returns</td><td>str</td><td>bytes object</td></tr>
-      </table>
-    </div>
-  </div>
+            <!-- Activity 1.1: Vision Scanner -->
+            <div class="case-panel active" id="pane-l1a1" style="margin-top:20px;">
+                <div class="glass-card interactive-panel">
+                    <div class="card-header-group">
+                        <div class="card-title">Binary Vision Scanner</div>
+                    </div>
+                    <p class="card-desc">Mystery files have had their extensions wiped. Drag the <strong>AI Binary Scanner</strong> lens onto a file card to scan its raw magic bytes and discover its true type signature!</p>
+                    
+                    <div class="scanner-explore-container">
+                        <div class="file-grid">
+                            <div class="mystery-file-card" id="scan-file-1" onclick="l1a1.selectFile(1)">
+                                <span class="mystery-file-icon">📄</span>
+                                <span class="mystery-file-name">data_stream_A</span>
+                            </div>
+                            <div class="mystery-file-card" id="scan-file-2" onclick="l1a1.selectFile(2)">
+                                <span class="mystery-file-icon">📄</span>
+                                <span class="mystery-file-name">data_stream_B</span>
+                            </div>
+                            <div class="mystery-file-card" id="scan-file-3" onclick="l1a1.selectFile(3)">
+                                <span class="mystery-file-icon">📄</span>
+                                <span class="mystery-file-name">data_stream_C</span>
+                            </div>
+                            <div class="mystery-file-card" id="scan-file-4" onclick="l1a1.selectFile(4)">
+                                <span class="mystery-file-icon">📄</span>
+                                <span class="mystery-file-name">data_stream_D</span>
+                            </div>
+                        </div>
 
-  <!-- S3 L2 -->
-  <div class="level-panel" id="s3-l2">
-    <div class="card">
-      <h3><span class="lvl-tag">LEVEL 2</span>Core Application — Reading Binary Files</h3>
-      <div class="level-desc"><strong>What you learn:</strong> Reading in binary mode ("rb") returns a <code>bytes</code> object. You can inspect individual bytes with indexing. File headers (magic bytes) identify file types — PNG starts with <code>\x89PNG</code>, JPEG with <code>\xFF\xD8</code>.</div>
-      <label>Simulate binary file read</label>
-      <select id="s3l2-file">
-        <option value="png">PNG Image — 8-byte magic header</option>
-        <option value="jpg">JPEG Image — 3-byte SOI marker</option>
-        <option value="pdf">PDF Document — %PDF header</option>
-        <option value="zip">ZIP Archive — PK header</option>
-        <option value="mp3">MP3 Audio — ID3 tag header</option>
-      </select>
-      <br><br>
-      <button class="action" onclick="s3l2Read()">▶ Read Binary Header</button>
-      <div class="output" id="s3l2-out">Select a file type and read its binary header</div>
-      <div class="binary-vis" id="s3l2-vis" style="margin-top:12px;"></div>
-      <div class="challenge-box">
-        <div class="ch-label">🎯 Mini-Challenge</div>
-        <p>What are "magic bytes"? Why do operating systems use them instead of just relying on the file extension? If you rename "photo.jpg" to "photo.txt" and open it with "rb", what do the first bytes show?</p>
-      </div>
-    </div>
-  </div>
+                        <div class="scanner-hud-panel" id="l1a1-scanner-zone" ondragover="allowDrop(event)" ondrop="l1a1.handleLensDrop(event)">
+                            <div class="scanning-beam"></div>
+                            <div class="scanner-lens-target" id="l1a1-lens" draggable="true" ondragstart="l1a1.handleLensDragStart(event)">
+                                AI SCANNER 🔍
+                            </div>
+                            
+                            <div class="scanner-meta-rows" id="l1a1-meta-rows" style="display:none;">
+                                <div class="scanner-meta-row">
+                                    <span class="scanner-meta-label">Magic Bytes:</span>
+                                    <span class="scanner-meta-val" id="l1a1-val-magic">-</span>
+                                </div>
+                                <div class="scanner-meta-row">
+                                    <span class="scanner-meta-label">Detected Type:</span>
+                                    <span class="scanner-meta-val" id="l1a1-val-type">-</span>
+                                </div>
+                                <div class="scanner-meta-row">
+                                    <span class="scanner-meta-label">Extension:</span>
+                                    <span class="scanner-meta-val" id="l1a1-val-ext">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-  <!-- S3 L3 -->
-  <div class="level-panel" id="s3-l3">
-    <div class="card">
-      <h3><span class="lvl-tag">LEVEL 3</span>Intermediate — Writing Binary Files</h3>
-      <div class="level-desc"><strong>What you learn:</strong> Writing binary means writing <code>bytes</code> objects. You can use <code>b"..."</code> literals or <code>bytes([...])</code>. Binary writing is how programs create images, save custom formats, or copy files byte-by-byte.</div>
-      <label>Choose a binary write scenario</label>
-      <select id="s3l3-scenario">
-        <option value="bytes_literal">Write bytes literal b"Hello"</option>
-        <option value="bytes_from_list">Write bytes from integer list</option>
-        <option value="copy">Binary file copy (read + write)</option>
-        <option value="create_png">Create minimal PNG-like header</option>
-      </select>
-      <br><br>
-      <label>Custom data (for bytes scenarios)</label>
-      <input type="text" id="s3l3-data" value="Python Rocks!" placeholder="Text to encode as bytes">
-      <br><br>
-      <button class="action" onclick="s3l3Run()">▶ Write Binary</button>
-      <div class="output" id="s3l3-out">Select a scenario and run</div>
-      <div class="binary-vis" id="s3l3-vis" style="margin-top:12px;"></div>
-      <div class="challenge-box">
-        <div class="ch-label">🎯 Mini-Challenge</div>
-        <p>What is the difference between <code>b"ABC"</code> and <code>"ABC".encode()</code>? Try the "bytes from list" scenario with [72,101,108,108,111] — what text does that spell? Why must you use "wb" and not "w" when writing images?</p>
-      </div>
-    </div>
-  </div>
+                    <!-- HEX VIEWER INTEGRATION -->
+                    <div class="hex-viewer-container">
+                        <div class="hex-header">
+                            <span>Offset</span>
+                            <span>Hex Bytes (Click to Inspect)</span>
+                            <span>ASCII Representation</span>
+                        </div>
+                        <div class="hex-rows" id="l1a1-hex-rows">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <div class="hex-inspector-bar">
+                            <span>Hex: <span class="hex-inspect-val" id="l1a1-ins-hex">-</span></span>
+                            <span>Dec: <span class="hex-inspect-val" id="l1a1-ins-dec">-</span></span>
+                            <span>Binary: <span class="hex-inspect-val" id="l1a1-ins-bin">-</span></span>
+                            <span>ASCII: <span class="hex-inspect-val" id="l1a1-ins-ascii">-</span></span>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- S3 L4 -->
-  <div class="level-panel" id="s3-l4">
-    <div class="card">
-      <h3><span class="lvl-tag">LEVEL 4</span>Advanced — File Exceptions</h3>
-      <div class="level-desc"><strong>What you learn:</strong> File operations can fail in many ways. <code>FileNotFoundError</code>, <code>PermissionError</code>, <code>IsADirectoryError</code>, and <code>OSError</code> are the key ones. Catching specific file exceptions makes your programs robust instead of fragile.</div>
-      <label>Simulate a file exception scenario</label>
-      <select id="s3l4-exc">
-        <option value="notfound">FileNotFoundError — file doesn't exist</option>
-        <option value="permission">PermissionError — no read access</option>
-        <option value="isdir">IsADirectoryError — path is a folder</option>
-        <option value="exists">FileExistsError — exclusive create fails</option>
-        <option value="decode">UnicodeDecodeError — binary read as text</option>
-        <option value="full">OSError — disk full (write fails)</option>
-      </select>
-      <br><br>
-      <button class="action" onclick="s3l4Run()">▶ Trigger File Exception</button>
-      <button class="action ghost" onclick="s3l4RunSafe()">▶ Same op with try/except</button>
-      <div class="output" id="s3l4-out">Select a scenario and run</div>
-      <div class="exc-stack" id="s3l4-stack"></div>
-      <div class="challenge-box">
-        <div class="ch-label">🎯 Mini-Challenge</div>
-        <p>Which exception would you catch when opening a config file that might not exist yet? Is <code>FileNotFoundError</code> a subclass of <code>OSError</code>? What's the safest way to check if a file exists before opening it?</p>
-      </div>
-    </div>
-  </div>
+                <div class="glass-card">
+                    <div class="card-header-group">
+                        <div class="card-title">Code Visualizer</div>
+                    </div>
+                    <div class="code-editor-panel" style="min-height:220px;">
+                        <div class="editor-tab-bar">
+                            <div class="editor-tab">vision_scanner.py</div>
+                        </div>
+                        <div class="editor-content-area" id="l1a1-code-area">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-box" id="l1a1-terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">detective@vision:~$</span> Select a mystery file and drag the scanner lens onto the scanner zone...</div>
+                    </div>
 
-  <!-- S3 L5 -->
-  <div class="level-panel" id="s3-l5">
-    <div class="card">
-      <h3><span class="lvl-tag">LEVEL 5</span>Expert — with Statement · Context Managers · os.path</h3>
-      <div class="level-desc"><strong>What you learn:</strong> The <code>with</code> statement is a context manager — it guarantees <code>__exit__</code> is called even if an exception occurs. <code>os.path</code> functions let you safely check files before opening. Together, they make file code bulletproof.</div>
-      <label>Scenario to explore</label>
-      <select id="s3l5-scenario">
-        <option value="with_basic">with open() — auto-close guarantee</option>
-        <option value="with_exc">with open() — exception inside with</option>
-        <option value="ospath_exists">os.path.exists() before open</option>
-        <option value="ospath_info">os.path — size, basename, dirname</option>
-        <option value="multi_with">Open two files in one with block</option>
-      </select>
-      <br><br>
-      <label>File path (simulated)</label>
-      <input type="text" id="s3l5-path" value="/home/user/data/scores.txt" placeholder="Enter a file path">
-      <br><br>
-      <button class="action" onclick="s3l5Run()">▶ Run Scenario</button>
-      <div class="output" id="s3l5-out">Select a scenario and run</div>
-      <div class="indent-demo" id="s3l5-code" style="margin-top:16px; display:none;"></div>
-      <div class="challenge-box">
-        <div class="ch-label">🎯 Mini-Challenge</div>
-        <p>What protocol must a class implement to work as a context manager? What's the difference between <code>os.path.exists()</code> and <code>os.path.isfile()</code>? Can you nest two <code>with</code> blocks or use a single <code>with</code> to open two files?</p>
-      </div>
-    </div>
-  </div>
+                    <!-- Hints -->
+                    <details class="hint-accordion">
+                        <summary class="hint-summary">Direct Case Solution Hints</summary>
+                        <div class="hint-body-content">
+                            <p class="hint-text" id="l1a1-hint-text">Loading instructions...</p>
+                            <div class="hint-stage-nav">
+                                <div class="hint-stage-dots" id="l1a1-hint-dots"></div>
+                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l1a1.nextHint()">Reveal Next Hint</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
 
-  <div class="footer-note">Module 3 · Python Exception &amp; File Handling · 3.3</div>
-</main>
+            <!-- Activity 1.2: Magic Byte Puzzle -->
+            <div class="case-panel" id="pane-l1a2" style="margin-top:20px;">
+                <div class="glass-card interactive-panel">
+                    <div class="card-header-group">
+                        <div class="card-title">Magic Byte Matchmaker</div>
+                    </div>
+                    <p class="card-desc">Establish connections between scrambled signatures. Click a <strong>Magic Hex Block</strong>, then its matching <strong>File Type</strong>, and finally its <strong>Extension</strong> to lock the sequence.</p>
+                    
+                    <div class="puzzle-columns">
+                        <!-- Column 1: Magic Bytes -->
+                        <div class="puzzle-column">
+                            <div class="puzzle-col-title">Hex Signature</div>
+                            <div class="puzzle-card" id="pcard-hex-png" onclick="l1a2.selectCard('hex', 'png')">89 50 4E 47</div>
+                            <div class="puzzle-card" id="pcard-hex-jpg" onclick="l1a2.selectCard('hex', 'jpg')">FF D8 FF E0</div>
+                            <div class="puzzle-card" id="pcard-hex-zip" onclick="l1a2.selectCard('hex', 'zip')">50 4B 03 04</div>
+                            <div class="puzzle-card" id="pcard-hex-pdf" onclick="l1a2.selectCard('hex', 'pdf')">25 50 44 46</div>
+                        </div>
+                        <!-- Column 2: File Type -->
+                        <div class="puzzle-column">
+                            <div class="puzzle-col-title">File Type</div>
+                            <div class="puzzle-card" id="pcard-type-zip" onclick="l1a2.selectCard('type', 'zip')">Compressed Archive</div>
+                            <div class="puzzle-card" id="pcard-type-png" onclick="l1a2.selectCard('type', 'png')">Portable Network Graphics</div>
+                            <div class="puzzle-card" id="pcard-type-pdf" onclick="l1a2.selectCard('type', 'pdf')">Adobe PDF Document</div>
+                            <div class="puzzle-card" id="pcard-type-jpg" onclick="l1a2.selectCard('type', 'jpg')">JPEG Joint Photo Group</div>
+                        </div>
+                        <!-- Column 3: Extension -->
+                        <div class="puzzle-column">
+                            <div class="puzzle-col-title">Extension</div>
+                            <div class="puzzle-card" id="pcard-ext-pdf" onclick="l1a2.selectCard('ext', 'pdf')">.pdf</div>
+                            <div class="puzzle-card" id="pcard-ext-png" onclick="l1a2.selectCard('ext', 'png')">.png</div>
+                            <div class="puzzle-card" id="pcard-ext-jpg" onclick="l1a2.selectCard('ext', 'jpg')">.jpg</div>
+                            <div class="puzzle-card" id="pcard-ext-zip" onclick="l1a2.selectCard('ext', 'zip')">.zip</div>
+                        </div>
+                    </div>
 
-<script>
-  /* ===================== LEVEL PILLS ===================== */
-  const count = 5;
-  const strip = document.getElementById('s3-levels');
-  const labels = ['L1 · Basics', 'L2 · Core', 'L3 · Intermediate', 'L4 · Advanced', 'L5 · Expert'];
-  for (let i = 1; i <= count; i++) {
-    const btn = document.createElement('button');
-    btn.className = 'lvl-pill' + (i === 1 ? ' active' : '');
-    btn.textContent = labels[i - 1];
-    btn.onclick = () => switchLevel('s3', i);
-    strip.appendChild(btn);
-  }
+                    <div class="puzzle-feedback-alert" id="l1a2-feedback-box">
+                        Select a card in any column to start linking.
+                    </div>
+                </div>
 
-  function switchLevel(sec, lvl) {
-    document.querySelectorAll(`#${sec}-levels .lvl-pill`).forEach((p, i) => {
-      p.classList.toggle('active', i === lvl - 1);
-    });
-    for (let i = 1; i <= count; i++) {
-      const panel = document.getElementById(`${sec}-l${i}`);
-      if (panel) panel.classList.toggle('active', i === lvl);
-    }
-    const bar = document.getElementById(`${sec}-bar`);
-    if (bar) bar.style.width = (lvl / count * 100) + '%';
-  }
+                <div class="glass-card">
+                    <div class="card-header-group">
+                        <div class="card-title">Binary vs Text Interpretations</div>
+                    </div>
+                    <p class="card-desc">Slide to see how a Text Editor interprets a Binary File compared to a proper Binary Parser.</p>
+                    
+                    <div class="slider-section">
+                        <div class="slider-control-row">
+                            <span class="slider-label" style="color:var(--primary)">Text Rendering</span>
+                            <input type="range" min="0" max="100" value="50" class="comparison-slider" id="l1a2-slider" oninput="l1a2.handleSlider(this.value)">
+                            <span class="slider-label" style="color:#2e8b57">Binary Grid</span>
+                        </div>
+                        <div class="comparison-display-box" id="l1a2-slider-display"></div>
+                    </div>
 
-  /* ===================== S3 L1 — TEXT VS BINARY ===================== */
-  function s3l1Show() {
-    const type = document.getElementById('s3l1-type').value;
-    const out = document.getElementById('s3l1-out');
-    const bytes = document.getElementById('s3l1-bytes');
+                    <details class="hint-accordion">
+                        <summary class="hint-summary">Direct Case Solution Hints</summary>
+                        <div class="hint-body-content">
+                            <p class="hint-text" id="l1a2-hint-text">Loading instructions...</p>
+                            <div class="hint-stage-nav">
+                                <div class="hint-stage-dots" id="l1a2-hint-dots"></div>
+                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l1a2.nextHint()">Reveal Next Hint</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
 
-    const scenarios = {
-      text_txt: {
-        out: `<span class="com">>>> with open("notes.txt", "r") as f:</span>
-    content = f.read()
-<span class="ok">→ "Hello, Python!\\nLine two here."</span>
-<span class="ok">type(content) → str</span>
-<span class="com"># Python decodes bytes → str using UTF-8 automatically</span>`,
-        bytesData: ['H','e','l','l','o',',','\\n','P','y','t','h','o','n','!']
-      },
-      text_bin: {
-        out: `<span class="com">>>> with open("notes.txt", "rb") as f:</span>
-    content = f.read()
-<span class="ok">→ b'Hello, Python!\\nLine two here.'</span>
-<span class="ok">type(content) → bytes</span>
-<span class="com"># No decoding — raw bytes returned</span>
-<span class="com"># content[0] → 72  (ASCII for 'H')</span>`,
-        bytesData: ['72','65','6C','6C','6F','2C','0A','50','79','74','68','6F','6E','21']
-      },
-      image: {
-        out: `<span class="com">>>> with open("photo.png", "rb") as f:</span>
-    header = f.read(8)
-<span class="ok">→ b'\\x89PNG\\r\\n\\x1a\\n'</span>
-<span class="com"># Magic bytes identify this as a PNG file</span>
-<span class="warn">⚠ Never open image with "r" — UnicodeDecodeError!</span>`,
-        bytesData: ['89','50','4E','47','0D','0A','1A','0A','…','…','…','…','…','…']
-      },
-      audio: {
-        out: `<span class="com">>>> with open("song.mp3", "rb") as f:</span>
-    header = f.read(10)
-<span class="ok">→ b'ID3\\x03\\x00\\x00\\x00\\x00...'</span>
-<span class="com"># ID3 tag — standard MP3 metadata header</span>
-<span class="warn">⚠ Audio files are pure binary — text mode fails.</span>`,
-        bytesData: ['49','44','33','03','00','00','00','00','FF','FB','…','…','…','…']
-      },
-      csv: {
-        out: `<span class="com">>>> with open("data.csv", "r") as f:</span>
-    lines = f.readlines()
-<span class="ok">→ ["name,score\\n", "Alice,92\\n", "Bob,78\\n"]</span>
-<span class="com"># CSV is a text file — commas are just characters</span>
-<span class="com"># Use the csv module for proper parsing</span>`,
-        bytesData: ['n','a','m','e',',','s','c','o','r','e','\\n','A','l','i']
-      }
-    };
+        <!-- LEVEL 2: BINARY FILE WORKSPACE -->
+        <div class="lvl-wrapper" id="lvl-2-wrapper" style="display:none;">
+            <div class="activity-tabs">
+                <button class="activity-tab active" id="tab-l2a1" onclick="switchActivity(2, 1)">2.1 Byte Builder</button>
+                <button class="activity-tab" id="tab-l2a2" onclick="switchActivity(2, 2)">2.2 Copy Simulator</button>
+            </div>
 
-    const s = scenarios[type];
-    out.innerHTML = s.out;
-    bytes.innerHTML = s.bytesData.map((b, i) =>
-      `<div class="byte-block ${i === 0 ? 'sep' : ''}" title="byte ${i}">${b}</div>`
-    ).join('');
-  }
+            <!-- Activity 2.1: Byte Builder -->
+            <div class="case-panel active" id="pane-l2a1" style="margin-top:20px;">
+                <div class="glass-card interactive-panel">
+                    <div class="card-header-group">
+                        <div class="card-title">Binary Byte Builder</div>
+                    </div>
+                    <p class="card-desc">Drag ASCII byte values from the pool into the target slots to construct the binary word <strong>"Hello"</strong> on disk.</p>
+                    
+                    <div class="builder-workspace">
+                        <div class="builder-pool" id="l2a1-pool" ondragover="allowDrop(event)" ondrop="l2a1.handleDropToPool(event)">
+                            <!-- Populated with draggable byte blocks -->
+                        </div>
 
-  /* ===================== S3 L2 — BINARY READ ===================== */
-  function s3l2Read() {
-    const file = document.getElementById('s3l2-file').value;
-    const out = document.getElementById('s3l2-out');
-    const vis = document.getElementById('s3l2-vis');
+                        <div class="builder-slots-row">
+                            <div class="builder-slot-card" id="byte-slot-0" ondragover="allowDrop(event)" ondrop="l2a1.handleDropToSlot(event, 0)">
+                                <span class="builder-slot-num">Slot 0</span>
+                                <span class="builder-slot-val">-</span>
+                                <span class="builder-slot-char">-</span>
+                            </div>
+                            <div class="builder-slot-card" id="byte-slot-1" ondragover="allowDrop(event)" ondrop="l2a1.handleDropToSlot(event, 1)">
+                                <span class="builder-slot-num">Slot 1</span>
+                                <span class="builder-slot-val">-</span>
+                                <span class="builder-slot-char">-</span>
+                            </div>
+                            <div class="builder-slot-card" id="byte-slot-2" ondragover="allowDrop(event)" ondrop="l2a1.handleDropToSlot(event, 2)">
+                                <span class="builder-slot-num">Slot 2</span>
+                                <span class="builder-slot-val">-</span>
+                                <span class="builder-slot-char">-</span>
+                            </div>
+                            <div class="builder-slot-card" id="byte-slot-3" ondragover="allowDrop(event)" ondrop="l2a1.handleDropToSlot(event, 3)">
+                                <span class="builder-slot-num">Slot 3</span>
+                                <span class="builder-slot-val">-</span>
+                                <span class="builder-slot-char">-</span>
+                            </div>
+                            <div class="builder-slot-card" id="byte-slot-4" ondragover="allowDrop(event)" ondrop="l2a1.handleDropToSlot(event, 4)">
+                                <span class="builder-slot-num">Slot 4</span>
+                                <span class="builder-slot-val">-</span>
+                                <span class="builder-slot-char">-</span>
+                            </div>
+                        </div>
 
-    const files = {
-      png: {
-        name: 'photo.png',
-        magic: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
-        labels: ['\\x89','P','N','G','\\r','\\n','\\x1a','\\n'],
-        desc: 'PNG magic number — 8 bytes. Universally identifies PNG files regardless of extension.'
-      },
-      jpg: {
-        name: 'photo.jpg',
-        magic: [0xFF, 0xD8, 0xFF],
-        labels: ['\\xFF','\\xD8','\\xFF'],
-        desc: 'JPEG SOI (Start of Image) marker — FF D8 FF. Followed by APP marker bytes.'
-      },
-      pdf: {
-        name: 'report.pdf',
-        magic: [0x25, 0x50, 0x44, 0x46, 0x2D],
-        labels: ['%','P','D','F','-'],
-        desc: 'PDF magic string is literally "%PDF-" — human-readable for a binary format.'
-      },
-      zip: {
-        name: 'archive.zip',
-        magic: [0x50, 0x4B, 0x03, 0x04],
-        labels: ['P','K','\\x03','\\x04'],
-        desc: '"PK" — named after Phil Katz, creator of the ZIP format. Used by .zip, .jar, .docx, .xlsx too!'
-      },
-      mp3: {
-        name: 'song.mp3',
-        magic: [0x49, 0x44, 0x33, 0x03, 0x00],
-        labels: ['I','D','3','\\x03','\\x00'],
-        desc: 'ID3 tag header — identifies MP3 with metadata. "ID3" is ASCII-readable in the binary.'
-      }
-    };
+                        <div style="display:flex; gap:10px; justify-content:center;">
+                            <button class="btn-primary" onclick="l2a1.saveToDisk()">💾 Save Buffer to Disk</button>
+                            <button class="btn-secondary" onclick="l2a1.resetSlots()">Clear slots</button>
+                        </div>
+                    </div>
 
-    const f = files[file];
-    const hexStr = f.magic.map(b => '\\x' + b.toString(16).padStart(2,'0')).join('');
+                    <!-- HEX INSPECTOR -->
+                    <div class="hex-viewer-container" style="margin-top:10px;">
+                        <div class="hex-header">
+                            <span>Offset</span>
+                            <span>Builder File Bytes</span>
+                            <span>ASCII View</span>
+                        </div>
+                        <div class="hex-rows" id="l2a1-hex-rows" style="max-height:80px;">
+                            <div class="hex-row">
+                                <span class="hex-offset">0x000000</span>
+                                <span class="hex-bytes" id="l2a1-hex-bytes">?? ?? ?? ?? ??</span>
+                                <span class="hex-ascii-text" id="l2a1-ascii-text">?????</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    out.innerHTML =
-      `<span class="com">>>> with open("${f.name}", "rb") as f:</span>
-    header = f.read(${f.magic.length})
-    print(header)
+                <div class="glass-card">
+                    <div class="card-header-group">
+                        <div class="card-title">Code Visualizer</div>
+                    </div>
+                    <div class="code-editor-panel" style="min-height:220px;">
+                        <div class="editor-tab-bar">
+                            <div class="editor-tab">byte_writer.py</div>
+                        </div>
+                        <div class="editor-content-area" id="l2a1-code-area">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-box" id="l2a1-terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">detective@compiler:~$</span> Drag byte cards into slots to build the buffer stream.</div>
+                    </div>
 
-<span class="ok">→ b'${hexStr}'</span>
-<span class="ok">type(header) → bytes</span>
-<span class="ok">len(header) → ${f.magic.length}</span>
+                    <details class="hint-accordion">
+                        <summary class="hint-summary">Direct Case Solution Hints</summary>
+                        <div class="hint-body-content">
+                            <p class="hint-text" id="l2a1-hint-text">Loading instructions...</p>
+                            <div class="hint-stage-nav">
+                                <div class="hint-stage-dots" id="l2a1-hint-dots"></div>
+                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l2a1.nextHint()">Reveal Next Hint</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
 
-<span class="com"># Individual byte access:</span>
-<span class="ok">header[0] → ${f.magic[0]} (0x${f.magic[0].toString(16).toUpperCase()})</span>
+            <!-- Activity 2.2: Copy Simulator -->
+            <div class="case-panel" id="pane-l2a2" style="margin-top:20px;">
+                <div class="glass-card interactive-panel">
+                    <div class="card-header-group">
+                        <div class="card-title">Binary Copy Pipeline</div>
+                    </div>
+                    <p class="card-desc">Configure the correct binary modes, then step through the copy operation. Watch bytes flow from <strong>Source Disk</strong> into the <strong>RAM Buffer</strong>, and write to the <strong>Destination Disk</strong>.</p>
+                    
+                    <div class="copy-simulator-panel">
+                        <div class="copy-mode-selectors">
+                            <div class="copy-mode-select-group">
+                                <label>Source Mode</label>
+                                <select class="copy-select" id="l2a2-sel-mode-in">
+                                    <option value="r">"r" (Text Read)</option>
+                                    <option value="rb" selected>"rb" (Binary Read)</option>
+                                    <option value="wb">"wb" (Binary Write)</option>
+                                </select>
+                            </div>
+                            <div class="copy-mode-select-group">
+                                <label>Destination Mode</label>
+                                <select class="copy-select" id="l2a2-sel-mode-out">
+                                    <option value="w">"w" (Text Write)</option>
+                                    <option value="rb">"rb" (Binary Read)</option>
+                                    <option value="wb" selected>"wb" (Binary Write)</option>
+                                </select>
+                            </div>
+                        </div>
 
-<span class="com"># ${f.desc}</span>`;
+                        <div class="copy-sectors-row">
+                            <!-- Source File -->
+                            <div class="copy-sector-box">
+                                <div class="copy-sector-title">source.dat (Disk)</div>
+                                <div class="copy-sector-bytes" id="l2a2-source-bytes"></div>
+                            </div>
+                            
+                            <div class="copy-sector-arrow">➔</div>
+                            
+                            <!-- RAM Buffer -->
+                            <div class="copy-buffer-box" id="l2a2-buffer-box">
+                                <div class="copy-sector-title">RAM BUFFER (64 Bytes)</div>
+                                <div class="copy-buffer-grid" id="l2a2-buffer-grid">
+                                    <span style="color:var(--text-muted); font-size:0.75rem; font-style:italic;">Empty</span>
+                                </div>
+                                <div class="copy-flow-particle" id="l2a2-flow-dot"></div>
+                            </div>
+                            
+                            <div class="copy-sector-arrow">➔</div>
 
-    vis.innerHTML = f.magic.map((b, i) =>
-      `<div class="byte-block sep" title="0x${b.toString(16).toUpperCase()}">${f.labels[i]}<br><span style="font-size:0.65rem;opacity:0.7;">0x${b.toString(16).toUpperCase()}</span></div>`
-    ).join('');
-  }
+                            <!-- Destination File -->
+                            <div class="copy-sector-box">
+                                <div class="copy-sector-title">copy.dat (Disk)</div>
+                                <div class="copy-sector-bytes" id="l2a2-dest-bytes"></div>
+                            </div>
+                        </div>
 
-  /* ===================== S3 L3 — BINARY WRITE ===================== */
-  function s3l3Run() {
-    const scenario = document.getElementById('s3l3-scenario').value;
-    const data = document.getElementById('s3l3-data').value;
-    const out = document.getElementById('s3l3-out');
-    const vis = document.getElementById('s3l3-vis');
+                        <div style="display:flex; gap:10px; justify-content:center;">
+                            <button class="btn-primary" id="btn-l2a2-read" onclick="l2a2.stepRead()">1. Read into Buffer</button>
+                            <button class="btn-primary" id="btn-l2a2-write" onclick="l2a2.stepWrite()" disabled>2. Write to Destination</button>
+                            <button class="btn-secondary" onclick="l2a2.resetSimulator()">Reset</button>
+                        </div>
+                    </div>
+                </div>
 
-    if (scenario === 'bytes_literal') {
-      const encoded = data.split('').map(c => c.charCodeAt(0));
-      out.innerHTML =
-        `<span class="com">>>> with open("binary.bin", "wb") as f:</span>
-    text = "${data}"
-    f.write(text.encode("utf-8"))  <span class="com"># str → bytes</span>
-    <span class="com"># OR: f.write(b"${data.substring(0,10)}...")</span>
+                <div class="glass-card">
+                    <div class="card-header-group">
+                        <div class="card-title">Code Visualizer</div>
+                    </div>
+                    <div class="code-editor-panel" style="min-height:220px;">
+                        <div class="editor-tab-bar">
+                            <div class="editor-tab">binary_copy.py</div>
+                        </div>
+                        <div class="editor-content-area" id="l2a2-code-area">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-box" id="l2a2-terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">detective@os:~$</span> Choose script modes, then execute step 1...</div>
+                    </div>
 
-<span class="ok">→ ${encoded.length} bytes written</span>
-<span class="ok">Bytes: b'${data}'</span>
-<span class="com"># encode() converts str to bytes using UTF-8</span>
-<span class="com"># "wb" mode writes raw bytes — no newline conversion</span>`;
-      vis.innerHTML = encoded.slice(0,12).map(b =>
-        `<div class="byte-block">${b}<br><span style="font-size:0.6rem;">${String.fromCharCode(b)}</span></div>`
-      ).join('') + (encoded.length > 12 ? '<div class="byte-block">…</div>' : '');
-    } else if (scenario === 'bytes_from_list') {
-      const lst = [72,101,108,108,111,44,32,87,111,114,108,100,33];
-      const text = lst.map(b => String.fromCharCode(b)).join('');
-      out.innerHTML =
-        `<span class="com">>>> byte_list = [72,101,108,108,111,44,32,87,111,114,108,100,33]</span>
-with open("msg.bin", "wb") as f:
-    f.write(bytes(byte_list))
+                    <details class="hint-accordion">
+                        <summary class="hint-summary">Direct Case Solution Hints</summary>
+                        <div class="hint-body-content">
+                            <p class="hint-text" id="l2a2-hint-text">Loading instructions...</p>
+                            <div class="hint-stage-nav">
+                                <div class="hint-stage-dots" id="l2a2-hint-dots"></div>
+                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l2a2.nextHint()">Reveal Next Hint</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
 
-<span class="ok">→ ${lst.length} bytes written</span>
-<span class="ok">bytes([72,101,108,108,111...]) → b'${text}'</span>
-<span class="com"># Each integer 0–255 maps to one byte</span>
-<span class="com"># ASCII: 72=H, 101=e, 108=l, 111=o, 33=!</span>`;
-      vis.innerHTML = lst.map(b =>
-        `<div class="byte-block sep">${b}<br><span style="font-size:0.6rem;">${String.fromCharCode(b)}</span></div>`
-      ).join('');
-    } else if (scenario === 'copy') {
-      out.innerHTML =
-        `<span class="com">>>> # Binary file copy — works for ANY file type</span>
-with open("source.png", "rb") as src:
-    with open("copy.png", "wb") as dst:
-        chunk = src.read(4096)  <span class="com"># read 4KB at a time</span>
-        while chunk:
-            dst.write(chunk)
-            chunk = src.read(4096)
+        <!-- LEVEL 3: FILE EXCEPTION CHALLENGE -->
+        <div class="lvl-wrapper" id="lvl-3-wrapper" style="display:none;">
+            <div class="activity-tabs">
+                <button class="activity-tab active" id="tab-l3a1" onclick="switchActivity(3, 1)">3.1 Exception Rescue</button>
+                <button class="activity-tab" id="tab-l3a2" onclick="switchActivity(3, 2)">3.2 Binary Repair Lab</button>
+            </div>
 
-<span class="ok">→ File copied byte-for-byte. Perfect clone. ✅</span>
-<span class="com"># Reading in chunks avoids loading huge files into RAM</span>
-<span class="com"># Works for images, audio, video, executables — anything!</span>
-<span class="warn">⚠ Text mode copy would corrupt binary files (line ending conversion)</span>`;
-      vis.innerHTML = '';
-    } else {
-      const pngHeader = [0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A];
-      out.innerHTML =
-        `<span class="com">>>> # Create a minimal PNG-like binary header</span>
-PNG_SIGNATURE = bytes([${pngHeader.join(',')}])
+            <!-- Activity 3.1: Exception Rescue -->
+            <div class="case-panel active" id="pane-l3a1" style="margin-top:20px;">
+                <div class="glass-card interactive-panel">
+                    <div class="card-header-group">
+                        <div class="card-title">Exception Rescue Mission</div>
+                    </div>
+                    <p class="card-desc">Failing scripts crash due to unhandled exceptions. Select a crash case, inspect the terminal traceback, then drag correct exception hooks and correction statements into the editor canvas placeholders.</p>
+                    
+                    <div class="rescue-scenarios-column">
+                        <div class="rescue-scenario-card" id="rescue-case-0" onclick="l3a1.selectCase(0)">
+                            <div>
+                                <div class="rescue-scenario-title">1. Binary Decoding Crash</div>
+                                <div class="rescue-scenario-desc">Opening binary data file using plain text mode.</div>
+                            </div>
+                            <span class="rescue-status-badge" id="badge-case-0">CRASHED</span>
+                        </div>
+                        <div class="rescue-scenario-card" id="rescue-case-1" onclick="l3a1.selectCase(1)">
+                            <div>
+                                <div class="rescue-scenario-title">2. Missing Database Target</div>
+                                <div class="rescue-scenario-desc">Opening local binary storage file that does not exist.</div>
+                            </div>
+                            <span class="rescue-status-badge" id="badge-case-1">CRASHED</span>
+                        </div>
+                        <div class="rescue-scenario-card" id="rescue-case-2" onclick="l3a1.selectCase(2)">
+                            <div>
+                                <div class="rescue-scenario-title">3. Folder Access Conflict</div>
+                                <div class="rescue-scenario-desc">Attempting to open an entire folder directory node as a file.</div>
+                            </div>
+                            <span class="rescue-status-badge" id="badge-case-2">CRASHED</span>
+                        </div>
+                        <div class="rescue-scenario-card" id="rescue-case-3" onclick="l3a1.selectCase(3)">
+                            <div>
+                                <div class="rescue-scenario-title">4. Lock Permission Block</div>
+                                <div class="rescue-scenario-desc">Writing to file sector owned by system administrator.</div>
+                            </div>
+                            <span class="rescue-status-badge" id="badge-case-3">CRASHED</span>
+                        </div>
+                    </div>
 
-with open("minimal.png", "wb") as f:
-    f.write(PNG_SIGNATURE)
+                    <div class="rescue-pool" id="l3a1-pool">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
 
-<span class="ok">→ 8-byte PNG signature written</span>
-<span class="ok">b'\\x89PNG\\r\\n\\x1a\\n'  ← official PNG magic bytes</span>
-<span class="com"># Real PNG files have many more chunks after the signature</span>
-<span class="com"># But the signature alone identifies it as PNG to any reader</span>`;
-      vis.innerHTML = pngHeader.map((b,i) =>
-        `<div class="byte-block sep">0x${b.toString(16).toUpperCase()}<br><span style="font-size:0.6rem;">${['\\x89','P','N','G','\\r','\\n','\\x1a','\\n'][i]}</span></div>`
-      ).join('');
-    }
-  }
+                <div class="glass-card">
+                    <div class="card-header-group">
+                        <div class="card-title">Code Editor Canvas</div>
+                    </div>
+                    <div class="code-editor-panel" style="min-height:220px;">
+                        <div class="editor-tab-bar">
+                            <div class="editor-tab">rescue_helper.py</div>
+                        </div>
+                        <div class="editor-content-area" id="l3a1-code-area">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="terminal-box" id="l3a1-terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">detective@rescue:~$</span> Select a crashed case on the left...</div>
+                    </div>
 
-  /* ===================== S3 L4 — FILE EXCEPTIONS ===================== */
-  function s3l4Run() {
-    const exc = document.getElementById('s3l4-exc').value;
-    const out = document.getElementById('s3l4-out');
-    const stack = document.getElementById('s3l4-stack');
-    stack.innerHTML = '';
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-primary" style="flex:1;" onclick="l3a1.executeRescue()">▶ Test Rescue Configuration</button>
+                        <button class="btn-secondary" onclick="l3a1.resetRescue()">Reset slots</button>
+                    </div>
 
-    const scenarios = {
-      notfound: {
-        op: 'open("missing_file.txt", "r")',
-        exc: 'FileNotFoundError',
-        msg: '[Errno 2] No such file or directory: \'missing_file.txt\'',
-        fix: 'Check os.path.exists() first, or use try/except'
-      },
-      permission: {
-        op: 'open("/etc/shadow", "r")',
-        exc: 'PermissionError',
-        msg: '[Errno 13] Permission denied: \'/etc/shadow\'',
-        fix: 'Check file permissions; run with appropriate privileges'
-      },
-      isdir: {
-        op: 'open("/home/user/", "r")',
-        exc: 'IsADirectoryError',
-        msg: '[Errno 21] Is a directory: \'/home/user/\'',
-        fix: 'Check os.path.isfile() before opening'
-      },
-      exists: {
-        op: 'open("existing.txt", "x")',
-        exc: 'FileExistsError',
-        msg: '[Errno 17] File exists: \'existing.txt\'',
-        fix: 'Use "w" to overwrite, or check existence first'
-      },
-      decode: {
-        op: 'open("image.png", "r").read()',
-        exc: 'UnicodeDecodeError',
-        msg: '\'utf-8\' codec can\'t decode byte 0x89 in position 0',
-        fix: 'Use "rb" binary mode for non-text files'
-      },
-      full: {
-        op: 'f.write(large_data)',
-        exc: 'OSError',
-        msg: '[Errno 28] No space left on device',
-        fix: 'Check disk space; handle partial writes in finally'
-      }
-    };
+                    <details class="hint-accordion">
+                        <summary class="hint-summary">Direct Case Solution Hints</summary>
+                        <div class="hint-body-content">
+                            <p class="hint-text" id="l3a1-hint-text">Loading instructions...</p>
+                            <div class="hint-stage-nav">
+                                <div class="hint-stage-dots" id="l3a1-hint-dots"></div>
+                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l3a1.nextHint()">Reveal Next Hint</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
 
-    const s = scenarios[exc];
-    out.innerHTML =
-      `<span class="com">>>> ${s.op}</span>
+            <!-- Activity 3.2: Binary Repair Lab -->
+            <div class="case-panel" id="pane-l3a2" style="margin-top:20px;">
+                <div class="glass-card interactive-panel">
+                    <div class="card-header-group">
+                        <div class="card-title">Repair Laboratory Console</div>
+                    </div>
+                    <p class="card-desc">Choose a damaged program target below. Complete the code builder selects to ensure correct binary modes, error bounds checking, and graceful exception recoveries.</p>
+                    
+                    <div class="repair-lab-panel">
+                        <div class="repair-scenario-selector">
+                            <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Program Target</label>
+                            <select class="repair-select-box" id="l3a2-scenario-select" onchange="l3a2.loadScenario(parseInt(this.value))">
+                                <option value="0">Challenge 1: Safe Network Image Downloader</option>
+                                <option value="1">Challenge 2: Robust Database Backup Appender</option>
+                            </select>
+                        </div>
 
-<span class="err">Traceback (most recent call last):</span>
-<span class="err">  File "script.py", line 1</span>
-<span class="err">    ${s.op}</span>
-<span class="err">${s.exc}: ${s.msg}</span>
+                        <div class="instruction-box" style="background:var(--bg-dark); border:1px solid var(--border); padding:10px; border-radius:6px;">
+                            <strong style="font-size:0.8rem; color:var(--primary);" id="l3a2-target-title">-</strong>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" id="l3a2-target-desc">-</p>
+                        </div>
 
-<span class="warn">⚠ Program crashed — exception not handled!</span>
-<span class="com"># Fix: ${s.fix}</span>`;
-  }
+                        <p class="card-desc" style="font-weight:700; margin-bottom:-4px;">Interactive Code Builder Script:</p>
+                        <div class="code-editor-panel" style="border-color:var(--text);">
+                            <div class="editor-tab-bar">
+                                <div class="editor-tab" id="l3a2-tab-filename">repair_lab.py</div>
+                            </div>
+                            <div class="editor-content-area" id="l3a2-code-builder" style="white-space: pre-wrap; font-size:0.8rem; line-height:1.7;">
+                                <!-- Built dynamically with dropdown elements -->
+                            </div>
+                        </div>
 
-  function s3l4RunSafe() {
-    const exc = document.getElementById('s3l4-exc').value;
-    const out = document.getElementById('s3l4-out');
-    const stack = document.getElementById('s3l4-stack');
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-primary" style="flex:1;" onclick="l3a2.executeRepair()">▶ Run Repair Script</button>
+                            <button class="btn-secondary" onclick="l3a2.resetLab()">Reset Code</button>
+                        </div>
+                    </div>
+                </div>
 
-    const excMap = {
-      notfound: 'FileNotFoundError',
-      permission: 'PermissionError',
-      isdir: 'IsADirectoryError',
-      exists: 'FileExistsError',
-      decode: 'UnicodeDecodeError',
-      full: 'OSError'
-    };
+                <div class="glass-card">
+                    <div class="card-header-group">
+                        <div class="card-title">Compiler Diagnostic Terminal</div>
+                    </div>
+                    
+                    <div class="terminal-box" id="l3a2-terminal" style="min-height:260px;">
+                        <div class="terminal-line"><span class="terminal-prompt">engineer@repairlab:~$</span> Choose options inside script dropdowns, then run...</div>
+                    </div>
 
-    const excType = excMap[exc];
-    const frames = [
-      { label: '1. try block starts', cls: '', text: '→ Attempting file operation...' },
-      { label: `2. ${excType} raised!`, cls: 'error', text: '→ Exception intercepted by except clause' },
-      { label: `3. except ${excType}: handles it`, cls: 'caught', text: `→ Logged error, notified user gracefully` },
-      { label: '4. finally: cleanup', cls: 'finally', text: '→ Resources released, program continues' }
-    ];
+                    <details class="hint-accordion">
+                        <summary class="hint-summary">Direct Case Solution Hints</summary>
+                        <div class="hint-body-content">
+                            <p class="hint-text" id="l3a2-hint-text">Loading instructions...</p>
+                            <div class="hint-stage-nav">
+                                <div class="hint-stage-dots" id="l3a2-hint-dots"></div>
+                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l3a2.nextHint()">Reveal Next Hint</button>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
 
-    out.innerHTML =
-      `<span class="com">>>> try:</span>
-    <span class="com"># attempt file operation</span>
-    <span class="ok">...</span>
-<span class="err">except ${excType} as e:</span>
-    <span class="ok">print(f"File error: {"{e}"}")</span>
-    <span class="ok">log_error(e)</span>
-<span class="ok">finally:</span>
-    <span class="ok">print("Operation complete (success or not)")</span>
+        <!-- Navigation Row -->
+        <div class="activity-nav-row">
+            <button class="btn-secondary" id="btn-prev-act" onclick="prevActivity()">← Previous Activity</button>
+            <span id="nav-status">Activity 1 of 6</span>
+            <button class="btn-primary" id="btn-next-act" onclick="nextActivity()">Next Activity →</button>
+        </div>
 
-<span class="ok">✅ Exception caught — program continues normally!</span>
-<span class="ok">Output: "File error: [specific message]"</span>`;
+    </main>
 
-    stack.innerHTML = frames.map(f =>
-      `<div class="exc-frame ${f.cls}"><strong>${f.label}</strong><br><code style="font-size:0.8rem;">${f.text}</code></div>`
-    ).join('');
-  }
+    <!-- Canvas for Confetti -->
+    <canvas id="confetti-canvas"></canvas>
 
-  /* ===================== S3 L5 — with / os.path ===================== */
-  function s3l5Run() {
-    const scenario = document.getElementById('s3l5-scenario').value;
-    const path = document.getElementById('s3l5-path').value;
-    const out = document.getElementById('s3l5-out');
-    const codeDiv = document.getElementById('s3l5-code');
+    <!-- SOUND & ENGINE SCRIPTS -->
+    <script>
+        /* ==========================================================================
+           1. AUDIO SYNTHESIZER ENGINE (Web Audio API)
+           ========================================================================== */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playBlip() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.08);
+            }
+            playLaser() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.frequency.setValueAtTime(1500, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+            playSuccess() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                // Note 1
+                let osc1 = this.ctx.createOscillator();
+                let gain1 = this.ctx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(this.ctx.destination);
+                osc1.frequency.setValueAtTime(523.25, now); // C5
+                gain1.gain.setValueAtTime(0.08, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc1.start();
+                osc1.stop(now + 0.15);
+                // Note 2
+                setTimeout(() => {
+                    let osc2 = this.ctx.createOscillator();
+                    let gain2 = this.ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(this.ctx.destination);
+                    osc2.frequency.setValueAtTime(659.25, this.ctx.currentTime); // E5
+                    gain2.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+                    osc2.start();
+                    osc2.stop(this.ctx.currentTime + 0.25);
+                }, 100);
+            }
+            playCrash() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.4);
+            }
+            playWrite() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.frequency.setValueAtTime(900, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+        }
+        const sound = new SoundFX();
 
-    const basename = path.split('/').pop();
-    const dirname = path.split('/').slice(0, -1).join('/') || '/';
-    const ext = basename.includes('.') ? '.' + basename.split('.').pop() : '';
+        /* ==========================================================================
+           2. CONFETTI EFFECT
+           ========================================================================== */
+        class Confetti {
+            constructor() {
+                this.canvas = document.getElementById('confetti-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.colors = ['#cc0000', '#ff3333', '#ffcc00', '#2e8b57', '#33ccff'];
+                
+                window.addEventListener('resize', () => this.resize());
+                this.resize();
+            }
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            trigger() {
+                this.particles = [];
+                for(let i = 0; i < 80; i++) {
+                    this.particles.push({
+                        x: window.innerWidth / 2,
+                        y: window.innerHeight / 2 - 50,
+                        vx: (Math.random() - 0.5) * 12,
+                        vy: (Math.random() - 0.7) * 14 - 4,
+                        size: Math.random() * 8 + 6,
+                        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+                        rotation: Math.random() * 360,
+                        rotationSpeed: (Math.random() - 0.5) * 8
+                    });
+                }
+                if (!this.animating) {
+                    this.animate();
+                }
+            }
+            animate() {
+                this.animating = true;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                let alive = false;
+                
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.4; // gravity
+                    p.vx *= 0.98;
+                    p.rotation += p.rotationSpeed;
+                    
+                    if(p.y < this.canvas.height) {
+                        alive = true;
+                        this.ctx.save();
+                        this.ctx.translate(p.x, p.y);
+                        this.ctx.rotate(p.rotation * Math.PI / 180);
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                        this.ctx.restore();
+                    }
+                });
 
-    codeDiv.style.display = 'block';
+                if (alive) {
+                    requestAnimationFrame(() => this.animate());
+                } else {
+                    this.animating = false;
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+            }
+        }
+        let confetti;
+        window.addEventListener('load', () => confetti = new Confetti());
 
-    if (scenario === 'with_basic') {
-      out.innerHTML =
-        `<span class="com"># with open() guarantees file is closed</span>
-with open("${basename}", "r") as f:
-    data = f.read()
+        /* ==========================================================================
+           3. TOAST MESSAGES
+           ========================================================================== */
+        function showToast(message, isSuccess = true) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '30px';
+            toast.style.right = '30px';
+            toast.style.background = isSuccess ? '#dafbe1' : '#ffebe9';
+            toast.style.color = isSuccess ? '#1a7f37' : '#cf222e';
+            toast.style.border = `2px solid ${isSuccess ? '#1a7f37' : '#cf222e'}`;
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '8px';
+            toast.style.fontFamily = 'Outfit, sans-serif';
+            toast.style.fontWeight = 'bold';
+            toast.style.fontSize = '0.85rem';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            toast.style.zIndex = '2000';
+            toast.style.animation = 'slideDown 0.2s ease forwards';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'none';
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.2s ease';
+                setTimeout(() => toast.remove(), 200);
+            }, 2500);
+        }
 
-<span class="ok">✅ __enter__ called: file opened</span>
-<span class="ok">✅ File operations execute in the block</span>
-<span class="ok">✅ __exit__ called: file closed automatically</span>
-<span class="com"># f.closed → True (outside the with block)</span>
-<span class="com"># Equivalent to: try/finally with f.close()</span>`;
-      codeDiv.innerHTML = `<span class="lvl0">with open("${basename}", "r") as f:</span><span class="lvl1">data = f.read()</span><span class="lvl1 hl-com"># file auto-closes here ↑</span><span class="lvl0 hl-ok">print(f.closed)  # → True</span>`;
-    } else if (scenario === 'with_exc') {
-      out.innerHTML =
-        `<span class="com"># Exception inside with block — file still closes!</span>
-try:
-    with open("${basename}", "r") as f:
-        data = f.read()
-        raise ValueError("Simulated error!")  <span class="err">← error here</span>
-        more = f.read()   <span class="com">← never reached</span>
-except ValueError as e:
-    print(f"Caught: {"{e}"}")
+        /* ==========================================================================
+           4. GLOBAL LEVEL/ACTIVITY NAVIGATION
+           ========================================================================== */
+        let currentLevel = 1;
+        let currentActivity = 1;
 
-<span class="ok">✅ Despite the exception, f.closed → True</span>
-<span class="ok">✅ __exit__ was called before the exception propagated</span>
-<span class="warn">⚠ Without with, the file would stay open if exception occurred!</span>`;
-      codeDiv.innerHTML = `<span class="lvl0">with open("file", "r") as f:</span><span class="lvl1">data = f.read()</span><span class="lvl1 hl-err">raise ValueError("oops!")</span><span class="lvl0 hl-com"># __exit__ called even now ↑</span>`;
-    } else if (scenario === 'ospath_exists') {
-      out.innerHTML =
-        `<span class="com">>>> import os</span>
+        function switchLevel(lvl) {
+            sound.playBlip();
+            currentLevel = lvl;
+            currentActivity = 1;
+            
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-lvl-${lvl}`).classList.add('active');
+            
+            document.querySelectorAll('.lvl-wrapper').forEach(w => w.style.display = 'none');
+            document.getElementById(`lvl-${lvl}-wrapper`).style.display = 'block';
 
-path = "${path}"
-if os.path.exists(path):
-    with open(path, "r") as f:
-        data = f.read()
-    print("File read successfully")
-else:
-    print(f"File not found: {"{path}"}")
+            // Show proper activity panel
+            showActivityPane(lvl, 1);
+        }
 
-<span class="ok">→ "File not found: ${path}"   (simulated)</span>
+        function switchActivity(lvl, act) {
+            sound.playBlip();
+            currentLevel = lvl;
+            currentActivity = act;
+            showActivityPane(lvl, act);
+        }
 
-<span class="com"># os.path.exists() returns True/False</span>
-<span class="com"># Prevents FileNotFoundError before it happens</span>
-<span class="com"># os.path.isfile() → True only for files (not dirs)</span>
-<span class="com"># os.path.isdir() → True only for directories</span>`;
-      codeDiv.innerHTML = `<span class="lvl0 hl-com">import os</span><span class="lvl0">if os.path.exists("${basename}"):</span><span class="lvl1">with open("${basename}") as f: ...</span><span class="lvl0">else:</span><span class="lvl1 hl-err">print("Not found!")</span>`;
-    } else if (scenario === 'ospath_info') {
-      out.innerHTML =
-        `<span class="com">>>> import os</span>
-path = "${path}"
+        function showActivityPane(lvl, act) {
+            // Update Tab active status
+            document.querySelectorAll(`.lvl-wrapper#lvl-${lvl}-wrapper .activity-tab`).forEach(t => t.classList.remove('active'));
+            const tab = document.getElementById(`tab-l${lvl}a${act}`);
+            if (tab) tab.classList.add('active');
 
-os.path.basename(path)   <span class="ok">→ "${basename}"</span>
-os.path.dirname(path)    <span class="ok">→ "${dirname}"</span>
-os.path.splitext(path)   <span class="ok">→ ("${basename.replace(ext,'')}", "${ext}")</span>
-os.path.abspath(".")     <span class="ok">→ "/current/working/directory"</span>
-os.path.join("${dirname}", "${basename}") <span class="ok">→ "${path}"</span>
+            // Toggle panes visibility
+            document.querySelectorAll(`.lvl-wrapper#lvl-${lvl}-wrapper .case-panel`).forEach(p => p.classList.remove('active'));
+            const pane = document.getElementById(`pane-l${lvl}a${act}`);
+            if (pane) pane.classList.add('active');
 
-<span class="com"># os.path.getsize(path) → file size in bytes</span>
-<span class="com"># os.path.getmtime(path) → last modification time</span>
-<span class="com"># os.getcwd() → current working directory</span>`;
-      codeDiv.innerHTML = `<span class="lvl0 hl-com">import os</span><span class="lvl0">os.path.basename("${path}")</span><span class="lvl0 hl-ok"># → "${basename}"</span><span class="lvl0">os.path.dirname("${path}")</span><span class="lvl0 hl-ok"># → "${dirname}"</span>`;
-    } else {
-      out.innerHTML =
-        `<span class="com"># Opening TWO files in a single with block</span>
+            // Initialize activity controllers
+            if (lvl === 1 && act === 1) l1a1.init();
+            if (lvl === 1 && act === 2) l1a2.init();
+            if (lvl === 2 && act === 1) l2a1.init();
+            if (lvl === 2 && act === 2) l2a2.init();
+            if (lvl === 3 && act === 1) l3a1.init();
+            if (lvl === 3 && act === 2) l3a2.init();
 
-with open("input.txt", "r") as src, \\
-     open("output.txt", "w") as dst:
-    for line in src:
-        processed = line.strip().upper()
-        dst.write(processed + "\\n")
+            updateGlobalNavigation();
+        }
 
-<span class="ok">✅ Both files opened simultaneously</span>
-<span class="ok">✅ Both auto-close when block exits</span>
-<span class="ok">✅ If one fails to open, the other is closed too</span>
+        function updateGlobalNavigation() {
+            const actIdx = (currentLevel - 1) * 2 + currentActivity; // 1 to 6
+            document.getElementById('nav-status').textContent = `Activity ${actIdx} of 6`;
 
-<span class="com"># Equivalent to nested with statements:</span>
-<span class="com"># with open("input") as src:</span>
-<span class="com">#     with open("output") as dst: ...</span>`;
-      codeDiv.innerHTML = `<span class="lvl0">with open("in.txt","r") as src, \\</span><span class="lvl0">     open("out.txt","w") as dst:</span><span class="lvl1">for line in src:</span><span class="lvl2">dst.write(line.upper())</span>`;
-    }
-  }
+            document.getElementById('btn-prev-act').disabled = (actIdx === 1);
+            document.getElementById('btn-next-act').disabled = (actIdx === 6);
+        }
 
-  /* ===================== INIT ===================== */
-  s3l1Show();
-</script>
+        function nextActivity() {
+            const actIdx = (currentLevel - 1) * 2 + currentActivity;
+            if (actIdx < 6) {
+                const nextLvl = Math.ceil((actIdx + 1) / 2);
+                const nextAct = ((actIdx) % 2) + 1;
+                
+                if (nextLvl !== currentLevel) {
+                    switchLevel(nextLvl);
+                    switchActivity(nextLvl, nextAct);
+                } else {
+                    switchActivity(currentLevel, nextAct);
+                }
+            }
+        }
+
+        function prevActivity() {
+            const actIdx = (currentLevel - 1) * 2 + currentActivity;
+            if (actIdx > 1) {
+                const prevLvl = Math.ceil((actIdx - 1) / 2);
+                const prevAct = ((actIdx - 2) % 2) + 1;
+                
+                if (prevLvl !== currentLevel) {
+                    switchLevel(prevLvl);
+                    switchActivity(prevLvl, prevAct);
+                } else {
+                    switchActivity(currentLevel, prevAct);
+                }
+            }
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        /* ==========================================================================
+           5. LEVEL 1 ACTIVITY 1: VISION SCANNER
+           ========================================================================== */
+        class VisionScannerController {
+            constructor() {
+                this.files = {
+                    1: {
+                        name: "mystery_file_1",
+                        magic: "89 50 4E 47 0D 0A 1A 0A",
+                        type: "Portable Network Graphics (PNG)",
+                        ext: ".png",
+                        desc: "Visual file signature starts with byte 0x89 and 'PNG' in ASCII.",
+                        hexData: [
+                            { offset: "0x0000", bytes: ["89", "50", "4E", "47", "0D", "0A", "1A", "0A"], ascii: ".PNG...." },
+                            { offset: "0x0008", bytes: ["00", "00", "00", "0D", "49", "48", "44", "52"], ascii: "....IHDR" }
+                        ],
+                        python: `with open("mystery_file_1.png", "rb") as f:\n    header = f.read(8)\n    if header == b'\\x89PNG\\r\\n\\x1a\\n':\n        print("PNG File Detected!")`,
+                        hints: [
+                            "Clue: Look at the first byte. Binary files like PNGs begin with non-ASCII markers (0x89).",
+                            "Concept: Computers read raw bytes to detect file formats, not names.",
+                            "Action: Drag the scanner lens onto the scan zone after selecting the card.",
+                            "Solution: Signature '89 50 4E 47' maps to PNG image assets."
+                        ]
+                    },
+                    2: {
+                        name: "mystery_file_2",
+                        magic: "FF D8 FF E0 00 10 4A 46",
+                        type: "JPEG Image",
+                        ext: ".jpg",
+                        desc: "Visual file signature starts with JPEG header 0xFFD8.",
+                        hexData: [
+                            { offset: "0x0000", bytes: ["FF", "D8", "FF", "E0", "00", "10", "4A", "46"], ascii: "......JF" },
+                            { offset: "0x0008", bytes: ["49", "46", "00", "01", "01", "01", "00", "60"], ascii: "IF.....`" }
+                        ],
+                        python: `with open("mystery_file_2.jpg", "rb") as f:\n    header = f.read(4)\n    if header == b'\\xff\\xd8\\xff\\xe0':\n        print("JPEG Photo Detected!")`,
+                        hints: [
+                            "Clue: Note the hex signature starting with FF D8.",
+                            "Concept: Binary headers contain unique constant identifiers.",
+                            "Action: Place the scanner lens over the panel target.",
+                            "Solution: Signature 'FF D8 FF E0' represents JPEG photographs."
+                        ]
+                    },
+                    3: {
+                        name: "mystery_file_3",
+                        magic: "49 44 33 03 00 00 00 00",
+                        type: "MP3 Audio File",
+                        ext: ".mp3",
+                        desc: "Visual signature starts with 0x494433 ('ID3' header metadata).",
+                        hexData: [
+                            { offset: "0x0000", bytes: ["49", "44", "33", "03", "00", "00", "00", "00"], ascii: "ID3....." },
+                            { offset: "0x0008", bytes: ["00", "23", "54", "45", "4E", "43", "00", "00"], ascii: ".#TENC.." }
+                        ],
+                        python: `with open("mystery_file_3.mp3", "rb") as f:\n    header = f.read(3)\n    if header == b'ID3':\n        print("MP3 Audio Detected!")`,
+                        hints: [
+                            "Clue: Inspect the ASCII column. It shows 'ID3'.",
+                            "Concept: Audio files embed headers to state bitrate and metadata.",
+                            "Action: Perform scanner operation.",
+                            "Solution: '49 44 33' is the ID3 metadata tag for MP3 tracks."
+                        ]
+                    },
+                    4: {
+                        name: "mystery_file_4",
+                        magic: "50 4B 03 04 14 00 08 00",
+                        type: "ZIP Compressed Archive",
+                        ext: ".zip",
+                        desc: "Visual signature starts with 0x504B ('PK' signature, named after Phil Katz).",
+                        hexData: [
+                            { offset: "0x0000", bytes: ["50", "4B", "03", "04", "14", "00", "08", "00"], ascii: "PK......" },
+                            { offset: "0x0008", bytes: ["08", "00", "00", "00", "00", "00", "00", "00"], ascii: "........" }
+                        ],
+                        python: `with open("mystery_file_4.zip", "rb") as f:\n    header = f.read(4)\n    if header == b'PK\\x03\\x04':\n        print("ZIP Archive Detected!")`,
+                        hints: [
+                            "Clue: 'PK' stands for Phil Katz, creator of ZIP compression format.",
+                            "Concept: Archives pack multiple compressed structures behind this magic signature.",
+                            "Action: Match scanner inputs.",
+                            "Solution: '50 4B 03 04' identifies ZIP and DOCX format standards."
+                        ]
+                    }
+                };
+
+                this.selectedId = null;
+                this.hintStage = 0;
+            }
+
+            init() {
+                this.selectedId = null;
+                this.hintStage = 0;
+                
+                document.querySelectorAll('#lvl-1-wrapper .mystery-file-card').forEach(c => c.classList.remove('active'));
+                
+                document.getElementById('l1a1-meta-rows').style.display = 'none';
+                document.getElementById('l1a1-scanner-zone').classList.remove('scanning');
+                document.getElementById('l1a1-hex-rows').innerHTML = `
+                    <div style="color:var(--text-muted); font-style:italic; font-size:0.8rem; text-align:center; padding:20px;">
+                        # Select a file above to view raw binary hex stream.
+                    </div>
+                `;
+                
+                document.getElementById('l1a1-terminal').innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">detective@vision:~$</span> Select a mystery file and drag the scanner lens onto the scanner zone...</div>
+                `;
+                document.getElementById('l1a1-code-area').innerHTML = `# Click files to inspect generated Python code...`;
+                
+                this.updateHintUI();
+            }
+
+            selectFile(id) {
+                sound.playBlip();
+                this.selectedId = id;
+                
+                document.querySelectorAll('#lvl-1-wrapper .mystery-file-card').forEach(c => c.classList.remove('active'));
+                document.getElementById(`scan-file-${id}`).classList.add('active');
+
+                // Render Hex Viewer
+                this.renderHex(id);
+                
+                // Show raw python outline
+                const file = this.files[id];
+                this.renderCode(file.python);
+                
+                document.getElementById('l1a1-terminal').innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">detective@vision:~$</span> Selected file "${file.name}". Drag the lens over the scanner zone to inspect signature...</div>
+                `;
+                
+                document.getElementById('l1a1-meta-rows').style.display = 'none';
+                
+                this.hintStage = 0;
+                this.updateHintUI();
+            }
+
+            renderHex(id) {
+                const file = this.files[id];
+                const container = document.getElementById('l1a1-hex-rows');
+                container.innerHTML = '';
+                
+                file.hexData.forEach(row => {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'hex-row';
+                    
+                    const offsetSpan = document.createElement('span');
+                    offsetSpan.className = 'hex-offset';
+                    offsetSpan.textContent = row.offset;
+                    rowDiv.appendChild(offsetSpan);
+                    
+                    const bytesSpan = document.createElement('span');
+                    bytesSpan.className = 'hex-bytes';
+                    row.bytes.forEach(b => {
+                        const bSpan = document.createElement('span');
+                        bSpan.className = 'hex-byte';
+                        bSpan.textContent = b;
+                        bSpan.onclick = () => this.inspectByte(b);
+                        bytesSpan.appendChild(bSpan);
+                    });
+                    rowDiv.appendChild(bytesSpan);
+                    
+                    const asciiSpan = document.createElement('span');
+                    asciiSpan.className = 'hex-ascii-text';
+                    asciiSpan.textContent = row.ascii;
+                    rowDiv.appendChild(asciiSpan);
+                    
+                    container.appendChild(rowDiv);
+                });
+            }
+
+            inspectByte(hexStr) {
+                sound.playBlip();
+                const decVal = parseInt(hexStr, 16);
+                const binStr = decVal.toString(2).padStart(8, '0');
+                
+                // Printable ASCII conversion
+                let asciiChar = String.fromCharCode(decVal);
+                if (decVal < 32 || decVal > 126) {
+                    asciiChar = '.';
+                }
+                
+                document.getElementById('l1a1-ins-hex').textContent = `0x${hexStr}`;
+                document.getElementById('l1a1-ins-dec').textContent = decVal;
+                document.getElementById('l1a1-ins-bin').textContent = binStr;
+                document.getElementById('l1a1-ins-ascii').textContent = asciiChar;
+
+                // Highlight target byte
+                document.querySelectorAll('#l1a1-hex-rows .hex-byte').forEach(el => {
+                    el.classList.toggle('selected', el.textContent === hexStr);
+                });
+            }
+
+            renderCode(codeText) {
+                const area = document.getElementById('l1a1-code-area');
+                const lines = codeText.split('\n');
+                area.innerHTML = lines.map((l, i) => {
+                    // Quick coloring
+                    let formatted = l
+                        .replace(/(with|as|if|import)/g, '<span class="hl-keyword">$1</span>')
+                        .replace(/(open|print|read)/g, '<span class="hl-builtin">$1</span>')
+                        .replace(/(b'.*?'|'.*?'|b".*?"|".*?")/g, '<span class="hl-string">$1</span>')
+                        .replace(/(#.*)/g, '<span class="hl-comment">$1</span>');
+                    return `<span class="code-line" data-line="${i+1}">${formatted}</span>`;
+                }).join('');
+            }
+
+            handleLensDragStart(e) {
+                if (this.selectedId === null) {
+                    e.preventDefault();
+                    showToast("⚠️ Select a mystery file first!", false);
+                    return;
+                }
+                e.dataTransfer.setData('text/plain', 'scanner_lens');
+            }
+
+            handleLensDrop(e) {
+                e.preventDefault();
+                const data = e.dataTransfer.getData('text/plain');
+                if (data === 'scanner_lens' && this.selectedId !== null) {
+                    this.executeScan();
+                }
+            }
+
+            executeScan() {
+                sound.playLaser();
+                const zone = document.getElementById('l1a1-scanner-zone');
+                zone.classList.add('scanning');
+                
+                const term = document.getElementById('l1a1-terminal');
+                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@vision:~$</span> Initializing vision payload reading...</div>`;
+                
+                let step = 0;
+                const file = this.files[this.selectedId];
+                
+                const processScan = () => {
+                    const lines = document.querySelectorAll('#l1a1-code-area .code-line');
+                    lines.forEach(l => l.classList.remove('active-pointer'));
+
+                    if (step === 0) {
+                        if (lines[0]) lines[0].classList.add('active-pointer');
+                        term.innerHTML += `<div class="terminal-line">Opening "${file.name}" in binary read mode 'rb'...</div>`;
+                        step++;
+                        setTimeout(processScan, 800);
+                    } else if (step === 1) {
+                        if (lines[1]) lines[1].classList.add('active-pointer');
+                        term.innerHTML += `<div class="terminal-line">Reading first 8 bytes signature...</div>`;
+                        step++;
+                        setTimeout(processScan, 800);
+                    } else if (step === 2) {
+                        if (lines[2]) lines[2].classList.add('active-pointer');
+                        term.innerHTML += `<div class="terminal-line"><span class="terminal-success">Match verified: header matches magic bytes [${file.magic}]</span></div>`;
+                        
+                        // Reveal metadata
+                        document.getElementById('l1a1-val-magic').textContent = file.magic.substring(0, 11);
+                        document.getElementById('l1a1-val-type').textContent = file.type;
+                        document.getElementById('l1a1-val-ext').textContent = file.ext;
+                        document.getElementById('l1a1-meta-rows').style.display = 'flex';
+                        
+                        step++;
+                        setTimeout(processScan, 800);
+                    } else {
+                        zone.classList.remove('scanning');
+                        sound.playSuccess();
+                        confetti.trigger();
+                        term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] File resolved to: ${file.name}${file.ext}</span></div>`;
+                        term.scrollTop = term.scrollHeight;
+                        showToast("🎉 Scan successful!");
+                    }
+                    term.scrollTop = term.scrollHeight;
+                };
+
+                setTimeout(processScan, 400);
+            }
+
+            nextHint() {
+                sound.playBlip();
+                this.hintStage = (this.hintStage + 1) % 4;
+                this.updateHintUI();
+            }
+
+            updateHintUI() {
+                const hintText = document.getElementById('l1a1-hint-text');
+                const file = this.files[this.selectedId || 1];
+                hintText.innerHTML = file.hints[this.hintStage];
+                
+                const dots = document.getElementById('l1a1-hint-dots');
+                dots.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
+                    dots.appendChild(dot);
+                }
+            }
+        }
+        const l1a1 = new VisionScannerController();
+
+        /* ==========================================================================
+           6. LEVEL 1 ACTIVITY 2: MAGIC BYTE PUZZLE
+           ========================================================================== */
+        class MagicPuzzleController {
+            constructor() {
+                this.targets = {
+                    hex: null,
+                    type: null,
+                    ext: null
+                };
+                
+                this.solutions = {
+                    'png': { hex: 'png', type: 'png', ext: 'png', desc: 'Portable Network Graphics standard signature is 89 50 4E 47.' },
+                    'jpg': { hex: 'jpg', type: 'jpg', ext: 'jpg', desc: 'JPEG files standard signature is FF D8 FF E0.' },
+                    'zip': { hex: 'zip', type: 'zip', ext: 'zip', desc: 'ZIP archives standard signature is PK (50 4B 03 04).' },
+                    'pdf': { hex: 'pdf', type: 'pdf', ext: 'pdf', desc: 'Adobe PDF files start with ASCII %PDF (25 50 44 46).' }
+                };
+
+                this.hints = [
+                    "Clue: Select one card from each column that represent the same format. E.g. .png matches Portable Network Graphics.",
+                    "Concept: Every type has a dedicated extension and a constant magic hex sequence.",
+                    "Action: Look at the visual translation values. 0x89 is typical for png, 0xFFD8 for jpg, 0x504B (PK) for zip.",
+                    "Solution: Connect [89 50 4E 47] ➔ [Portable Network Graphics] ➔ [.png]."
+                ];
+                
+                this.hintStage = 0;
+            }
+
+            init() {
+                this.targets = { hex: null, type: null, ext: null };
+                this.hintStage = 0;
+                
+                document.querySelectorAll('#pane-l1a2 .puzzle-card').forEach(c => {
+                    c.classList.remove('selected', 'locked');
+                });
+                
+                document.getElementById('l1a2-feedback-box').innerHTML = `<span style="color:var(--text-muted)">Select a card in any column to start linking.</span>`;
+                this.updateHintUI();
+                
+                // Initialize split comparison slider default rendering
+                this.handleSlider(50);
+            }
+
+            selectCard(col, val) {
+                sound.playBlip();
+                
+                // Clean current column selection
+                document.querySelectorAll(`#pane-l1a2 .puzzle-column:nth-child(${col === 'hex' ? 1 : col === 'type' ? 2 : 3}) .puzzle-card`).forEach(c => {
+                    if (!c.classList.contains('locked')) c.classList.remove('selected');
+                });
+
+                // Set selection
+                this.targets[col] = val;
+                document.getElementById(`pcard-${col}-${val}`).classList.add('selected');
+
+                this.checkSelections();
+            }
+
+            checkSelections() {
+                const { hex, type, ext } = this.targets;
+                if (hex && type && ext) {
+                    // Check if they match
+                    if (hex === type && type === ext) {
+                        // Success!
+                        sound.playSuccess();
+                        const sol = this.solutions[hex];
+                        
+                        document.getElementById(`pcard-hex-${hex}`).classList.add('locked');
+                        document.getElementById(`pcard-type-${type}`).classList.add('locked');
+                        document.getElementById(`pcard-ext-${ext}`).classList.add('locked');
+                        
+                        document.getElementById('l1a2-feedback-box').innerHTML = `
+                            <span class="terminal-success"><strong>✅ Correct Link!</strong> ${sol.desc}</span>
+                        `;
+                        
+                        // Clear selected keys
+                        this.targets = { hex: null, type: null, ext: null };
+
+                        // Check if all locked
+                        const allLocked = document.querySelectorAll('#pane-l1a2 .puzzle-card.locked').length === 12;
+                        if (allLocked) {
+                            confetti.trigger();
+                            showToast("🏆 All signatures matched successfully!");
+                        }
+                    } else {
+                        // Mismatch
+                        sound.playCrash();
+                        document.getElementById('l1a2-feedback-box').innerHTML = `
+                            <span class="terminal-error"><strong>❌ Incorrect Match.</strong> The selected parameters do not share a common file format standard. Try again.</span>
+                        `;
+                        
+                        // Reset selections in cards
+                        setTimeout(() => {
+                            document.querySelectorAll('#pane-l1a2 .puzzle-card:not(.locked)').forEach(c => c.classList.remove('selected'));
+                            this.targets = { hex: null, type: null, ext: null };
+                        }, 1200);
+                    }
+                }
+            }
+
+            handleSlider(val) {
+                const textInterpretation = "‰PNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0000`\u0000\u0000\u0000`\b\u0006\u0000\u0000\u0000ãù«™\u0000\u0000\u0000\u0019tEXtSoftware\u0000Adobe ImageReadyqÆe<";
+                const binaryInterpretation = "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52 00 00 00 60 00 00 00 60 08 06 00 00 00 E3 F9 AB 99 00 00 00 19 74 45 58 74 53 6F 66 74 77 61 72 65 00 41 64 6F 62 65 20 49 6D 61 67 65 52 65 61 64 79 71 C6 65 3C";
+                
+                const splitIndex = Math.floor((val / 100) * binaryInterpretation.length);
+                
+                // Show visual division
+                const textPart = textInterpretation.substring(0, Math.floor((100 - val) / 100 * textInterpretation.length));
+                const binPart = binaryInterpretation.substring(0, splitIndex);
+                
+                const display = document.getElementById('l1a2-slider-display');
+                if (val < 50) {
+                    display.innerHTML = `<span style="color:var(--primary); font-style:italic;">${textPart}</span>`;
+                } else {
+                    display.innerHTML = `<span style="color:#2e8b57; font-weight:bold;">${binPart}</span>`;
+                }
+            }
+
+            nextHint() {
+                sound.playBlip();
+                this.hintStage = (this.hintStage + 1) % 4;
+                this.updateHintUI();
+            }
+
+            updateHintUI() {
+                const hintText = document.getElementById('l1a2-hint-text');
+                hintText.innerHTML = this.hints[this.hintStage];
+                
+                const dots = document.getElementById('l1a2-hint-dots');
+                dots.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
+                    dots.appendChild(dot);
+                }
+            }
+        }
+        const l1a2 = new MagicPuzzleController();
+
+        /* ==========================================================================
+           7. LEVEL 2 ACTIVITY 1: BYTE BUILDER
+           ========================================================================== */
+        class ByteBuilderController {
+            constructor() {
+                this.expectedSequence = [72, 101, 108, 108, 111]; // "Hello"
+                this.slots = [null, null, null, null, null];
+                this.bytePool = [72, 101, 108, 108, 111, 65, 90, 33]; // includes distractors
+                this.pythonCode = `data = bytes([SLOTS_PLACEHOLDER])\nwith open("output.bin", "wb") as f:\n    f.write(data)`;
+                this.hints = [
+                    "Clue: Drag values representing letters H (72), e (101), l (108), l (108), o (111).",
+                    "Concept: Python builds immutable byte collections using the bytes() function.",
+                    "Action: Place the numbers 72, 101, 108, 108, and 111 into slots 0-4 sequentially.",
+                    "Solution: Fill the buffer correctly and trigger the disk save."
+                ];
+                this.hintStage = 0;
+            }
+
+            init() {
+                this.slots = [null, null, null, null, null];
+                this.hintStage = 0;
+                
+                // Shuffle pool elements visually
+                this.bytePool.sort(() => Math.random() - 0.5);
+                
+                this.renderPool();
+                this.renderSlots();
+                this.updateHexView();
+                this.renderCode();
+                
+                document.getElementById('l2a1-terminal').innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">detective@compiler:~$</span> Drag byte cards into slots to build the buffer stream.</div>
+                `;
+                this.updateHintUI();
+            }
+
+            renderPool() {
+                const pool = document.getElementById('l2a1-pool');
+                pool.innerHTML = '';
+                this.bytePool.forEach((val, idx) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'builder-byte-tag';
+                    tag.draggable = true;
+                    tag.id = `byte-card-${idx}`;
+                    tag.textContent = val;
+                    tag.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', JSON.stringify({ index: idx, value: val }));
+                    });
+                    pool.appendChild(tag);
+                });
+            }
+
+            renderSlots() {
+                for (let i = 0; i < 5; i++) {
+                    const slot = document.getElementById(`byte-slot-${i}`);
+                    const val = this.slots[i];
+                    if (val !== null) {
+                        slot.classList.add('filled');
+                        slot.querySelector('.builder-slot-val').textContent = val;
+                        // Show character match
+                        slot.querySelector('.builder-slot-char').textContent = `'${String.fromCharCode(val)}'`;
+                    } else {
+                        slot.classList.remove('filled');
+                        slot.querySelector('.builder-slot-val').textContent = '-';
+                        slot.querySelector('.builder-slot-char').textContent = '-';
+                    }
+                }
+            }
+
+            handleDropToSlot(e, slotIdx) {
+                e.preventDefault();
+                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                sound.playBlip();
+
+                // If slot already has element, return it to pool
+                if (this.slots[slotIdx] !== null) {
+                    // return existing to pool array if not there
+                    this.bytePool.push(this.slots[slotIdx]);
+                }
+
+                // Place new element in slot
+                this.slots[slotIdx] = data.value;
+                
+                // Remove from pool
+                this.bytePool = this.bytePool.filter((v, idx) => idx !== data.index);
+
+                this.renderPool();
+                this.renderSlots();
+                this.updateHexView();
+                this.renderCode();
+            }
+
+            handleDropToPool(e) {
+                e.preventDefault();
+                // If dragging from a slot back to pool
+                // for simplicity we allow clearing slots
+            }
+
+            resetSlots() {
+                sound.playBlip();
+                this.init();
+            }
+
+            updateHexView() {
+                const hexBytes = document.getElementById('l2a1-hex-bytes');
+                const asciiText = document.getElementById('l2a1-ascii-text');
+                
+                const hexArr = [];
+                const asciiArr = [];
+                
+                for (let i = 0; i < 5; i++) {
+                    const val = this.slots[i];
+                    if (val !== null) {
+                        hexArr.push(val.toString(16).toUpperCase().padStart(2, '0'));
+                        asciiArr.push(String.fromCharCode(val));
+                    } else {
+                        hexArr.push('??');
+                        asciiArr.push('?');
+                    }
+                }
+                
+                hexBytes.textContent = hexArr.join(' ');
+                asciiText.textContent = asciiArr.join('');
+            }
+
+            renderCode() {
+                const list = this.slots.map(v => v !== null ? v : '??').join(', ');
+                const formatted = this.pythonCode.replace('SLOTS_PLACEHOLDER', list);
+                
+                const area = document.getElementById('l2a1-code-area');
+                const lines = formatted.split('\n');
+                
+                area.innerHTML = lines.map((l, i) => {
+                    let colored = l
+                        .replace(/(with|as)/g, '<span class="hl-keyword">$1</span>')
+                        .replace(/(open|bytes)/g, '<span class="hl-builtin">$1</span>')
+                        .replace(/(b'.*?'|'.*?'|b".*?"|".*?")/g, '<span class="hl-string">$1</span>')
+                        .replace(/(#.*)/g, '<span class="hl-comment">$1</span>');
+                    return `<span class="code-line" data-line="${i+1}">${colored}</span>`;
+                }).join('');
+            }
+
+            saveToDisk() {
+                const term = document.getElementById('l2a1-terminal');
+                const isComplete = this.slots.every(v => v !== null);
+                
+                if (!isComplete) {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[BUFFER ERROR] Buffer is incomplete. Fill all slots before flashing stream to disk.</span></div>`;
+                    showToast("⚠️ Slots incomplete!", false);
+                    return;
+                }
+
+                // Check correct sequence
+                const isCorrect = this.slots.every((v, i) => v === this.expectedSequence[i]);
+                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@compiler:~$</span> Initializing wb saving protocol...</div>`;
+
+                if (isCorrect) {
+                    sound.playSuccess();
+                    confetti.trigger();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] bytes array converted. 5 bytes written successfully. File "output.bin" saved.</span></div>`;
+                    showToast("🏆 Byte Builder completed!");
+                } else {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[COMPILER CRASH] ASCII mismatch. File created, but the saved word is "${this.slots.map(v => String.fromCharCode(v)).join('')}" instead of "Hello". Correct the bytes sequence!</span></div>`;
+                    showToast("❌ Incorrect word builder pattern.", false);
+                }
+                term.scrollTop = term.scrollHeight;
+            }
+
+            nextHint() {
+                sound.playBlip();
+                this.hintStage = (this.hintStage + 1) % 4;
+                this.updateHintUI();
+            }
+
+            updateHintUI() {
+                const hintText = document.getElementById('l2a1-hint-text');
+                hintText.innerHTML = this.hints[this.hintStage];
+                
+                const dots = document.getElementById('l2a1-hint-dots');
+                dots.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
+                    dots.appendChild(dot);
+                }
+            }
+        }
+        const l2a1 = new ByteBuilderController();
+
+        /* ==========================================================================
+           8. LEVEL 2 ACTIVITY 2: BINARY COPY SIMULATOR
+           ========================================================================== */
+        class CopySimulatorController {
+            constructor() {
+                this.sourceData = ["48", "45", "4C", "50", "20", "4D", "45"]; // HELP ME
+                this.ramBuffer = [];
+                this.destData = [];
+                
+                this.pythonCode = `with open("source.dat", "IN_MODE") as f_in, open("copy.dat", "OUT_MODE") as f_out:\n    buffer = f_in.read()\n    f_out.write(buffer)`;
+                this.hints = [
+                    "Clue: Look at the script mode parameters. Reading binary requires 'rb', writing binary requires 'wb'.",
+                    "Concept: Regular modes 'r' and 'w' handle text line-breaks and can corrupt raw bytes. Binary mode maintains integrity.",
+                    "Action: Configure mode dropdowns to 'rb' and 'wb', then perform step 1.",
+                    "Solution: Select correct modes, run read, then run write."
+                ];
+                this.hintStage = 0;
+            }
+
+            init() {
+                this.ramBuffer = [];
+                this.destData = [];
+                this.hintStage = 0;
+                
+                document.getElementById('btn-l2a2-read').disabled = false;
+                document.getElementById('btn-l2a2-write').disabled = true;
+
+                this.renderSectors();
+                this.renderCode();
+                
+                document.getElementById('l2a2-terminal').innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">detective@os:~$</span> Choose script modes, then execute step 1...</div>
+                `;
+                this.updateHintUI();
+            }
+
+            renderSectors() {
+                const src = document.getElementById('l2a2-source-bytes');
+                src.innerHTML = this.sourceData.map(b => `<span>${b}</span>`).join('');
+                
+                const ram = document.getElementById('l2a2-buffer-grid');
+                if (this.ramBuffer.length > 0) {
+                    ram.innerHTML = this.ramBuffer.map(b => `<span class="copy-buffer-byte">${b}</span>`).join('');
+                } else {
+                    ram.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; font-style:italic;">Empty</span>`;
+                }
+                
+                const dest = document.getElementById('l2a2-dest-bytes');
+                if (this.destData.length > 0) {
+                    dest.innerHTML = this.destData.map(b => `<span>${b}</span>`).join('');
+                } else {
+                    dest.innerHTML = `<span style="color:var(--text-muted); font-size:0.75rem; font-style:italic;">Empty</span>`;
+                }
+            }
+
+            renderCode() {
+                const inMode = document.getElementById('l2a2-sel-mode-in').value;
+                const outMode = document.getElementById('l2a2-sel-mode-out').value;
+                
+                const formatted = this.pythonCode
+                    .replace('IN_MODE', inMode)
+                    .replace('OUT_MODE', outMode);
+                    
+                const area = document.getElementById('l2a2-code-area');
+                const lines = formatted.split('\n');
+                
+                area.innerHTML = lines.map((l, i) => {
+                    let colored = l
+                        .replace(/(with|as)/g, '<span class="hl-keyword">$1</span>')
+                        .replace(/(open|read|write)/g, '<span class="hl-builtin">$1</span>')
+                        .replace(/(b'.*?'|'.*?'|b".*?"|".*?")/g, '<span class="hl-string">$1</span>')
+                        .replace(/(#.*)/g, '<span class="hl-comment">$1</span>');
+                    return `<span class="code-line" data-line="${i+1}">${colored}</span>`;
+                }).join('');
+            }
+
+            stepRead() {
+                const inMode = document.getElementById('l2a2-sel-mode-in').value;
+                const term = document.getElementById('l2a2-terminal');
+
+                // Check mode
+                if (inMode !== 'rb') {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[CRASH] UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position. Cannot parse binary byte stream without binary mode flag ('rb').</span></div>`;
+                    showToast("❌ Script crashed!", false);
+                    return;
+                }
+
+                sound.playWrite();
+                // Animate flow particle from source to RAM
+                this.animateFlow('source', () => {
+                    this.ramBuffer = [...this.sourceData];
+                    this.renderSectors();
+                    
+                    document.getElementById('btn-l2a2-read').disabled = true;
+                    document.getElementById('btn-l2a2-write').disabled = false;
+                    
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[READ] 7 bytes read into Memory RAM Buffer successfully.</span></div>`;
+                });
+            }
+
+            stepWrite() {
+                const outMode = document.getElementById('l2a2-sel-mode-out').value;
+                const term = document.getElementById('l2a2-terminal');
+
+                // Check mode
+                if (outMode !== 'wb') {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[CRASH] TypeError: a bytes-like object is required, not 'str'. Text write mode 'w' rejected buffer payload.</span></div>`;
+                    showToast("❌ Script crashed!", false);
+                    return;
+                }
+
+                sound.playWrite();
+                // Animate flow particle from RAM to Destination
+                this.animateFlow('dest', () => {
+                    this.destData = [...this.ramBuffer];
+                    this.ramBuffer = [];
+                    this.renderSectors();
+                    
+                    document.getElementById('btn-l2a2-write').disabled = true;
+                    
+                    sound.playSuccess();
+                    confetti.trigger();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[WRITE] 7 bytes written from buffer onto copy.dat sector. Copy complete!</span></div>`;
+                    showToast("🏆 Copy Simulator succeeded!");
+                });
+            }
+
+            animateFlow(target, callback) {
+                const dot = document.getElementById('l2a2-flow-dot');
+                dot.style.opacity = '1';
+                dot.style.left = target === 'source' ? '0px' : '50%';
+                dot.style.transition = 'left 0.5s linear';
+                
+                setTimeout(() => {
+                    dot.style.left = target === 'source' ? '50%' : '100%';
+                }, 50);
+
+                setTimeout(() => {
+                    dot.style.opacity = '0';
+                    callback();
+                }, 550);
+            }
+
+            resetSimulator() {
+                sound.playBlip();
+                this.init();
+            }
+
+            nextHint() {
+                sound.playBlip();
+                this.hintStage = (this.hintStage + 1) % 4;
+                this.updateHintUI();
+            }
+
+            updateHintUI() {
+                const hintText = document.getElementById('l2a2-hint-text');
+                hintText.innerHTML = this.hints[this.hintStage];
+                
+                const dots = document.getElementById('l2a2-hint-dots');
+                dots.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
+                    dots.appendChild(dot);
+                }
+            }
+        }
+        const l2a2 = new CopySimulatorController();
+
+        // Listen for mode select changes to dynamically render python code visualizer
+        document.getElementById('l2a2-sel-mode-in').addEventListener('change', () => l2a2.renderCode());
+        document.getElementById('l2a2-sel-mode-out').addEventListener('change', () => l2a2.renderCode());
+
+        /* ==========================================================================
+           9. LEVEL 3 ACTIVITY 1: EXCEPTION RESCUE
+           ========================================================================== */
+        class ExceptionRescueController {
+            constructor() {
+                this.cases = [
+                    {
+                        title: "1. Binary Decoding Crash",
+                        traceback: "Traceback (most recent call last):\n  File \"rescue.py\", line 2, in <module>\n    data = f.read()\nUnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte",
+                        editorCode: "try:\n    with open(\"photo.jpg\", \"r\") as f:\n        data = f.read()\nexcept [EXCEPTION_DROP_ZONE]:\n    [RECOVERY_DROP_ZONE]",
+                        correctException: "UnicodeDecodeError",
+                        correctRecovery: "print('Binary format detected. Re-opening in rb mode')",
+                        hints: [
+                            "Clue: Look at the traceback name. It says 'UnicodeDecodeError'.",
+                            "Concept: Text mode 'r' tries to decode bytes to strings, failing for raw binary values.",
+                            "Action: Drag 'UnicodeDecodeError' into the exception handler slot, and choose printing recovery.",
+                            "Solution: Catches UnicodeDecodeError, triggers backup printing recovery block."
+                        ]
+                    },
+                    {
+                        title: "2. Missing Database Target",
+                        traceback: "Traceback (most recent call last):\n  File \"rescue.py\", line 2, in <module>\n    with open(\"db_backup.dat\", \"rb\") as f:\nFileNotFoundError: [Errno 2] No such file or directory: 'db_backup.dat'",
+                        editorCode: "try:\n    with open(\"db_backup.dat\", \"rb\") as f:\n        data = f.read()\nexcept [EXCEPTION_DROP_ZONE]:\n    [RECOVERY_DROP_ZONE]",
+                        correctException: "FileNotFoundError",
+                        correctRecovery: "data = b'' # Load empty byte default fallback",
+                        hints: [
+                            "Clue: Look at the traceback. The file is missing, yielding a FileNotFoundError.",
+                            "Concept: Code must recover from absent files by initializing fallbacks.",
+                            "Action: Match exceptions and load the data fallback.",
+                            "Solution: Catch FileNotFoundError, then assign data = b''."
+                        ]
+                    },
+                    {
+                        title: "3. Folder Access Conflict",
+                        traceback: "Traceback (most recent call last):\n  File \"rescue.py\", line 2, in <module>\n    with open(\"/var/log\", \"rb\") as f:\nIsADirectoryError: [Errno 21] Is a directory: '/var/log'",
+                        editorCode: "try:\n    with open(\"/var/log\", \"rb\") as f:\n        data = f.read()\nexcept [EXCEPTION_DROP_ZONE]:\n    [RECOVERY_DROP_ZONE]",
+                        correctException: "IsADirectoryError",
+                        correctRecovery: "print('Error: Target path is a directory node')",
+                        hints: [
+                            "Clue: opening directory folder logs raises IsADirectoryError.",
+                            "Concept: Unix OS blocks byte stream requests aimed at folder descriptors.",
+                            "Action: Choose IsADirectoryError exception.",
+                            "Solution: Catch exception and notify user target is a directory node."
+                        ]
+                    },
+                    {
+                        title: "4. Lock Permission Block",
+                        traceback: "Traceback (most recent call last):\n  File \"rescue.py\", line 2, in <module>\n    with open(\"/sys/secure.bin\", \"wb\") as f:\nPermissionError: [Errno 13] Permission denied: '/sys/secure.bin'",
+                        editorCode: "try:\n    with open(\"/sys/secure.bin\", \"wb\") as f:\n        f.write(data)\nexcept [EXCEPTION_DROP_ZONE]:\n    [RECOVERY_DROP_ZONE]",
+                        correctException: "PermissionError",
+                        correctRecovery: "print('Access denied. Run program with Admin rights')",
+                        hints: [
+                            "Clue: Traceback reports 'PermissionError'.",
+                            "Concept: Operating system security bounds prevent writing system paths.",
+                            "Action: Select PermissionError blocks.",
+                            "Solution: Catches PermissionError, prompts user to escalate privileges."
+                        ]
+                    }
+                ];
+
+                this.currentIdx = 0;
+                this.selectedBlocks = {
+                    exception: null,
+                    recovery: null
+                };
+
+                this.poolBlocks = [
+                    { id: "UnicodeDecodeError", text: "UnicodeDecodeError", type: "exception" },
+                    { id: "FileNotFoundError", text: "FileNotFoundError", type: "exception" },
+                    { id: "IsADirectoryError", text: "IsADirectoryError", type: "exception" },
+                    { id: "PermissionError", text: "PermissionError", type: "exception" },
+                    { id: "rec_dec", text: "print('Binary format detected. Re-opening in rb mode')", type: "recovery" },
+                    { id: "rec_fnf", text: "data = b'' # Load empty byte default fallback", type: "recovery" },
+                    { id: "rec_dir", text: "print('Error: Target path is a directory node')", type: "recovery" },
+                    { id: "rec_perm", text: "print('Access denied. Run program with Admin rights')", type: "recovery" }
+                ];
+                
+                this.rescuedStates = [false, false, false, false];
+                this.hintStage = 0;
+            }
+
+            init() {
+                this.selectedBlocks = { exception: null, recovery: null };
+                this.hintStage = 0;
+                
+                // Shuffle pool
+                this.poolBlocks.sort(() => Math.random() - 0.5);
+                
+                this.renderPool();
+                this.selectCase(this.currentIdx);
+                this.updateHintUI();
+            }
+
+            renderPool() {
+                const pool = document.getElementById('l3a1-pool');
+                pool.innerHTML = '';
+                this.poolBlocks.forEach(b => {
+                    const tag = document.createElement('div');
+                    tag.className = 'rescue-block-tag';
+                    tag.draggable = true;
+                    tag.id = `rescue-block-${b.id}`;
+                    tag.textContent = b.text;
+                    tag.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', JSON.stringify(b));
+                    });
+                    pool.appendChild(tag);
+                });
+            }
+
+            selectCase(idx) {
+                sound.playBlip();
+                this.currentIdx = idx;
+                this.selectedBlocks = { exception: null, recovery: null };
+                
+                document.querySelectorAll('#pane-l3a1 .rescue-scenario-card').forEach(c => c.classList.remove('active'));
+                document.getElementById(`rescue-case-${idx}`).classList.add('active');
+                
+                const c = this.cases[idx];
+                
+                // Render traceback inside terminal
+                const term = document.getElementById('l3a1-terminal');
+                term.innerHTML = `<div class="terminal-line"><span class="terminal-error">${c.traceback.replace(/\n/g, '<br>')}</span></div>`;
+                
+                this.renderCodeCanvas();
+                this.hintStage = 0;
+                this.updateHintUI();
+            }
+
+            renderCodeCanvas() {
+                const c = this.cases[this.currentIdx];
+                const area = document.getElementById('l3a1-code-area');
+                
+                // Construct editable HTML segments
+                const lines = c.editorCode.split('\n');
+                
+                area.innerHTML = lines.map((l, i) => {
+                    let formatted = l
+                        .replace(/(try|with|as|except)/g, '<span class="hl-keyword">$1</span>')
+                        .replace(/(open|read|write|print)/g, '<span class="hl-builtin">$1</span>')
+                        .replace(/(b'.*?'|'.*?'|b".*?"|".*?")/g, '<span class="hl-string">$1</span>');
+                        
+                    // Inject drop zone placeholders
+                    if (formatted.includes('[EXCEPTION_DROP_ZONE]')) {
+                        const filledText = this.selectedBlocks.exception ? this.selectedBlocks.exception.text : '[ DRAG EXCEPTION HERE ]';
+                        const filledClass = this.selectedBlocks.exception ? 'filled' : '';
+                        formatted = formatted.replace('[EXCEPTION_DROP_ZONE]', `<span class="rescue-drop-zone ${filledClass}" ondragover="allowDrop(event)" ondrop="l3a1.handleDropSlot(event, 'exception')">${filledText}</span>`);
+                    }
+                    if (formatted.includes('[RECOVERY_DROP_ZONE]')) {
+                        const filledText = this.selectedBlocks.recovery ? this.selectedBlocks.recovery.text : '[ DRAG RECOVERY STATEMENT HERE ]';
+                        const filledClass = this.selectedBlocks.recovery ? 'filled' : '';
+                        formatted = formatted.replace('[RECOVERY_DROP_ZONE]', `<span class="rescue-drop-zone ${filledClass}" ondragover="allowDrop(event)" ondrop="l3a1.handleDropSlot(event, 'recovery')">${filledText}</span>`);
+                    }
+
+                    return `<span class="code-line" data-line="${i+1}">${formatted}</span>`;
+                }).join('');
+            }
+
+            handleDropSlot(e, type) {
+                e.preventDefault();
+                const block = JSON.parse(e.dataTransfer.getData('text/plain'));
+                sound.playBlip();
+
+                if (block.type !== type) {
+                    showToast("⚠️ Drop the matching block type!", false);
+                    return;
+                }
+
+                this.selectedBlocks[type] = block;
+                this.renderCodeCanvas();
+            }
+
+            resetRescue() {
+                sound.playBlip();
+                this.selectedBlocks = { exception: null, recovery: null };
+                this.renderCodeCanvas();
+            }
+
+            executeRescue() {
+                const term = document.getElementById('l3a1-terminal');
+                const c = this.cases[this.currentIdx];
+
+                if (!this.selectedBlocks.exception || !this.selectedBlocks.recovery) {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[COMPILER ERROR] Incomplete rescue setup. Populate both drop slots before executing test.</span></div>`;
+                    showToast("⚠️ Drag blocks first!", false);
+                    return;
+                }
+
+                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@rescue:~$</span> Running compiled helper...</div>`;
+
+                const isExcCorrect = this.selectedBlocks.exception.text === c.correctException;
+                const isRecCorrect = this.selectedBlocks.recovery.text === c.correctRecovery;
+
+                if (isExcCorrect && isRecCorrect) {
+                    sound.playSuccess();
+                    confetti.trigger();
+                    this.rescuedStates[this.currentIdx] = true;
+                    
+                    // Mark badge rescued
+                    const badge = document.getElementById(`badge-case-${this.currentIdx}`);
+                    badge.textContent = "RESCUED";
+                    badge.className = "rescue-status-badge rescued";
+
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] Exception caught: ${c.correctException}. Recovery statement processed successfully. Program rescued.</span></div>`;
+                    showToast("🏆 Exception rescued!");
+                } else {
+                    sound.playCrash();
+                    let feedback = "[CRASH DETAILS] ";
+                    if (!isExcCorrect) {
+                        feedback += `Incorrect exception target caught. Target program raises a ${c.correctException}. `;
+                    } else if (!isRecCorrect) {
+                        feedback += `Mismatched recovery strategy. This operation needs: "${c.correctRecovery}". `;
+                    }
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">${feedback}</span></div>`;
+                    showToast("❌ Crash recovery failed.", false);
+                }
+                term.scrollTop = term.scrollHeight;
+            }
+
+            nextHint() {
+                sound.playBlip();
+                this.hintStage = (this.hintStage + 1) % 4;
+                this.updateHintUI();
+            }
+
+            updateHintUI() {
+                const hintText = document.getElementById('l3a1-hint-text');
+                const c = this.cases[this.currentIdx];
+                hintText.innerHTML = c.hints[this.hintStage];
+                
+                const dots = document.getElementById('l3a1-hint-dots');
+                dots.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
+                    dots.appendChild(dot);
+                }
+            }
+        }
+        const l3a1 = new ExceptionRescueController();
+
+        /* ==========================================================================
+           10. LEVEL 3 ACTIVITY 2: BINARY REPAIR LAB
+           ========================================================================== */
+        class BinaryRepairLabController {
+            constructor() {
+                this.scenarios = [
+                    {
+                        title: "Safe Network Image Downloader",
+                        desc: "Repair the script below so it safely streams binary bytes from network files to output disk images using the correct modes and exception boundaries.",
+                        filename: "downloader.py",
+                        hints: [
+                            "Clue: Writing images to disk demands 'wb' (binary write) mode flag.",
+                            "Concept: Catching both FileNotFoundError and general exceptions prevents unexpected compiler dumps.",
+                            "Action: Select 'wb' in open mode, catch FileNotFoundError in exception slot, write buffer bytes in writer handle.",
+                            "Solution: Modes: 'wb', catch: FileNotFoundError, write: f.write(payload)."
+                        ],
+                        correctAnswers: {
+                            mode: "wb",
+                            exception: "FileNotFoundError",
+                            writer: "f.write(payload)"
+                        }
+                    },
+                    {
+                        title: "Robust Database Backup Appender",
+                        desc: "Repair the backup appender so it loads binary log states and appends recovery records to the EOF position without losing previous content.",
+                        filename: "appender.py",
+                        hints: [
+                            "Clue: Appending logs to binary records demands 'ab' (binary append) mode.",
+                            "Concept: Secure OS boundaries raise PermissionError when lacking admin flags.",
+                            "Action: Select 'ab' mode, catch PermissionError in exception slot, write buffer bytes.",
+                            "Solution: Modes: 'ab', catch: PermissionError, write: f.write(payload)."
+                        ],
+                        correctAnswers: {
+                            mode: "ab",
+                            exception: "PermissionError",
+                            writer: "f.write(payload)"
+                        }
+                    }
+                ];
+
+                this.currentIdx = 0;
+                this.hintStage = 0;
+            }
+
+            init() {
+                this.hintStage = 0;
+                this.loadScenario(this.currentIdx);
+            }
+
+            loadScenario(idx) {
+                this.currentIdx = idx;
+                const sc = this.scenarios[idx];
+                
+                document.getElementById('l3a2-target-title').textContent = sc.title;
+                document.getElementById('l3a2-target-desc').textContent = sc.desc;
+                document.getElementById('l3a2-tab-filename').textContent = sc.filename;
+
+                const selectEl = document.getElementById('l3a2-scenario-select');
+                if (selectEl) {
+                    selectEl.value = idx.toString();
+                }
+
+                // Render dynamic builder HTML
+                this.renderBuilder();
+                this.updateHintUI();
+                
+                document.getElementById('l3a2-terminal').innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">engineer@repairlab:~$</span> Choose options inside script dropdowns, then run...</div>
+                `;
+            }
+
+            renderBuilder() {
+                const sc = this.scenarios[this.currentIdx];
+                const builder = document.getElementById('l3a2-code-builder');
+                
+                // Shuffle option arrays so correct answers are not first
+                const modes = ["wb", "ab", "w", "rb", ""].sort(() => Math.random() - 0.5);
+                const exceptions = ["PermissionError", "UnicodeDecodeError", "FileNotFoundError", "IsADirectoryError", ""].sort(() => Math.random() - 0.5);
+                const writers = ["f.write(str(payload))", "f.write(payload)", "f.read(payload)", ""].sort(() => Math.random() - 0.5);
+
+                const getOptions = (list) => {
+                    return list.map(opt => `<option value="${opt}">${opt === "" ? "--" : opt}</option>`).join('');
+                };
+
+                builder.innerHTML = `
+<span class="hl-keyword">try</span>:
+    payload = b'\\x89PNG\\r\\n'  <span class="hl-comment"># Raw binary buffer</span>
+    <span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"target_file"</span>, <select class="repair-select-box" id="l3a2-mode-sel">${getOptions(modes)}</select>) <span class="hl-keyword">as</span> f:
+        <select class="repair-select-box" id="l3a2-write-sel">${getOptions(writers)}</select>
+<span class="hl-keyword">except</span> <select class="repair-select-box" id="l3a2-exc-sel">${getOptions(exceptions)}</select> <span class="hl-keyword">as</span> err:
+    <span class="hl-builtin">print</span>(<span class="hl-string">"Exception recovery: "</span>, err)
+                `;
+            }
+
+            resetLab() {
+                sound.playBlip();
+                this.init();
+            }
+
+            executeRepair() {
+                const modeVal = document.getElementById('l3a2-mode-sel').value;
+                const writeVal = document.getElementById('l3a2-write-sel').value;
+                const excVal = document.getElementById('l3a2-exc-sel').value;
+                const term = document.getElementById('l3a2-terminal');
+
+                // Check for incomplete selects
+                if (!modeVal || !writeVal || !excVal) {
+                    sound.playCrash();
+                    term.innerHTML = `<div class="terminal-line"><span class="terminal-error">[SYNTAX CRASH] IndentationError: empty select placeholder configuration. Complete all dropdown options.</span></div>`;
+                    showToast("⚠️ Complete all dropdown selections.");
+                    return;
+                }
+
+                term.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">engineer@repairlab:~$</span> Stepping through laboratory execution...</div>`;
+
+                const sc = this.scenarios[this.currentIdx];
+                const answers = sc.correctAnswers;
+
+                let step = 0;
+                const processSteps = () => {
+                    if (step === 0) {
+                        term.innerHTML += `<div class="terminal-line">Opening "target_file" in mode '${modeVal}'...</div>`;
+                        if (modeVal !== answers.mode) {
+                            sound.playCrash();
+                            if (modeVal === 'w') {
+                                term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] UnicodeEncodeError: text mode 'w' rejected hex payload raw bytes. Program dumped.</span></div>`;
+                            } else if (modeVal === 'rb') {
+                                term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] io.UnsupportedOperation: not writable. Cannot write payloads in read mode 'rb'.</span></div>`;
+                            } else {
+                                term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] Incompatible open mode flags for target operation: ${sc.title}.</span></div>`;
+                            }
+                            showToast("❌ Script crashed.", false);
+                            return;
+                        }
+                        step++;
+                        setTimeout(processSteps, 850);
+                    } else if (step === 1) {
+                        term.innerHTML += `<div class="terminal-line">Executing write statement "${writeVal}"...</div>`;
+                        if (writeVal !== answers.writer) {
+                            sound.playCrash();
+                            if (writeVal === 'f.write(str(payload))') {
+                                term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] TypeError: write() argument must be str, not bytes. Tried to double-wrap raw bytes payload.</span></div>`;
+                            } else {
+                                term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] AttributeError: operation failed. Mismatched write method descriptor.</span></div>`;
+                            }
+                            showToast("❌ Script crashed.", false);
+                            return;
+                        }
+                        step++;
+                        setTimeout(processSteps, 850);
+                    } else {
+                        // Success block!
+                        sound.playSuccess();
+                        particles.triggerConfetti();
+                        term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] 6 bytes written smoothly. Program exited code 0. Diagnostic verified.</span></div>`;
+                        showToast("🏆 Script repaired successfully!");
+                    }
+                    term.scrollTop = term.scrollHeight;
+                };
+
+                // Catch exception mock triggers (let's assume we simulate a trigger context if they selected the correct exception)
+                if (excVal !== answers.exception) {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[COMPILER EXCEPTION] Exception handler catch mismatch. Program raised a ${answers.exception} during validation, but try block is guarded by ${excVal}. Uncaught exception trace dumped.</span></div>`;
+                    showToast("❌ Crash recovery mismatch.", false);
+                    return;
+                }
+
+                setTimeout(processSteps, 400);
+            }
+
+            nextHint() {
+                sound.playBlip();
+                this.hintStage = (this.hintStage + 1) % 4;
+                this.updateHintUI();
+            }
+
+            updateHintUI() {
+                const hintText = document.getElementById('l3a2-hint-text');
+                const sc = this.scenarios[this.currentIdx];
+                hintText.innerHTML = sc.hints[this.hintStage];
+                
+                const dots = document.getElementById('l3a2-hint-dots');
+                dots.innerHTML = '';
+                for (let i = 0; i < 4; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
+                    dots.appendChild(dot);
+                }
+            }
+        }
+        const l3a2 = new BinaryRepairLabController();
+
+        /* ==========================================================================
+           11. CONVENIENCE ALIASES & GLOBAL INITIALIZERS
+           ========================================================================== */
+        const particles = {
+            triggerConfetti: () => confetti && confetti.trigger(),
+            triggerSparks: (x, y, color) => {
+                // Sparks handled within canvas confetti burst for simplicity
+            }
+        };
+
+        // Initialize Level 1 Activity 1 on startup
+        window.addEventListener('load', () => {
+            switchLevel(1);
+        });
+    </script>
 </body>
 </html>
