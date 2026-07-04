@@ -1,41 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Advanced — Lambdas, Recursion, Copying &amp; Decorators</title>
+    <title>PyExec Lab: Lambdas, Recursion & Memory Cloning</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
 
         :root {
-            --bg-main: #fffcfc;
-            --bg-card: #ffffff;
-            --bg-card-hover: #fffefe;
-            --border-color: #ffd1d5;
-            --border-glow: rgba(225, 6, 0, 0.15);
-            --red: #e10600;
-            --red-dark: #b30500;
-            --red-deep: #7a0000;
-            --white: #ffffff;
-            --off: #fff8f8;
-            --ink: #1a0808;
-            --mono: 'JetBrains Mono', 'Fira Code', monospace;
-            --display: 'Archivo Black', sans-serif;
-            --body: 'Inter', sans-serif;
-
-            /* Level badge colors */
-            --l1: #0057b7;
-            --l2: #2e7d32;
-            --l3: #e65100;
-            --l4: #6a1b9a;
-            --l5: #b71c1c;
-
-            /* Game Colors */
-            --correct: #2e7d32;
-            --correct-bg: rgba(46, 125, 50, 0.06);
-            --wrong: #b71c1c;
-            --wrong-bg: rgba(183, 28, 28, 0.06);
+            --primary: #E10600;
+            --primary-light: #FFECEB;
+            --primary-glow: rgba(225, 6, 0, 0.15);
+            --bg-main: #FAFAFA;
+            --bg-card: #FFFFFF;
+            --border-color: #EAEAEA;
+            --text-main: #1A1A1A;
+            --text-secondary: #666666;
+            --code-bg: #0F141C;
+            --code-text: #E5E9F0;
+            --green: #10B981;
+            --green-light: #E6F8F2;
+            --orange: #F59E0B;
+            --orange-light: #FEF3C7;
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
         }
 
         * {
@@ -44,1723 +32,2564 @@
             padding: 0;
         }
 
-        html,
         body {
-            font-family: var(--body);
-            background: var(--bg-main);
-            color: var(--ink);
-            scroll-behavior: smooth;
-            background-image:
-                radial-gradient(at 0% 0%, rgba(225, 6, 0, 0.02) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(0, 87, 183, 0.02) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(225, 6, 0, 0.02) 0px, transparent 50%);
-            background-attachment: fixed;
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
-        /* ===== HERO ===== */
-        .hero {
-            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-            color: var(--white);
-            padding: 80px 24px 80px;
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-            border-bottom: 4px solid var(--red-deep);
+        /* App Wrapper */
+        .app-container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            min-width: 1200px;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            top: -300px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-
-        .hero h1 {
-            font-family: var(--display);
-            font-size: clamp(2.2rem, 7vw, 4.5rem);
-            line-height: 1.05;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: linear-gradient(to right, #ffffff, #ffccd0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero h1 span {
-            -webkit-text-fill-color: initial;
-            color: transparent;
-            -webkit-text-stroke: 1.5px var(--white);
-        }
-
-        .hero p.sub {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            max-width: 680px;
-            margin-inline: auto;
-            color: #ffeaea;
-            line-height: 1.6;
-        }
-
-        main {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px 100px;
-        }
-
-        /* ===== SECTION HEADER ===== */
-        .sec-head {
-            margin-bottom: 32px;
-        }
-
-        .sec-num {
-            font-family: var(--mono);
-            color: var(--red);
-            font-weight: 700;
-            letter-spacing: 3px;
-            font-size: 0.85rem;
-        }
-
-        .sec-head h2 {
-            font-family: var(--display);
-            font-size: clamp(1.6rem, 4vw, 2.5rem);
-            text-transform: uppercase;
-            margin-top: 8px;
-            color: var(--red-deep);
-            border-bottom: 4px solid var(--red);
-            display: inline-block;
-            padding-bottom: 8px;
-        }
-
-        .sec-head p {
-            margin-top: 16px;
-            color: #5a4b4b;
-            max-width: 720px;
-            line-height: 1.65;
-            font-size: 1.05rem;
-        }
-
-        /* ===== LEVEL STRIP ===== */
-        .level-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 32px;
-        }
-
-        .lvl-pill {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 8px 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.06);
-            color: #4b5563;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .lvl-pill:hover {
-            background: rgba(0, 0, 0, 0.04);
-            border-color: rgba(0, 0, 0, 0.1);
-            color: #111827;
-            transform: translateY(-2px);
-        }
-
-        .lvl-pill.active.l1 {
-            background: var(--l1);
-            color: #fff;
-            border-color: var(--l1);
-            box-shadow: 0 4px 12px rgba(0, 87, 183, 0.25);
-        }
-
-        .lvl-pill.active.l2 {
-            background: var(--l2);
-            color: #fff;
-            border-color: var(--l2);
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-        }
-
-        .lvl-pill.active.l3 {
-            background: var(--l3);
-            color: #fff;
-            border-color: var(--l3);
-            box-shadow: 0 4px 12px rgba(230, 81, 0, 0.25);
-        }
-
-        .lvl-pill.active.l4 {
-            background: var(--l4);
-            color: #fff;
-            border-color: var(--l4);
-            box-shadow: 0 4px 12px rgba(106, 27, 154, 0.25);
-        }
-
-        .lvl-pill.active.l5 {
-            background: var(--l5);
-            color: #fff;
-            border-color: var(--l5);
-            box-shadow: 0 4px 12px rgba(183, 28, 28, 0.25);
-        }
-
-        .level-panel {
-            display: none;
-        }
-
-        .level-panel.active {
-            display: block;
-            animation: fadeIn .4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== CARD ===== */
-        .card {
+        /* Top Navigation Header */
+        header.app-header {
             background: var(--bg-card);
-            border: 1px solid #ffd1d5;
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 28px;
-            box-shadow: 6px 6px 0 #ffebeb;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .card:hover {
-            border-color: var(--red);
-            transform: translateY(-2px);
-            box-shadow: 8px 8px 0 #ffd1d5;
-        }
-
-        .card h3 {
-            font-family: var(--display);
-            font-size: 1.15rem;
-            color: var(--ink);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .card h3 .tag {
-            font-family: var(--mono);
-            background: var(--red);
-            color: white;
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-right: 12px;
-            font-weight: 700;
-        }
-
-        .card h3 .lvl-tag {
-            font-family: var(--mono);
-            font-size: 0.72rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-right: 12px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .card h3 .lvl-tag.l1 {
-            background: var(--l1);
-        }
-
-        .card h3 .lvl-tag.l2 {
-            background: var(--l2);
-        }
-
-        .card h3 .lvl-tag.l3 {
-            background: var(--l3);
-        }
-
-        .card h3 .lvl-tag.l4 {
-            background: var(--l4);
-        }
-
-        .card h3 .lvl-tag.l5 {
-            background: var(--l5);
-        }
-
-        .level-desc {
-            background: rgba(225, 6, 0, 0.02);
-            border-left: 4px solid var(--red);
-            border-radius: 0 10px 10px 0;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            color: #374151;
-            line-height: 1.7;
-            font-size: 0.95rem;
-            border-top: 1px solid rgba(225, 6, 0, 0.04);
-            border-right: 1px solid rgba(225, 6, 0, 0.04);
-            border-bottom: 1px solid rgba(225, 6, 0, 0.04);
-        }
-
-        .level-desc strong {
-            color: var(--red-deep);
-        }
-
-        .level-desc ul,
-        .level-desc ol {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-
-        /* ===== INPUTS ===== */
-        label {
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #5a4b4b;
-            display: block;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input[type=text],
-        input[type=number],
-        select,
-        textarea {
-            font-family: var(--mono);
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #ffd1d5;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            background: #ffffff;
-            color: var(--ink);
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--red);
-            box-shadow: 0 0 10px rgba(225, 6, 0, 0.08);
-        }
-
-        .row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .row>div {
-            flex: 1;
-            min-width: 140px;
-        }
-
-        /* ===== BUTTONS ===== */
-        button.action {
-            font-family: var(--display);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--red);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 12px rgba(225, 6, 0, 0.2);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        button.action:hover {
-            background: var(--red-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(225, 6, 0, 0.3);
-        }
-
-        button.action:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 6px rgba(225, 6, 0, 0.2);
-        }
-
-        button.action.ghost {
-            background: transparent;
-            color: var(--red);
-            border: 2px solid var(--red);
-            box-shadow: none;
-        }
-
-        button.action.ghost:hover {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--red-dark);
-            border-color: var(--red-dark);
-        }
-
-        /* ===== OUTPUT ===== */
-        .output {
-            margin-top: 20px;
-            background: #fff8f8;
-            color: #1a0808;
-            font-family: var(--mono);
-            font-size: 0.9rem;
-            border-radius: 10px;
-            padding: 20px;
-            min-height: 60px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            border-left: 4px solid var(--red);
-            border: 1px solid #ffd1d5;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
-        }
-
-        .output .err {
-            color: #b30500;
-            font-weight: bold;
-        }
-
-        .output .com {
-            color: #7f8e9f;
-        }
-
-        .output .lbl {
-            color: #0057b7;
-            font-weight: bold;
-        }
-
-        .output .ok {
-            color: #1e7e34;
-            font-weight: bold;
-        }
-
-        /* ===== TABLE ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            margin-top: 10px;
-        }
-
-        th,
-        td {
-            border: 1px solid #ffd1d5;
-            padding: 12px 14px;
-            text-align: left;
-        }
-
-        th {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--red-deep);
-            text-transform: uppercase;
-            font-size: 0.72rem;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        tr:nth-child(even) {
-            background: rgba(225, 6, 0, 0.01);
-        }
-
-        .progress-bar-wrap {
-            background: rgba(0, 0, 0, 0.04);
-            border-radius: 20px;
-            height: 8px;
-            margin-bottom: 32px;
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 20px;
-            background: linear-gradient(to right, var(--red), #ff7b7b);
-            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .challenge-box {
-            background: rgba(230, 81, 0, 0.02);
-            border: 1px dashed rgba(230, 81, 0, 0.3);
-            border-radius: 12px;
-            padding: 18px;
-            margin-top: 20px;
-        }
-
-        .challenge-box .ch-label {
-            font-family: var(--mono);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--l3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .challenge-box p {
-            color: #374151;
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .indent-demo {
-            font-family: var(--mono);
-            background: #fff8f8;
-            color: #1a0808;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            overflow: auto;
-            border: 1px solid #ffd1d5;
-            margin-top: 10px;
-        }
-
-        .indent-demo .lvl0 {
-            color: #b30500;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl1 {
-            color: #15803d;
-            padding-left: 20px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl2 {
-            color: #b45309;
-            padding-left: 40px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl3 {
-            color: #6a1b9a;
-            padding-left: 60px;
-            display: block;
-            font-weight: bold;
-        }
-
-        .indent-demo .lvl4 {
-            color: #b71c1c;
-            padding-left: 80px;
-            display: block;
-            font-weight: bold;
-        }
-
-        /* ================= VISUALIZERS ================= */
-        .lambda-chain {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-        }
-
-        .lambda-box {
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            padding: 10px 16px;
-            border-radius: 8px;
-            background: #fff8f8;
-            border: 1px solid #ffd1d5;
-        }
-
-        .lambda-box.val {
-            background: var(--red);
-            color: white;
-            border-color: var(--red);
-            box-shadow: 2px 2px 0 var(--red-dark);
-        }
-
-        .lambda-arrow {
-            color: #5a4b4b;
-            font-size: 1.2rem;
-        }
-
-        .rec-stack {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .rec-frame {
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border-left: 4px solid var(--red);
-            background: #FFF;
-            border: 1px solid #ffd1d5;
-            box-shadow: 2px 2px 0 #ffebeb;
-        }
-
-        .rec-frame.top {
-            border-color: var(--red);
-            background: rgba(225, 6, 0, 0.03);
-            font-weight: bold;
-        }
-
-        .deco-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            align-items: flex-start;
-            margin-top: 16px;
-        }
-
-        .deco-layer {
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            padding: 12px 18px;
-            border-radius: 8px;
-            border-left: 3px solid;
-            background: #fff8f8;
-            border: 1px solid #ffd1d5;
-        }
-
-        .deco-layer.outer {
-            border-left-color: var(--red);
-            margin-left: 0;
-        }
-
-        .deco-layer.inner {
-            border-left-color: var(--ink);
-            margin-left: 20px;
-        }
-
-        .deco-layer.core {
-            border-left-color: #5a4b4b;
-            margin-left: 40px;
-            background: #FFF;
-        }
-
-        .loop-track {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 16px;
-            min-height: 40px;
-        }
-
-        .loop-item {
-            font-family: var(--mono);
-            font-size: 0.85rem;
-            background: var(--red);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            animation: pop .2s ease;
-            box-shadow: 2px 2px 0 var(--red-dark);
-        }
-
-        .loop-item.skip {
-            background: var(--bg-main);
-            color: #5a4b4b;
-            border: 1px solid var(--border-color);
-            box-shadow: none;
-        }
-
-        /* ================= DRAG AND DROP CUSTOM STYLES ================= */
-        .game-container {
-            background: #fffafa;
-            color: var(--ink);
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 18px;
-            border: 1px solid #ffd1d5;
-            font-family: var(--mono);
-            box-shadow: inset 0 2px 8px rgba(225, 6, 0, 0.03), 6px 6px 0 #ffebeb;
-        }
-
-        .game-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
-            padding-bottom: 12px;
-            margin-bottom: 18px;
-            font-size: 0.85rem;
-            color: #5a4b4b;
+            z-index: 100;
         }
 
-        .game-score {
-            color: var(--red-deep);
-            font-weight: bold;
-        }
-
-        .items-pool {
-            background: rgba(0, 0, 0, 0.01);
-            padding: 18px;
-            border-radius: 10px;
-            min-height: 80px;
-            margin: 18px 0;
-            border: 1px dashed rgba(0, 0, 0, 0.1);
+        .logo-section {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
             align-items: center;
-            transition: all 0.2s;
+            gap: 0.75rem;
         }
 
-        .items-pool.hovered {
-            background: rgba(225, 6, 0, 0.02);
-            border-color: rgba(225, 6, 0, 0.25);
+        .logo-section .icon {
+            font-size: 1.8rem;
+            color: var(--primary);
         }
 
-        .draggable-item {
-            background: linear-gradient(135deg, var(--red) 0%, #ff5e6d 100%);
-            color: #fff;
-            border: 1px solid var(--red-dark);
-            padding: 10px 18px;
+        .logo-section h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        .logo-section span {
+            color: var(--primary);
+        }
+
+        .nav-levels {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-level-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
             border-radius: 8px;
-            cursor: grab;
-            user-select: none;
-            font-weight: 700;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .nav-level-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .nav-level-btn.active {
+            background-color: var(--primary);
+            color: #FFF;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* Main Workspace Split Layout */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            overflow: hidden;
+            height: calc(100vh - 65px);
+        }
+
+        /* Left Side: Activity Space */
+        .activity-space {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .activity-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-header h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .activity-tabs {
+            display: flex;
+            background: #EAEAEA;
+            padding: 3px;
+            border-radius: 8px;
+        }
+
+        .activity-tab-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1.2rem;
             font-size: 0.8rem;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.15);
-            transition: transform 0.15s, box-shadow 0.15s;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .activity-tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Glassmorphic Panel Cards */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        /* Right Side: Editor & Console Sidebar */
+        .sidebar {
+            border-left: 1px solid var(--border-color);
+            background: var(--bg-card);
+            display: grid;
+            grid-template-rows: 1fr 200px 180px;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            background: #FDFDFD;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Code Sync Viewer */
+        .code-viewer {
+            flex: 1;
+            background: var(--code-bg);
+            padding: 1rem;
+            overflow-y: auto;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--code-text);
+            line-height: 1.6;
+        }
+
+        .code-line {
+            display: flex;
+            gap: 1rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.15s ease;
+        }
+
+        .code-line.active {
+            background: rgba(225, 6, 0, 0.2);
+            border-left: 3px solid var(--primary);
+        }
+
+        .code-line-num {
+            color: #4C566A;
+            user-select: none;
+            width: 20px;
+            text-align: right;
+        }
+
+        /* Console Output */
+        .console-log {
+            flex: 1;
+            background: #0B0E14;
+            color: #A3BE8C;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .console-line {
+            margin-bottom: 0.25rem;
+        }
+
+        .console-prompt {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+
+        .console-success {
+            color: var(--green);
+        }
+
+        .console-error {
+            color: var(--primary);
+        }
+
+        /* Inspector */
+        .inspector-panel {
+            background: #FFF;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .inspector-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .inspector-label {
+            font-family: var(--font-code);
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .inspector-val {
+            font-family: var(--font-code);
+            color: var(--text-main);
+        }
+
+        /* Drag & Drop Classes */
+        .draggable-item {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: grab;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            user-select: none;
         }
 
         .draggable-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 8px var(--primary-glow);
             transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(225, 6, 0, 0.25);
         }
 
         .draggable-item:active {
             cursor: grabbing;
-            transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(225, 6, 0, 0.15);
         }
 
-        .draggable-item.dragging {
-            opacity: 0.4;
-            transform: scale(0.95);
-        }
-
-        .drop-zone {
-            border: 2px dashed rgba(225, 6, 0, 0.2);
+        .drop-target {
+            border: 2px dashed #C3C3C3;
+            background: rgba(0, 0, 0, 0.02);
             border-radius: 8px;
-            min-height: 40px;
-            min-width: 140px;
+            min-height: 38px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
             vertical-align: middle;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-left: 10px;
-            padding: 3px;
-            color: var(--red-deep);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
-        .drop-zone.hovered {
-            border-color: var(--red);
-            background: rgba(225, 6, 0, 0.08);
-            transform: scale(1.05);
+        .drop-target.hovered {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .drop-target.filled {
+            border-style: solid;
+            border-color: var(--border-color);
+            background: var(--bg-card);
+        }
+
+        /* Generic Action Buttons */
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #FFF;
+            border: 1px solid var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            background: #CC0500;
+            border-color: #CC0500;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+            border-color: var(--text-secondary);
+        }
+
+        /* Progressive Hint System UI */
+        .hint-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--orange-light);
+            border: 1px solid #FDE68A;
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.85rem;
+            color: #92400E;
+        }
+
+        .hint-stage-dots {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .hint-dot {
+            width: 8px;
+            height: 8px;
+            background: #FCD34D;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .hint-dot.active {
+            background: var(--orange);
+            box-shadow: 0 0 6px var(--orange);
+        }
+
+        /* ================= LEVEL 1 STYLING ================= */
+        .machine-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 350px;
+            background: linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .machine-body {
+            position: relative;
+            width: 420px;
+            height: 180px;
+            background: #1A1A1A;
+            border: 6px solid #444;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15), inset 0 2px 10px rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFF;
+            z-index: 10;
+        }
+
+        .machine-body::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        .machine-input-funnel {
+            position: absolute;
+            left: -40px;
+            width: 40px;
+            height: 80px;
+            background: #444;
+            clip-path: polygon(0 0, 100% 25%, 100% 75%, 0 100%);
+        }
+
+        .machine-output-funnel {
+            position: absolute;
+            right: -40px;
+            width: 40px;
+            height: 80px;
+            background: #444;
+            clip-path: polygon(0 25%, 100% 0, 100% 100%, 0 75%);
+        }
+
+        .machine-display {
+            font-family: var(--font-code);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #000;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #333;
+        }
+
+        .machine-io-card {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            z-index: 5;
+            opacity: 0;
+        }
+
+        .machine-io-card.input-mode {
+            left: -100px;
+            top: calc(50% - 30px);
+        }
+
+        .machine-io-card.output-mode {
+            right: -100px;
+            top: calc(50% - 30px);
+        }
+
+        /* CSS Animations for Lambda Machine */
+        @keyframes enterMachine {
+            0% {
+                left: -100px;
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            30% {
+                left: 20px;
+                opacity: 1;
+                transform: scale(1.0);
+            }
+            70% {
+                left: 170px;
+                opacity: 1;
+                transform: scale(0.9);
+                background: var(--primary-light);
+            }
+            100% {
+                left: 250px;
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        @keyframes exitMachine {
+            0% {
+                right: 250px;
+                opacity: 0;
+                transform: scale(0.5);
+                background: var(--primary-light);
+            }
+            30% {
+                right: 170px;
+                opacity: 1;
+                transform: scale(0.9);
+            }
+            70% {
+                right: 20px;
+                opacity: 1;
+                transform: scale(1.0);
+            }
+            100% {
+                right: -100px;
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        .animate-input {
+            animation: enterMachine 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .animate-output {
+            animation: exitMachine 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Matcher Grid */
+        .matcher-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .matcher-machine {
+            border: 2px solid var(--border-color);
+            background: #FFF;
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .matcher-machine.success {
+            border-color: var(--green);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+            background: var(--green-light);
+        }
+
+        .matcher-machine.error {
+            animation: shake 0.5s ease;
+            border-color: var(--primary);
             box-shadow: 0 0 15px rgba(225, 6, 0, 0.1);
         }
 
-        .drop-zone .draggable-item {
-            margin: 0;
-            box-shadow: none;
-            padding: 6px 14px;
-            width: 100%;
-            text-align: center;
+        .error-shake {
+            animation: shake 0.5s ease;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 15px rgba(225, 6, 0, 0.25) !important;
         }
 
-        .game-feedback {
-            margin-top: 16px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            padding: 16px;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        /* ================= LEVEL 2 STYLING ================= */
+        /* Elevator Visualizer */
+        .elevator-container {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1.5rem;
+            min-height: 400px;
+            background: #FFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .elevator-shaft {
+            position: relative;
+            background: #F0F0F0;
+            border: 3px solid #DDD;
             border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.3s;
-            border: 1px solid transparent;
+            width: 70px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 0;
         }
 
-        .game-feedback.correct {
-            display: block;
-            background: var(--correct-bg);
-            border-color: var(--correct);
-            color: var(--correct);
-            box-shadow: 0 0 20px rgba(46, 125, 50, 0.05);
+        .elevator-cabin {
+            position: absolute;
+            left: calc(50% - 25px);
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFF;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px var(--primary-glow);
+            transition: bottom 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            bottom: 10px;
+            z-index: 20;
         }
 
-        .game-feedback.wrong {
-            display: block;
-            background: var(--wrong-bg);
-            border-color: var(--wrong);
-            color: var(--wrong);
-            box-shadow: 0 0 20px rgba(183, 28, 28, 0.05);
+        .elevator-cabin::after {
+            content: '⚡';
+            font-size: 1rem;
         }
 
-        .footer-note {
-            text-align: center;
-            font-family: var(--mono);
+        .elevator-floors {
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: flex-start;
+            gap: 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .elevator-floor-row {
+            height: 60px;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            padding-left: 1rem;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .stack-frame-box {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-family: var(--font-code);
             font-size: 0.8rem;
-            color: #5a4b4b;
-            margin-top: 80px;
-            padding-top: 24px;
-            border-top: 1px dashed #ffd1d5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            animation: slideInLeft 0.3s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .stack-frame-box.base-case {
+            border-color: var(--green);
+            background: var(--green-light);
+        }
+
+        /* Maze Visualizer */
+        .maze-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            background: #F5F5F5;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 250px;
+        }
+
+        .maze-room {
+            background: #FFF;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .maze-room.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .maze-room.solved {
+            border-color: var(--green);
+            background: var(--green-light);
+        }
+
+        .detective-avatar {
+            font-size: 2rem;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
+        }
+
+        .key-avatar {
+            font-size: 1.5rem;
+            animation: pulse 1s infinite alternate;
+        }
+
+        /* ================= LEVEL 3 STYLING ================= */
+        .memory-display-space {
+            position: relative;
+            background: #FFF;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-height: 380px;
+            padding: 1.5rem;
+        }
+
+        .memory-col-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .variables-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4.5rem;
+            padding-top: 2rem;
+        }
+
+        .variable-label-box {
+            font-family: var(--font-code);
+            font-size: 1rem;
+            font-weight: 800;
+            background: #FFF;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            color: var(--primary);
+            box-shadow: 0 4px 8px var(--primary-glow);
+            position: relative;
+        }
+
+        .objects-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            position: relative;
+        }
+
+        .object-block-group {
+            border: 2px dashed #CDCDCD;
+            border-radius: 12px;
+            padding: 1rem;
+            background: rgba(0,0,0,0.01);
+            position: relative;
+        }
+
+        .object-memory-block {
+            background: #FFF;
+            border: 2.5px solid var(--text-main);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            display: inline-block;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .object-memory-block.mutated {
+            animation: highlightMutation 0.8s ease;
+        }
+
+        @keyframes highlightMutation {
+            0% { background-color: var(--orange-light); border-color: var(--orange); }
+            100% { background-color: #FFF; border-color: var(--text-main); }
+        }
+
+        .object-id-tag {
+            position: absolute;
+            top: -12px;
+            right: 10px;
+            background: #1A1A1A;
+            color: #FFF;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-code);
+        }
+
+        .ref-element {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #F0F0F0;
+            border-radius: 4px;
+            margin: 2px;
+        }
+
+        .svg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Memory Rescue Scenarios Panel */
+        .rescue-scenarios {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+        }
+
+        .scenario-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .scenario-tab {
+            background: #FFF;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .scenario-tab:hover {
+            border-color: var(--primary);
+        }
+
+        .scenario-tab.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        .scenario-tab h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .scenario-tab p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .scenario-workspace {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #FFF;
+            padding: 1.5rem;
         }
     </style>
 </head>
-
 <body>
 
-    <header class="hero">
-        <h1>Advanced <span>Python Toolkit</span></h1>
-        <p class="sub">Harness the power of functional paradigms. Master anonymous expressions (lambdas), execution
-            recursion stacks, object copying, and function wrapper decorators.</p>
+<div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="logo-section">
+            <div class="icon">⚡</div>
+            <h1>PyExec<span>Lab</span></h1>
+        </div>
+        <nav class="nav-levels">
+            <button class="nav-level-btn active" onclick="switchLevel(1)">Level 1: Lambda Studio</button>
+            <button class="nav-level-btn" onclick="switchLevel(2)">Level 2: Recursion Lab</button>
+            <button class="nav-level-btn" onclick="switchLevel(3)">Level 3: Memory Lab</button>
+        </nav>
     </header>
 
-    <main>
-        <div class="sec-head">
-            <div class="sec-num">// SUBTOPIC 2.5</div>
-            <h2>Recursion · Lambda · Copies · Decorators</h2>
-            <p>Master Python's meta-programming utilities. Work through the 5 progression levels from lambdas and arrays
-                mapping to copy safety and nested wrapper structures.</p>
+    <!-- Main Content Workspace Split -->
+    <div class="workspace">
+        
+        <!-- Left Side: Simulator and Interactions -->
+        <div class="activity-space">
+            
+            <div class="activity-nav">
+                <div class="activity-header">
+                    <h2 id="activity-title">Level 1 - Activity 1</h2>
+                    <p id="activity-desc">Activity instructions appear here.</p>
+                </div>
+                <div class="activity-tabs">
+                    <button class="activity-tab-btn active" id="act-tab-1" onclick="switchActivity(1)">Activity 1</button>
+                    <button class="activity-tab-btn" id="act-tab-2" onclick="switchActivity(2)">Activity 2</button>
+                </div>
+            </div>
+
+            <!-- Top Navigation & Hint Control Bar -->
+            <div class="glass-card" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; border-color: var(--border-color);">
+                <!-- Navigation row -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="navigatePrev()">&larr; Prev</button>
+                    <span id="nav-status" style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">Level 1 - Activity 1</span>
+                    <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="navigateNext()">Next &rarr;</button>
+                </div>
+                
+                <!-- Hint Section -->
+                <div class="hint-bar" style="margin-top: 0.25rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span>💡</span>
+                        <strong id="hint-text" style="font-size: 0.8rem;">Stuck? Request a progressive nudge clue!</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="hint-stage-dots" id="hint-dots">
+                            <div class="hint-dot"></div>
+                            <div class="hint-dot"></div>
+                            <div class="hint-dot"></div>
+                            <div class="hint-dot"></div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: #FFF;" onclick="requestNudgeHint()">Get Clue</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Simulator Visualizer Panel -->
+            <div class="glass-card" id="simulation-panel" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Simulated content dynamically injected here -->
+            </div>
+
         </div>
 
-        <div class="level-strip" id="s5-levels"></div>
-        <div class="progress-bar-wrap">
-            <div class="progress-bar" id="s5-bar" style="width:20%"></div>
+        <!-- Right Side: Synchronized Code, Console & Variable Inspector -->
+        <div class="sidebar">
+            
+            <!-- Code Viewer -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <span>Python Code Synchronizer</span>
+                </div>
+                <div class="code-viewer" id="code-viewer-panel">
+                    <!-- Code lines injected here -->
+                </div>
+            </div>
+
+            <!-- Console Output -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <span>Terminal Console</span>
+                </div>
+                <div class="console-log" id="console-panel">
+                    <div class="console-line"><span class="console-prompt">&gt;&gt;&gt;</span>PyExec Lab ready. Select a level to begin.</div>
+                </div>
+            </div>
+
+            <!-- Object & Variable Inspector -->
+            <div class="sidebar-section" style="border-bottom: none;">
+                <div class="sidebar-title">
+                    <span>Variable & Object Inspector</span>
+                </div>
+                <div class="inspector-panel" id="inspector-panel">
+                    <div class="inspector-grid" id="inspector-grid">
+                        <div class="inspector-label">State</div>
+                        <div class="inspector-val">Ready</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- S5 L1 -->
-        <div class="level-panel active" id="s5-l1">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Anonymous Expressions: lambda</h3>
-                <div class="level-desc" style="background: rgba(0, 87, 183, 0.02); border-left-color: var(--l1);">
-                    <strong>Core Concepts:</strong>
-                    <p>A lambda function is a lightweight, one-line anonymous function defined without a name:</p>
-                    <ul>
-                        <li><strong>Syntax Constraints:</strong> Declared using
-                            <code>lambda arguments: expression</code>. No explicit <code>def</code> or
-                            <code>return</code> keywords are used. The evaluated expression is implicitly returned.
-                        </li>
-                        <li><strong>Single Expression Limit:</strong> Lambdas can contain *only one* expression. They
-                            cannot contain statements (such as assignments <code>=</code> or loops <code>for</code>).
-                        </li>
-                    </ul>
-                </div>
-            </div>
+    </div>
+</div>
 
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l1">LEVEL 1</span>Lambda Expression Compiler</h3>
-                <div class="level-desc">
-                    <strong>Interactive Test:</strong> Choose a lambda mapping operation (e.g. squaring, doubling, or
-                    checking parity) and evaluate input values inline.
-                </div>
-                <div class="row">
-                    <div><label>Operation</label>
-                        <select id="s5l1-op">
-                            <option value="square">x → x²</option>
-                            <option value="double">x → x × 2</option>
-                            <option value="iseven">x → is even?</option>
-                            <option value="greet">name → "Hello, name!"</option>
-                            <option value="add">a, b → a + b</option>
-                        </select>
-                    </div>
-                    <div><label>Input (for two-arg: use comma)</label><input type="text" id="s5l1-input" value="7">
-                    </div>
-                </div>
-                <button class="action" onclick="s5l1Run()">▶ Run Lambda</button>
-                <div class="output" id="s5l1-out">com: pick an operation and enter input</div>
-                <div class="lambda-chain" id="s5l1-chain"></div>
+<script>
+    // System State Manager
+    const state = {
+        currentLevel: 1,
+        currentActivity: 1,
+        hintIndex: 0,
+        isExecuting: false,
+        speedMs: 1000,
+        paused: false,
+        
+        // Level 1 variables
+        l1_act1_machine: 'square', // square, double, even, max, celsius, cube, palindrome
+        l1_act1_slots: { arg: null, exp: null },
+        l1_act2_challenge: 0, // 0: Age, 1: NameLen, 2: Score
+        l1_act2_selection: null,
 
-                <div class="challenge-box">
-                    <div class="ch-label">🎯 Mini-Challenge</div>
-                    <p>Write a lambda that returns the larger of two inputs using an inline ternary operator:
-                        <code>lambda a, b: a if a > b else b</code>. Can a lambda have multiple statements?
-                    </p>
-                </div>
-            </div>
+        // Level 2 variables
+        l2_act1_func: 'factorial', 
+        l2_act1_val: 4,
+        l2_act1_stack: [],
+        l2_act1_step: 0,
+        l2_act1_direction: 'up',
+        l2_elevator_pos: 10,
+        l2_maze_room: 0,
 
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Lambda Expression Sorter</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct body expressions to complete each anonymous lambda
-                    definition!
-                </div>
-                <div class="game-container" id="l1-game">
-                    <div class="game-header">
-                        <span>🎯 Lambda Body Resolver</span>
-                        <span class="game-score">Score: <span id="l1-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px;">
-                            <span>max_val = lambda a, b: </span>
-                            <div class="drop-zone" id="l1-zone-0" data-expected="a if a > b else b"
-                                data-pool-id="l1-pool"></div>
-                        </div>
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px; margin-top:10px;">
-                            <span>sort_key = lambda x: </span>
-                            <div class="drop-zone" id="l1-zone-1" data-expected="x[1]" data-pool-id="l1-pool"></div>
-                        </div>
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px; margin-top:10px;">
-                            <span>is_palindrome = lambda s: </span>
-                            <div class="drop-zone" id="l1-zone-2" data-expected="s == s[::-1]" data-pool-id="l1-pool">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l1-pool">
-                        <div class="draggable-item" id="l1-item-max" draggable="true" data-val="a if a > b else b">a if
-                            a &gt; b else b</div>
-                        <div class="draggable-item" id="l1-item-sort" draggable="true" data-val="x[1]">x[1]</div>
-                        <div class="draggable-item" id="l1-item-pal" draggable="true" data-val="s == s[::-1]">s ==
-                            s[::-1]</div>
-                        <div class="draggable-item" id="l1-item-wrong1" draggable="true" data-val="a if a > b">a if a
-                            &gt; b</div>
-                        <div class="draggable-item" id="l1-item-wrong2" draggable="true" data-val="x[0]">x[0]</div>
-                        <div class="draggable-item" id="l1-item-wrong3" draggable="true" data-val="s[::-1]">s[::-1]
-                        </div>
-                    </div>
-                    <button class="action" onclick="l1Verify()">Verify Lambdas</button>
-                    <div class="game-feedback" id="l1-feedback"></div>
-                </div>
-            </div>
-        </div>
+        // Level 3 variables
+        l3_act1_copyType: 'assign', 
+        l3_act1_x: [10, [20, 30]],
+        l3_act1_y: [10, [20, 30]],
+        l3_act1_mutated: false,
+        l3_act2_scenario: 0, // 0: Config Isolation, 1: Role Security, 2: Dict Override
+        l3_act2_copyOp: null,
+        l3_act2_mutationOp: null
+    };
 
-        <!-- S5 L2 -->
-        <div class="level-panel" id="s5-l2">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Functional Mapping &amp; Filtering</h3>
-                <div class="level-desc" style="background: rgba(46, 125, 50, 0.02); border-left-color: var(--l2);">
-                    <strong>Core Concepts:</strong>
-                    <p>Python provides functional programmers with mapping and filtering utilities to transform arrays:
-                    </p>
-                    <ul>
-                        <li><strong>map(function, iterable):</strong> Applies the target mapping function to every
-                            single item in the input sequence.</li>
-                        <li><strong>filter(function, iterable):</strong> Evaluates each sequence item against a Boolean
-                            function, retaining only elements that yield <code>True</code>.</li>
-                        <li><strong>Lazy Evaluation:</strong> Both <code>map</code> and <code>filter</code> return lazy
-                            iterator generators. To manifest their concrete results into memory, you must wrap them with
-                            <code>list()</code>.
-                        </li>
-                    </ul>
-                </div>
-            </div>
+    // Hint Database
+    const hints = {
+        '1-1': [
+            "A lambda is an anonymous (nameless) function in Python: lambda args: expression.",
+            "Drag variables (like x, a, b, c, or s) to the first slot, and the operation to the second slot.",
+            "For the Even Checker, the input needs to yield a Boolean. Modulo 2 check (x % 2 == 0) is ideal.",
+            "Complete expression template: square = lambda x: x * x. The target output is 25 for input 5."
+        ],
+        '1-2': [
+            "Sort items by passing a lambda key extraction function: list.sort(key=lambda player: key_expr).",
+            "Age extraction can be fetched using player['age'].",
+            "For descending sort, negate the score: -player['score'].",
+            "Place player['age'] for Age sort, len(player['name']) for Name length sort, and -player['score'] for Score sort."
+        ],
+        '2-1': [
+            "Recursion requires a base case to halt and recursive calls to solve subsets.",
+            "Each recursive call pushes a new floor (Stack Frame) onto the call stack.",
+            "Watch variables like n decrease down to the base case, then watch return values carry back down.",
+            "Elevator descends when the base case resolves: factorial(0) returns 1, multiplying recursively."
+        ],
+        '2-2': [
+            "Direct the detective through nested rooms using recursive logic blocks.",
+            "Base Case: If the target room has the key, we should halt and return True.",
+            "Alternative Base Case: If the room is blocked, return False.",
+            "Recursive step: Continue search by recursively calling search(room.next_room)."
+        ],
+        '3-1': [
+            "Assignment (=) creates another label referencing the exact same object ID.",
+            "Shallow copy copies the outer container, but nested sub-structures remain shared pointers.",
+            "Deep copy recursively duplicates everything, making completely independent copies.",
+            "Try Deep Copy, then click Mutate. Observe that only variable X changes, leaving Y isolated."
+        ],
+        '3-2': [
+            "Choose copy.deepcopy(original) when mutating nested lists/dicts to fully isolate variables.",
+            "If only modifying a top-level string (like backup['user'] = 'guest'), shallow copy.copy() is sufficient and efficient.",
+            "Choose the mutation option that updates the backup variable, not the original.",
+            "Challenge 1 & 2 require copy.deepcopy() and nested mutations. Challenge 3 requires copy.copy() and top-level mutation."
+        ]
+    };
 
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l2">LEVEL 2</span>Lazy Array Transformer</h3>
-                <div class="level-desc">
-                    <strong>Interactive Test:</strong> Enter a comma-separated array list, and execute map or filter
-                    transforms using custom lambdas.
-                </div>
-                <div class="row">
-                    <div><label>Numbers (comma-separated)</label><input type="text" id="s5l2-nums"
-                            value="1, 2, 3, 4, 5, 6, 7, 8, 9, 10"></div>
-                </div>
-                <button class="action" onclick="s5l2Map('square')">▶ map(x²)</button>
-                <button class="action ghost" onclick="s5l2Map('double')">▶ map(×2)</button>
-                <button class="action ghost" onclick="s5l2Filter('even')">▼ filter(even)</button>
-                <button class="action ghost" onclick="s5l2Filter('gt5')">▼ filter(&gt;5)</button>
-                <div class="output" id="s5l2-out">com: enter numbers and try map or filter</div>
-                <div class="loop-track" id="s5l2-track"></div>
+    // Code Templates for Sync Panel
+    const codeTemplates = {
+        '1-1': [
+            { line: 1, text: "# Create lambda function" },
+            { line: 2, text: "machine = lambda $ARG: $EXP" },
+            { line: 3, text: "" },
+            { line: 4, text: "# Call lambda expression" },
+            { line: 5, text: "output_val = machine($INPUT)" },
+            { line: 6, text: "print(output_val)" }
+        ],
+        '1-2': [
+            { line: 1, text: "# Custom key sorting demo" },
+            { line: 2, text: "players = [" },
+            { line: 3, text: "    {'name': 'Alice', 'score': 80, 'age': 22}," },
+            { line: 4, text: "    {'name': 'Bob', 'score': 95, 'age': 19}," },
+            { line: 5, text: "    {'name': 'Charlie', 'score': 85, 'age': 25}," },
+            { line: 6, text: "    {'name': 'David', 'score': 90, 'age': 21}" },
+            { line: 7, text: "]" },
+            { line: 8, text: "" },
+            { line: 9, text: "# Sort utilizing lambda key" },
+            { line: 10, text: "players.sort(key=lambda player: $KEY_EXPR)" }
+        ],
+        '2-1': [
+            { line: 1, text: "def recursive_calc(n):" },
+            { line: 2, text: "    # Base case stops recursion" },
+            { line: 3, text: "    if n <= 1: return 1" },
+            { line: 4, text: "    # Recursive case calls function again" },
+            { line: 5, text: "    return n * recursive_calc(n - 1)" }
+        ],
+        '2-2': [
+            { line: 1, text: "def escape_maze(room):" },
+            { line: 2, text: "    # Base Case: Key located" },
+            { line: 3, text: "    if room.has_key: return True" },
+            { line: 4, text: "    # Base Case: Dead end" },
+            { line: 5, text: "    if room.is_blocked: return False" },
+            { line: 6, text: "    # Recursive Case" },
+            { line: 7, text: "    return escape_maze(room.next_room)" }
+        ],
+        '3-1': [
+            { line: 1, text: "import copy" },
+            { line: 2, text: "x = [10, [20, 30]]" },
+            { line: 3, text: "y = $COPY_OP" },
+            { line: 4, text: "" },
+            { line: 5, text: "# Mutate X nested list" },
+            { line: 6, text: "x[1][0] = 99" }
+        ],
+        '3-2': [
+            { line: 1, text: "# Advanced Memory Rescue" },
+            { line: 2, text: "import copy" },
+            { line: 3, text: "original = $SETUP_DICT" },
+            { line: 4, text: "backup = $COPY_OP" },
+            { line: 5, text: "" },
+            { line: 6, text: "# Mutate to test reference safety" },
+            { line: 7, text: "$MUTATION_OP" }
+        ]
+    };
 
-                <div class="challenge-box">
-                    <div class="ch-label">🎯 Mini-Challenge</div>
-                    <p>Chain them: filter the list to keep only even numbers, then map the squares. How would you write
-                        this as a list comprehension: <code>[x**2 for x in nums if x%2==0]</code>?</p>
-                </div>
-            </div>
+    // Code highlighting function
+    function highlightCodeLine(lineNum) {
+        document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+        if (lineNum) {
+            const el = document.getElementById(`code-l-${lineNum}`);
+            if (el) el.classList.add('active');
+        }
+    }
 
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Lazy Chained Pipeline</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct mapping and filtering expressions to build a
-                    functional pipeline that squares only the even numbers in the sequence!
-                </div>
-                <div class="game-container" id="l2-game">
-                    <div class="game-header">
-                        <span>🎯 Chained functional pipeline</span>
-                        <span class="game-score">Score: <span id="l2-score">0</span>/4</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            <span>result = </span>
-                            <div class="drop-zone" id="l2-zone-0" data-expected="map" data-pool-id="l2-pool"></div>
-                            <span>(</span>
-                            <div class="drop-zone" id="l2-zone-1" data-expected="lambda x: x ** 2"
-                                data-pool-id="l2-pool"></div>
-                            <span>, </span>
-                            <div class="drop-zone" id="l2-zone-2" data-expected="filter" data-pool-id="l2-pool"></div>
-                            <span>(</span>
-                            <div class="drop-zone" id="l2-zone-3" data-expected="lambda x: x % 2 == 0"
-                                data-pool-id="l2-pool"></div>
-                            <span>, numbers))</span>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l2-pool">
-                        <div class="draggable-item" id="l2-item-map" draggable="true" data-val="map">map</div>
-                        <div class="draggable-item" id="l2-item-sq" draggable="true" data-val="lambda x: x ** 2">lambda
-                            x: x ** 2</div>
-                        <div class="draggable-item" id="l2-item-filter" draggable="true" data-val="filter">filter</div>
-                        <div class="draggable-item" id="l2-item-even" draggable="true" data-val="lambda x: x % 2 == 0">
-                            lambda x: x % 2 == 0</div>
-                        <div class="draggable-item" id="l2-item-zip" draggable="true" data-val="zip">zip</div>
-                        <div class="draggable-item" id="l2-item-double" draggable="true" data-val="lambda x: x * 2">
-                            lambda x: x * 2</div>
-                        <div class="draggable-item" id="l2-item-odd" draggable="true" data-val="lambda x: x % 2 != 0">
-                            lambda x: x % 2 != 0</div>
-                    </div>
-                    <button class="action" onclick="l2Verify()">Verify Pipeline</button>
-                    <div class="game-feedback" id="l2-feedback"></div>
-                </div>
-            </div>
-        </div>
+    // Terminal printing utility
+    function appendTerminal(msg, status = null) {
+        const panel = document.getElementById('console-panel');
+        const line = document.createElement('div');
+        line.className = 'console-line';
+        let prefix = `<span class="console-prompt">&gt;&gt;&gt;</span>`;
+        let text = msg;
+        if (status === 'success') {
+            text = `<span class="console-success">${msg}</span>`;
+        } else if (status === 'error') {
+            text = `<span class="console-error">${msg}</span>`;
+        }
+        line.innerHTML = `${prefix}${text}`;
+        panel.appendChild(line);
+        panel.scrollTop = panel.scrollHeight;
+    }
 
-        <!-- S5 L3 -->
-        <div class="level-panel" id="s5-l3">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Recursion &amp; Context Stack Frames</h3>
-                <div class="level-desc" style="background: rgba(230, 81, 0, 0.02); border-left-color: var(--l3);">
-                    <strong>Core Concepts:</strong>
-                    <p>Recursion is a programming technique where a function calls itself:</p>
-                    <ul>
-                        <li><strong>Base Case (The Stop Guard):</strong> A conditional branch that returns a value
-                            without making further recursive calls, preventing infinite recursion.</li>
-                        <li><strong>Recursive Case (Reduction):</strong> The path where the function calls itself with a
-                            reduced subset of parameters, moving closer to the base case.</li>
-                        <li><strong>Stack Limits:</strong> Each recursive call creates a new context frame on the
-                            execution stack. To prevent stack overflows, Python limits default recursion depth to 1000
-                            frames.</li>
-                    </ul>
-                </div>
-            </div>
+    function clearTerminal() {
+        document.getElementById('console-panel').innerHTML = '';
+    }
 
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l3">LEVEL 3</span>Recursive Stack Tracer</h3>
-                <div class="level-desc">
-                    <strong>Interactive Test:</strong> Select a recursive function (Factorial, Fibonacci, Sum) and step
-                    value, then execute to watch stack frames push and resolve.
-                </div>
-                <div class="row">
-                    <div><label>Function</label>
-                        <select id="s5l3-func">
-                            <option value="factorial">factorial(n)</option>
-                            <option value="fibonacci">fibonacci(n)</option>
-                            <option value="sum">sum(1..n)</option>
-                        </select>
-                    </div>
-                    <div><label>n</label><input type="number" id="s5l3-n" value="6" min="0" max="15"></div>
-                </div>
-                <button class="action" onclick="s5l3Run()">▶ Trace Recursion</button>
-                <div class="output" id="s5l3-out">com: pick a function and a value of n</div>
-                <div class="rec-stack" id="s5l3-stack"></div>
+    // Level Management
+    function switchLevel(lvlNum) {
+        if (state.isExecuting) return;
+        state.currentLevel = lvlNum;
+        state.currentActivity = 1;
+        state.hintIndex = 0;
+        
+        document.querySelectorAll('.nav-level-btn').forEach((btn, idx) => {
+            if (idx + 1 === lvlNum) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        
+        document.getElementById('act-tab-1').classList.add('active');
+        document.getElementById('act-tab-2').classList.remove('active');
+        
+        resetHintTracker();
+        loadActivity();
+    }
 
-                <div class="challenge-box">
-                    <div class="ch-label">🎯 Mini-Challenge</div>
-                    <p>Select factorial with n=0. Observe how the base case instantly resolves without adding frames.
-                        What occurs if the base case is deleted?</p>
-                </div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Recursive Digit Sum</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct conditionals and recursion components to construct
-                    a valid digit sum reduction function!
-                </div>
-                <div class="game-container" id="l3-game">
-                    <div class="game-header">
-                        <span>🎯 Digit Sum Reduction Stack</span>
-                        <span class="game-score">Score: <span id="l3-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0">def sum_digits(n):</div>
-                        <div class="lvl1" style="display:flex; align-items:center; gap:8px;">
-                            <span>if </span>
-                            <div class="drop-zone" id="l3-zone-0" data-expected="n < 10" data-pool-id="l3-pool"></div>
-                            <span>:</span>
-                        </div>
-                        <div class="lvl2">return n</div>
-                        <div class="lvl1" style="display:flex; align-items:center; gap:8px;">
-                            <span>return </span>
-                            <div class="drop-zone" id="l3-zone-1" data-expected="n % 10" data-pool-id="l3-pool"></div>
-                            <span> + sum_digits(</span>
-                            <div class="drop-zone" id="l3-zone-2" data-expected="n // 10" data-pool-id="l3-pool"></div>
-                            <span>)</span>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l3-pool">
-                        <div class="draggable-item" id="l3-item-basecond" draggable="true" data-val="n < 10">n &lt; 10
-                        </div>
-                        <div class="draggable-item" id="l3-item-mod10" draggable="true" data-val="n % 10">n % 10</div>
-                        <div class="draggable-item" id="l3-item-div10" draggable="true" data-val="n // 10">n // 10</div>
-                        <div class="draggable-item" id="l3-item-wrongcond" draggable="true" data-val="n <= 1">n &lt;= 1
-                        </div>
-                        <div class="draggable-item" id="l3-item-floatdiv" draggable="true" data-val="n / 10">n / 10
-                        </div>
-                        <div class="draggable-item" id="l3-item-neg1" draggable="true" data-val="n - 1">n - 1</div>
-                    </div>
-                    <button class="action" onclick="l3Verify()">Verify Digit Sum</button>
-                    <div class="game-feedback" id="l3-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S5 L4 -->
-        <div class="level-panel" id="s5-l4">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Memory References: Shallow vs Deep Copy</h3>
-                <div class="level-desc" style="background: rgba(106, 27, 154, 0.02); border-left-color: var(--l4);">
-                    <strong>Core Concepts:</strong>
-                    <p>How objects duplicate inside memory affects reference isolation:</p>
-                    <ul>
-                        <li><strong>Assignment (=):</strong> Copies the memory address reference only. Both variables
-                            point to the exact same object. Modifying one modifies the other.</li>
-                        <li><strong>Shallow Copy (copy.copy):</strong> Creates a new outer container, but nested
-                            elements (like sublists) remain shared references. Modifying a nested list modifies both
-                            objects.</li>
-                        <li><strong>Deep Copy (copy.deepcopy):</strong> Fully duplicates all structures recursively,
-                            creating a completely independent copy in memory. Modifying any nested element leaves the
-                            original unchanged.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l4">LEVEL 4</span>Object Cloner Sandbox</h3>
-                <div class="level-desc">
-                    <strong>Interactive Test:</strong> Enter lists and choose clone mappings to watch how mutations
-                    affect original list elements.
-                </div>
-                <div class="row">
-                    <div><label>Original outer list (comma-separated)</label><input type="text" id="s5l4-outer"
-                            value="a, b, c"></div>
-                    <div><label>Nested sub-list (comma-separated)</label><input type="text" id="s5l4-inner"
-                            value="1, 2, 3"></div>
-                </div>
-                <button class="action" onclick="s5l4Demo('assign')">▶ Assignment (=)</button>
-                <button class="action ghost" onclick="s5l4Demo('shallow')">▶ Shallow Copy</button>
-                <button class="action ghost" onclick="s5l4Demo('deep')">▶ Deep Copy</button>
-                <div class="output" id="s5l4-out">com: choose a copy type and see what changes</div>
-
-                <div class="challenge-box">
-                    <div class="ch-label">🎯 Mini-Challenge</div>
-                    <p>Run Shallow Copy, then change nested sublist values. Notice how nested sublists remain shared
-                        references, while outer lists are copied!</p>
-                </div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Copy Identity Classifier</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct assignment or copying statements to satisfy each
-                    memory address id() identity condition!
-                </div>
-                <div class="game-container" id="l4-game">
-                    <div class="game-header">
-                        <span>🎯 copy.copy vs copy.deepcopy identity</span>
-                        <span class="game-score">Score: <span id="l4-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0"># Condition 1: id(ref_a) == id(original) is True (Shared address)</div>
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px;">
-                            <span>ref_a = </span>
-                            <div class="drop-zone" id="l4-zone-0" data-expected="original" data-pool-id="l4-pool"></div>
-                        </div>
-                        <div class="lvl0" style="margin-top:10px;"># Condition 2: Outer is new, but inner is shared:
-                            id(ref_b[0]) == id(original[0]) is True</div>
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px;">
-                            <span>ref_b = </span>
-                            <div class="drop-zone" id="l4-zone-1" data-expected="copy.copy(original)"
-                                data-pool-id="l4-pool"></div>
-                        </div>
-                        <div class="lvl0" style="margin-top:10px;"># Condition 3: Entirely independent nested
-                            structures: id(ref_c[0]) == id(original[0]) is False</div>
-                        <div class="lvl0" style="display:flex; align-items:center; gap:8px;">
-                            <span>ref_c = </span>
-                            <div class="drop-zone" id="l4-zone-2" data-expected="copy.deepcopy(original)"
-                                data-pool-id="l4-pool"></div>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l4-pool">
-                        <div class="draggable-item" id="l4-item-alias" draggable="true" data-val="original">original
-                        </div>
-                        <div class="draggable-item" id="l4-item-shallow" draggable="true"
-                            data-val="copy.copy(original)">copy.copy(original)</div>
-                        <div class="draggable-item" id="l4-item-deep" draggable="true"
-                            data-val="copy.deepcopy(original)">copy.deepcopy(original)</div>
-                        <div class="draggable-item" id="l4-item-bad1" draggable="true" data-val="original.copy()">
-                            original.copy()</div>
-                        <div class="draggable-item" id="l4-item-bad2" draggable="true" data-val="clone(original)">
-                            clone(original)</div>
-                    </div>
-                    <button class="action" onclick="l4Verify()">Verify Copying</button>
-                    <div class="game-feedback" id="l4-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- S5 L5 -->
-        <div class="level-panel" id="s5-l5">
-            <!-- Card 1: THEORY -->
-            <div class="card">
-                <h3><span class="tag">THEORY</span>Decorators &amp; Call Interception</h3>
-                <div class="level-desc" style="background: rgba(183, 28, 28, 0.02); border-left-color: var(--l5);">
-                    <strong>Core Concepts:</strong>
-                    <p>A decorator is a meta-programming utility used to extend the behavior of a function without
-                        modifying its source code:</p>
-                    <ul>
-                        <li><strong>Wrapper Function:</strong> Decorators are functions that take another function as an
-                            argument, wrap it with extra logic (e.g. logging execution speed or validating parameters),
-                            and return the wrapper function.</li>
-                        <li><strong>Sugar Syntax:</strong> Placing <code>@decorator_name</code> directly above a
-                            function declaration is syntactic sugar for <code>func = decorator_name(func)</code>.</li>
-                    </ul>
-                </div>
-                <h4>Decorator Anatomy</h4>
-                <div class="indent-demo">
-                    <span class="lvl0">def logger(func):</span>
-                    <span class="lvl1">def wrapper(*args, **kwargs):</span>
-                    <span class="lvl2">print("Calling...")</span>
-                    <span class="lvl2">res = func(*args) # executes target</span>
-                    <span class="lvl2">return res</span>
-                    <span class="lvl1">return wrapper</span>
-                </div>
-            </div>
-
-            <!-- Card 2: SIMULATOR -->
-            <div class="card">
-                <h3><span class="lvl-tag l5">LEVEL 5</span>Decorator Interceptor</h3>
-                <div class="level-desc">
-                    <strong>Interactive Test:</strong> Choose a decorator style (Timer metrics, Log hooks, or Positive
-                    parameter validation) and execute calls to trace how the decorator wraps the execution flow.
-                </div>
-                <div class="row">
-                    <div><label>Decorator type</label>
-                        <select id="s5l5-deco">
-                            <option value="timer">@timer — measure execution time</option>
-                            <option value="logger">@logger — log calls &amp; return values</option>
-                            <option value="validate">@validate_positive — guard inputs</option>
-                        </select>
-                    </div>
-                    <div><label>Input value</label><input type="number" id="s5l5-val" value="8"></div>
-                </div>
-                <button class="action" onclick="s5l5Run()">▶ Apply Decorator</button>
-                <div class="output" id="s5l5-out">com: pick a decorator and run</div>
-                <div class="deco-wrap" id="s5l5-vis" style="margin-top:12px;display:none;"></div>
-
-                <div class="challenge-box">
-                    <div class="ch-label">🎯 Mini-Challenge</div>
-                    <p>Pick the <code>@validate_positive</code> validator decorator. Input a negative number like
-                        <code>-3</code> and run. Notice how the wrapper intercepts and raises an exception before the
-                        core function runs!
-                    </p>
-                </div>
-            </div>
-
-            <!-- Card 3: PUZZLE -->
-            <div class="card">
-                <h3><span class="tag">PUZZLE</span>Decorator Closure Anatomy</h3>
-                <div class="level-desc">
-                    <strong>The Challenge:</strong> Drag the correct parameter definitions, calls, and return items to
-                    complete a custom wrapper decorator!
-                </div>
-                <div class="game-container" id="l5-game">
-                    <div class="game-header">
-                        <span>🎯 Decorator structural closure</span>
-                        <span class="game-score">Score: <span id="l5-score">0</span>/3</span>
-                    </div>
-                    <div class="indent-demo" style="line-height:2.2;">
-                        <div class="lvl0">def track_calls(func):</div>
-                        <div class="lvl1" style="display:flex; align-items:center; gap:8px;">
-                            <span>def wrapper(</span>
-                            <div class="drop-zone" id="l5-zone-0" data-expected="*args, **kwargs"
-                                data-pool-id="l5-pool"></div>
-                            <span>):</span>
-                        </div>
-                        <div class="lvl2" style="display:flex; align-items:center; gap:8px;">
-                            <span>print(f"Calling {func.__name__}")</span>
-                        </div>
-                        <div class="lvl2" style="display:flex; align-items:center; gap:8px;">
-                            <span>result = </span>
-                            <div class="drop-zone" id="l5-zone-1" data-expected="func(*args, **kwargs)"
-                                data-pool-id="l5-pool"></div>
-                        </div>
-                        <div class="lvl2">return result</div>
-                        <div class="lvl1" style="display:flex; align-items:center; gap:8px;">
-                            <div class="drop-zone" id="l5-zone-2" data-expected="return wrapper" data-pool-id="l5-pool">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="items-pool" id="l5-pool">
-                        <div class="draggable-item" id="l5-item-args" draggable="true" data-val="*args, **kwargs">*args,
-                            **kwargs</div>
-                        <div class="draggable-item" id="l5-item-call" draggable="true" data-val="func(*args, **kwargs)">
-                            func(*args, **kwargs)</div>
-                        <div class="draggable-item" id="l5-item-retwrap" draggable="true" data-val="return wrapper">
-                            return wrapper</div>
-                        <div class="draggable-item" id="l5-item-wrongargs" draggable="true" data-val="args, kwargs">
-                            args, kwargs</div>
-                        <div class="draggable-item" id="l5-item-wrongcall" draggable="true" data-val="func">func</div>
-                        <div class="draggable-item" id="l5-item-wrongret" draggable="true" data-val="return result">
-                            return result</div>
-                    </div>
-                    <button class="action" onclick="l5Verify()">Verify Decorator Anatomy</button>
-                    <div class="game-feedback" id="l5-feedback"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-note">Module 2 · Decision Making &amp; Functions · Section 2.5</div>
-    </main>
-
-    <script>
-        const SUBTOPIC = 's5';
-        const LEVEL_LABELS = [
-            { cls: 'l1', label: 'Level 1 · Lambda expressions' },
-            { cls: 'l2', label: 'Level 2 · Chained map &amp; filter' },
-            { cls: 'l3', label: 'Level 3 · Recursive Digit Sum' },
-            { cls: 'l4', label: 'Level 4 · Copy Memory &amp; id() Identity' },
-            { cls: 'l5', label: 'Level 5 · Decorator wrapper closure' },
-        ];
-
-        const strip = document.getElementById(`${SUBTOPIC}-levels`);
-        LEVEL_LABELS.forEach((lv, i) => {
-            const btn = document.createElement('button');
-            btn.className = `lvl-pill ${lv.cls}${i === 0 ? ' active' : ''}`;
-            btn.innerHTML = lv.label;
-            btn.onclick = () => switchLevel(SUBTOPIC, i + 1, btn);
-            strip.appendChild(btn);
+    function switchActivity(actNum) {
+        if (state.isExecuting) return;
+        state.currentActivity = actNum;
+        state.hintIndex = 0;
+        
+        document.querySelectorAll('.activity-tab-btn').forEach((btn, idx) => {
+            if (idx + 1 === actNum) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
 
-        function switchLevel(st, num, btn) {
-            document.querySelectorAll(`#${st}-levels .lvl-pill`).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll(`.level-panel`).forEach(p => p.classList.remove('active'));
-            document.getElementById(`${st}-l${num}`).classList.add('active');
-            document.getElementById(`${st}-bar`).style.width = (num * 20) + '%';
-        }
+        resetHintTracker();
+        loadActivity();
+    }
 
-        // ===================== DRAG & DROP UTILITIES =====================
-        function dragStart(e) {
-            e.dataTransfer.setData("text/plain", e.target.id);
-            e.target.classList.add("dragging");
-        }
-        function dragEnd(e) {
-            e.target.classList.remove("dragging");
-        }
-        function dragOver(e) {
-            e.preventDefault();
-        }
-        function dragEnter(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add("hovered");
-        }
-        function dragLeave(e) {
-            e.currentTarget.classList.remove("hovered");
-        }
-        function dropItem(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove("hovered");
-            const id = e.dataTransfer.getData("text/plain");
-            const draggable = document.getElementById(id);
-            let target = e.currentTarget;
-
-            if (target.classList.contains("drop-zone") || target.classList.contains("items-pool") || target.classList.contains("bucket")) {
-                if (target.classList.contains("drop-zone") && target.children.length > 0) {
-                    const existing = target.children[0];
-                    document.getElementById(existing.dataset.poolId || target.dataset.poolId).appendChild(existing);
-                }
-                target.appendChild(draggable);
-                if (target.classList.contains("drop-zone")) {
-                    draggable.dataset.poolId = target.dataset.poolId;
-                }
+    function navigatePrev() {
+        if (state.isExecuting) return;
+        if (state.currentActivity === 2) {
+            switchActivity(1);
+        } else if (state.currentActivity === 1) {
+            if (state.currentLevel === 2) {
+                switchLevel(1);
+                switchActivity(2);
+            } else if (state.currentLevel === 3) {
+                switchLevel(2);
+                switchActivity(2);
             }
         }
-        function shufflePools() {
-            document.querySelectorAll(".items-pool").forEach(pool => {
-                const items = Array.from(pool.children);
-                for (let i = items.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [items[i], items[j]] = [items[j], items[i]];
-                }
-                items.forEach(item => pool.appendChild(item));
-            });
-        }
-        function initDragAndDrop() {
-            document.querySelectorAll(".draggable-item").forEach(item => {
-                item.addEventListener("dragstart", dragStart);
-                item.addEventListener("dragend", dragEnd);
-            });
-            document.querySelectorAll(".drop-zone, .items-pool, .bucket").forEach(zone => {
-                zone.addEventListener("dragover", dragOver);
-                zone.addEventListener("dragenter", dragEnter);
-                zone.addEventListener("dragleave", dragLeave);
-                zone.addEventListener("drop", dropItem);
-            });
-        }
+    }
 
-        // ===================== PUZZLE VERIFICATIONS =====================
-        function l1Verify() {
-            const slots = ['l1-zone-0', 'l1-zone-1', 'l1-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l1-score').textContent = score;
-            const feedback = document.getElementById('l1-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Perfect! You matched all the advanced lambda equations correctly!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Some lambda equations are incorrect. Verify mapping arguments. Reshuffling!';
-                shufflePools();
+    function navigateNext() {
+        if (state.isExecuting) return;
+        if (state.currentActivity === 1) {
+            switchActivity(2);
+        } else if (state.currentActivity === 2) {
+            if (state.currentLevel === 1) {
+                switchLevel(2);
+                switchActivity(1);
+            } else if (state.currentLevel === 2) {
+                switchLevel(3);
+                switchActivity(1);
             }
         }
+    }
 
-        function l2Verify() {
-            const slots = ['l2-zone-0', 'l2-zone-1', 'l2-zone-2', 'l2-zone-3'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
+    // Hints
+    function resetHintTracker() {
+        const dots = document.getElementById('hint-dots');
+        dots.innerHTML = `
+            <div class="hint-dot"></div>
+            <div class="hint-dot"></div>
+            <div class="hint-dot"></div>
+            <div class="hint-dot"></div>
+        `;
+        document.getElementById('hint-text').textContent = "Stuck? Request a progressive nudge clue!";
+    }
+
+    function requestNudgeHint() {
+        const key = `${state.currentLevel}-${state.currentActivity}`;
+        const activeHints = hints[key];
+        if (!activeHints) return;
+
+        if (state.hintIndex < activeHints.length) {
+            const textEl = document.getElementById('hint-text');
+            textEl.textContent = activeHints[state.hintIndex];
+            
+            const dots = document.querySelectorAll('#hint-dots .hint-dot');
+            if (dots[state.hintIndex]) {
+                dots[state.hintIndex].classList.add('active');
+            }
+            state.hintIndex++;
+        } else {
+            document.getElementById('hint-text').textContent = "That is all the hints available for this activity!";
+        }
+    }
+
+    // Sync Code panel renderer
+    function renderCodeSync() {
+        const key = `${state.currentLevel}-${state.currentActivity}`;
+        const template = codeTemplates[key];
+        const panel = document.getElementById('code-viewer-panel');
+        panel.innerHTML = '';
+
+        if (!template) return;
+
+        template.forEach(lineObj => {
+            let lineText = lineObj.text;
+            
+            // Replace placeholders based on state
+            if (key === '1-1') {
+                const arg = state.l1_act1_slots.arg || '_____';
+                const exp = state.l1_act1_slots.exp || '_____';
+                let inputVal = '5';
+                if (state.l1_act1_machine === 'double') inputVal = '12';
+                if (state.l1_act1_machine === 'even') inputVal = '8';
+                if (state.l1_act1_machine === 'max') inputVal = '9, 4';
+                if (state.l1_act1_machine === 'celsius') inputVal = '20';
+                if (state.l1_act1_machine === 'cube') inputVal = '3';
+                if (state.l1_act1_machine === 'palindrome') inputVal = "'radar'";
+                
+                lineText = lineText.replace('$ARG', arg).replace('$EXP', exp).replace('$INPUT', inputVal);
+            } else if (key === '1-2') {
+                let keyExpr = '_____';
+                if (state.l1_act2_selection) {
+                    if (state.l1_act2_selection === 'age') keyExpr = 'player["age"]';
+                    if (state.l1_act2_selection === 'namelen') keyExpr = 'len(player["name"])';
+                    if (state.l1_act2_selection === 'score') keyExpr = '-player["score"]';
+                    if (state.l1_act2_selection === 'score-asc') keyExpr = 'player["score"]';
+                    if (state.l1_act2_selection === 'name') keyExpr = 'player["name"]';
+                }
+                lineText = lineText.replace('$KEY_EXPR', keyExpr);
+            } else if (key === '3-1') {
+                let copyOp = 'x';
+                if (state.l3_act1_copyType === 'shallow') copyOp = 'copy.copy(x)';
+                if (state.l3_act1_copyType === 'deep') copyOp = 'copy.deepcopy(x)';
+                lineText = lineText.replace('$COPY_OP', copyOp);
+            } else if (key === '3-2') {
+                let setupDict = '{"user": "sys_admin", "roles": ["read", "write"], "config": {"theme": "dark", "zoom": 1.2}}';
+                let copyOp = '_____';
+                if (state.l3_act2_copyOp === 'assign') copyOp = 'original';
+                if (state.l3_act2_copyOp === 'shallow') copyOp = 'copy.copy(original)';
+                if (state.l3_act2_copyOp === 'deep') copyOp = 'copy.deepcopy(original)';
+
+                let mutationOp = '_____';
+                if (state.l3_act2_mutationOp) {
+                    if (state.l3_act2_mutationOp === 'zoom') mutationOp = 'backup["config"]["zoom"] = 1.5';
+                    if (state.l3_act2_mutationOp === 'roles') mutationOp = 'backup["roles"].append("root")';
+                    if (state.l3_act2_mutationOp === 'user') mutationOp = 'backup["user"] = "guest"';
+                    if (state.l3_act2_mutationOp === 'orig-zoom') mutationOp = 'original["config"]["zoom"] = 1.5';
+                }
+                
+                lineText = lineText.replace('$SETUP_DICT', setupDict).replace('$COPY_OP', copyOp).replace('$MUTATION_OP', mutationOp);
+            }
+
+            const div = document.createElement('div');
+            div.className = 'code-line';
+            div.id = `code-l-${lineObj.line}`;
+            div.innerHTML = `<span class="code-line-num">${lineObj.line}</span><span>${escapeHtml(lineText)}</span>`;
+            panel.appendChild(div);
+        });
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Drag and Drop Helper setup
+    function setupDragAndDrop() {
+        const draggables = document.querySelectorAll('.draggable-item');
+        const dropTargets = document.querySelectorAll('.drop-target');
+
+        draggables.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.id);
+                e.target.classList.add('dragging');
+            });
+
+            item.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+            });
+        });
+
+        dropTargets.forEach(target => {
+            target.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                target.classList.add('hovered');
+            });
+
+            target.addEventListener('dragleave', () => {
+                target.classList.remove('hovered');
+            });
+
+            target.addEventListener('drop', (e) => {
+                e.preventDefault();
+                target.classList.remove('hovered');
+                const itemId = e.dataTransfer.getData('text/plain');
+                const draggedItem = document.getElementById(itemId);
+                
+                if (draggedItem && (draggedItem.dataset.pool === target.dataset.pool)) {
+                    // Place inside target
+                    target.innerHTML = '';
+                    const clone = draggedItem.cloneNode(true);
+                    clone.style.margin = '0';
+                    clone.style.width = '100%';
+                    clone.style.textAlign = 'center';
+                    clone.classList.remove('dragging');
+                    target.appendChild(clone);
+                    target.classList.add('filled');
+                    
+                    // Trigger callback
+                    handleDropCallback(target.id, draggedItem.dataset.val);
                 }
             });
-            document.getElementById('l2-score').textContent = score;
-            const feedback = document.getElementById('l2-feedback');
-            if (score === 4) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Excellent! You have correctly chained the map and filter pipelines using lambda parameters!';
+        });
+    }
+
+    // Load Level & Activity
+    function loadActivity() {
+        const visualPanel = document.getElementById('simulation-panel');
+        visualPanel.innerHTML = '';
+        state.isExecuting = false;
+
+        const levelTitle = document.getElementById('activity-title');
+        const levelDesc = document.getElementById('activity-desc');
+
+        if (state.currentLevel === 1) {
+            if (state.currentActivity === 1) {
+                levelTitle.textContent = "Level 1.1: The Lambda Machine";
+                levelDesc.textContent = "Drag parameters and expressions to configure the functional lambda machine.";
+                loadL1A1(visualPanel);
             } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Incorrect lambda pipeline arrangement. Check nesting of map/filter functions. Reshuffling!';
-                shufflePools();
+                levelTitle.textContent = "Level 1.2: Function Matcher Challenge";
+                levelDesc.textContent = "Complete mapping/matching of lambdas onto the target function nodes.";
+                loadL1A2(visualPanel);
             }
-        }
-
-        function l3Verify() {
-            const slots = ['l3-zone-0', 'l3-zone-1', 'l3-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l3-score').textContent = score;
-            const feedback = document.getElementById('l3-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Correct! The function uses modular reduction n % 10 to extract the last digit, and recursive floor division n // 10 to process the rest!';
+        } else if (state.currentLevel === 2) {
+            if (state.currentActivity === 1) {
+                levelTitle.textContent = "Level 2.1: The Recursive Elevator";
+                levelDesc.textContent = "Observe function stack frames pile up as the elevator moves vertically.";
+                loadL2A1(visualPanel);
             } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Recursion logic error. Check the base case guard, remainder modulo, and division reduction steps. Reshuffling!';
-                shufflePools();
+                levelTitle.textContent = "Level 2.2: Recursive Maze Escape";
+                levelDesc.textContent = "Configure target code options to guide the detective to the escape key room.";
+                loadL2A2(visualPanel);
             }
-        }
-
-        function l4Verify() {
-            const slots = ['l4-zone-0', 'l4-zone-1', 'l4-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l4-score').textContent = score;
-            const feedback = document.getElementById('l4-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Flawless! Assignment references the same cell, copy.copy creates a new outer layer with shared elements, and copy.deepcopy clones everything!';
+        } else if (state.currentLevel === 3) {
+            if (state.currentActivity === 1) {
+                levelTitle.textContent = "Level 3.1: Memory Clone Factory";
+                levelDesc.textContent = "Analyze address pointer mapping changes under Assignment vs Copy operations.";
+                loadL3A1(visualPanel);
             } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Incorrect copy type behaviors. Review memory reference assertions. Reshuffling!';
-                shufflePools();
-            }
-        }
-
-        function l5Verify() {
-            const slots = ['l5-zone-0', 'l5-zone-1', 'l5-zone-2'];
-            let score = 0;
-            slots.forEach(sid => {
-                const zone = document.getElementById(sid);
-                if (zone.children.length > 0 && zone.children[0].dataset.val === zone.dataset.expected) {
-                    score++;
-                }
-            });
-            document.getElementById('l5-score').textContent = score;
-            const feedback = document.getElementById('l5-feedback');
-            if (score === 3) {
-                feedback.className = 'game-feedback correct';
-                feedback.innerHTML = '🎉 Perfect! The wrapper closure intercepts any arguments (*args, **kwargs), executes the original func, and the decorator returns the wrapper function object!';
-            } else {
-                feedback.className = 'game-feedback wrong';
-                feedback.innerHTML = '❌ Incorrect decorator architecture. Check wrapper parameters, execution call, and returned closures. Reshuffling!';
-                shufflePools();
-            }
-        }
-
-        // ===================== SIMULATION LOGIC =====================
-        function s5l1Run() {
-            const op = document.getElementById('s5l1-op').value;
-            const inp = document.getElementById('s5l1-input').value.trim();
-            const out = document.getElementById('s5l1-out');
-            const chain = document.getElementById('s5l1-chain');
-            let expr, result, args;
-            if (op === 'square') { expr = 'lambda x: x**2'; const x = parseFloat(inp) || 0; result = x * x; args = `x=${x}`; }
-            else if (op === 'double') { expr = 'lambda x: x*2'; const x = parseFloat(inp) || 0; result = x * 2; args = `x=${x}`; }
-            else if (op === 'iseven') { expr = 'lambda x: x%2==0'; const x = parseInt(inp) || 0; result = x % 2 === 0; args = `x=${x}`; }
-            else if (op === 'greet') { expr = 'lambda name: f"Hello, {name}!"'; result = `Hello, ${inp}!`; args = `name="${inp}"`; }
-            else { expr = 'lambda a, b: a+b'; const parts = inp.split(','); const a = parseFloat(parts[0]) || 0; const b = parseFloat(parts[1]) || 0; result = a + b; args = `a=${a}, b=${b}`; }
-            out.innerHTML =
-                `<span class="com">>>> # lambda — anonymous one-line function</span>
-fn = ${expr}
-
-fn(${args})
-<span class="ok">→ ${result}</span>
-
-<span class="com"># Equivalent def version:</span>
-def fn(${args.split('=')[0]}):
-    return <span style="color:#ffd97d">${expr.split(':')[1].trim()}</span>`;
-            chain.innerHTML = `
-    <div class="lambda-box fn">lambda ${args.split('=')[0].split(',').join(', ')}</div>
-    <div class="lambda-arrow">→</div>
-    <div class="lambda-box fn">${expr.split(':')[1].trim()}</div>
-    <div class="lambda-arrow">→</div>
-    <div class="lambda-box val">${result}</div>`;
-        }
-
-        function s5l2Map(type) {
-            const raw = document.getElementById('s5l2-nums').value;
-            const nums = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-            const out = document.getElementById('s5l2-out');
-            const track = document.getElementById('s5l2-track');
-            let result, expr;
-            if (type === 'square') { result = nums.map(n => n * n); expr = 'lambda x: x**2'; }
-            else { result = nums.map(n => n * 2); expr = 'lambda x: x*2'; }
-            out.innerHTML =
-                `<span class="com">>>> list(map(${expr}, nums))</span>
-nums    →  [${nums.join(', ')}]
-result  →  [${result.join(', ')}]
-<span class="ok">map() applies the function to EVERY element</span>
-<span class="com"># map() is lazy — wrap with list() to materialise</span>`;
-            track.innerHTML = result.map(v => `<div class="loop-item">${v}</div>`).join('');
-        }
-
-        function s5l2Filter(type) {
-            const raw = document.getElementById('s5l2-nums').value;
-            const nums = raw.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-            const out = document.getElementById('s5l2-out');
-            const track = document.getElementById('s5l2-track');
-            let result, expr, skipped;
-            if (type === 'even') { result = nums.filter(n => n % 2 === 0); skipped = nums.filter(n => n % 2 !== 0); expr = 'lambda x: x%2==0'; }
-            else { result = nums.filter(n => n > 5); skipped = nums.filter(n => n <= 5); expr = 'lambda x: x>5'; }
-            out.innerHTML =
-                `<span class="com">>>> list(filter(${expr}, nums))</span>
-nums     →  [${nums.join(', ')}]
-kept     →  [${result.join(', ')}]   <span class="ok">← passes filter</span>
-removed  →  [${skipped.join(', ')}]  <span class="err">← filtered out</span>
-<span class="ok">filter() keeps only elements where function returns True</span>`;
-            track.innerHTML = nums.map(n => {
-                const keep = (type === 'even' ? n % 2 === 0 : n > 5);
-                return `<div class="loop-item ${keep ? '' : 'skip'}">${n}</div>`;
-            }).join('');
-        }
-
-        function s5l3Run() {
-            const func = document.getElementById('s5l3-func').value;
-            const n = parseInt(document.getElementById('s5l3-n').value) || 6;
-            const out = document.getElementById('s5l3-out');
-            const stack = document.getElementById('s5l3-stack');
-            let frames = [], result;
-            if (func === 'factorial') {
-                let r = 1;
-                for (let i = n; i >= 0; i--) {
-                    if (i === 0) frames.push(`factorial(0) → BASE CASE → return 1`);
-                    else frames.push(`factorial(${i}) = ${i} × factorial(${i - 1})`);
-                    if (i > 0) r *= i;
-                }
-                result = r;
-                out.innerHTML =
-                    `<span class="com">>>> def factorial(n):</span>
-        if n == 0: return 1   <span class="ok">← base case</span>
-        return n * factorial(n-1)   <span class="com">← recursive case</span>
-
-factorial(${n})
-<span class="ok">→ ${result}</span>`;
-            } else if (func === 'fibonacci') {
-                function fib(k) { return k <= 1 ? k : fib(k - 1) + fib(k - 2); }
-                result = fib(n);
-                for (let i = 0; i <= n; i++)frames.push(`fib(${i}) → ${fib(i)}`);
-                out.innerHTML =
-                    `<span class="com">>>> def fib(n):</span>
-        if n <= 1: return n       <span class="ok">← base case</span>
-        return fib(n-1)+fib(n-2)  <span class="com">← two recursive calls</span>
-
-fib(${n})  →  <span class="ok">${result}</span>
-<span class="warn">⚠ Exponential time complexity O(2ⁿ) — use memoisation for large n!</span>`;
-            } else {
-                result = n * (n + 1) / 2;
-                for (let i = n; i >= 0; i--)frames.push(`sum(${i}) = ${i} + sum(${i - 1})` + (i === 0 ? ' → BASE CASE → 0' : ''));
-                out.innerHTML =
-                    `<span class="com">>>> def total(n):</span>
-        if n == 0: return 0       <span class="ok">← base case</span>
-        return n + total(n-1)     <span class="com">← recursive case</span>
-
-total(${n})
-<span class="ok">→ ${result}  (= ${n}×(${n}+1)/2 — Gauss formula)</span>`;
-            }
-            stack.innerHTML = frames.slice(0, 8).map((f, i) =>
-                `<div class="rec-frame ${i === 0 ? 'top' : ''}">${f}</div>`
-            ).join('');
-        }
-
-        function s5l4Demo(type) {
-            const outerRaw = document.getElementById('s5l4-outer').value.split(',').map(s => s.trim());
-            const innerRaw = document.getElementById('s5l4-inner').value.split(',').map(s => s.trim());
-            const out = document.getElementById('s5l4-out');
-            if (type === 'assign') {
-                out.innerHTML =
-                    `<span class="com">>>> original = [${JSON.stringify(outerRaw)}, [${innerRaw.join(', ')}]]</span>
-copy = original   <span class="com"># assignment — same object!</span>
-
-copy[1].append("NEW")
-print(original[1])   <span class="err">→ [${innerRaw.join(', ')}, NEW]   ← ALSO CHANGED!</span>
-
-<span class="err">⚠ Assignment copies the REFERENCE, not the data.</span>
-<span class="err">  Modifying copy modifies original too!</span>
-<span class="com">  id(original) == id(copy)  →  True</span>`;
-            } else if (type === 'shallow') {
-                out.innerHTML =
-                    `<span class="com">>>> import copy</span>
-original = [${JSON.stringify(outerRaw)}, [${innerRaw.join(', ')}]]
-shallow = copy.copy(original)
-
-shallow.append("extra")
-print(original)    <span class="ok">→ unchanged (outer list is copied)</span>
-
-shallow[1].append("NEW")
-print(original[1]) <span class="err">→ [${innerRaw.join(', ')}, NEW]   ← inner list STILL SHARED!</span>
-
-<span class="warn">⚠ Shallow copy: outer structure is independent,</span>
-<span class="warn">  but nested objects are still the SAME references.</span>`;
-            } else {
-                out.innerHTML =
-                    `<span class="com">>>> import copy</span>
-original = [${JSON.stringify(outerRaw)}, [${innerRaw.join(', ')}]]
-deep = copy.deepcopy(original)
-
-deep[1].append("NEW")
-print(original[1]) <span class="ok">→ [${innerRaw.join(', ')}]   ← UNCHANGED ✅</span>
-print(deep[1])     <span class="ok">→ [${innerRaw.join(', ')}, NEW]</span>
-
-<span class="ok">✅ Deep copy: ALL levels are fully independent.</span>
-<span class="com">   More memory + slower, but completely safe.</span>
-<span class="com">   Use deepcopy when nested mutable objects exist.</span>`;
+                levelTitle.textContent = "Level 3.2: Memory Rescue Challenge";
+                levelDesc.textContent = "Resolve shared reference leaks in patient logs, cart systems, or robot parameters.";
+                loadL3A2(visualPanel);
             }
         }
 
-        function s5l5Run() {
-            const deco = document.getElementById('s5l5-deco').value;
-            const val = parseInt(document.getElementById('s5l5-val').value) || 8;
-            const out = document.getElementById('s5l5-out');
-            const vis = document.getElementById('s5l5-vis');
-            vis.style.display = 'block';
-            if (deco === 'timer') {
-                const fakeTime = (val * 1.23).toFixed(3);
-                out.innerHTML =
-                    `<span class="com">>>> @timer</span>
-def factorial(n):
-    result = 1
-    for i in range(1, n+1):
-        result *= i
-    return result
+        renderCodeSync();
+        updateInspector();
 
-<span class="com">--- @timer wraps the call ---</span>
-[TIMER] factorial(${val}) called...
-<span class="ok">factorial(${val}) = ${[...Array(val)].reduce((a, b, i) => a * (i + 1), 1)}</span>
-[TIMER] Execution time: ${fakeTime} ms`;
-                vis.innerHTML = `
-<div class="deco-layer outer">@timer — outer wrapper: records start time</div>
-<div class="deco-layer inner">wrapper(*args) — calls original + measures</div>
-<div class="deco-layer core">factorial(${val}) — original function runs here</div>`;
-            } else if (deco === 'logger') {
-                const result = [...Array(val)].reduce((a, b, i) => a * (i + 1), 1);
-                out.innerHTML =
-                    `<span class="com">>>> @logger</span>
-def factorial(n):
-    ...
+        const navStatus = document.getElementById('nav-status');
+        if (navStatus) {
+            navStatus.textContent = `Level ${state.currentLevel} - Activity ${state.currentActivity}`;
+        }
+    }
 
-<span class="com">--- @logger intercepts ---</span>
-[LOG] Calling factorial with args=(${val},) kwargs={}
-<span class="ok">[LOG] factorial returned: ${result}</span>
-<span class="com"># functools.wraps preserves factorial.__name__ and __doc__</span>`;
-                vis.innerHTML = `
-<div class="deco-layer outer">@logger — logs: function name, args, return value</div>
-<div class="deco-layer inner">wrapper(*args, **kwargs) — calls + captures result</div>
-<div class="deco-layer core">factorial(${val}) → ${result}</div>`;
+    // Handle Drop Callbacks
+    function handleDropCallback(targetId, value) {
+        if (state.currentLevel === 1) {
+            if (state.currentActivity === 1) {
+                if (targetId === 'l1a1-arg-slot') state.l1_act1_slots.arg = value;
+                if (targetId === 'l1a1-exp-slot') state.l1_act1_slots.exp = value;
             } else {
-                if (val <= 0) {
-                    out.innerHTML = `<span class="err">@validate_positive caught: ValueError — Input must be positive, got ${val}</span>`;
-                    vis.innerHTML = `<div class="deco-layer outer">@validate_positive — guard fires! ❌</div><div class="deco-layer inner">raises ValueError before calling original</div>`;
+                if (targetId === 'l1a2-sort-slot') state.l1_act2_selection = value;
+            }
+        } else if (state.currentLevel === 2) {
+            if (state.currentActivity === 2) {
+                if (targetId === 'l2a2-base-slot') state.l2_maze_base = value;
+                if (targetId === 'l2a2-rec-slot') state.l2_maze_rec = value;
+            }
+        } else if (state.currentLevel === 3) {
+            if (state.currentActivity === 2) {
+                if (targetId === 'l3a2-copy-slot') state.l3_act2_copyOp = value;
+                if (targetId === 'l3a2-mutation-slot') state.l3_act2_mutationOp = value;
+            }
+        }
+        renderCodeSync();
+    }
+
+    // Update variable inspector
+    function updateInspector(data = {}) {
+        const grid = document.getElementById('inspector-grid');
+        grid.innerHTML = '';
+        
+        let inspectItems = [];
+
+        if (state.currentLevel === 1) {
+            inspectItems = [
+                { label: 'Active Machine', val: state.l1_act1_machine.toUpperCase() },
+                { label: 'Parameters', val: state.l1_act1_slots.arg || 'None' },
+                { label: 'Expression', val: state.l1_act1_slots.exp || 'None' }
+            ];
+        } else if (state.currentLevel === 2) {
+            inspectItems = [
+                { label: 'Recursion Depth', val: state.l2_act1_stack.length },
+                { label: 'Stack Size', val: `${state.l2_act1_stack.length * 64} bytes` },
+                { label: 'Current n', val: state.l2_act1_stack.length > 0 ? state.l2_act1_stack[state.l2_act1_stack.length - 1].n : 'None' }
+            ];
+        } else if (state.currentLevel === 3) {
+            const xAddr = '0x7FEE' + Math.abs(xHashCode(JSON.stringify(state.l3_act1_x))).toString(16).toUpperCase().substring(0, 4);
+            const yAddr = '0x7FEE' + Math.abs(xHashCode(JSON.stringify(state.l3_act1_y))).toString(16).toUpperCase().substring(0, 4);
+            const xInnerAddr = '0x7FF0' + Math.abs(xHashCode(JSON.stringify(state.l3_act1_x[1]))).toString(16).toUpperCase().substring(0, 4);
+            const yInnerAddr = '0x7FF0' + Math.abs(xHashCode(JSON.stringify(state.l3_act1_y[1]))).toString(16).toUpperCase().substring(0, 4);
+
+            inspectItems = [
+                { label: 'x ID', val: xAddr },
+                { label: 'y ID', val: yAddr },
+                { label: 'x[1] ID (nested)', val: xInnerAddr },
+                { label: 'y[1] ID (nested)', val: yInnerAddr },
+                { label: 'x Values', val: JSON.stringify(state.l3_act1_x) },
+                { label: 'y Values', val: JSON.stringify(state.l3_act1_y) }
+            ];
+        }
+
+        inspectItems.forEach(item => {
+            const lbl = document.createElement('div');
+            lbl.className = 'inspector-label';
+            lbl.textContent = item.label;
+            const val = document.createElement('div');
+            val.className = 'inspector-val';
+            val.textContent = item.val;
+            grid.appendChild(lbl);
+            grid.appendChild(val);
+        });
+    }
+
+    function xHashCode(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return hash;
+    }
+
+    // ==============================================================
+    // LEVEL 1: LAMBDA STUDIO IMPLEMENTATION
+    // ==============================================================
+    
+    function loadL1A1(container) {
+        container.innerHTML = `
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                <button class="nav-level-btn ${state.l1_act1_machine === 'square' ? 'active' : ''}" onclick="selectL1Machine('square')">Square (x²)</button>
+                <button class="nav-level-btn ${state.l1_act1_machine === 'double' ? 'active' : ''}" onclick="selectL1Machine('double')">Doubler (x*2)</button>
+                <button class="nav-level-btn ${state.l1_act1_machine === 'even' ? 'active' : ''}" onclick="selectL1Machine('even')">Even Checker</button>
+                <button class="nav-level-btn ${state.l1_act1_machine === 'max' ? 'active' : ''}" onclick="selectL1Machine('max')">Max Finder (a,b)</button>
+                <button class="nav-level-btn ${state.l1_act1_machine === 'celsius' ? 'active' : ''}" onclick="selectL1Machine('celsius')">Celsius &rarr; F</button>
+                <button class="nav-level-btn ${state.l1_act1_machine === 'cube' ? 'active' : ''}" onclick="selectL1Machine('cube')">Cube (x³)</button>
+                <button class="nav-level-btn ${state.l1_act1_machine === 'palindrome' ? 'active' : ''}" onclick="selectL1Machine('palindrome')">Palindrome</button>
+            </div>
+            
+            <div class="machine-container">
+                <div class="machine-io-card input-mode" id="l1-input-node">5</div>
+                
+                <div class="machine-body">
+                    <div class="machine-input-funnel"></div>
+                    <div class="machine-display">
+                        <span style="color: var(--primary);">lambda</span>
+                        <div class="drop-target" id="l1a1-arg-slot" data-pool="l1a1-pool" style="width: 70px;">Arg</div>
+                        <span>:</span>
+                        <div class="drop-target" id="l1a1-exp-slot" data-pool="l1a1-pool" style="width: 140px;">Expression</div>
+                    </div>
+                    <div class="machine-output-funnel"></div>
+                </div>
+
+                <div class="machine-io-card output-mode" id="l1-output-node">25</div>
+            </div>
+
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Draggable Components Pool</div>
+            <div class="items-pool" id="l1a1-pool" style="margin: 0; min-height: 60px;">
+                <div class="draggable-item" id="l1-drag-x" draggable="true" data-pool="l1a1-pool" data-val="x">x</div>
+                <div class="draggable-item" id="l1-drag-ab" draggable="true" data-pool="l1a1-pool" data-val="a, b">a, b</div>
+                <div class="draggable-item" id="l1-drag-c" draggable="true" data-pool="l1a1-pool" data-val="c">c</div>
+                <div class="draggable-item" id="l1-drag-s" draggable="true" data-pool="l1a1-pool" data-val="s">s</div>
+                <div class="draggable-item" id="l1-drag-sq" draggable="true" data-pool="l1a1-pool" data-val="x * x">x * x</div>
+                <div class="draggable-item" id="l1-drag-db" draggable="true" data-pool="l1a1-pool" data-val="x * 2">x * 2</div>
+                <div class="draggable-item" id="l1-drag-even" draggable="true" data-pool="l1a1-pool" data-val="x % 2 == 0">x % 2 == 0</div>
+                <div class="draggable-item" id="l1-drag-max" draggable="true" data-pool="l1a1-pool" data-val="a if a > b else b">a if a &gt; b else b</div>
+                <div class="draggable-item" id="l1-drag-cel" draggable="true" data-pool="l1a1-pool" data-val="c * 9/5 + 32">c * 9/5 + 32</div>
+                <div class="draggable-item" id="l1-drag-cube" draggable="true" data-pool="l1a1-pool" data-val="x ** 3">x ** 3</div>
+                <div class="draggable-item" id="l1-drag-pal" draggable="true" data-pool="l1a1-pool" data-val="s == s[::-1]">s == s[::-1]</div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="runL1A1Simulation()">▶ Run Code</button>
+                <button class="btn btn-secondary" onclick="resetL1A1()">🔄 Replay</button>
+            </div>
+        `;
+        
+        setupDragAndDrop();
+        resetL1A1Values();
+    }
+
+    function selectL1Machine(type) {
+        state.l1_act1_machine = type;
+        resetL1A1();
+        loadActivity();
+    }
+
+    function resetL1A1Values() {
+        state.l1_act1_slots = { arg: null, exp: null };
+        let inputNode = document.getElementById('l1-input-node');
+        if (state.l1_act1_machine === 'square') inputNode.textContent = '5';
+        if (state.l1_act1_machine === 'double') inputNode.textContent = '12';
+        if (state.l1_act1_machine === 'even') inputNode.textContent = '8';
+        if (state.l1_act1_machine === 'max') inputNode.textContent = '9, 4';
+        if (state.l1_act1_machine === 'celsius') inputNode.textContent = '20';
+        if (state.l1_act1_machine === 'cube') inputNode.textContent = '3';
+        if (state.l1_act1_machine === 'palindrome') inputNode.textContent = "'radar'";
+    }
+
+    function resetL1A1() {
+        resetL1A1Values();
+        const inputNode = document.getElementById('l1-input-node');
+        const outputNode = document.getElementById('l1-output-node');
+        inputNode.classList.remove('animate-input');
+        outputNode.classList.remove('animate-output');
+        document.getElementById('l1a1-arg-slot').innerHTML = 'Arg';
+        document.getElementById('l1a1-arg-slot').classList.remove('filled');
+        document.getElementById('l1a1-exp-slot').innerHTML = 'Expression';
+        document.getElementById('l1a1-exp-slot').classList.remove('filled');
+        clearTerminal();
+        appendTerminal("Lambda Machine reset. Please re-construct lambda.");
+    }
+
+    function runL1A1Simulation() {
+        if (state.isExecuting) return;
+        
+        const arg = state.l1_act1_slots.arg;
+        const exp = state.l1_act1_slots.exp;
+
+        if (!arg || !exp) {
+            appendTerminal("SyntaxError: Lambda configuration slots are incomplete!", "error");
+            return;
+        }
+
+        // Validate lambda target for the selected machine
+        let isCorrect = false;
+        let outVal = '';
+        if (state.l1_act1_machine === 'square' && arg === 'x' && exp === 'x * x') {
+            isCorrect = true; outVal = '25';
+        } else if (state.l1_act1_machine === 'double' && arg === 'x' && exp === 'x * 2') {
+            isCorrect = true; outVal = '24';
+        } else if (state.l1_act1_machine === 'even' && arg === 'x' && exp === 'x % 2 == 0') {
+            isCorrect = true; outVal = 'True';
+        } else if (state.l1_act1_machine === 'max' && arg === 'a, b' && exp === 'a if a > b else b') {
+            isCorrect = true; outVal = '9';
+        } else if (state.l1_act1_machine === 'celsius' && arg === 'c' && exp === 'c * 9/5 + 32') {
+            isCorrect = true; outVal = '68';
+        } else if (state.l1_act1_machine === 'cube' && arg === 'x' && exp === 'x ** 3') {
+            isCorrect = true; outVal = '27';
+        } else if (state.l1_act1_machine === 'palindrome' && arg === 's' && exp === 's == s[::-1]') {
+            isCorrect = true; outVal = 'True';
+        }
+
+        state.isExecuting = true;
+        clearTerminal();
+        highlightCodeLine(2);
+        appendTerminal(`Constructing: lambda ${arg}: ${exp}`);
+
+        const inputNode = document.getElementById('l1-input-node');
+        const outputNode = document.getElementById('l1-output-node');
+        outputNode.textContent = outVal || 'ERR';
+
+        inputNode.classList.add('animate-input');
+
+        setTimeout(() => {
+            highlightCodeLine(5);
+            if (isCorrect) {
+                appendTerminal(`Invoking call: machine(${inputNode.textContent})`);
+                outputNode.classList.add('animate-output');
+                setTimeout(() => {
+                    highlightCodeLine(6);
+                    appendTerminal(`Output produced: ${outVal}`, "success");
+                    state.isExecuting = false;
+                }, 1000);
+            } else {
+                appendTerminal(`RuntimeError: Incorrect expression output for input ${inputNode.textContent}`, "error");
+                state.isExecuting = false;
+            }
+        }, 1500);
+    }
+
+    // LEVEL 1 ACTIVITY 2: SORT KEY VISUALIZER
+    const initialPlayers = [
+        { name: "Bob", score: 95, age: 19, nameLen: 3 },
+        { name: "David", score: 90, age: 21, nameLen: 5 },
+        { name: "Alice", score: 80, age: 22, nameLen: 5 },
+        { name: "Charlie", score: 85, age: 25, nameLen: 7 }
+    ];
+
+    function loadL1A2(container) {
+        state.l1_act2_selection = null;
+
+        container.innerHTML = `
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                <button class="nav-level-btn ${state.l1_act2_challenge === 0 ? 'active' : ''}" onclick="selectL1Act2Challenge(0)">Sort by Age (Ascending)</button>
+                <button class="nav-level-btn ${state.l1_act2_challenge === 1 ? 'active' : ''}" onclick="selectL1Act2Challenge(1)">Sort by Name Length (Ascending)</button>
+                <button class="nav-level-btn ${state.l1_act2_challenge === 2 ? 'active' : ''}" onclick="selectL1Act2Challenge(2)">Sort by Score (Descending)</button>
+            </div>
+
+            <div style="background: #F5F5F5; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; min-height: 180px; position: relative;">
+                <!-- Cards Container -->
+                <div id="player-cards-container" style="display: flex; gap: 1.5rem; justify-content: center; position: relative; height: 130px; width: 100%;">
+                    <!-- Rendered Cards dynamically below -->
+                </div>
+            </div>
+
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top: 1rem;">Lambda Function Composer</div>
+            <div class="indent-demo" style="line-height:2.2;">
+                <div class="lvl0"># Drag correct extractor to customize sorting key</div>
+                <div class="lvl0" style="display:flex; align-items:center; gap:0.5rem;">
+                    <span>players.sort(key=lambda player: </span>
+                    <div class="drop-target" id="l1a2-sort-slot" data-pool="l1a2-sort-pool" style="width: 250px;">Drag key extractor here</div>
+                    <span>)</span>
+                </div>
+            </div>
+
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top: 0.5rem;">Draggable Key Extractors</div>
+            <div class="items-pool" id="l1a2-sort-pool" style="margin: 0; min-height: 60px;">
+                <div class="draggable-item" id="l1a2-drag-age" draggable="true" data-pool="l1a2-sort-pool" data-val="age">player["age"]</div>
+                <div class="draggable-item" id="l1a2-drag-len" draggable="true" data-pool="l1a2-sort-pool" data-val="namelen">len(player["name"])</div>
+                <div class="draggable-item" id="l1a2-drag-score-desc" draggable="true" data-pool="l1a2-sort-pool" data-val="score">-player["score"]</div>
+                <div class="draggable-item" id="l1a2-drag-score-asc" draggable="true" data-pool="l1a2-sort-pool" data-val="score-asc">player["score"]</div>
+                <div class="draggable-item" id="l1a2-drag-name" draggable="true" data-pool="l1a2-sort-pool" data-val="name">player["name"]</div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="runL1A2Sorting()">▶ Execute sort()</button>
+                <button class="btn btn-secondary" onclick="resetL1A2()">🔄 Reset Cards</button>
+            </div>
+        `;
+
+        renderPlayerCards(initialPlayers);
+        setupDragAndDrop();
+    }
+
+    function selectL1Act2Challenge(idx) {
+        state.l1_act2_challenge = idx;
+        resetL1A2();
+    }
+
+    function renderPlayerCards(playersList) {
+        const container = document.getElementById('player-cards-container');
+        if (!container) return;
+        container.innerHTML = '';
+        playersList.forEach((p, idx) => {
+            const card = document.createElement('div');
+            card.className = 'glass-card';
+            card.id = `player-card-${p.name.toLowerCase()}`;
+            card.style.width = '120px';
+            card.style.height = '110px';
+            card.style.position = 'absolute';
+            card.style.left = `${idx * 140 + 20}px`;
+            card.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+            card.style.display = 'flex';
+            card.style.flexDirection = 'column';
+            card.style.alignItems = 'center';
+            card.style.justifyContent = 'center';
+            card.style.gap = '0.25rem';
+            card.style.boxShadow = '0 4px 10px rgba(0,0,0,0.05)';
+            card.style.border = '1.5px solid var(--border-color)';
+            card.innerHTML = `
+                <strong style="color: var(--primary);">${p.name}</strong>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">Age: <strong>${p.age}</strong></span>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">Score: <strong>${p.score}</strong></span>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function resetL1A2() {
+        state.l1_act2_selection = null;
+        loadActivity();
+        clearTerminal();
+        appendTerminal("Sorting workspace reset.");
+    }
+
+    function runL1A2Sorting() {
+        if (state.isExecuting) return;
+        
+        const selection = state.l1_act2_selection;
+        if (!selection) {
+            clearTerminal();
+            appendTerminal("TypeError: Sort key lambda is missing!", "error");
+            return;
+        }
+
+        clearTerminal();
+        state.isExecuting = true;
+        appendTerminal("Compilation check: Key lambda loaded.");
+
+        // Check correctness based on selected challenge
+        let isCorrect = false;
+        let sortedList = [...initialPlayers];
+        
+        if (state.l1_act2_challenge === 0 && selection === 'age') {
+            isCorrect = true;
+            sortedList.sort((a, b) => a.age - b.age);
+        } else if (state.l1_act2_challenge === 1 && selection === 'namelen') {
+            isCorrect = true;
+            sortedList.sort((a, b) => a.nameLen - b.nameLen);
+        } else if (state.l1_act2_challenge === 2 && selection === 'score') {
+            isCorrect = true;
+            sortedList.sort((a, b) => b.score - a.score); // descending
+        }
+
+        if (isCorrect) {
+            highlightCodeLine(10);
+            appendTerminal("Applying sorting key onto players list...", "success");
+            
+            // Perform card movements
+            setTimeout(() => {
+                sortedList.forEach((p, sortedIdx) => {
+                    const card = document.getElementById(`player-card-${p.name.toLowerCase()}`);
+                    if (card) {
+                        card.style.left = `${sortedIdx * 140 + 20}px`;
+                        card.style.borderColor = 'var(--green)';
+                        card.style.backgroundColor = 'var(--green-light)';
+                    }
+                });
+                
+                appendTerminal(`Sorting result: ${JSON.stringify(sortedList.map(x => x.name))}`, "success");
+                state.isExecuting = false;
+            }, 1000);
+        } else {
+            appendTerminal("LogicError: The key lambda yielded incorrect values or sorting directions.", "error");
+            
+            // Animate card shake error visual
+            setTimeout(() => {
+                initialPlayers.forEach(p => {
+                    const card = document.getElementById(`player-card-${p.name.toLowerCase()}`);
+                    if (card) {
+                        card.style.borderColor = 'var(--primary)';
+                        card.classList.add('error-shake');
+                        setTimeout(() => {
+                            card.classList.remove('error-shake');
+                        }, 500);
+                    }
+                });
+                state.isExecuting = false;
+            }, 500);
+        }
+    }
+
+    // ==============================================================
+    // LEVEL 2: RECURSION LABORATORY IMPLEMENTATION
+    // ==============================================================
+    
+    function loadL2A1(container) {
+        container.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; width: 100%;">
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="nav-level-btn ${state.l2_act1_func === 'factorial' ? 'active' : ''}" onclick="selectL2Func('factorial')">factorial(n)</button>
+                    <button class="nav-level-btn ${state.l2_act1_func === 'sum' ? 'active' : ''}" onclick="selectL2Func('sum')">sum(1..n)</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label style="margin: 0;">n = </label>
+                    <input type="number" id="l2-n-input" value="${state.l2_act1_val}" min="1" max="5" style="width: 70px; padding: 0.3rem 0.5rem;">
+                </div>
+            </div>
+
+            <div class="elevator-container">
+                <div class="elevator-shaft">
+                    <div class="elevator-cabin" id="elevator-cabin"></div>
+                </div>
+                <div class="elevator-floors" id="elevator-floors-list">
+                    <div class="elevator-floor-row" style="color: var(--text-secondary); font-size: 0.75rem;">Ground (Start)</div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="runL2A1Tracer()">▶ Run Code</button>
+                <button class="btn btn-secondary" onclick="resetL2A1()">🔄 Replay</button>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+                    <label style="margin: 0; font-size: 0.75rem;">Speed</label>
+                    <select id="elevator-speed-select" style="width: 100px; padding: 0.3rem 0.5rem;" onchange="updateElevatorSpeed(this.value)">
+                        <option value="2000">Slow</option>
+                        <option value="1000" selected>Normal</option>
+                        <option value="400">Fast</option>
+                    </select>
+                </div>
+            </div>
+        `;
+        
+        resetL2A1();
+    }
+
+    function selectL2Func(funcName) {
+        state.l2_act1_func = funcName;
+        loadActivity();
+    }
+
+    function updateElevatorSpeed(val) {
+        state.speedMs = parseInt(val);
+    }
+
+    function resetL2A1() {
+        state.l2_act1_stack = [];
+        state.l2_act1_step = 0;
+        state.l2_act1_direction = 'up';
+        const floors = document.getElementById('elevator-floors-list');
+        if (floors) {
+            floors.innerHTML = `<div class="elevator-floor-row" style="color: var(--text-secondary); font-size: 0.75rem;">Ground (Start)</div>`;
+        }
+        const cabin = document.getElementById('elevator-cabin');
+        if (cabin) {
+            cabin.style.bottom = '10px';
+        }
+        clearTerminal();
+        appendTerminal("Recursion elevator reset. Click 'Run Code' to trace.");
+        highlightCodeLine(null);
+    }
+
+    function runL2A1Tracer() {
+        if (state.isExecuting) return;
+        
+        const inputN = parseInt(document.getElementById('l2-n-input').value);
+        if (isNaN(inputN) || inputN < 1 || inputN > 5) {
+            appendTerminal("Please select n between 1 and 5 for execution safety.", "error");
+            return;
+        }
+
+        state.l2_act1_val = inputN;
+        state.l2_act1_stack = [];
+        state.l2_act1_step = 0;
+        state.l2_act1_direction = 'up';
+        state.isExecuting = true;
+        
+        clearTerminal();
+        appendTerminal(`Executing: recursive_calc(${inputN})`);
+        
+        executeNextRecursionStep();
+    }
+
+    function executeNextRecursionStep() {
+        const floorsList = document.getElementById('elevator-floors-list');
+        const cabin = document.getElementById('elevator-cabin');
+        
+        if (state.l2_act1_direction === 'up') {
+            const currentN = state.l2_act1_val - state.l2_act1_step;
+            
+            // Push Stack Frame
+            const frame = { depth: state.l2_act1_step, n: currentN, val: null };
+            state.l2_act1_stack.push(frame);
+
+            // Add visual floor
+            const row = document.createElement('div');
+            row.className = 'elevator-floor-row';
+            row.id = `floor-row-${state.l2_act1_step}`;
+            
+            const isBaseCase = currentN === 1;
+            const card = document.createElement('div');
+            card.className = `stack-frame-box ${isBaseCase ? 'base-case' : ''}`;
+            card.innerHTML = `
+                <strong>Frame ${state.l2_act1_step}</strong>
+                <span>n = ${currentN}</span>
+                <span id="frame-ret-${state.l2_act1_step}">waiting...</span>
+            `;
+            row.appendChild(card);
+            floorsList.appendChild(row);
+
+            // Animate Elevator Cabin
+            const bottomOffset = 10 + (state.l2_act1_step * 70);
+            cabin.style.bottom = `${bottomOffset}px`;
+
+            if (isBaseCase) {
+                highlightCodeLine(3);
+                appendTerminal(`Base case reached: recursive_calc(1) returns 1`, "success");
+                document.getElementById(`frame-ret-${state.l2_act1_step}`).textContent = "returns 1";
+                state.l2_act1_direction = 'down';
+                frame.val = 1;
+                
+                setTimeout(executeNextRecursionStep, state.speedMs);
+            } else {
+                highlightCodeLine(5);
+                appendTerminal(`Recursive step: n=${currentN}. Invoking recursive_calc(${currentN - 1})`);
+                state.l2_act1_step++;
+                setTimeout(executeNextRecursionStep, state.speedMs);
+            }
+        } else {
+            // Unwinding Stack
+            if (state.l2_act1_stack.length > 1) {
+                const finishedFrame = state.l2_act1_stack.pop();
+                const targetFrame = state.l2_act1_stack[state.l2_act1_stack.length - 1];
+                
+                let computedVal = 1;
+                if (state.l2_act1_func === 'factorial') {
+                    computedVal = targetFrame.n * finishedFrame.val;
+                    appendTerminal(`Popping Frame ${finishedFrame.depth}. Return ${finishedFrame.val} back to Frame ${targetFrame.depth}. Compute: ${targetFrame.n} * ${finishedFrame.val} = ${computedVal}`);
                 } else {
-                    out.innerHTML =
-                        `<span class="com">>>> @validate_positive</span>
-def square(n):
-    return n * n
+                    computedVal = targetFrame.n + finishedFrame.val;
+                    appendTerminal(`Popping Frame ${finishedFrame.depth}. Return ${finishedFrame.val} back to Frame ${targetFrame.depth}. Compute: ${targetFrame.n} + ${finishedFrame.val} = ${computedVal}`);
+                }
+                
+                targetFrame.val = computedVal;
+                
+                // Animate Cabin down
+                const bottomOffset = 10 + ((state.l2_act1_stack.length - 1) * 70);
+                cabin.style.bottom = `${bottomOffset}px`;
 
-<span class="com">--- @validate_positive checks input ---</span>
-✅ Input ${val} is positive — proceeding...
-<span class="ok">square(${val}) = ${val * val}</span>
+                // Update UI frame returning status
+                document.getElementById(`frame-ret-${targetFrame.depth}`).textContent = `returns ${computedVal}`;
+                
+                // Fade out/remove old floor
+                const oldFloor = document.getElementById(`floor-row-${finishedFrame.depth}`);
+                if (oldFloor) oldFloor.style.opacity = '0.4';
 
-<span class="com"># Try a negative number to see the guard fire!</span>`;
-                    vis.innerHTML = `
-<div class="deco-layer outer">@validate_positive — checks input &gt; 0 ✅</div>
-<div class="deco-layer inner">wrapper(${val}) — validation passed, calling original</div>
-<div class="deco-layer core">square(${val}) → ${val * val}</div>`;
+                highlightCodeLine(5);
+                setTimeout(executeNextRecursionStep, state.speedMs);
+            } else {
+                // Final ground return
+                const finalFrame = state.l2_act1_stack.pop();
+                cabin.style.bottom = `10px`;
+                highlightCodeLine(null);
+                appendTerminal(`Recursion Complete! Final calculated result is ${finalFrame.val}`, "success");
+                state.isExecuting = false;
+            }
+        }
+        updateInspector();
+    }
+
+    // LEVEL 2 ACTIVITY 2: RECURSIVE MAZE
+    function loadL2A2(container) {
+        state.l2_maze_base = null;
+        state.l2_maze_rec = null;
+        
+        container.innerHTML = `
+            <div class="maze-container">
+                <div class="maze-room" id="room-0">
+                    <strong>Room 1</strong>
+                    <div id="detective-holder">🕵️</div>
+                </div>
+                <div class="maze-room" id="room-1">
+                    <strong>Room 2</strong>
+                </div>
+                <div class="maze-room" id="room-2">
+                    <strong>Room 3</strong>
+                </div>
+                <div class="maze-room" id="room-3">
+                    <strong>Room 4</strong>
+                    <div class="key-avatar">🔑</div>
+                </div>
+            </div>
+
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Recursive Algorithm Assembly</div>
+            <div class="indent-demo" style="line-height: 2.2;">
+                <div class="lvl0">def escape_room(room):</div>
+                <div class="lvl1" style="display:flex; align-items:center; gap:0.5rem;">
+                    <span>if room.has_key:</span>
+                    <div class="drop-target" id="l2a2-base-slot" data-pool="l2a2-pool" style="width: 200px;">Base Case Return</div>
+                </div>
+                <div class="lvl1" style="display:flex; align-items:center; gap:0.5rem;">
+                    <span>else:</span>
+                    <div class="drop-target" id="l2a2-rec-slot" data-pool="l2a2-pool" style="width: 240px;">Recursive Action</div>
+                </div>
+            </div>
+
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top:0.5rem;">Instruction Block Cache</div>
+            <div class="items-pool" id="l2a2-pool" style="margin: 0; min-height: 60px;">
+                <div class="draggable-item" id="l2a2-i1" draggable="true" data-pool="l2a2-pool" data-val="ret-true">return True</div>
+                <div class="draggable-item" id="l2a2-i2" draggable="true" data-pool="l2a2-pool" data-val="ret-false">return False</div>
+                <div class="draggable-item" id="l2a2-i3" draggable="true" data-pool="l2a2-pool" data-val="rec-search">return escape_room(room.next)</div>
+                <div class="draggable-item" id="l2a2-i4" draggable="true" data-pool="l2a2-pool" data-val="bad-loop">while room != null: search()</div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="runL2A2Maze()">▶ Run Code</button>
+                <button class="btn btn-secondary" onclick="resetL2A2()">🔄 Replay</button>
+            </div>
+        `;
+
+        setupDragAndDrop();
+    }
+
+    function resetL2A2() {
+        loadActivity();
+        clearTerminal();
+        appendTerminal("Maze rooms initialized.");
+    }
+
+    function runL2A2Maze() {
+        if (state.isExecuting) return;
+        
+        const base = state.l2_maze_base;
+        const rec = state.l2_maze_rec;
+
+        if (!base || !rec) {
+            clearTerminal();
+            appendTerminal("AssertionError: Algorithm code configuration incomplete!", "error");
+            return;
+        }
+
+        clearTerminal();
+        state.isExecuting = true;
+        appendTerminal("Compiler check: Algorithm loaded. Beginning search loop...");
+
+        // Visual step animations
+        let currentRoom = 0;
+        
+        function moveRoom() {
+            if (currentRoom < 4) {
+                // Clear active states
+                document.querySelectorAll('.maze-room').forEach(rm => rm.classList.remove('active'));
+                
+                const roomEl = document.getElementById(`room-${currentRoom}`);
+                roomEl.classList.add('active');
+                
+                const det = document.getElementById('detective-holder');
+                if (det) det.remove();
+                
+                roomEl.innerHTML += `<div id="detective-holder" class="detective-avatar">🕵️</div>`;
+                appendTerminal(`recursive call: escape_room(room_${currentRoom + 1})`);
+                
+                currentRoom++;
+                setTimeout(moveRoom, 1000);
+            } else {
+                // Key reached
+                if (base === 'ret-true' && rec === 'rec-search') {
+                    document.getElementById('room-3').classList.add('solved');
+                    appendTerminal("Base case reached: Key found! Unwinding recursive frames...", "success");
+                    
+                    // Traceback
+                    let traceRoom = 3;
+                    function unwind() {
+                        if (traceRoom >= 0) {
+                            const roomEl = document.getElementById(`room-${traceRoom}`);
+                            roomEl.style.background = "#E6F8F2";
+                            appendTerminal(`Frame escape_room(room_${traceRoom + 1}) returned True`);
+                            traceRoom--;
+                            setTimeout(unwind, 600);
+                        } else {
+                            appendTerminal("Maze Escape Successful! Detective out.", "success");
+                            state.isExecuting = false;
+                        }
+                    }
+                    setTimeout(unwind, 1000);
+                } else {
+                    appendTerminal("StackOverflow / LogicError: Incorrect block layout resulted in algorithm deadlock.", "error");
+                    state.isExecuting = false;
                 }
             }
         }
+        
+        setTimeout(moveRoom, 500);
+    }
 
-        // Init
-        initDragAndDrop();
-        shufflePools();
-        s5l1Run();
-    </script>
+    // ==============================================================
+    // LEVEL 3: MEMORY LABORATORY IMPLEMENTATION
+    // ==============================================================
+    
+    function loadL3A1(container) {
+        state.l3_act1_x = [10, [20, 30]];
+        state.l3_act1_y = [10, [20, 30]];
+        state.l3_act1_mutated = false;
+
+        container.innerHTML = `
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.5rem;">
+                <button class="nav-level-btn ${state.l3_act1_copyType === 'assign' ? 'active' : ''}" onclick="selectL3CopyType('assign')">y = x (Assignment)</button>
+                <button class="nav-level-btn ${state.l3_act1_copyType === 'shallow' ? 'active' : ''}" onclick="selectL3CopyType('shallow')">y = copy.copy(x)</button>
+                <button class="nav-level-btn ${state.l3_act1_copyType === 'deep' ? 'active' : ''}" onclick="selectL3CopyType('deep')">y = copy.deepcopy(x)</button>
+            </div>
+
+            <div class="memory-display-space" style="min-height: 400px; padding: 1.5rem; position: relative;">
+                <svg class="svg-overlay" id="pointer-svg"></svg>
+                <div style="display: flex; justify-content: space-between; align-items: stretch; height: 100%; position: relative; z-index: 10;">
+                    
+                    <!-- Col 1: Variables -->
+                    <div style="display: flex; flex-direction: column; gap: 6rem; justify-content: center; width: 80px;">
+                        <div class="variable-label-box" id="var-box-x" style="margin: 0;">x</div>
+                        <div class="variable-label-box" id="var-box-y" style="margin: 0;">y</div>
+                    </div>
+
+                    <!-- Col 2: Parent Objects -->
+                    <div style="display: flex; flex-direction: column; gap: 4rem; justify-content: center; width: 220px; align-items: center;">
+                        <!-- Parent list X -->
+                        <div class="object-block-group" id="obj-group-x" style="width: 180px;">
+                            <span style="font-size: 0.7rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Outer List (X)</span>
+                            <div class="object-memory-block" id="block-x-parent" style="width: 100%; margin-top: 5px; display: flex; gap: 5px;">
+                                <div class="object-id-tag" id="id-tag-x-parent">id: 0x8104</div>
+                                <span class="ref-element" style="flex: 1; text-align: center;">10</span>
+                                <span class="ref-element" id="nested-ref-x" style="flex: 1; text-align: center; background: var(--green-light); border: 1.5px solid var(--green); border-radius: 4px; font-weight: bold; color: var(--green);">[●]</span>
+                            </div>
+                        </div>
+
+                        <!-- Parent list Y (Used in Copy types) -->
+                        <div class="object-block-group" id="obj-group-y" style="width: 180px; visibility: hidden; opacity: 0; transition: all 0.3s ease;">
+                            <span style="font-size: 0.7rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Outer List (Y)</span>
+                            <div class="object-memory-block" id="block-y-parent" style="width: 100%; margin-top: 5px; display: flex; gap: 5px;">
+                                <div class="object-id-tag" id="id-tag-y-parent">id: 0x8250</div>
+                                <span class="ref-element" style="flex: 1; text-align: center;">10</span>
+                                <span class="ref-element" id="nested-ref-y" style="flex: 1; text-align: center; background: var(--green-light); border: 1.5px solid var(--green); border-radius: 4px; font-weight: bold; color: var(--green);">[●]</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Col 3: Nested Objects -->
+                    <div style="display: flex; flex-direction: column; gap: 4rem; justify-content: center; width: 220px; align-items: center;">
+                        <!-- Sublist block (Shared/copied) -->
+                        <div class="object-block-group" id="obj-group-sub" style="width: 180px;">
+                            <span style="font-size: 0.7rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;" id="sublist-title">Nested Sublist</span>
+                            <div class="object-memory-block" id="block-nested" style="width: 100%; margin-top: 5px; display: flex; gap: 5px;">
+                                <div class="object-id-tag" id="id-tag-nested">id: 0x9280</div>
+                                <span class="ref-element" id="nested-val-0" style="flex: 1; text-align: center;">20</span>
+                                <span class="ref-element" id="nested-val-1" style="flex: 1; text-align: center;">30</span>
+                            </div>
+                        </div>
+
+                        <!-- Deep Copied sublist block -->
+                        <div class="object-block-group" id="obj-group-sub-deep" style="width: 180px; visibility: hidden; opacity: 0; transition: all 0.3s ease;">
+                            <span style="font-size: 0.7rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Copied Sublist</span>
+                            <div class="object-memory-block" id="block-nested-deep" style="width: 100%; margin-top: 5px; display: flex; gap: 5px;">
+                                <div class="object-id-tag" id="id-tag-nested-deep">id: 0x9350</div>
+                                <span class="ref-element" id="deep-nested-val-0" style="flex: 1; text-align: center;">20</span>
+                                <span class="ref-element" id="deep-nested-val-1" style="flex: 1; text-align: center;">30</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="mutateL3A1()">⚡ Mutate x[1][0] = 99</button>
+                <button class="btn btn-secondary" onclick="resetL3A1()">🔄 Reset Objects</button>
+            </div>
+        `;
+        
+        setTimeout(drawMemoryPointers, 100);
+    }
+
+    function selectL3CopyType(type) {
+        state.l3_act1_copyType = type;
+        loadActivity();
+    }
+
+    function resetL3A1() {
+        state.l3_act1_mutated = false;
+        loadActivity();
+        clearTerminal();
+        appendTerminal("Memory space initialized. Choose a copy operation to inspect bindings.");
+    }
+
+    function drawMemoryPointers() {
+        const svg = document.getElementById('pointer-svg');
+        if (!svg) return;
+        svg.innerHTML = `
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--primary)" />
+                </marker>
+                <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--green)" />
+                </marker>
+            </defs>
+        `;
+
+        const xBox = document.getElementById('var-box-x').getBoundingClientRect();
+        const yBox = document.getElementById('var-box-y').getBoundingClientRect();
+        const xParent = document.getElementById('block-x-parent').getBoundingClientRect();
+        const svgBox = svg.getBoundingClientRect();
+
+        const x1 = xBox.right - svgBox.left;
+        const y1 = xBox.top + (xBox.height / 2) - svgBox.top;
+        const tx1 = xParent.left - svgBox.left - 5;
+        const ty1 = xParent.top + (xParent.height / 2) - svgBox.top;
+
+        // Pointer: x -> parent_x
+        drawArrow(svg, x1, y1, tx1, ty1, 'var(--primary)', 'path-x-to-parent');
+
+        const y1_pos = yBox.top + (yBox.height / 2) - svgBox.top;
+        
+        const objY = document.getElementById('obj-group-y');
+        const objSubDeep = document.getElementById('obj-group-sub-deep');
+        
+        if (state.l3_act1_copyType === 'assign') {
+            objY.style.visibility = 'hidden';
+            objY.style.opacity = '0';
+            objSubDeep.style.visibility = 'hidden';
+            objSubDeep.style.opacity = '0';
+
+            // y points to x's parent
+            drawArrow(svg, x1, y1_pos, tx1, ty1 + 10, 'var(--primary)', 'path-y-to-parent');
+            
+            // Draw nested pointer (X parent to sublist)
+            const refX = document.getElementById('nested-ref-x').getBoundingClientRect();
+            const sub = document.getElementById('block-nested').getBoundingClientRect();
+            drawArrow(svg, refX.right - svgBox.left, refX.top + (refX.height / 2) - svgBox.top, sub.left - svgBox.left - 5, sub.top + (sub.height / 2) - svgBox.top, 'var(--green)', 'path-x-parent-to-sub');
+
+        } else if (state.l3_act1_copyType === 'shallow') {
+            objY.style.visibility = 'visible';
+            objY.style.opacity = '1';
+            objSubDeep.style.visibility = 'hidden';
+            objSubDeep.style.opacity = '0';
+            
+            const yParent = document.getElementById('block-y-parent').getBoundingClientRect();
+            const ty2 = yParent.left - svgBox.left - 5;
+            const ty2_h = yParent.top + (yParent.height / 2) - svgBox.top;
+            
+            // y points to parent_y
+            drawArrow(svg, x1, y1_pos, ty2, ty2_h, 'var(--primary)', 'path-y-to-parent-copy');
+            
+            // Nested pointers from both parents point to the SAME sublist
+            const refX = document.getElementById('nested-ref-x').getBoundingClientRect();
+            const refY = document.getElementById('nested-ref-y').getBoundingClientRect();
+            const sub = document.getElementById('block-nested').getBoundingClientRect();
+            
+            const subLeft = sub.left - svgBox.left - 5;
+            const subTop = sub.top + (sub.height / 2) - svgBox.top;
+            
+            drawArrow(svg, refX.right - svgBox.left, refX.top + (refX.height / 2) - svgBox.top, subLeft, subTop, 'var(--green)', 'path-x-parent-to-sub');
+            drawArrow(svg, refY.right - svgBox.left, refY.top + (refY.height / 2) - svgBox.top, subLeft, subTop + 10, 'var(--green)', 'path-y-parent-to-sub');
+
+        } else if (state.l3_act1_copyType === 'deep') {
+            objY.style.visibility = 'visible';
+            objY.style.opacity = '1';
+            objSubDeep.style.visibility = 'visible';
+            objSubDeep.style.opacity = '1';
+
+            const yParent = document.getElementById('block-y-parent').getBoundingClientRect();
+            const ty2 = yParent.left - svgBox.left - 5;
+            const ty2_h = yParent.top + (yParent.height / 2) - svgBox.top;
+
+            // y points to parent_y
+            drawArrow(svg, x1, y1_pos, ty2, ty2_h, 'var(--primary)', 'path-y-to-parent-copy');
+
+            // x parent points to original sublist
+            const refX = document.getElementById('nested-ref-x').getBoundingClientRect();
+            const sub = document.getElementById('block-nested').getBoundingClientRect();
+            drawArrow(svg, refX.right - svgBox.left, refX.top + (refX.height / 2) - svgBox.top, sub.left - svgBox.left - 5, sub.top + (sub.height / 2) - svgBox.top, 'var(--green)', 'path-x-parent-to-sub');
+
+            // y parent points to deep copied sublist
+            const refY = document.getElementById('nested-ref-y').getBoundingClientRect();
+            const subDeep = document.getElementById('block-nested-deep').getBoundingClientRect();
+            drawArrow(svg, refY.right - svgBox.left, refY.top + (refY.height / 2) - svgBox.top, subDeep.left - svgBox.left - 5, subDeep.top + (subDeep.height / 2) - svgBox.top, 'var(--green)', 'path-y-parent-to-sub-deep');
+        }
+    }
+
+    function drawArrow(svg, x1, y1, x2, y2, color, id = '') {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const pathData = `M ${x1} ${y1} C ${x1 + dx * 0.4} ${y1}, ${x1 + dx * 0.6} ${y2}, ${x2} ${y2}`;
+        line.setAttribute('d', pathData);
+        line.setAttribute('stroke', color);
+        line.setAttribute('stroke-width', '2.5');
+        line.setAttribute('fill', 'none');
+        line.setAttribute('marker-end', color.includes('green') ? 'url(#arrow-green)' : 'url(#arrow)');
+        if (id) {
+            line.setAttribute('id', id);
+        }
+        svg.appendChild(line);
+        return line;
+    }
+
+    function animateDotAlongPath(pathId, color, callback) {
+        const pathElement = document.getElementById(pathId);
+        if (!pathElement) {
+            if (callback) callback();
+            return;
+        }
+
+        const svg = document.getElementById('pointer-svg');
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('r', '6');
+        dot.setAttribute('fill', color);
+        dot.style.filter = `drop-shadow(0 0 6px ${color})`;
+        svg.appendChild(dot);
+
+        const length = pathElement.getTotalLength();
+        let startTime = null;
+        const duration = 650;
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = (timestamp - startTime) / duration;
+
+            if (progress < 1) {
+                const point = pathElement.getPointAtLength(progress * length);
+                dot.setAttribute('cx', point.x);
+                dot.setAttribute('cy', point.y);
+                requestAnimationFrame(step);
+            } else {
+                dot.remove();
+                if (callback) callback();
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    function mutateL3A1() {
+        if (state.l3_act1_mutated || state.isExecuting) return;
+        state.isExecuting = true;
+        
+        clearTerminal();
+        appendTerminal("Access Path Trace: x -> [1] -> [0] = 99");
+
+        // Step 1: Trace X variable label to Parent list X
+        animateDotAlongPath('path-x-to-parent', 'var(--primary)', () => {
+            appendTerminal("Tracing reference binding 'x' to Outer Container...");
+            
+            // Step 2: Trace Parent X list to Nested Sublist
+            animateDotAlongPath('path-x-parent-to-sub', 'var(--green)', () => {
+                appendTerminal("Dereferencing nested index [1] list reference...");
+                
+                // Mutate target value
+                state.l3_act1_mutated = true;
+                state.l3_act1_x = [10, [99, 30]];
+                
+                const nestedBlock = document.getElementById('block-nested');
+                nestedBlock.classList.add('mutated');
+                document.getElementById('nested-val-0').textContent = '99';
+                appendTerminal("Mutated inner list index [0] to 99 in memory address 0x9280.", "success");
+
+                // Evaluate leaks
+                if (state.l3_act1_copyType === 'assign') {
+                    state.l3_act1_y = [10, [99, 30]];
+                    // Trace back leak: y variable maps to same parent
+                    animateDotAlongPath('path-y-to-parent', 'var(--primary)', () => {
+                        appendTerminal("Leak Alert! Variable 'y' bound to identical address 0x8104! Y mutated too.", "error");
+                        updateInspector();
+                        state.isExecuting = false;
+                    });
+                } else if (state.l3_act1_copyType === 'shallow') {
+                    state.l3_act1_y = [10, [99, 30]];
+                    // Trace back leak: nested pointer sub to parent Y, then Y
+                    animateDotAlongPath('path-y-parent-to-sub', 'var(--green)', () => {
+                        animateDotAlongPath('path-y-to-parent-copy', 'var(--primary)', () => {
+                            appendTerminal("Leak Alert! Shallow copied list Y shares nested reference 0x9280! Y mutated too.", "error");
+                            updateInspector();
+                            state.isExecuting = false;
+                        });
+                    });
+                } else if (state.l3_act1_copyType === 'deep') {
+                    state.l3_act1_y = [10, [20, 30]];
+                    appendTerminal("Isolation Success! Deep copy generated distinct nested address 0x9350. Y unaffected.", "success");
+                    updateInspector();
+                    state.isExecuting = false;
+                }
+            });
+        });
+    }
+
+    // LEVEL 3 ACTIVITY 2: MEMORY RESCUE CHALLENGE
+    const l3a2Scenarios = [
+        {
+            title: "Config Isolation",
+            desc: "Isolate the configuration settings of the copy backup so that modifying the nested backup['config']['zoom'] leaves the original intact.",
+            setup: 'original = {"user": "sys_admin", "roles": ["read", "write"], "config": {"theme": "dark", "zoom": 1.2}}'
+        },
+        {
+            title: "Permission Role Isolation",
+            desc: "Duplicate the admin record, then append 'root' role to backup['roles'] list. The original admin config must NOT receive 'root' clearance.",
+            setup: 'original = {"user": "sys_admin", "roles": ["read", "write"], "config": {"theme": "dark", "zoom": 1.2}}'
+        },
+        {
+            title: "Top-Level User Override",
+            desc: "Modify only the top-level string reference backup['user'] = 'guest' in the backup. Choose the most computationally efficient copy operation that satisfies isolation.",
+            setup: 'original = {"user": "sys_admin", "roles": ["read", "write"], "config": {"theme": "dark", "zoom": 1.2}}'
+        }
+    ];
+
+    function loadL3A2(container) {
+        state.l3_act2_copyOp = null;
+        state.l3_act2_mutationOp = null;
+
+        const sc = l3a2Scenarios[state.l3_act2_scenario];
+
+        container.innerHTML = `
+            <div class="rescue-scenarios">
+                <div class="scenario-nav">
+                    <div class="scenario-tab ${state.l3_act2_scenario === 0 ? 'active' : ''}" onclick="selectL3Scenario(0)">
+                        <h4>1. Config Isolation</h4>
+                        <p>Change backup zoom without mutating original.</p>
+                    </div>
+                    <div class="scenario-tab ${state.l3_act2_scenario === 1 ? 'active' : ''}" onclick="selectL3Scenario(1)">
+                        <h4>2. Permission Role Isolation</h4>
+                        <p>Inject user permission into backup roles.</p>
+                    </div>
+                    <div class="scenario-tab ${state.l3_act2_scenario === 2 ? 'active' : ''}" onclick="selectL3Scenario(2)">
+                        <h4>3. Top-Level User Override</h4>
+                        <p>Modify top-level user config efficiently.</p>
+                    </div>
+                </div>
+
+                <div class="scenario-workspace">
+                    <strong style="color: var(--primary);">Rescue Task Description:</strong>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">${sc.desc}</p>
+                    
+                    <div class="indent-demo" style="line-height:2.2;">
+                        <div class="lvl0">original = ${sc.setup}</div>
+                        <div class="lvl0" style="display:flex; align-items:center; gap:0.5rem;">
+                            <span>backup = </span>
+                            <div class="drop-target" id="l3a2-copy-slot" data-pool="l3a2-copy-pool" style="width: 200px;">Drag copying operator</div>
+                        </div>
+                        <div class="lvl0" style="display:flex; align-items:center; gap:0.5rem;">
+                            <span># Modify backup object reference</span>
+                            <div class="drop-target" id="l3a2-mutation-slot" data-pool="l3a2-mutation-pool" style="width: 250px;">Drag mutation statement</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top: 1rem;">Copy Operations Pool</div>
+                    <div class="items-pool" id="l3a2-copy-pool" style="margin: 0; min-height: 50px;">
+                        <div class="draggable-item" id="l3a2-drag-assign" draggable="true" data-pool="l3a2-copy-pool" data-val="assign">original</div>
+                        <div class="draggable-item" id="l3a2-drag-shallow" draggable="true" data-pool="l3a2-copy-pool" data-val="shallow">copy.copy(original)</div>
+                        <div class="draggable-item" id="l3a2-drag-deep" draggable="true" data-pool="l3a2-copy-pool" data-val="deep">copy.deepcopy(original)</div>
+                    </div>
+
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top: 0.5rem;">Mutations Pool</div>
+                    <div class="items-pool" id="l3a2-mutation-pool" style="margin: 0; min-height: 50px;">
+                        <div class="draggable-item" id="l3a2-drag-mut-zoom" draggable="true" data-pool="l3a2-mutation-pool" data-val="zoom">backup["config"]["zoom"] = 1.5</div>
+                        <div class="draggable-item" id="l3a2-drag-mut-roles" draggable="true" data-pool="l3a2-mutation-pool" data-val="roles">backup["roles"].append("root")</div>
+                        <div class="draggable-item" id="l3a2-drag-mut-user" draggable="true" data-pool="l3a2-mutation-pool" data-val="user">backup["user"] = "guest"</div>
+                        <div class="draggable-item" id="l3a2-drag-mut-bad" draggable="true" data-pool="l3a2-mutation-pool" data-val="orig-zoom">original["config"]["zoom"] = 1.5</div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="verifyRescue()">▶ Run Diagnostics</button>
+                        <button class="btn btn-secondary" onclick="resetL3A2()">🔄 Reset Code</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        setupDragAndDrop();
+    }
+
+    function selectL3Scenario(idx) {
+        state.l3_act2_scenario = idx;
+        loadActivity();
+    }
+
+    function resetL3A2() {
+        state.l3_act2_copyOp = null;
+        state.l3_act2_mutationOp = null;
+        loadActivity();
+        clearTerminal();
+        appendTerminal("Rescue workspace reset.");
+    }
+
+    function verifyRescue() {
+        const copyOp = state.l3_act2_copyOp;
+        const mutationOp = state.l3_act2_mutationOp;
+        clearTerminal();
+
+        if (!copyOp || !mutationOp) {
+            appendTerminal("TypeError: Configuration slots are incomplete!", "error");
+            return;
+        }
+
+        // Diagnostic assertions
+        let pass = false;
+        if (state.l3_act2_scenario === 0) {
+            // Config Isolation (requires deep copy)
+            if (copyOp === 'deep' && mutationOp === 'zoom') {
+                pass = true;
+            }
+        } else if (state.l3_act2_scenario === 1) {
+            // Permission Role Isolation (requires deep copy because roles list is nested)
+            if (copyOp === 'deep' && mutationOp === 'roles') {
+                pass = true;
+            }
+        } else if (state.l3_act2_scenario === 2) {
+            // Top-Level User Override (shallow copy is sufficient and more efficient!)
+            if (copyOp === 'shallow' && mutationOp === 'user') {
+                pass = true;
+            }
+        }
+
+        if (pass) {
+            appendTerminal("Diagnostics Passed! Memory isolated correctly without reference leaks.", "success");
+            appendTerminal("Result: Original configuration parameters remain untouched and secure.", "success");
+        } else {
+            appendTerminal("Diagnostics Failed! Assertion failed.", "error");
+            if (copyOp === 'assign') {
+                appendTerminal("AssertionError: Variable backup points to exact same memory ID as original.", "error");
+            } else if (copyOp === 'shallow' && state.l3_act2_scenario < 2) {
+                appendTerminal("AssertionError: Inner reference leak! original['config'] and backup['config'] share same sub-object ID.", "error");
+            } else if (copyOp === 'deep' && state.l3_act2_scenario === 2) {
+                appendTerminal("Warning Nudge: Deep copy is functionally correct but computationally inefficient for top-level mutations. Shallow copy is preferred here.", "error");
+            } else {
+                appendTerminal("AssertionError: Mutation statement target mutated incorrect variables.", "error");
+            }
+        }
+    }
+
+    // Initialize Application
+    window.onload = () => {
+        switchLevel(1);
+    };
+
+</script>
 </body>
-
 </html>
