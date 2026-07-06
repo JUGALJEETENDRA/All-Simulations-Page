@@ -1,1825 +1,3422 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Navigation, Signposts, and Wayfinding Patterns Virtual Lab</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
-
-        /* Design Tokens */
-        :root {
-            --primary: hsl(354, 85%, 40%);
-            /* Rich academic crimson red */
-            --primary-hover: hsl(354, 85%, 32%);
-            --primary-light: hsl(354, 100%, 97.5%);
-            --primary-light-hover: hsl(354, 100%, 94%);
-            --success: hsl(142, 70%, 35%);
-            --success-light: hsl(142, 70%, 96%);
-            --error: hsl(0, 85%, 45%);
-            --error-light: hsl(0, 85%, 96%);
-            --bg: hsl(0, 5%, 97.5%);
-            --surface: hsl(0, 0%, 100%);
-            --text: hsl(220, 15%, 15%);
-            --text-muted: hsl(220, 10%, 45%);
-            --border: hsl(0, 0%, 90%);
-            --border-accent: hsl(354, 60%, 92%);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 10px 24px -8px rgba(179, 0, 0, 0.08);
-            --shadow-lg: 0 16px 36px -12px rgba(179, 0, 0, 0.12);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            padding-bottom: 40px;
-        }
-
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, hsl(354, 90%, 30%) 100%);
-            color: white;
-            padding: 32px 20px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(179, 0, 0, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        header h1 {
-            margin: 0;
-            font-family: 'Outfit', sans-serif;
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        header p {
-            margin: 8px 0 0;
-            font-size: 14.5px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 24px auto;
-            padding: 0 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border-accent);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        h2 {
-            font-family: 'Outfit', sans-serif;
-            color: var(--primary);
-            margin-top: 0;
-            font-size: 19px;
-            font-weight: 700;
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 8px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Theory columns */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 12px;
-        }
-
-        .box {
-            border: 1px solid var(--border);
-            padding: 14px;
-            border-radius: var(--radius-md);
-            background: var(--primary-light);
-            font-size: 13px;
-            transition: var(--transition);
-        }
-
-        .box:hover {
-            transform: translateY(-2px);
-            border-color: var(--primary);
-            background: var(--surface);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .box b {
-            color: var(--primary);
-            display: block;
-            margin-bottom: 6px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 14px;
-        }
-
-        /* Simulation HUD */
-        .hud-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--primary-light);
-            border: 1px solid var(--border-accent);
-            border-radius: var(--radius-md);
-            padding: 12px 18px;
-            margin-bottom: 16px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .hud-stat span {
-            color: var(--primary);
-            font-family: 'Outfit', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .progress-container {
-            width: 100%;
-            background: var(--border);
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 20%;
-            background: linear-gradient(90deg, var(--primary) 0%, hsl(354, 90%, 48%) 100%);
-            border-radius: 4px;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Level Screen elements */
-        .level-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            min-height: 280px;
-        }
-
-        .control-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-        }
-
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 11px 20px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 13.5px;
-            font-family: 'Outfit', sans-serif;
-            transition: var(--transition);
-            box-shadow: 0 4px 6px rgba(179, 0, 0, 0.1);
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 12px rgba(179, 0, 0, 0.18);
-        }
-
-        button:active {
-            transform: translateY(1px);
-        }
-
-        button:disabled {
-            background: hsl(0, 0%, 90%);
-            color: hsl(0, 0%, 60%);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-secondary {
-            background: var(--surface);
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            padding: 9px 18px;
-            box-shadow: none;
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary-light);
-            border-color: var(--primary-hover);
-            color: var(--primary-hover);
-            box-shadow: 0 4px 8px rgba(179, 0, 0, 0.05);
-        }
-
-        /* Portal Mockup Frame (Level 1, 5) */
-        .portal-mock {
-            border: 1px solid var(--border-accent);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            background: var(--surface);
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .portal-topbar {
-            background: var(--primary);
-            color: white;
-            padding: 12px 16px;
-            font-weight: 700;
-            font-size: 13.5px;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .portal-breadcrumb {
-            background: var(--primary-light);
-            padding: 10px 16px;
-            color: var(--primary);
-            font-size: 12.5px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-accent);
-        }
-
-        .portal-body {
-            display: grid;
-            grid-template-columns: 170px 1fr;
-            min-height: 200px;
-        }
-
-        @media (max-width: 550px) {
-            .portal-body {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .portal-sidebar {
-            background: hsl(0, 0%, 99%);
-            border-right: 1px solid var(--border);
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .portal-nav-btn {
-            background: var(--surface);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 9px 11px;
-            text-align: left;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12.5px;
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-            box-shadow: none;
-            width: 100%;
-        }
-
-        .portal-nav-btn:hover {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: none;
-            box-shadow: none;
-        }
-
-        .portal-nav-btn.active {
-            background: var(--primary);
-            color: white !important;
-            border-color: var(--primary);
-        }
-
-        .portal-screen {
-            padding: 20px;
-            background: var(--surface);
-        }
-
-        .portal-screen h3 {
-            margin-top: 0;
-            color: var(--primary);
-            font-size: 16px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-        }
-
-        .portal-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .portal-box-btn {
-            background: var(--primary-light);
-            border: 1px solid var(--border-accent);
-            padding: 14px 10px;
-            border-radius: var(--radius-sm);
-            text-align: center;
-            font-weight: 700;
-            font-size: 12.5px;
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .portal-box-btn:hover {
-            background: var(--surface);
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* Draggable items & targets (Level 2, 3, 4) */
-        .drag-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .cards-deck {
-            flex: 1;
-            min-width: 200px;
-            border: 2px dashed var(--border);
-            background: hsl(0, 0%, 99%);
-            padding: 14px;
-            border-radius: var(--radius-md);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .targets-deck {
-            flex: 2;
-            min-width: 280px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .drag-chip {
-            background: var(--surface);
-            border: 1.5px solid var(--border-accent);
-            padding: 9px 13px;
-            border-radius: var(--radius-sm);
-            font-size: 12.5px;
-            font-weight: 700;
-            color: var(--primary);
-            cursor: grab;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .drag-chip:hover {
-            border-color: var(--primary);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(179, 0, 0, 0.08);
-        }
-
-        .drag-chip:active {
-            cursor: grabbing;
-        }
-
-        .drag-chip.selected {
-            box-shadow: 0 0 0 3px hsla(354, 85%, 40%, 0.25);
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .dropzone-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: hsl(0, 0%, 99%);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 10px 14px;
-            min-height: 52px;
-            gap: 10px;
-        }
-
-        .dropzone-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .dropzone-box {
-            border: 2px dashed hsl(0, 0%, 75%);
-            border-radius: var(--radius-sm);
-            min-width: 150px;
-            min-height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 6px;
-            background: var(--surface);
-            cursor: pointer;
-            font-size: 12.5px;
-            transition: var(--transition);
-        }
-
-        .dropzone-box:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .dropzone-box.drag-over {
-            background: var(--primary-light-hover);
-            border-color: var(--primary);
-        }
-
-        /* Feedback outlines */
-        .correct {
-            background: var(--success-light) !important;
-            border-color: var(--success) !important;
-            color: var(--success) !important;
-            border-style: solid !important;
-        }
-
-        .wrong {
-            background: var(--error-light) !important;
-            border-color: var(--error) !important;
-            color: var(--error) !important;
-            border-style: solid !important;
-            animation: shake 0.4s ease;
-        }
-
-        @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-4px);
-            }
-
-            75% {
-                transform: translateX(4px);
-            }
-        }
-
-        #feedbackText {
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--primary);
-            margin-top: 10px;
-            min-height: 18px;
-        }
-
-        /* Level 3: Slot layout */
-        .breadcrumb-slots {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--surface);
-            padding: 20px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .breadcrumb-slot {
-            border: 2px dashed hsl(0, 0%, 75%);
-            border-radius: var(--radius-sm);
-            min-width: 130px;
-            min-height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: hsl(0, 0%, 99%);
-            cursor: pointer;
-            font-size: 12.5px;
-            transition: var(--transition);
-        }
-
-        .breadcrumb-slot:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .breadcrumb-slot.drag-over {
-            background: var(--primary-light-hover);
-            border-color: var(--primary);
-        }
-
-        .breadcrumb-divider {
-            font-weight: bold;
-            color: hsl(0, 0%, 70%);
-            font-size: 16px;
-        }
-
-        /* Level 4: Folder box grid */
-        .folders-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-        }
-
-        .folder-box {
-            border: 2px dashed hsl(0, 0%, 75%);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            min-height: 150px;
-            background: hsl(0, 0%, 99%);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .folder-box:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .folder-box.drag-over {
-            background: var(--primary-light-hover);
-            border-color: var(--primary);
-        }
-
-        .folder-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--primary);
-            border-bottom: 2px solid var(--surface);
-            padding-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .folder-contents {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex: 1;
-        }
-
-        /* Level 5 Options List */
-        .l5-options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .l5-option-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 14px 18px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            color: var(--text);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-            width: 100%;
-        }
-
-        .l5-option-btn:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            transform: translateX(4px);
-        }
-
-        .l5-option-btn.correct-path {
-            border-color: var(--success) !important;
-            background: var(--success-light) !important;
-            color: var(--success) !important;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .l5-option-btn.wrong-path {
-            border-color: var(--error) !important;
-            background: var(--error-light) !important;
-            color: var(--error) !important;
-            box-shadow: none;
-            transform: none;
-        }
-
-        /* Scorecard layout */
-        .scorecard {
-            border: 4px double var(--primary);
-            border-radius: var(--radius-lg);
-            padding: 30px 24px;
-            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .scorecard-heading {
-            font-family: 'Outfit', sans-serif;
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .scorecard-table {
-            width: 100%;
-            margin: 10px 0;
-            border-collapse: collapse;
-        }
-
-        .scorecard-table th,
-        .scorecard-table td {
-            padding: 10px 14px;
-            text-align: left;
-            font-size: 13.5px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .scorecard-table th {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .scorecard-table td {
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .badge-unveiled {
-            font-family: 'Outfit', sans-serif;
-            font-size: 18px;
-            font-weight: 800;
-            color: white;
-            background: var(--primary);
-            padding: 8px 18px;
-            border-radius: 30px;
-            display: inline-block;
-            margin: 8px auto;
-            box-shadow: 0 4px 10px rgba(179, 0, 0, 0.2);
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            color: var(--primary);
-            background: #ffffff;
-            border: 1.5px solid #ffffff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .back-btn:hover {
-            background: var(--primary-light, #fdf2f2);
-            color: var(--primary-hover, #780000);
-            border-color: var(--primary-light, #fdf2f2);
-            transform: translateY(-50%) translateX(-4px);
-        }
-
-        @media (max-width: 768px) {
-            header {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 16px;
-                padding-top: 24px;
-                padding-bottom: 24px;
-            }
-            .back-btn {
-                position: static;
-                transform: none;
-            }
-            .back-btn:hover {
-                transform: translateX(-4px);
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Programming Simulation Lab — Navigation & Wayfinding</title>
+  
+  <!-- Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* DESIGN SYSTEM: RED & WHITE ACADEMIC LAB THEME */
+    :root {
+      --primary-red: #c41e3a;
+      --primary-red-hover: #a7162d;
+      --primary-red-dim: rgba(196, 30, 58, 0.05);
+      --primary-red-border: rgba(196, 30, 58, 0.15);
+      --bg-white: #ffffff;
+      --bg-grey: #f7fafc;
+      --bg-grey-dark: #edf2f7;
+      --text-main: #1a202c;
+      --text-muted: #718096;
+      --border-grey: #e2e8f0;
+      --border-grey-dark: #cbd5e0;
+      
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+      
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+      
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.25s ease;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.04);
+      --shadow-card: 0 4px 20px rgba(0,0,0,0.02);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-white);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    /* APP HEADER styles */
+    .app-header {
+      height: 60px;
+      background: var(--bg-white);
+      border-bottom: 1.5px solid var(--border-grey);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+      border: 1px solid var(--border-grey);
+    }
+
+    .back-link:hover {
+      color: var(--primary-red);
+      border-color: var(--primary-red-border);
+      background: var(--primary-red-dim);
+    }
+
+    .logo-mark {
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-red);
+      transform: rotate(45deg);
+      box-shadow: 0 0 6px var(--primary-red);
+    }
+
+    .logo-title {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .logo-tag {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: var(--bg-grey);
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-grey);
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* BUTTONS SYSTEM */
+    .btn-lab {
+      padding: 8px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .btn-lab-primary {
+      background-color: var(--primary-red);
+      color: var(--bg-white);
+      border: 1.5px solid var(--primary-red);
+    }
+
+    .btn-lab-primary:hover:not(:disabled) {
+      background-color: var(--primary-red-hover);
+      border-color: var(--primary-red-hover);
+    }
+
+    .btn-lab-secondary {
+      background-color: var(--bg-white);
+      color: var(--text-main);
+      border: 1.5px solid var(--border-grey-dark);
+    }
+
+    .btn-lab-secondary:hover:not(:disabled) {
+      background-color: var(--bg-grey);
+      border-color: var(--border-grey-dark);
+    }
+
+    .btn-lab-text {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 4px;
+    }
+
+    .btn-lab-text:hover {
+      color: var(--primary-red);
+    }
+
+    .btn-lab:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* MAIN BODY PANELS CONTAINER */
+    .app-body {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 110px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* SIDEBAR DIRECTORY */
+    .app-sidebar {
+      width: 260px;
+      background: var(--bg-grey);
+      border-right: 1px solid var(--border-grey);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 14px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding-left: 6px;
+    }
+
+    .nav-levels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .level-nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .level-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      padding: 6px;
+    }
+
+    .activity-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-left: 8px;
+      border-left: 1.5px solid var(--border-grey-dark);
+    }
+
+    .activity-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: left;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      transition: var(--transition-fast);
+      width: 100%;
+    }
+
+    .activity-nav-btn:hover {
+      background: var(--bg-grey-dark);
+      color: var(--text-main);
+    }
+
+    .activity-nav-btn.active {
+      background: var(--primary-red-dim);
+      color: var(--primary-red);
+      font-weight: 600;
+    }
+
+    .activity-nav-btn .dot {
+      width: 4px;
+      height: 4px;
+      background-color: var(--text-muted);
+      border-radius: 50%;
+    }
+
+    .activity-nav-btn.active .dot {
+      background-color: var(--primary-red);
+      box-shadow: 0 0 4px var(--primary-red);
+    }
+
+    /* CENTRAL PORT CONTAINER */
+    .app-viewport {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      overflow-x: auto;
+      background: var(--bg-white);
+      position: relative;
+      min-width: 0;
+    }
+
+    /* WELCOME VIEWPORT */
+    .welcome-viewport {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 24px;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: fadeSlideIn var(--transition-normal);
+    }
+
+    .welcome-viewport.active {
+      display: flex;
+    }
+
+    .welcome-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .welcome-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .welcome-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .welcome-mini-card {
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .welcome-mini-card strong {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .welcome-mini-card span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ACTIVITIES CANVAS PANELS */
+    .activity-viewport-panel {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      animation: fadeSlideIn var(--transition-normal);
+    }
+
+    .activity-viewport-panel.active {
+      display: flex;
+    }
+
+    /* COLLAPSIBLE RIGHT SYLLABUS PANEL */
+    .app-learning-panel {
+      width: 320px;
+      background: var(--bg-grey);
+      border-left: 1px solid var(--border-grey);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 110px);
+      max-height: calc(100vh - 110px);
+      transition: width var(--transition-normal);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .learning-panel-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+      width: 320px;
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .learning-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--primary-red);
+      padding-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .concept-topic-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .concept-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .concept-value {
+      font-size: 13px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .syllabus-text-box {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      background: var(--bg-white);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    /* FOOTER CONTROL ACTIONS BAR */
+    .app-footer {
+      height: 50px;
+      background: var(--bg-grey);
+      border-top: 1.5px solid var(--border-grey);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    /* REUSABLE LAB CARDS */
+    .lab-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 24px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .lab-card-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-grey);
+      padding-bottom: 16px;
+    }
+
+    .lab-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .lab-card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* DRAG CHIPS AND TARGETS */
+    .chip-deck {
+      background: var(--bg-grey);
+      border: 2px dashed var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 120px;
+    }
+
+    .chip-deck-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .drag-card-chip {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-grey-dark);
+      border-left: 4px solid var(--primary-red);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: grab;
+      user-select: none;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .drag-card-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+      border-color: var(--primary-red);
+    }
+
+    .drag-card-chip.dragging {
+      opacity: 0.4;
+    }
+
+    .drag-card-chip.selected {
+      background: var(--primary-red-dim);
+      border-color: var(--primary-red);
+    }
+
+    /* PORTAL SIMULATOR FRAME */
+    .mock-portal {
+      border: 1px solid var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-white);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      margin-top: 10px;
+      position: relative;
+    }
+
+    .mock-portal-header {
+      background: var(--bg-grey-dark);
+      border-bottom: 1.5px solid var(--border-grey);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mock-portal-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-main);
+      letter-spacing: 0.5px;
+    }
+
+    .mock-portal-url {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-white);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-grey);
+      width: 50%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .mock-portal-breadcrumbs {
+      background: var(--bg-grey);
+      border-bottom: 1px solid var(--border-grey);
+      padding: 8px 16px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .mock-portal-breadcrumbs span {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .breadcrumb-item-link {
+      color: var(--primary-red);
+      cursor: pointer;
+    }
+
+    .breadcrumb-item-link:hover {
+      text-decoration: underline;
+    }
+
+    .mock-portal-body {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      min-height: 280px;
+      position: relative;
+    }
+
+    .mock-portal-sidebar {
+      background: var(--bg-grey);
+      border-right: 1.5px solid var(--border-grey);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .portal-sidebar-btn {
+      background: transparent;
+      border: none;
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .portal-sidebar-btn:hover {
+      background: var(--bg-grey-dark);
+      color: var(--primary-red);
+    }
+
+    .portal-sidebar-btn.active {
+      background: var(--primary-red-dim);
+      color: var(--primary-red);
+      font-weight: 700;
+    }
+
+    .mock-portal-viewport {
+      padding: 24px;
+      background: var(--bg-white);
+      position: relative;
+    }
+
+    .portal-view-card {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: scaleIn var(--transition-fast) forwards;
+    }
+
+    .portal-view-card.active {
+      display: flex;
+    }
+
+    .portal-headline {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .portal-options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .portal-option-card {
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      padding: 16px 12px;
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .portal-option-card:hover {
+      border-color: var(--primary-red);
+      background: var(--bg-white);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hud-stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .hud-stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hud-stat-val {
+      color: var(--primary-red);
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+
+    /* DRAGGABLE SIDEBAR BUTTONS FOR ACT 2 */
+    .portal-sidebar-btn.dragover {
+      border: 2.5px dashed var(--primary-red) !important;
+      background: var(--primary-red-dim) !important;
+    }
+    
+    .portal-sidebar-btn.correct-drop {
+      border: 2px solid #38a169 !important;
+      background: rgba(56, 161, 105, 0.05) !important;
+      color: #276749 !important;
+    }
+
+    .portal-sidebar-btn.incorrect-drop {
+      border: 2px solid var(--primary-red) !important;
+      background: var(--primary-red-dim) !important;
+      color: var(--primary-red) !important;
+    }
+
+    .act2-sublabel {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-weight: normal;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* LEVEL 1 ACTIVITY 2: LABEL REDESIGN MATCH CONTAINER */
+    .label-match-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* LEVEL 2 ACTIVITY 1 & 2: BREADCRUMBS */
+    .breadcrumbs-slots-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--bg-grey);
+      border: 1.5px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb-slot-box {
+      width: 140px;
+      height: 44px;
+      border: 2px dashed var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      background: var(--bg-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-align: center;
+      padding: 4px;
+      position: relative;
+    }
+
+    .breadcrumb-slot-box.dragover {
+      border-color: var(--primary-red);
+      background: var(--primary-red-dim);
+    }
+
+    .breadcrumb-slot-box.filled {
+      border-style: solid;
+      border-color: var(--border-grey-dark);
+      font-weight: 600;
+      color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .breadcrumb-slot-box.correct-node {
+      border-color: #38a169;
+      background: rgba(56, 161, 105, 0.05);
+      color: #276749;
+    }
+
+    .breadcrumb-slot-box.wrong-node {
+      border-color: var(--primary-red);
+      background: var(--primary-red-dim);
+      color: var(--primary-red);
+    }
+
+    .breadcrumb-arrow {
+      font-size: 16px;
+      color: var(--text-muted);
+      font-weight: bold;
+    }
+
+    /* LEVEL 3 ACTIVITY 1: NAVIGATION FLOW SCRIPTS */
+    .task-instruction-card {
+      background: var(--primary-red-dim);
+      border-left: 4px solid var(--primary-red);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-red-hover);
+      margin-bottom: 16px;
+    }
+
+    /* HEATMAP OVERLAY STYLES */
+    .heatmap-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.25);
+      pointer-events: none;
+      z-index: 50;
+      display: none;
+    }
+
+    .heatmap-overlay.show {
+      display: block;
+    }
+
+    .heatmap-label-overlay {
+      position: absolute;
+      background: rgba(239, 68, 68, 0.18);
+      border: 2px solid #ef4444;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7f1d1d;
+      font-weight: 800;
+      font-size: 9px;
+      z-index: 60;
+    }
+
+    .heatmap-most-clicked {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border: 1.5px solid rgba(239, 68, 68, 0.5) !important;
+      position: relative;
+    }
+    .heatmap-most-clicked::after {
+      content: '🔥 Most Clicked (4)';
+      position: absolute;
+      top: -8px;
+      right: 4px;
+      background: #ef4444;
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 3px;
+      z-index: 10;
+    }
+
+    .heatmap-wrong-turn {
+      background: rgba(245, 158, 11, 0.15) !important;
+      border: 1.5px dashed rgba(245, 158, 11, 0.6) !important;
+      position: relative;
+    }
+    .heatmap-wrong-turn::after {
+      content: '⚠️ Wrong Turn';
+      position: absolute;
+      top: -8px;
+      right: 4px;
+      background: #f59e0b;
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 3px;
+      z-index: 10;
+    }
+
+    .heatmap-backtrack {
+      background: rgba(59, 130, 246, 0.15) !important;
+      border: 1.5px dotted rgba(59, 130, 246, 0.6) !important;
+      position: relative;
+    }
+    .heatmap-backtrack::after {
+      content: '🔄 Backtrack';
+      position: absolute;
+      top: -8px;
+      right: 4px;
+      background: #3b82f6;
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 3px;
+      z-index: 10;
+    }
+
+    .heatmap-optimal {
+      box-shadow: 0 0 12px #38a169 !important;
+      border: 2px solid #38a169 !important;
+      position: relative;
+    }
+    .heatmap-optimal::after {
+      content: '✓ Optimal';
+      position: absolute;
+      top: -8px;
+      right: 4px;
+      background: #38a169;
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 3px;
+      z-index: 10;
+    }
+
+    /* AUDIT CAPSTONE DEFECT SHADOW OVERLAYS */
+    .audit-portal-mock {
+      border: 1px solid var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--bg-white);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      margin-top: 10px;
+      position: relative;
+    }
+
+    .audit-defect-item {
+      position: relative;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .audit-defect-item::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 1.5px dashed var(--primary-red);
+      border-radius: var(--radius-sm);
+      background: rgba(196, 30, 58, 0.03);
+      pointer-events: none;
+      animation: pulseBorder 2s infinite ease-in-out;
+    }
+
+    .audit-defect-item.solved::after {
+      border: 1.5px solid #38a169;
+      background: rgba(56, 161, 105, 0.03);
+      animation: none;
+    }
+
+    /* CALLOUT TAG FOR RESOLVED DEFECTS */
+    .audit-resolved-callout {
+      position: absolute;
+      top: -12px;
+      right: 4px;
+      background: #38a169;
+      color: white;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+      z-index: 100;
+      animation: scaleIn var(--transition-fast) forwards;
+    }
+
+    /* AUDIT DASHBOARD METRICS */
+    .audit-dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .audit-metric-card {
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-normal);
+    }
+
+    .audit-metric-card.pass {
+      border-color: #c6f6d5;
+      background: #f0fff4;
+    }
+
+    .audit-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #fed7d7;
+      color: #9b2c2c;
+      font-weight: 800;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .audit-metric-card.pass .audit-badge {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .audit-metric-info {
+      flex: 1;
+    }
+
+    .audit-metric-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .audit-metric-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+
+    @keyframes pulseBorder {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* PROGRESSIVE HINTS STYLE */
+    .hint-popover {
+      position: fixed;
+      top: 70px;
+      right: 24px;
+      width: 300px;
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+      animation: fadeSlideIn var(--transition-fast);
+    }
+
+    .hint-popover.open {
+      display: flex;
+    }
+
+    .hint-header {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-red);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1.5px solid var(--border-grey);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hint-body {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      min-height: 48px;
+    }
+
+    .hint-steps-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .hint-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--border-grey-dark);
+      transition: background var(--transition-fast);
+    }
+
+    .hint-dot.active {
+      background-color: var(--primary-red);
+    }
+
+    /* TOAST ALERTS */
+    .toast-feedback {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--text-main);
+      color: var(--bg-white);
+      border-radius: var(--radius-md);
+      padding: 10px 18px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 10000;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      animation: fadeSlideIn var(--transition-fast);
+    }
+
+    .toast-feedback.show {
+      display: block;
+    }
+
+    /* DYNAMIC OBSERVATION Recaps */
+    .obs-recap-box {
+      background-color: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-left: 4px solid var(--primary-red);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .obs-recap-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary-red);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .obs-recap-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ANIMATED PATH JOURNEYS */
+    .breadcrumb-node-anim {
+      display: inline-flex;
+      align-items: center;
+      animation: breadcrumbSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes breadcrumbSlideIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .clicked-pulse {
+      animation: clickPulse 0.4s ease;
+    }
+
+    @keyframes clickPulse {
+      0% { box-shadow: 0 0 0 0 rgba(196, 30, 58, 0.4); }
+      100% { box-shadow: 0 0 0 8px rgba(196, 30, 58, 0); }
+    }
+
+    /* CORE ANIMATIONS */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .shake-animation {
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- Header Banner -->
-    <header>
-        <a href="../../index.html" class="back-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Back to Module
-        </a>
-        <h1>Navigation, Signposts and Wayfinding Patterns</h1>
-        <p>Interactive Virtual Lab Simulation</p>
-    </header>
+  <!-- APP HEADER -->
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="../../index.html" class="back-link" title="Back to main directory">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </a>
+      <div class="logo-mark"></div>
+      <div class="logo-title">UI Programming Lab</div>
+      <div class="logo-tag">Module 2.2: Wayfinding</div>
+    </div>
+    
+    <div class="header-center">
+      <button class="btn-lab btn-lab-secondary" id="btn-header-home" onclick="navigateTo('welcome')">Home</button>
+      <button class="btn-lab btn-lab-secondary" id="btn-header-reset" onclick="resetActiveActivity()">Restart Activity</button>
+      <button class="btn-lab btn-lab-primary" id="btn-header-hint" onclick="toggleHintPopover()">Hint</button>
+    </div>
+  </header>
 
-    <div class="container">
+  <!-- APP BODY -->
+  <div class="app-body">
+    
+    <!-- SIDEBAR NAVIGATION DIRECTORY -->
+    <aside class="app-sidebar">
+      <div class="sidebar-section-title">Navigation Directory</div>
+      <nav class="nav-levels-list">
+        
+        <!-- LEVEL 1 -->
+        <div class="level-nav-item">
+          <div class="level-header">Level 1: Understanding Navigation</div>
+          <div class="activity-nav-list">
+            <button class="activity-nav-btn" id="nav-act-1" onclick="navigateTo('act-1')">
+              <span class="dot"></span>
+              <span>1. Destination Navigation</span>
+            </button>
+            <button class="activity-nav-btn" id="nav-act-2" onclick="navigateTo('act-2')">
+              <span class="dot"></span>
+              <span>2. Label Evaluation</span>
+            </button>
+          </div>
+        </div>
 
-        <!-- Short Theory Card -->
-        <section class="card">
-            <h2>📘 Wayfinding & Navigation Theory</h2>
-            <div class="grid">
-                <div class="box">
-                    <b>Navigation</b>
-                    Menus, links, and buttons that allow users to move inside an application.
-                </div>
-                <div class="box">
-                    <b>Signposts</b>
-                    Labels, headings, and icons that help users determine where they can go.
-                </div>
-                <div class="box">
-                    <b>Breadcrumbs</b>
-                    A textual path (e.g. Home > Academic > Results) showing hierarchy and locations.
-                </div>
-                <div class="box">
-                    <b>Wayfinding</b>
-                    Visual indicators (like highlighted links) explaining: "Where am I right now?"
-                </div>
-                <div class="box">
-                    <b>Clear Labels</b>
-                    Descriptive button titles (like "Fees") instead of vague titles (like "Money").
-                </div>
+        <!-- LEVEL 2 -->
+        <div class="level-nav-item">
+          <div class="level-header">Level 2: Understanding Wayfinding</div>
+          <div class="activity-nav-list">
+            <button class="activity-nav-btn" id="nav-act-3" onclick="navigateTo('act-3')">
+              <span class="dot"></span>
+              <span>3. Breadcrumb Builder</span>
+            </button>
+            <button class="activity-nav-btn" id="nav-act-4" onclick="navigateTo('act-4')">
+              <span class="dot"></span>
+              <span>4. Repair Breadcrumbs</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- LEVEL 3 -->
+        <div class="level-nav-item">
+          <div class="level-header">Level 3: Navigation Design Laboratory</div>
+          <div class="activity-nav-list">
+            <button class="activity-nav-btn" id="nav-act-5" onclick="navigateTo('act-5')">
+              <span class="dot"></span>
+              <span>5. Flow Challenge</span>
+            </button>
+            <button class="activity-nav-btn" id="nav-act-6" onclick="navigateTo('act-6')">
+              <span class="dot"></span>
+              <span>6. Navigation Audit</span>
+            </button>
+          </div>
+        </div>
+
+      </nav>
+    </aside>
+
+    <!-- MAIN VIEWPORT PANELS -->
+    <main class="app-viewport">
+
+      <!-- WELCOME SCREEN -->
+      <div class="welcome-viewport active" id="panel-welcome">
+        <h1 class="welcome-title">Navigation & Wayfinding Lab</h1>
+        <p class="welcome-desc">
+          Explore how signposts, clear terminology, structural breadcrumbs, and flat click depths increase student search rates and prevent portal orientation fatigue.
+        </p>
+        
+        <div class="welcome-card-grid">
+          <div class="welcome-mini-card">
+            <strong>1. Explore</strong>
+            <span>Investigate destination links and match vague categories</span>
+          </div>
+          <div class="welcome-mini-card">
+            <strong>2. Repair</strong>
+            <span>Construct parent-child trails and correct broken paths</span>
+          </div>
+          <div class="welcome-mini-card">
+            <strong>3. Evaluate</strong>
+            <span>Run automated flow audits and critique usability defects</span>
+          </div>
+        </div>
+
+        <button class="btn-lab btn-lab-primary" style="margin-top: 12px; padding: 12px 24px;" onclick="navigateTo('act-1')">Start Lab Investigations</button>
+      </div>
+
+      <!-- LEVEL 1 ACTIVITY 1: DESTINATION NAVIGATION -->
+      <div class="activity-viewport-panel" id="panel-act-1">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <h2 class="lab-card-title">Activity 1: Destination Navigation</h2>
+            <div class="lab-card-subtitle">Locate the student's <strong>Exam Results</strong> page by clicking through the mock directories below. Watch the breadcrumb animation and visual pathway updates.</div>
+          </div>
+          
+          <div class="hud-stats-row">
+            <div class="hud-stat-badge">
+              <span>Path Clicks:</span>
+              <span class="hud-stat-val" id="act1-clicks">0</span>
             </div>
-        </section>
+            <div class="hud-stat-badge">
+              <span>Wrong Turns:</span>
+              <span class="hud-stat-val" id="act1-errors">0</span>
+            </div>
+          </div>
 
-        <!-- Interactive Simulator workspace -->
-        <section class="card">
-            <h2>🎮 Wayfinding Virtual Lab</h2>
-
-            <!-- HUD Stats -->
-            <div class="hud-row">
-                <div class="hud-stat">Level: <span id="hudLevelText">1 of 5</span></div>
-                <div class="hud-stat" style="display: none;">Score: <span id="hudScoreText">0</span></div>
+          <!-- Mock Portal Simulation -->
+          <div class="mock-portal">
+            <div class="mock-portal-header">
+              <div class="mock-portal-title">Academics Portal Mockup</div>
+              <div class="mock-portal-url">https://portal.university.edu/student/home</div>
+            </div>
+            
+            <div class="mock-portal-breadcrumbs" id="act1-breadcrumbs">
+              <!-- Breadcrumbs are built here with animated entry -->
             </div>
 
-            <!-- Linear Progress Bar -->
-            <div class="progress-container">
-                <div class="progress-bar" id="hudProgressBar"></div>
+            <div class="mock-portal-body">
+              <aside class="mock-portal-sidebar">
+                <button class="portal-sidebar-btn active" id="act1-side-Home" onclick="navigateAct1('Home')">Home Dashboard</button>
+                <button class="portal-sidebar-btn" id="act1-side-Academic" onclick="navigateAct1('Academic')">Academic Logs</button>
+                <button class="portal-sidebar-btn" id="act1-side-Profile" onclick="triggerAct1Error('Profile')">Profile Details</button>
+                <button class="portal-sidebar-btn" id="act1-side-Fees" onclick="triggerAct1Error('Fees')">Financial Invoices</button>
+              </aside>
+              <main class="mock-portal-viewport" id="act1-viewport">
+                <!-- Injected dynamically -->
+              </main>
+            </div>
+          </div>
+
+          <div class="obs-recap-box" id="act1-obs-box" style="display: none;">
+            <div class="obs-recap-title">Heuristic Analysis</div>
+            <div class="obs-recap-desc" id="act1-obs-text"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LEVEL 1 ACTIVITY 2: NAVIGATION LABEL EVALUATION (SIDEBAR LABEL REDESIGN) -->
+      <div class="activity-viewport-panel" id="panel-act-2">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <h2 class="lab-card-title">Activity 2: Sidebar Menu Label Redesign</h2>
+            <div class="lab-card-subtitle">Redesign the vague navigation menus on the left sidebar by dragging and dropping standard terms directly onto them.</div>
+          </div>
+
+          <div class="label-match-container">
+            
+            <!-- Left: Sidebar Editor mock menu -->
+            <div class="mock-portal" style="border: 1px solid var(--border-grey-dark);">
+              <div class="mock-portal-header">
+                <div class="mock-portal-title">Sidebar Design Editor</div>
+              </div>
+              <div class="mock-portal-body" style="grid-template-columns: 1fr; min-height: 240px;">
+                <aside class="mock-portal-sidebar" style="border-right: none; width:100%; gap:10px;" id="act2-sidebar-container">
+                  <!-- Side button menu drops loaded here -->
+                </aside>
+              </div>
+            </div>
+            
+            <!-- Right: Deck Tray -->
+            <div class="chip-deck">
+              <div class="dnd-toolbox-title">Standard Terms Deck</div>
+              <div class="chip-deck-row" id="act2-chip-deck">
+                <!-- Draggables rendered dynamically -->
+              </div>
             </div>
 
-            <!-- Main Game Arena -->
-            <div class="level-container" id="levelContainer">
-                <!-- Content dynamically injected per level by JS -->
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LEVEL 2 ACTIVITY 1: BREADCRUMB BUILDER -->
+      <div class="activity-viewport-panel" id="panel-act-3">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <h2 class="lab-card-title">Activity 3: Breadcrumb Builder</h2>
+            <div class="lab-card-subtitle">Arrange the breadcrumb trail components in the correct hierarchical sequence (left-to-right) for the specified task.</div>
+          </div>
+
+          <div class="task-instruction-card" id="act3-task-prompt">
+            Task: Build path
+          </div>
+
+          <div class="breadcrumbs-slots-row" id="act3-slots-row">
+            <!-- Slots rendered dynamically -->
+          </div>
+
+          <div class="chip-deck">
+            <div class="dnd-toolbox-title">Breadcrumb Nodes Deck</div>
+            <div class="chip-deck-row" id="act3-chip-deck">
+              <!-- Draggables rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LEVEL 2 ACTIVITY 2: REPAIR BROKEN BREADCRUMBS -->
+      <div class="activity-viewport-panel" id="panel-act-4">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <h2 class="lab-card-title">Activity 4: Repair Broken Breadcrumbs</h2>
+            <div class="lab-card-subtitle">Diagnose the wayfinding path error and drop the correct replacement node into the broken slot.</div>
+          </div>
+
+          <div class="task-instruction-card" id="act4-task-prompt">
+            Scenario
+          </div>
+
+          <div class="breadcrumbs-slots-row" id="act4-slots-row">
+            <!-- Slots rendered dynamically -->
+          </div>
+
+          <div class="chip-deck">
+            <div class="dnd-toolbox-title">Repair Nodes Deck</div>
+            <div class="chip-deck-row" id="act4-chip-deck">
+              <!-- Cards rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LEVEL 3 ACTIVITY 1: NAVIGATION FLOW CHALLENGE -->
+      <div class="activity-viewport-panel" id="panel-act-5">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <h2 class="lab-card-title">Activity 5: Navigation Flow Challenge</h2>
+            <div class="lab-card-subtitle">Complete the wayfinding lookups on <strong>4 distinct application portals</strong>. Clicks and wrong turns are tracked automatically.</div>
+          </div>
+
+          <div class="task-instruction-card" id="act5-task-prompt">
+            Loading task...
+          </div>
+
+          <!-- Flow Portal Mockup -->
+          <div class="mock-portal" id="act5-portal-area" style="transition: border-color var(--transition-normal);">
+            <div class="mock-portal-header">
+              <div class="mock-portal-title" id="act5-portal-header-title">Portal Mockup</div>
+              <div class="mock-portal-url" id="act5-portal-url">https://portal.university.edu/student/dashboard</div>
+            </div>
+            
+            <div class="mock-portal-breadcrumbs" id="act5-breadcrumbs">
+              <!-- Animated breadcrumb entries injected here -->
             </div>
 
-            <!-- Feedback notifications -->
-            <div id="feedbackText"></div>
-
-            <!-- Action buttons -->
-            <div class="control-row">
-                <button class="btn-secondary" id="prevBtn" onclick="goToPrevLevel()" style="display: none;">Previous Level</button>
-                <button id="checkBtn" onclick="checkCurrentLevel()">Check Answer</button>
-                <button class="btn-secondary" id="hintBtn" onclick="showLevelHint()">Hint</button>
-                <button class="btn-secondary" id="resetBtn" onclick="resetCurrentLevel()">Reset Level</button>
-                <button id="nextBtn" onclick="goToNextLevel()" disabled>Next Level</button>
+            <div class="mock-portal-body">
+              <aside class="mock-portal-sidebar" id="act5-sidebar">
+                <!-- Sidebar buttons dynamically populated -->
+              </aside>
+              
+              <main class="mock-portal-viewport" id="act5-viewport" style="position:relative;">
+                <!-- Main viewport content -->
+              </main>
             </div>
-        </section>
+          </div>
 
-        <!-- Dynamically Updated Observation card -->
-        <section class="card">
-            <h2>🔬 Tester Observation Log</h2>
-            <p id="observationText">
-                Start auditing navigation. Observations will dynamically update as you submit paths and labels...
-            </p>
-        </section>
+          <!-- Final Report & Heatmap slots -->
+          <div id="act5-report-container" style="display: none; margin-top: 16px;">
+            <!-- Report Table and heatmap toggle elements injected here -->
+          </div>
 
-        <!-- Usability Conclusion Section -->
-        <section class="card">
-            <h2>📝 Usability Conclusion</h2>
-            <p style="font-size: 13.5px; color: #222;">
-                Good navigation and wayfinding patterns improve usability by helping users understand their current
-                location, available choices, and correct next steps. Descriptive labels and breadcrumbs prevent users
-                from taking confusing detours, saving effort and reducing frustration.
-            </p>
-        </section>
+        </div>
+      </div>
 
+      <!-- LEVEL 3 ACTIVITY 2: NAVIGATION AUDIT CAPSTONE -->
+      <div class="activity-viewport-panel" id="panel-act-6">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <h2 class="lab-card-title">Activity 6: Navigation Audit (Capstone)</h2>
+            <div class="lab-card-subtitle">Audit the sitemap and visual elements of this student portal. Identify and click on the <strong>6 major defects</strong> to pass the audit.</div>
+          </div>
+
+          <!-- VISUAL METRICS AUDIT DASHBOARD -->
+          <div class="audit-dashboard-grid" id="act6-dashboard">
+            
+            <!-- Metric 1: Clear Labels -->
+            <div class="audit-metric-card" id="metric-label">
+              <div class="audit-badge" id="badge-label">FAIL</div>
+              <div class="audit-metric-info">
+                <div class="audit-metric-title">Clear Labels</div>
+                <div class="audit-metric-desc">Ambiguous or creative menu titles.</div>
+              </div>
+            </div>
+
+            <!-- Metric 2: Breadcrumbs -->
+            <div class="audit-metric-card" id="metric-breadcrumb">
+              <div class="audit-badge" id="badge-breadcrumb">FAIL</div>
+              <div class="audit-metric-info">
+                <div class="audit-metric-title">Breadcrumb Quality</div>
+                <div class="audit-metric-desc">Incorrect parent levels.</div>
+              </div>
+            </div>
+
+            <!-- Metric 3: Click Depth -->
+            <div class="audit-metric-card" id="metric-depth">
+              <div class="audit-badge" id="badge-depth">FAIL</div>
+              <div class="audit-metric-info">
+                <div class="audit-metric-title">Click Depth</div>
+                <div class="audit-metric-desc">Target buried > 3 levels deep.</div>
+              </div>
+            </div>
+
+            <!-- Metric 4: Active State -->
+            <div class="audit-metric-card" id="metric-active-state">
+              <div class="audit-badge" id="badge-active-state">FAIL</div>
+              <div class="audit-metric-info">
+                <div class="audit-metric-title">Active States</div>
+                <div class="audit-metric-desc">Current page lacks highlight.</div>
+              </div>
+            </div>
+
+            <!-- Metric 5: Signposts -->
+            <div class="audit-metric-card" id="metric-misgrouped">
+              <div class="audit-badge" id="badge-misgrouped">FAIL</div>
+              <div class="audit-metric-info">
+                <div class="audit-metric-title">Signposts Alignment</div>
+                <div class="audit-metric-desc">Invoices misgrouped under support.</div>
+              </div>
+            </div>
+
+            <!-- Metric 6: Consistency -->
+            <div class="audit-metric-card" id="metric-duplicate">
+              <div class="audit-badge" id="badge-duplicate">FAIL</div>
+              <div class="audit-metric-info">
+                <div class="audit-metric-title">Navigation Consistency</div>
+                <div class="audit-metric-desc">Duplicate menu item references.</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Auditable Portal -->
+          <div class="audit-portal-mock">
+            <div class="mock-portal-header">
+              <div class="mock-portal-title">Portal Audit Inspect Panel</div>
+              <div class="mock-portal-url">https://portal.university.edu/audit-inspect</div>
+            </div>
+
+            <!-- Defect 6: Broken Breadcrumb -->
+            <div class="mock-portal-breadcrumbs" style="justify-content: space-between;">
+              <div class="audit-defect-item" id="defect-breadcrumb" onclick="solveDefect('breadcrumb')">
+                You are here: <span id="defect-breadcrumb-text" style="color:var(--primary-red); font-weight:700;">Home → Support → Profile Details</span>
+              </div>
+              <div style="font-size: 11px; font-weight: bold; color: var(--text-muted);">Browsing: Profile details page</div>
+            </div>
+
+            <div class="mock-portal-body">
+              <aside class="mock-portal-sidebar">
+                <button class="portal-sidebar-btn" disabled>Dashboard</button>
+                <button class="portal-sidebar-btn" disabled>Academic Logs</button>
+                <button class="portal-sidebar-btn" disabled>Fees & Finances</button>
+                <button class="portal-sidebar-btn" disabled>Student Support</button>
+                
+                <!-- Defect 5: Missing Active indicator -->
+                <button class="portal-sidebar-btn audit-defect-item" id="defect-active-state" onclick="solveDefect('active-state')">
+                  <span>Attendance Record</span>
+                </button>
+
+                <!-- Defect 1: Confusing Vague Label -->
+                <button class="portal-sidebar-btn audit-defect-item" id="defect-label" onclick="solveDefect('label')" style="background:#fff3cd; border-color:#ffeeba;">
+                  <span id="defect-label-text" style="color:#856404; font-weight:bold;">📄 Study Stuff</span>
+                </button>
+
+                <!-- Defect 2: Duplicate path link -->
+                <button class="portal-sidebar-btn audit-defect-item" id="defect-duplicate" onclick="solveDefect('duplicate')" style="background:#f8d7da; border-color:#f5c6cb;">
+                  <span id="defect-duplicate-text" style="color:#721c24; font-weight:bold;">📅 Timetable</span>
+                </button>
+              </aside>
+
+              <main class="mock-portal-viewport">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  
+                  <!-- Defect 4: Misgrouped link inside Support card -->
+                  <div class="lab-card" style="padding:16px; background:var(--bg-grey);">
+                    <div class="folder-title" style="color:var(--text-main); font-size:13px; font-weight:bold; margin-bottom:8px; border-bottom:1.5px solid var(--border-grey-dark);">Student Support Directory</div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; position:relative;">
+                      <span class="drag-card-chip" style="font-size:11px; border-left-color:var(--text-muted); cursor:default;">Contact Helpdesk</span>
+                      <span class="drag-card-chip" style="font-size:11px; border-left-color:var(--text-muted); cursor:default;">FAQ Section</span>
+                      
+                      <span class="drag-card-chip audit-defect-item" id="defect-misgrouped" onclick="solveDefect('misgrouped')" style="font-size:11px; background:#fff3cd; border-color:#ffeeba;">
+                        <span id="defect-misgrouped-text" style="color:#856404; font-weight:bold;">💵 Pay Tuition</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Defect 3: Deep click depth path link -->
+                  <div class="lab-card" style="padding:16px; background:var(--bg-grey);">
+                    <div class="folder-title" style="color:var(--text-main); font-size:13px; font-weight:bold; margin-bottom:8px; border-bottom:1.5px solid var(--border-grey-dark);">Quick Actions Links</div>
+                    <div style="position:relative;">
+                      <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Deep path warning: This transcript requires searching 6 subfolders.</p>
+                      
+                      <button class="btn-lab btn-lab-secondary audit-defect-item" id="defect-depth" onclick="solveDefect('depth')" style="font-size:11px; border-color:#ffeeba; background:#fff3cd;">
+                        <span id="defect-depth-text" style="color:#856404;">Explore: Home → Academic → Semester 1 → Logs → Reports → Grades → Semester GPA</span>
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </main>
+            </div>
+          </div>
+
+          <!-- CAPSTONE REPORT SUMMARY -->
+          <div id="act6-report-container" style="display: none; margin-top: 16px;">
+            <!-- Audits text will be dynamically built here -->
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SYLLABUS THEORY PANEL -->
+    <aside class="app-learning-panel" id="learning-panel">
+      <div class="learning-panel-content">
+        <div class="learning-header">Concept Explorer</div>
+        
+        <div class="concept-topic-group">
+          <div class="concept-label">Current Concept</div>
+          <div class="concept-value" id="learning-concept">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Definition</div>
+          <div class="syllabus-text-box" id="learning-definition">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Real-world Example</div>
+          <div class="syllabus-text-box" id="learning-example">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Heuristic Best Practice</div>
+          <div class="syllabus-text-box" id="learning-best-practice">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Common Mistakes</div>
+          <div class="syllabus-text-box" id="learning-mistake">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Design Tip</div>
+          <div class="syllabus-text-box" id="learning-design-tip">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Why This Matters</div>
+          <div class="syllabus-text-box" id="learning-why-matters">-</div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- APP FOOTER -->
+  <footer class="app-footer">
+    <div>
+      <button class="btn-lab btn-lab-secondary" id="btn-footer-prev" onclick="navigatePrev()">Previous Activity</button>
+      <button class="btn-lab btn-lab-secondary" id="btn-footer-next" onclick="navigateNext()">Next Activity</button>
+    </div>
+    
+    <div>
+      <button class="btn-lab btn-lab-primary" id="btn-footer-check" onclick="checkCurrentActivity()">Check Answer</button>
     </div>
 
-    <script>
-        // --- GAME DATABASE ---
-        const levelData = [
-            {
-                number: 1,
-                title: "Level 1: Find the Correct Page",
-                instruction: "Auditing navigation: Locate the student's <b>Exam Results</b> page by clicking through the categories. Breadcrumbs will update as you move.",
-                hint: "Click 'Academic' in the sidebar menu first, then select 'Exam Results' inside the viewport."
-            },
-            {
-                number: 2,
-                title: "Level 2: Drag and Drop Navigation Items",
-                instruction: "Replace the vague, confusing labels in the left sidebar menu with the correct, clear label cards from the tray below. Drag cards or click to match.",
-                mapping: {
-                    "Money": "Fees",
-                    "Study Stuff": "Resources",
-                    "Help Area": "Support",
-                    "Marks": "Exam Results"
-                },
-                hint: "Money maps to Fees; Study Stuff maps to Resources; Help Area maps to Support; Marks maps to Exam Results."
-            },
-            {
-                number: 3,
-                title: "Level 3: Breadcrumb Builder",
-                instruction: "Arrange the breadcrumb trail components in the correct hierarchical sequence (left-to-right) for each task. Drag cards or click slots.",
-                challenges: [
-                    {
-                        task: "Build the breadcrumb for the <b>Fee Receipt</b> page:",
-                        correct: ["Home", "Fees", "Fee Receipt"],
-                        options: ["Fee Receipt", "Home", "Fees"]
-                    },
-                    {
-                        task: "Build the breadcrumb for the <b>Attendance Report</b> page:",
-                        correct: ["Home", "Academic", "Attendance"],
-                        options: ["Academic", "Home", "Attendance"]
-                    },
-                    {
-                        task: "Build the breadcrumb for the <b>Hostel Complaint</b> page:",
-                        correct: ["Home", "Support", "Hostel Complaint"],
-                        options: ["Support", "Hostel Complaint", "Home"]
-                    }
-                ],
-                hint: "The structure is always from parent to child: Home is the root, followed by the Main Category, and then the Sub-page."
-            },
-            {
-                number: 4,
-                title: "Level 4: Fix Bad Navigation Structure",
-                instruction: "This student portal menu is poorly organized. Sort the page cards from the tray below into their correct category folders.",
-                categories: ["Academic", "Profile", "Fees", "Support"],
-                pages: [
-                    { name: "Exam Results", category: "Academic" },
-                    { name: "ID Card", category: "Profile" },
-                    { name: "Fee Receipt", category: "Fees" },
-                    { name: "Help Desk", category: "Support" }
-                ],
-                hint: "Exam Results belong to Academic; ID Card belongs to Profile; Fee Receipt belongs to Fees; Help Desk belongs to Support."
-            },
-            {
-                number: 5,
-                title: "Level 5: Final Wayfinding Challenge",
-                instruction: "Complete 4 navigation scenarios. For each scenario, choose the shortest, most intuitive click pathway.",
-                tasks: [
-                    {
-                        scenario: "Task 1 of 4: Find Exam Results",
-                        options: [
-                            { text: "Home → Academic → Exam Results", correct: true },
-                            { text: "Home → Profile → Exam Results", correct: false },
-                            { text: "Home → Support → Academic → Results", correct: false }
-                        ]
-                    },
-                    {
-                        scenario: "Task 2 of 4: Download Fee Receipt",
-                        options: [
-                            { text: "Home → Fees → Fee Receipt", correct: true },
-                            { text: "Home → Academic → Fees → Receipt", correct: false },
-                            { text: "Home → Support → Fees → Fee Receipt", correct: false }
-                        ]
-                    },
-                    {
-                        scenario: "Task 3 of 4: Check Attendance",
-                        options: [
-                            { text: "Home → Academic → Attendance", correct: true },
-                            { text: "Home → Profile → Academic → Attendance", correct: false },
-                            { text: "Home → Support → Attendance", correct: false }
-                        ]
-                    },
-                    {
-                        scenario: "Task 4 of 4: Contact Help Desk",
-                        options: [
-                            { text: "Home → Support → Help Desk", correct: true },
-                            { text: "Home → Academic → Help Desk", correct: false },
-                            { text: "Home → Fees → Help Desk", correct: false }
-                        ]
-                    }
-                ],
-                hint: "Select the most direct route which correctly matches category domains without taking unnecessary detours."
-            }
-        ];
+    <div style="font-family: var(--font-mono); font-size:10px; color:var(--text-muted);">
+      Active View: <span id="footer-status-view" style="color:var(--primary-red); font-weight:700;">Welcome Screen</span>
+    </div>
+  </footer>
 
-        // --- GAME STATE ---
-        let state = {
-            level: 0, // index 0 to 4
-            score: 0,
-            correctAnswers: 0,
-            mistakesCount: 0,
-            hintsCount: 0,
-            levelPassed: false,
-            selectedCardId: null, // touch/click placement card selection
+  <!-- Toast Overlay -->
+  <div class="toast-feedback" id="toast-el">Feedback Alert Message</div>
 
-            // Placements memory
-            placements: {}, // key -> value
+  <!-- Progressive Hint Popover -->
+  <div class="hint-popover" id="hint-popover">
+    <div class="hint-header">
+      <span>Progressive Hint Clues</span>
+      <button class="btn-lab-text" style="padding:2px; font-weight:bold; cursor:pointer;" onclick="toggleHintPopover()">✕</button>
+    </div>
+    
+    <div class="hint-body" id="hint-text-content">
+      Select an active laboratory simulation to load progressive hint indices.
+    </div>
 
-            // Level 1 specific
-            l1Path: ["Home"],
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+      <div class="hint-steps-dots" id="hint-steps-container">
+        <!-- Dots injected dynamically -->
+      </div>
+      <button class="btn-lab btn-lab-secondary" style="padding:4px 8px; font-size:10px;" onclick="advanceActiveHint()">Next Hint</button>
+    </div>
+  </div>
 
-            // Level 3 specific
-            l3ChallengeIdx: 0,
+  <script>
+    // --- UTILITY SHUFFLE FUNCTION ---
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
 
-            // Level 5 specific
-            l5TaskIdx: 0
-        };
+    // --- STATE MANAGEMENT ---
+    const appState = {
+      activeView: 'welcome',
+      hintIndex: 0,
+      
+      // Global metrics (no gamified points/stars/XP)
+      clicksCount: 0,
+      mistakesCount: 0,
+      hintsCount: 0,
 
-        // --- INITIALIZATION ---
-        function initGame() {
-            state.level = 0;
-            state.score = 0;
-            state.correctAnswers = 0;
-            state.mistakesCount = 0;
-            state.hintsCount = 0;
+      // Activity states
+      act1: {
+        path: ['Home'],
+        clicks: 0,
+        errors: 0,
+        completed: false
+      },
+      act2: {
+        placements: {}, // vagueId -> standardValue
+        completed: false
+      },
+      act3: {
+        challengeIndex: 0,
+        placements: {}, // slotIndex -> value
+        completed: false
+      },
+      act4: {
+        challengeIndex: 0,
+        placements: {}, // slotIndex -> value
+        completed: false
+      },
+      act5: {
+        taskIndex: 0,
+        path: ['Home'],
+        clicks: 0,
+        errors: 0,
+        stats: [], // logs performance per task
+        completed: false,
+        heatmapVisible: false
+      },
+      act6: {
+        defectsSolved: [], // list of keys solved
+        completed: false
+      },
 
-            updateHUD();
-            updateObservation();
-            loadLevel(0);
+      hints: {
+        'welcome': [
+          "Welcome Hint 1: Click a Level/Activity in the Navigation Directory to begin the lab.",
+          "Welcome Hint 2: You can freely jump between any activities using the sidebar links at any time.",
+          "Welcome Hint 3: Click 'Restart Activity' in the top header if you want to wipe the active state."
+        ],
+        'act-1': [
+          "Destination Hint 1: The goal is to reach 'Exam Results'. Where do academic marks usually go? Click 'Academic Logs' first.",
+          "Destination Hint 2: Select 'Exam Results' link in the viewport to finalize the search path.",
+          "Destination Hint 3: Avoid profile or finance links as they will register wrong turns."
+        ],
+        'act-2': [
+          "Label Hint 1: Drag standard cards directly onto the matching vague sidebar items on the left portal menu.",
+          "Label Hint 2: Drag 'Resources' to 'Study Stuff' and 'Fees' to 'Money'.",
+          "Label Hint 3: When dropped, the sidebar labels will rewrite themselves in-place."
+        ],
+        'act-3': [
+          "Breadcrumb Hint 1: Always order directories from highest parent (root) to target sub-page.",
+          "Breadcrumb Hint 2: Home is the universal root. Academic is a level 1 parent. Attendance is a level 2 page.",
+          "Breadcrumb Hint 3: Order: Root → Primary Folder → Child File."
+        ],
+        'act-4': [
+          "Repair Hint 1: Review Scenario 1. Exam results belong to the Academic category. Drop 'Academic' in the empty slot.",
+          "Repair Hint 2: Scenario 2 is mixed up. The root node Home must start the path, followed by parent category, then active page.",
+          "Repair Hint 3: Scenario 3 misgroups Fee Receipt under Support. Swap Support with 'Fees' to correct the location."
+        ],
+        'act-5': [
+          "Flow Hint 1: Complete all 4 scenarios (Hospital Portal, Banking App, Food Delivery, and Railway Booking) by finding target subpages.",
+          "Flow Hint 2: Each portal uses a distinct color scheme and sitemap hierarchy to simulate real-world testing.",
+          "Flow Hint 3: Upon completing the tasks, toggle the Heatmap Visual Overlay to analyze click paths."
+        ],
+        'act-6': [
+          "Audit Hint 1: Look at the visual metrics dashboard. Locate and click elements on the mockup that correspond to the FAIL categories.",
+          "Audit Hint 2: Find the duplicate Timetable link, the deep click path GPA button, and the vague 'Study Stuff' sidebar button.",
+          "Audit Hint 3: Resolving defects transforms card metrics to green PASS states and places callout markers on the mockup."
+        ]
+      }
+    };
+
+    // --- HCD SYLLABUS DATA ---
+    const syllabusData = {
+      'welcome': {
+        concept: "Navigation & Wayfinding Systems",
+        definition: "The structural patterns, links, signposts, and breadcrumb trails that help users navigate interfaces and find information without getting lost.",
+        example: "A clear student dashboard presenting categorized channels like Academics, Profile, and Fees.",
+        bestPractice: "Always highlight the active screen, keep labels consistent, and display breadcrumbs on deep content structures.",
+        mistake: "Using vague label titles (e.g. 'Stuff'), having extreme click depths, and missing location markers.",
+        designTip: "Keep primary items within 3 clicks of the home dashboard (low click depth).",
+        whyMatters: "Minimizes user bounce rates, speeds up task resolution, and lowers cognitive friction."
+      },
+      'act-1': {
+        concept: "Destination Path Navigation",
+        definition: "The linear route taken by a user from the homepage root through menu divisions to reach a specific destination target.",
+        example: "Clicking Home → Academic Logs → Exam Results.",
+        bestPractice: "Structure directories logically so each link represents a predictable context domain.",
+        mistake: "Hiding target links inside unrelated category parent slots (e.g. placing timetables under Finance).",
+        designTip: "Group functions contextually rather than technologically to match user mental groups.",
+        whyMatters: "Direct paths decrease user search times and prevent search detours."
+      },
+      'act-2': {
+        concept: "Navigation Label Predictability",
+        definition: "Selecting self-explanatory, standard menu terms that clarify exactly what a user will find upon clicking.",
+        example: "Using 'Resources' instead of 'Study Stuff' and 'Support' instead of 'Help Area'.",
+        bestPractice: "Adopt standard terms based on common web patterns. Avoid internal jargon or creative labels.",
+        mistake: "Vague labels like 'Other Stuff', 'Miscellaneous', or internal department codes.",
+        designTip: "Test vocabulary options with users using card sorting to verify labels.",
+        whyMatters: "Predictable labels prevent search frustration and build user confidence."
+      },
+      'act-3': {
+        concept: "Breadcrumb Scaffolding",
+        definition: "A wayfinding signpost display showing the active page's place in the site hierarchy, allowing instant navigation back to parent folders.",
+        example: "Home > Fees > Fee Receipt.",
+        bestPractice: "Show hierarchy levels separated by symbols like '>' and keep parent levels clickable.",
+        mistake: "Breadcrumbs reflecting click history (temporal) rather than static directory tree levels (structural).",
+        designTip: "Place breadcrumbs directly above the page title to anchor the visual hierarchy.",
+        whyMatters: "Reduces user disorientation and allows quick backtracking."
+      },
+      'act-4': {
+        concept: "Wayfinding Orientation Errors",
+        definition: "Broken paths or incorrect signposts in breadcrumbs that display incorrect parent categories or wrong ordering.",
+        example: "Displaying Home > Support > Fee Receipt instead of Home > Fees > Fee Receipt.",
+        bestPractice: "Maintain strict mapping between menu categories and breadcrumbs.",
+        mistake: "Skipping middle tiers or referencing incorrect categories inside the breadcrumb string.",
+        designTip: "Audit parent directories systematically to ensure correct hierarchical grouping.",
+        whyMatters: "Correct orientation paths prevent users from taking incorrect detours."
+      },
+      'act-5': {
+        concept: "Click Depth & Path Efficiency",
+        definition: "Optimizing the number of clicks required to reach target items. High click depth leads to navigation fatigue.",
+        example: "Reaching transcripts in 2 clicks instead of 6 clicks.",
+        bestPractice: "Keep highly accessed items near the top of the information tree hierarchy.",
+        mistake: "Burying pages inside deeply nested subdirectories, requiring unnecessary navigation loops.",
+        designTip: "Aim for a path efficiency score above 80% on critical student tasks.",
+        whyMatters: "Fewer clicks improve user task completion rates and decrease friction."
+      },
+      'act-6': {
+        concept: "Navigation Heuristics Audit",
+        definition: "Evaluating navigation layouts against UX wayfinding principles to identify and repair structural bugs.",
+        example: "Auditing a portal to remove duplicate navigation items, correct misgrouped categories, and fix missing active states.",
+        bestPractice: "Systematically check for consistent active links, standard labels, and correct hierarchies.",
+        mistake: "Omitting visual cues that indicate the current active tab (no 'You are here' wayfinding indicator).",
+        designTip: "Always highlight the active page in the sidebar menu using a high-contrast style.",
+        whyMatters: "An audited interface reduces cognitive search effort and makes applications self-explanatory."
+      }
+    };
+
+    // --- ACTIVITY DATABASES ---
+    const ACT2_DATA = [
+      { id: "Money", standard: "Fees", initial: "Money", icon: "📂" },
+      { id: "Study Stuff", standard: "Resources", initial: "Study Stuff", icon: "📄" },
+      { id: "Help Area", standard: "Support", initial: "Help Area", icon: "📂" },
+      { id: "Marks", standard: "Exam Results", initial: "Marks", icon: "📄" }
+    ];
+
+    const ACT3_DATA = [
+      {
+        prompt: "Task 1 of 3: Build the breadcrumb for <strong>Fee Receipt</strong> page.",
+        correct: ["Home", "Fees", "Fee Receipt"],
+        options: ["Fee Receipt", "Home", "Fees"]
+      },
+      {
+        prompt: "Task 2 of 3: Build the breadcrumb for <strong>Attendance Report</strong> page.",
+        correct: ["Home", "Academic", "Attendance"],
+        options: ["Academic", "Home", "Attendance"]
+      },
+      {
+        prompt: "Task 3 of 3: Build the breadcrumb for <strong>Hostel Complaint</strong> page.",
+        correct: ["Home", "Support", "Hostel Complaint"],
+        options: ["Support", "Hostel Complaint", "Home"]
+      }
+    ];
+
+    const ACT4_DATA = [
+      {
+        prompt: "Scenario 1 of 3: Repair incomplete breadcrumb: <strong>Home → [ Slot ] → Exam Results</strong>",
+        nodes: ["Home", null, "Exam Results"], // null means editable slot
+        options: ["Academic", "Fees", "Support"],
+        correctIndex: 1, // index of empty slot
+        correctValue: "Academic"
+      },
+      {
+        prompt: "Scenario 2 of 3: Reorder mixed breadcrumb: <strong>Academic → Home → Attendance</strong>",
+        nodes: [null, null, null],
+        options: ["Home", "Academic", "Attendance"],
+        correct: ["Home", "Academic", "Attendance"]
+      },
+      {
+        prompt: "Scenario 3 of 3: Repair incorrect category parent: <strong>Home → [ Support ] → Fee Receipt</strong>",
+        nodes: ["Home", null, "Fee Receipt"], // slot 1 is editable
+        options: ["Academic", "Profile", "Fees"],
+        correctIndex: 1,
+        correctValue: "Fees"
+      }
+    ];
+
+    // --- ACTIVITY 5 SCENARIOS (Hospital, Banking, Food, Railway) ---
+    const ACT5_DATA = [
+      {
+        task: "Task 1 of 4: Locate the <strong>Doctor Schedules</strong> subpage in the Hospital Portal.",
+        target: "Doctor Schedules",
+        optimalClicks: 2,
+        appType: "hospital",
+        themeColor: "#0d9488",
+        themeColorLight: "rgba(13, 148, 136, 0.05)",
+        themeColorBorder: "rgba(13, 148, 136, 0.15)",
+        url: "https://patient.hospital.org/dashboard",
+        title: "Hospital Health Portal",
+        sidebar: ["Home", "Appointments", "Billing", "Medical Records"],
+        screens: {
+          "Home": {
+            headline: "Patient Care Dashboard",
+            options: ["Appointments", "Billing", "Medical Records"]
+          },
+          "Appointments": {
+            headline: "Appointments Scheduling",
+            options: ["Book Appointment", "Doctor Schedules", "Cancel Appointment"]
+          },
+          "Billing": {
+            headline: "Medical Invoices",
+            options: ["Unpaid Bills", "Payment History"]
+          },
+          "Medical Records": {
+            headline: "Electronic Health Records",
+            options: ["Lab Reports", "Prescriptions", "Vaccine Logs"]
+          }
         }
-
-        function updateHUD() {
-            document.getElementById('hudLevelText').innerText = `${state.level + 1} of 5`;
-            document.getElementById('hudScoreText').innerText = state.score;
-            const progressPercent = ((state.level + 1) / 5) * 100;
-            const barEl = document.getElementById('hudProgressBar');
-            if (barEl) {
-                barEl.style.width = `${progressPercent}%`;
-            }
+      },
+      {
+        task: "Task 2 of 4: Find the <strong>Wire Transfer</strong> option in the Banking Application.",
+        target: "Wire Transfer",
+        optimalClicks: 2,
+        appType: "banking",
+        themeColor: "#1e3a8a",
+        themeColorLight: "rgba(30, 58, 138, 0.05)",
+        themeColorBorder: "rgba(30, 58, 138, 0.15)",
+        url: "https://online.capitalbank.com/user/transfers",
+        title: "Capital Online Banking",
+        sidebar: ["Dashboard", "Accounts", "Transfers", "Card Settings"],
+        screens: {
+          "Dashboard": {
+            headline: "Secure Bank Dashboard",
+            options: ["Accounts", "Transfers", "Card Settings"]
+          },
+          "Accounts": {
+            headline: "Account Balances",
+            options: ["Checking Account", "Savings Account", "Statement Logs"]
+          },
+          "Transfers": {
+            headline: "Money Transfers & Wire Hub",
+            options: ["Internal Transfer", "Wire Transfer", "Pay Bills"]
+          },
+          "Card Settings": {
+            headline: "Card Security Settings",
+            options: ["Lock Card", "Reset PIN", "Request Replacement"]
+          }
         }
-
-        function loadLevel(idx) {
-            state.level = idx;
-            state.levelPassed = false;
-            state.selectedCardId = null;
-            state.placements = {};
-
-            document.getElementById('prevBtn').style.display = (idx > 0) ? 'inline-block' : 'none';
-            document.getElementById('nextBtn').disabled = false;
-            document.getElementById('checkBtn').disabled = false;
-            document.getElementById('checkBtn').style.display = 'inline-block';
-            document.getElementById('hintBtn').disabled = false;
-            document.getElementById('feedbackText').innerText = '';
-            document.getElementById('feedbackText').className = '';
-
-            updateHUD();
-            updateObservation();
-
-            const container = document.getElementById('levelContainer');
-            container.innerHTML = '';
-
-            const level = levelData[idx];
-
-            if (idx === 0) {
-                // Level 1 Setup
-                state.l1Path = ["Home"];
-                renderLevel1();
-            }
-            else if (idx === 1) {
-                // Level 2 Setup
-                renderLevel2();
-            }
-            else if (idx === 2) {
-                // Level 3 Setup
-                state.l3ChallengeIdx = 0;
-                loadLevel3Challenge();
-            }
-            else if (idx === 3) {
-                // Level 4 Setup
-                renderLevel4();
-            }
-            else if (idx === 4) {
-                // Level 5 Setup
-                state.l5TaskIdx = 0;
-                loadLevel5Task();
-            }
+      },
+      {
+        task: "Task 3 of 4: Find the <strong>Order Tracking</strong> page in the Food Delivery App.",
+        target: "Order Tracking",
+        optimalClicks: 2,
+        appType: "food",
+        themeColor: "#ea580c",
+        themeColorLight: "rgba(234, 88, 12, 0.05)",
+        themeColorBorder: "rgba(234, 88, 12, 0.15)",
+        url: "https://app.bitesdelivery.com/home",
+        title: "Bites Food Delivery",
+        sidebar: ["Dashboard", "Browse Menu", "Cart", "Active Orders"],
+        screens: {
+          "Dashboard": {
+            headline: "Bites Delivery Hub",
+            options: ["Browse Menu", "Cart", "Active Orders"]
+          },
+          "Browse Menu": {
+            headline: "Popular Categories",
+            options: ["Burgers & Fast Food", "Asian Cuisine", "Desserts"]
+          },
+          "Cart": {
+            headline: "Review Your Cart",
+            options: ["Proceed to Checkout", "Add Delivery Instructions"]
+          },
+          "Active Orders": {
+            headline: "Active Orders Status",
+            options: ["Order Tracking", "Order History", "Support Tickets"]
+          }
         }
-
-        // --- BUTTON CONTROLS ---
-        function resetCurrentLevel() {
-            loadLevel(state.level);
+      },
+      {
+        task: "Task 4 of 4: Find the <strong>Train Schedule</strong> page in the Railway Booking Portal.",
+        target: "Train Schedule",
+        optimalClicks: 2,
+        appType: "railway",
+        themeColor: "#1e293b",
+        themeColorLight: "rgba(30, 41, 59, 0.05)",
+        themeColorBorder: "rgba(30, 41, 59, 0.15)",
+        url: "https://railways.transit.govt/tickets",
+        title: "Railway Transit Booking",
+        sidebar: ["Dashboard", "Book Ticket", "PNR Status", "Timetables"],
+        screens: {
+          "Dashboard": {
+            headline: "Railway Passenger Services",
+            options: ["Book Ticket", "PNR Status", "Timetables"]
+          },
+          "Book Ticket": {
+            headline: "Ticket Booking Desk",
+            options: ["Search Trains", "Seat Availability", "Recent Bookings"]
+          },
+          "PNR Status": {
+            headline: "Check PNR Status",
+            options: ["Active Ticket PNR", "Refund Status"]
+          },
+          "Timetables": {
+            headline: "Transit Timetables",
+            options: ["Train Schedule", "Station Info", "Live Tracking"]
+          }
         }
+      }
+    ];
 
-        function showLevelHint() {
-            const level = levelData[state.level];
-            state.score = Math.max(0, state.score - 2);
-            state.hintsCount++;
-            updateHUD();
+    // --- NAVIGATION ROUTING ---
+    function navigateTo(viewId) {
+      // Toggle popovers
+      document.getElementById('hint-popover').classList.remove('open');
 
-            const hintText = (state.level === 2)
-                ? level.hint
-                : level.hint;
+      // Update active nav link classes
+      document.querySelectorAll('.activity-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const activeNav = document.getElementById(`nav-${viewId}`);
+      if (activeNav) activeNav.classList.add('active');
 
-            showFeedback(`Hint: ${hintText}`, 'normal');
+      // Toggle views
+      document.querySelectorAll('.welcome-viewport, .activity-viewport-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      
+      const targetPanel = document.getElementById(viewId === 'welcome' ? 'panel-welcome' : `panel-${viewId}`);
+      if (targetPanel) targetPanel.classList.add('active');
+
+      appState.activeView = viewId;
+
+      // Update status footer
+      const statusText = document.getElementById('footer-status-view');
+      if (statusText) {
+        if (viewId === 'welcome') statusText.innerText = "Welcome Screen";
+        else {
+          const actNum = viewId.replace('act-', '');
+          statusText.innerText = `Activity ${actNum}`;
         }
+      }
 
-        function goToPrevLevel() {
-            if (state.level > 0) {
-                loadLevel(state.level - 1);
-            }
+      // Always show Check Answer, disabled on welcome
+      const checkBtn = document.getElementById('btn-footer-check');
+      checkBtn.style.display = 'inline-flex';
+      if (viewId === 'welcome') {
+        checkBtn.disabled = true;
+      } else {
+        checkBtn.disabled = false;
+      }
+
+      // Update HCD learning panel
+      const syllabus = syllabusData[viewId] || syllabusData['welcome'];
+      document.getElementById('learning-concept').innerText = syllabus.concept;
+      document.getElementById('learning-definition').innerText = syllabus.definition;
+      document.getElementById('learning-example').innerText = syllabus.example;
+      document.getElementById('learning-best-practice').innerText = syllabus.bestPractice;
+      document.getElementById('learning-mistake').innerText = syllabus.mistake;
+      document.getElementById('learning-design-tip').innerText = syllabus.designTip;
+      document.getElementById('learning-why-matters').innerText = syllabus.whyMatters;
+
+      // Init the activity view elements
+      loadActivityData(viewId);
+    }
+
+    function navigatePrev() {
+      const views = ['welcome', 'act-1', 'act-2', 'act-3', 'act-4', 'act-5', 'act-6'];
+      const currentIdx = views.indexOf(appState.activeView);
+      if (currentIdx > 0) {
+        navigateTo(views[currentIdx - 1]);
+      }
+    }
+
+    function navigateNext() {
+      const views = ['welcome', 'act-1', 'act-2', 'act-3', 'act-4', 'act-5', 'act-6'];
+      const currentIdx = views.indexOf(appState.activeView);
+      if (currentIdx < views.length - 1) {
+        navigateTo(views[currentIdx + 1]);
+      }
+    }
+
+    function loadActivityData(viewId) {
+      if (viewId === 'act-1') {
+        renderAct1();
+      } else if (viewId === 'act-2') {
+        renderAct2();
+      } else if (viewId === 'act-3') {
+        renderAct3();
+      } else if (viewId === 'act-4') {
+        renderAct4();
+      } else if (viewId === 'act-5') {
+        renderAct5();
+      } else if (viewId === 'act-6') {
+        renderAct6();
+      }
+    }
+
+    function resetActiveActivity() {
+      const viewId = appState.activeView;
+      if (viewId === 'welcome') return;
+
+      // Clear states
+      if (viewId === 'act-1') {
+        appState.act1.path = ['Home'];
+        appState.act1.clicks = 0;
+        appState.act1.errors = 0;
+        appState.act1.completed = false;
+        document.getElementById('act1-obs-box').style.display = 'none';
+      } else if (viewId === 'act-2') {
+        appState.act2.placements = {};
+        appState.act2.completed = false;
+      } else if (viewId === 'act-3') {
+        appState.act3.challengeIndex = 0;
+        appState.act3.placements = {};
+        appState.act3.completed = false;
+      } else if (viewId === 'act-4') {
+        appState.act4.challengeIndex = 0;
+        appState.act4.placements = {};
+        appState.act4.completed = false;
+      } else if (viewId === 'act-5') {
+        appState.act5.taskIndex = 0;
+        appState.act5.path = ['Home'];
+        appState.act5.clicks = 0;
+        appState.act5.errors = 0;
+        appState.act5.stats = [];
+        appState.act5.completed = false;
+        appState.act5.heatmapVisible = false;
+        document.getElementById('act5-portal-area').style.display = 'flex';
+        document.getElementById('act5-report-container').style.display = 'none';
+      } else if (viewId === 'act-6') {
+        appState.act6.defectsSolved = [];
+        appState.act6.completed = false;
+        document.getElementById('act6-report-container').style.display = 'none';
+        
+        // Reset dashboard metrics visually
+        const categories = ['label', 'breadcrumb', 'depth', 'active-state', 'misgrouped', 'duplicate'];
+        categories.forEach(cat => {
+          const card = document.getElementById(`metric-${cat}`);
+          const badge = document.getElementById(`badge-${cat}`);
+          card.classList.remove('pass');
+          badge.innerText = "FAIL";
+        });
+
+        // Reset visual elements
+        const items = document.querySelectorAll('.audit-defect-item');
+        items.forEach(el => {
+          el.classList.remove('solved');
+          // Remove callouts
+          const oldCallout = el.querySelector('.audit-resolved-callout');
+          if (oldCallout) oldCallout.remove();
+        });
+
+        document.getElementById('defect-label-text').innerHTML = "📄 Study Stuff";
+        document.getElementById('defect-label').style.background = "#fff3cd";
+        document.getElementById('defect-label').style.borderColor = "#ffeeba";
+        
+        document.getElementById('defect-duplicate').style.display = 'inline-flex';
+        
+        document.getElementById('defect-depth-text').innerText = "Explore: Home → Academic → Semester 1 → Logs → Reports → Grades → Semester GPA";
+        document.getElementById('defect-depth').style.background = "#fff3cd";
+        document.getElementById('defect-depth').style.borderColor = "#ffeeba";
+        
+        document.getElementById('defect-misgrouped-text').innerText = "💵 Pay Tuition";
+        document.getElementById('defect-misgrouped').style.background = "#fff3cd";
+        document.getElementById('defect-misgrouped').style.borderColor = "#ffeeba";
+        
+        document.getElementById('defect-active-state').style.background = "transparent";
+        document.getElementById('defect-active-state').style.color = "var(--text-main)";
+        
+        document.getElementById('defect-breadcrumb-text').innerText = "Home → Support → Profile Details";
+        document.getElementById('defect-breadcrumb-text').style.color = "var(--primary-red)";
+      }
+
+      triggerToast("Activity restarted successfully.");
+      loadActivityData(viewId);
+    }
+
+    // --- TOAST NOTIFICATIONS ---
+    function triggerToast(message) {
+      const toast = document.getElementById('toast-el');
+      if (!toast) return;
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // --- CLICK-TO-PLACE SUPPORT ---
+    let actSelectedCard = null;
+
+    function handleCardSelect(value, element) {
+      // Remove previous highlights
+      document.querySelectorAll('.drag-card-chip').forEach(c => c.classList.remove('selected'));
+      
+      if (actSelectedCard === value) {
+        actSelectedCard = null;
+      } else {
+        actSelectedCard = value;
+        if (element) element.classList.add('selected');
+      }
+    }
+
+    // --- DRAG AND DROP HANDLERS ---
+    function onDragStart(ev, value) {
+      ev.dataTransfer.setData("text/plain", value);
+    }
+
+    function onDragOver(ev) {
+      ev.preventDefault();
+      ev.currentTarget.classList.add('dragover');
+    }
+
+    function onDragLeave(ev) {
+      ev.preventDefault();
+      ev.currentTarget.classList.remove('dragover');
+    }
+
+    // --- PULSE WAVE EFFECT ON LINK CLICK ---
+    function applyClickPulse(element) {
+      if (!element) return;
+      element.classList.add('clicked-pulse');
+      setTimeout(() => element.classList.remove('clicked-pulse'), 450);
+    }
+
+    // --- LEVEL 1 ACTIVITY 1: DESTINATION NAVIGATION ---
+    function renderAct1() {
+      document.getElementById('act1-clicks').innerText = appState.act1.clicks;
+      document.getElementById('act1-errors').innerText = appState.act1.errors;
+
+      // Update breadcrumbs with animated entries
+      const breadContainer = document.getElementById('act1-breadcrumbs');
+      breadContainer.innerHTML = '<span>You are here: </span>';
+      appState.act1.path.forEach((node, idx) => {
+        const item = document.createElement('span');
+        item.className = 'breadcrumb-node-anim';
+        if (idx < appState.act1.path.length - 1) {
+          item.innerHTML = `<span class="breadcrumb-item-link" onclick="navigateAct1('${node}')">${node}</span> <span class="breadcrumb-arrow" style="margin: 0 4px;">→</span> `;
+        } else {
+          item.innerHTML = `<span style="font-weight: 700; color: var(--text-main);">${node}</span>`;
         }
+        breadContainer.appendChild(item);
+      });
 
-        function goToNextLevel() {
-            if (state.level < 4) {
-                loadLevel(state.level + 1);
-            } else {
-                showFinalScorecard();
-            }
-        }
+      // Update active sidebar tab
+      document.querySelectorAll('#panel-act-1 .portal-sidebar-btn').forEach(btn => btn.classList.remove('active'));
+      const activeSidebarTag = appState.act1.path[1] || 'Home';
+      const sideButton = document.getElementById(`act1-side-${activeSidebarTag}`);
+      if (sideButton) sideButton.classList.add('active');
 
-        function showFeedback(text, type) {
-            const el = document.getElementById('feedbackText');
-            el.innerText = text;
-            el.className = type;
-        }
+      // Render viewport page contents
+      const viewport = document.getElementById('act1-viewport');
+      viewport.innerHTML = '';
 
-        // --- LEVEL 1 IMPLEMENTATION ---
-        function renderLevel1() {
-            const container = document.getElementById('levelContainer');
-            const breadcrumbStr = state.l1Path.join(" → ");
-            const activeTab = state.l1Path[state.l1Path.length - 1];
+      const lastNode = appState.act1.path[appState.act1.path.length - 1];
 
-            let viewHtml = '';
-            if (activeTab === 'Home') {
-                viewHtml = `
-          <h3>Dashboard Home</h3>
-          <p style="font-size:12px; color:#666;">This is the student dashboard. Click the matching sidebar menu to proceed.</p>
-          <div class="portal-grid">
-            <div class="portal-box-btn" onclick="navigateL1('Academic')">Academic</div>
-            <div class="portal-box-btn" onclick="triggerL1Error('Profile', this)">Profile</div>
-            <div class="portal-box-btn" onclick="triggerL1Error('Fees', this)">Fees</div>
-          </div>
-        `;
-            } else if (activeTab === 'Academic') {
-                viewHtml = `
-          <h3>Academic Section</h3>
-          <p style="font-size:12px; color:#666;">Browse academic records and evaluation forms.</p>
-          <div class="portal-grid">
-            <div class="portal-box-btn" onclick="navigateL1('Exam Results')">Exam Results</div>
-            <div class="portal-box-btn" onclick="triggerL1Error('Timetable', this)">Timetable</div>
-          </div>
-        `;
-            } else if (activeTab === 'Exam Results') {
-                viewHtml = `
-          <h3 style="color:green;">Exam Results</h3>
-          <p style="font-size:12px; font-weight:bold; color:green;">Success! You reached the destination page.</p>
-          <table style="width:100%; border-collapse:collapse; font-size:12px; margin-top:8px;">
-            <tr style="border-bottom:1px solid #b30000; font-weight:bold;">
-              <td style="padding:4px 0;">Subject</td>
-              <td>Grade</td>
-            </tr>
-            <tr>
-              <td style="padding:4px 0;">Information Architecture</td>
-              <td>A</td>
-            </tr>
-          </table>
-        `;
-            }
-
-            container.innerHTML = `
-        <p style="font-size:13px; color:#555; font-weight:bold; margin-bottom:8px;">${levelData[0].instruction}</p>
-        <div class="portal-mock">
-          <div class="portal-topbar">Student Portal</div>
-          <div class="portal-breadcrumb">You are here: ${breadcrumbStr}</div>
-          <div class="portal-body">
-            <div class="portal-sidebar">
-              <button class="portal-nav-btn ${activeTab === 'Home' ? 'active' : ''}" onclick="navigateL1('Home')">Home</button>
-              <button class="portal-nav-btn ${activeTab === 'Academic' ? 'active' : ''}" onclick="navigateL1('Academic')">Academic</button>
-              <button class="portal-nav-btn" onclick="triggerL1Error('Profile', this)">Profile</button>
-              <button class="portal-nav-btn" onclick="triggerL1Error('Fees', this)">Fees</button>
+      if (lastNode === 'Home') {
+        const opts = shuffleArray([
+          { id: "Academic", html: `<div class="portal-option-card" id="act1-opt-academic" onclick="navigateAct1('Academic', this)">📂 Academic Logs</div>` },
+          { id: "Profile", html: `<div class="portal-option-card" onclick="triggerAct1Error('Profile', this)">📂 Profile Details</div>` },
+          { id: "Fees", html: `<div class="portal-option-card" onclick="triggerAct1Error('Fees', this)">📂 Financial Invoices</div>` }
+        ]);
+        viewport.innerHTML = `
+          <div class="portal-view-card active">
+            <div class="portal-headline">Dashboard Hub</div>
+            <p style="font-size: 12px; color: var(--text-muted);">Welcome to the mock Student Portal. Locate the <strong>Exam Results</strong> page using the categories below.</p>
+            <div class="portal-options-grid">
+              ${opts.map(o => o.html).join('')}
             </div>
-            <div class="portal-screen">${viewHtml}</div>
           </div>
-        </div>
-      `;
-        }
-
-        function navigateL1(tab) {
-            if (tab === 'Home') {
-                state.l1Path = ["Home"];
-            } else if (tab === 'Academic') {
-                state.l1Path = ["Home", "Academic"];
-            } else if (tab === 'Exam Results') {
-                state.l1Path = ["Home", "Academic", "Exam Results"];
-            }
-            renderLevel1();
-        }
-
-        function triggerL1Error(tabName, el) {
-            state.score = Math.max(0, state.score - 5);
-            state.mistakesCount++;
-            updateHUD();
-            updateObservation();
-            showFeedback(`Incorrect path! Navigating to '${tabName}' does not lead to Exam Results. Try again.`, 'wrong');
-
-            if (el) {
-                el.classList.add('wrong');
-                setTimeout(() => el.classList.remove('wrong'), 500);
-            }
-        }
-
-        // --- LEVEL 2 IMPLEMENTATION ---
-        function renderLevel2() {
-            const container = document.getElementById('levelContainer');
-            const level = levelData[1];
-
-            container.innerHTML = `
-        <p style="font-size:13px; color:#555; font-weight:bold; margin-bottom:8px;">${level.instruction}</p>
-        <div class="drag-container">
-          <!-- Clear tags deck -->
-          <div class="cards-deck" id="l2Deck"></div>
-
-          <!-- Confusing links targets -->
-          <div class="targets-deck" id="l2Targets"></div>
-        </div>
-      `;
-
-            renderLevel2Decks();
-        }
-
-        function renderLevel2Decks() {
-            const level = levelData[1];
-            const deck = document.getElementById('l2Deck');
-            const targets = document.getElementById('l2Targets');
-
-            deck.innerHTML = '';
-            targets.innerHTML = '';
-
-            // Cards to drag
-            const clearOptions = Object.values(level.mapping);
-            const remainingOptions = clearOptions.filter(opt => !Object.values(state.placements).includes(opt));
-
-            if (remainingOptions.length === 0) {
-                deck.innerHTML = `<p style="font-size:11.5px; color:green; font-style:italic; font-weight:bold; text-align:center;">All elements matched! Click 'Check Answer' to verify.</p>`;
-            } else {
-                remainingOptions.forEach(opt => {
-                    const card = document.createElement('div');
-                    card.className = `drag-chip`;
-                    card.draggable = true;
-                    card.id = `chip-${opt}`;
-                    card.setAttribute('data-label', opt);
-
-                    card.addEventListener('dragstart', handleDragStart);
-                    card.addEventListener('click', () => selectCard(opt));
-
-                    card.innerHTML = `<span>📄 ${opt}</span>`;
-                    deck.appendChild(card);
-                });
-            }
-
-            // Dropzone slots
-            for (const poorKey in level.mapping) {
-                const dropVal = state.placements[poorKey];
-                const row = document.createElement('div');
-                row.className = 'dropzone-row';
-
-                const label = document.createElement('span');
-                label.className = 'dropzone-label';
-                label.innerText = `Confusing: "${poorKey}"`;
-                row.appendChild(label);
-
-                const dropBox = document.createElement('div');
-                dropBox.className = 'dropzone-box';
-                dropBox.setAttribute('data-poor', poorKey);
-
-                dropBox.addEventListener('dragover', handleDragOver);
-                dropBox.addEventListener('dragleave', handleDragLeave);
-                dropBox.addEventListener('drop', handleDropL2);
-                dropBox.addEventListener('click', () => handleL2DropzoneClick(poorKey));
-
-                if (dropVal) {
-                    dropBox.innerHTML = `<span style="font-weight:bold; color:#b30000;">${dropVal}</span>`;
-                } else {
-                    dropBox.innerText = "[Place Here]";
-                }
-
-                row.appendChild(dropBox);
-                targets.appendChild(row);
-            }
-        }
-
-        function selectCard(labelId) {
-            document.querySelectorAll('.drag-chip').forEach(el => el.classList.remove('selected'));
-            if (state.selectedCardId === labelId) {
-                state.selectedCardId = null;
-            } else {
-                state.selectedCardId = labelId;
-                const card = document.getElementById(`chip-${labelId}`);
-                if (card) card.classList.add('selected');
-            }
-        }
-
-        function handleDragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.getAttribute('data-label'));
-            state.selectedCardId = e.target.getAttribute('data-label');
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('drag-over');
-        }
-
-        function handleDropL2(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('drag-over');
-            const label = e.dataTransfer.getData('text/plain');
-            const poor = e.currentTarget.getAttribute('data-poor');
-            if (label && poor) {
-                state.placements[poor] = label;
-                renderLevel2Decks();
-            }
-        }
-
-        function handleL2DropzoneClick(poorKey) {
-            if (state.selectedCardId) {
-                state.placements[poorKey] = state.selectedCardId;
-                state.selectedCardId = null;
-                renderLevel2Decks();
-            } else if (state.placements[poorKey]) {
-                // Return item back to tray
-                delete state.placements[poorKey];
-                renderLevel2Decks();
-            }
-        }
-
-        // --- LEVEL 3 IMPLEMENTATION ---
-        function loadLevel3Challenge() {
-            const container = document.getElementById('levelContainer');
-            const level = levelData[2];
-            const challenge = level.challenges[state.l3ChallengeIdx];
-
-            container.innerHTML = `
-        <p style="font-size:13px; color:#555; font-weight:bold; margin-bottom:8px;">${level.instruction}</p>
-        <p style="font-size:12.5px; font-weight:bold; color:#b30000; margin-bottom:8px;">Task ${state.l3ChallengeIdx + 1} of 3: ${challenge.task}</p>
-        
-        <div class="drag-container">
-          <!-- Cards tray -->
-          <div class="cards-deck" id="l3Deck"></div>
-
-          <!-- Slots path row -->
-          <div class="targets-deck">
-            <div class="breadcrumb-slots" id="l3Slots">
-              <!-- Slot 1 -->
-              <div class="breadcrumb-slot" data-slot="0" ondragover="handleDragOver" ondragleave="handleDragLeave" ondrop="handleDropL3" onclick="handleL3SlotClick(0)">[Slot 1]</div>
-              <span class="breadcrumb-divider">→</span>
-              <!-- Slot 2 -->
-              <div class="breadcrumb-slot" data-slot="1" ondragover="handleDragOver" ondragleave="handleDragLeave" ondrop="handleDropL3" onclick="handleL3SlotClick(1)">[Slot 2]</div>
-              <span class="breadcrumb-divider">→</span>
-              <!-- Slot 3 -->
-              <div class="breadcrumb-slot" data-slot="2" ondragover="handleDragOver" ondragleave="handleDragLeave" ondrop="handleDropL3" onclick="handleL3SlotClick(2)">[Slot 3]</div>
+        `;
+      } else if (lastNode === 'Academic') {
+        const opts = shuffleArray([
+          { id: "Results", html: `<div class="portal-option-card" id="act1-opt-results" onclick="navigateAct1('Exam Results', this)">📄 Exam Results</div>` },
+          { id: "Timetable", html: `<div class="portal-option-card" onclick="triggerAct1Error('Timetable', this)">📄 Timetable</div>` }
+        ]);
+        viewport.innerHTML = `
+          <div class="portal-view-card active">
+            <div class="portal-headline">Academic Directory</div>
+            <p style="font-size: 12px; color: var(--text-muted);">Select the correct academic sub-page log.</p>
+            <div class="portal-options-grid">
+              ${opts.map(o => o.html).join('')}
             </div>
           </div>
-        </div>
-      `;
-
-            renderLevel3Decks();
-        }
-
-        function renderLevel3Decks() {
-            const level = levelData[2];
-            const challenge = level.challenges[state.l3ChallengeIdx];
-            const deck = document.getElementById('l3Deck');
-
-            deck.innerHTML = '';
-
-            const placedValues = Object.values(state.placements);
-            const remainingOptions = challenge.options.filter(opt => !placedValues.includes(opt));
-
-            if (remainingOptions.length === 0) {
-                deck.innerHTML = `<p style="font-size:11.5px; color:#666; font-style:italic; font-weight:bold; text-align:center;">Breadcrumb arranged! Click 'Check Answer'.</p>`;
-            } else {
-                remainingOptions.forEach(opt => {
-                    const card = document.createElement('div');
-                    card.className = 'drag-chip';
-                    card.draggable = true;
-                    card.id = `chip-${opt}`;
-                    card.setAttribute('data-label', opt);
-
-                    card.addEventListener('dragstart', handleDragStart);
-                    card.addEventListener('click', () => selectCard(opt));
-
-                    card.innerHTML = `<span>📄 ${opt}</span>`;
-                    deck.appendChild(card);
-                });
-            }
-
-            // Update slots display
-            for (let i = 0; i < 3; i++) {
-                const slotEl = document.querySelector(`.breadcrumb-slot[data-slot="${i}"]`);
-                if (slotEl) {
-                    slotEl.addEventListener('dragover', handleDragOver);
-                    slotEl.addEventListener('dragleave', handleDragLeave);
-                    slotEl.addEventListener('drop', handleDropL3);
-
-                    const val = state.placements[i];
-                    if (val) {
-                        slotEl.innerHTML = `<span style="font-weight:bold; color:#b30000;">${val}</span>`;
-                    } else {
-                        slotEl.innerText = `[Slot ${i + 1}]`;
-                    }
-                }
-            }
-        }
-
-        function handleDropL3(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('drag-over');
-            const label = e.dataTransfer.getData('text/plain');
-            const slotIdx = parseInt(e.currentTarget.getAttribute('data-slot'));
-            if (label && !isNaN(slotIdx)) {
-                state.placements[slotIdx] = label;
-                renderLevel3Decks();
-            }
-        }
-
-        function handleL3SlotClick(slotIdx) {
-            if (state.selectedCardId) {
-                state.placements[slotIdx] = state.selectedCardId;
-                state.selectedCardId = null;
-                renderLevel3Decks();
-            } else if (state.placements[slotIdx]) {
-                delete state.placements[slotIdx];
-                renderLevel3Decks();
-            }
-        }
-
-        // --- LEVEL 4 IMPLEMENTATION ---
-        function renderLevel4() {
-            const container = document.getElementById('levelContainer');
-            const level = levelData[3];
-
-            container.innerHTML = `
-        <p style="font-size:13px; color:#555; font-weight:bold; margin-bottom:8px;">${level.instruction}</p>
-        
-        <div class="drag-container" style="flex-direction:column; gap:16px;">
-          <!-- Tray of unsorted pages -->
-          <div class="cards-deck" style="width:100%;">
-            <div class="l4-deck-title" style="font-size:11px; font-weight:bold; text-transform:uppercase; color:#b30000; margin-bottom:6px;">Unsorted Page Cards</div>
-            <div class="deck-cards" id="l4Deck" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        `;
+      } else if (lastNode === 'Exam Results') {
+        appState.act1.completed = true;
+        viewport.innerHTML = `
+          <div class="portal-view-card active" style="animation: scaleIn 0.3s ease;">
+            <div class="portal-headline" style="color: #38a169; display: flex; align-items: center; gap: 6px;">
+              <span>✓ Target Reached: Exam Results</span>
+            </div>
+            <div style="background: var(--bg-grey); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-grey-dark);">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12.5px;">
+                <thead>
+                  <tr style="border-bottom: 1.5px solid var(--primary-red); text-align: left;">
+                    <th style="padding: 6px;">Subject Code</th>
+                    <th style="padding: 6px;">Course Title</th>
+                    <th style="padding: 6px; text-align: right;">Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding: 6px; font-family: var(--font-mono);">CS-401</td>
+                    <td style="padding: 6px;">Human-Computer Interaction</td>
+                    <td style="padding: 6px; text-align: right; font-weight: bold; color: #38a169;">A+</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 6px; font-family: var(--font-mono);">CS-402</td>
+                    <td style="padding: 6px;">Information Architecture</td>
+                    <td style="padding: 6px; text-align: right; font-weight: bold; color: #38a169;">A</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted);">Wayfinding analysis is complete. Click 'Next Activity' to progress.</p>
           </div>
+        `;
+        showAct1Report();
+      }
+    }
 
-          <!-- Folders grid -->
-          <div class="folders-grid" id="l4Folders"></div>
-        </div>
+    function navigateAct1(target, clickEl) {
+      if (appState.act1.completed && target !== 'Home') return;
+      
+      applyClickPulse(clickEl);
+      appState.act1.clicks++;
+      
+      if (target === 'Home') {
+        appState.act1.path = ['Home'];
+        appState.act1.completed = false;
+        document.getElementById('act1-obs-box').style.display = 'none';
+      } else if (target === 'Academic') {
+        appState.act1.path = ['Home', 'Academic'];
+      } else if (target === 'Exam Results') {
+        appState.act1.path = ['Home', 'Academic', 'Exam Results'];
+      }
+
+      renderAct1();
+    }
+
+    function triggerAct1Error(category, clickEl) {
+      if (appState.act1.completed) return;
+      applyClickPulse(clickEl);
+      appState.act1.clicks++;
+      appState.act1.errors++;
+      appState.mistakesCount++;
+      
+      // Visual feedback: shake the mock portal viewport
+      const portal = document.querySelector('#panel-act-1 .mock-portal');
+      portal.classList.add('shake-animation');
+      setTimeout(() => portal.classList.remove('shake-animation'), 400);
+
+      triggerToast(`Friction warning: Navigating to '${category}' does not lead to Exam Results!`);
+      renderAct1();
+    }
+
+    function showAct1Report() {
+      const obsBox = document.getElementById('act1-obs-box');
+      const obsText = document.getElementById('act1-obs-text');
+      
+      obsBox.style.display = 'block';
+      const optimal = 2;
+      const actual = appState.act1.clicks;
+      const efficiency = Math.round((optimal / actual) * 100);
+
+      obsText.innerHTML = `
+        <strong>Path Click count:</strong> ${actual} clicks (Optimal: ${optimal})<br>
+        <strong>Path Efficiency:</strong> ${efficiency}%<br>
+        <strong>Analysis:</strong> Navigating through clear categories (Academics → Exam Results) prevents user search fatigue. Incorrect detours (${appState.act1.errors} errors) occur when parent category taxonomies are poorly mapped or link labels lack scent.
       `;
+    }
 
-            renderLevel4Decks();
+    // --- LEVEL 1 ACTIVITY 2: NAVIGATION LABEL EVALUATION (SIDEBAR LABEL REDESIGN) ---
+    function renderAct2() {
+      actSelectedCard = null;
+
+      // Render the mock editor sidebar
+      const sidebarContainer = document.getElementById('act2-sidebar-container');
+      sidebarContainer.innerHTML = '';
+
+      shuffleArray(ACT2_DATA).forEach(item => {
+        const row = document.createElement('button');
+        row.className = 'portal-sidebar-btn';
+        row.style.border = '1px solid var(--border-grey-dark)';
+        row.style.padding = '12px 14px';
+        row.style.height = 'auto';
+        row.style.background = 'var(--bg-white)';
+        row.setAttribute('data-vague', item.id);
+
+        const placement = appState.act2.placements[item.id];
+
+        if (placement) {
+          // Changed name
+          row.innerHTML = `
+            <div>
+              <span style="font-weight: 700; color:var(--text-main);">${item.icon} ${placement}</span>
+              <span class="act2-sublabel">(replaces: ${item.initial})</span>
+            </div>
+            <span style="font-size:10px; color:var(--primary-red); font-weight:bold; cursor:pointer;" onclick="clearAct2Slot('${item.id}', event)">✕</span>
+          `;
+        } else {
+          // Vague Initial state
+          row.style.background = '#fff3cd';
+          row.style.borderColor = '#ffeeba';
+          row.innerHTML = `
+            <div>
+              <span style="font-weight: 700; color:#856404;">${item.icon} ${item.initial}</span>
+              <span class="act2-sublabel" style="color:#856404;">Vague Label: Drop replacement here</span>
+            </div>
+            <span style="font-size: 16px; color: #856404;">➔</span>
+          `;
         }
 
-        function renderLevel4Decks() {
-            const level = levelData[3];
-            const deck = document.getElementById('l4Deck');
-            const folders = document.getElementById('l4Folders');
+        // Setup Drag and Drop events
+        row.addEventListener('dragover', onDragOver);
+        row.addEventListener('dragleave', onDragLeave);
+        row.addEventListener('drop', (ev) => {
+          ev.preventDefault();
+          row.classList.remove('dragover');
+          const value = ev.dataTransfer.getData("text/plain");
+          placeAct2Card(item.id, value);
+        });
 
-            deck.innerHTML = '';
-            folders.innerHTML = '';
+        // Click to place support
+        row.addEventListener('click', () => {
+          if (actSelectedCard) {
+            placeAct2Card(item.id, actSelectedCard);
+            actSelectedCard = null;
+          }
+        });
 
-            // Unsorted page cards
-            const placedPages = Object.keys(state.placements);
-            const remainingPages = level.pages.filter(p => !placedPages.includes(p.name));
+        sidebarContainer.appendChild(row);
+      });
 
-            if (remainingPages.length === 0) {
-                deck.innerHTML = `<p style="font-size:11.5px; color:green; font-style:italic; font-weight:bold; text-align:center; width:100%;">All pages sorted! Click 'Check Answer'.</p>`;
-            } else {
-                remainingPages.forEach(p => {
-                    const card = document.createElement('div');
-                    card.className = 'drag-chip';
-                    card.draggable = true;
-                    card.id = `chip-${p.name}`;
-                    card.setAttribute('data-label', p.name);
+      // Render standard terms deck
+      const deck = document.getElementById('act2-chip-deck');
+      deck.innerHTML = '';
 
-                    card.addEventListener('dragstart', handleDragStart);
-                    card.addEventListener('click', () => selectCard(p.name));
+      const placedValues = Object.values(appState.act2.placements);
+      const remainingItems = shuffleArray(ACT2_DATA.filter(item => !placedValues.includes(item.standard)));
 
-                    card.innerHTML = `<span>📄 ${p.name}</span>`;
-                    deck.appendChild(card);
-                });
-            }
+      if (remainingItems.length === 0) {
+        deck.innerHTML = `<p style="font-size: 11px; color:#38a169; font-weight:bold; font-style:italic;">All sidebar items renamed. Click 'Check Answer'.</p>`;
+      } else {
+        remainingItems.forEach(item => {
+          const chip = document.createElement('div');
+          chip.className = 'drag-card-chip';
+          chip.draggable = true;
+          chip.innerText = item.standard;
 
-            // Folders
-            level.categories.forEach(cat => {
-                const folder = document.createElement('div');
-                folder.className = 'folder-box';
-                folder.setAttribute('data-folder', cat);
+          chip.addEventListener('dragstart', (ev) => onDragStart(ev, item.standard));
+          chip.addEventListener('click', () => handleCardSelect(item.standard, chip));
 
-                folder.addEventListener('dragover', handleDragOver);
-                folder.addEventListener('dragleave', handleDragLeave);
-                folder.addEventListener('drop', handleDropL4);
-                folder.addEventListener('click', () => handleL4FolderClick(cat));
+          deck.appendChild(chip);
+        });
+      }
+    }
 
-                const title = document.createElement('div');
-                title.className = 'folder-title';
-                title.innerText = `📂 ${cat}`;
-                folder.appendChild(title);
+    function placeAct2Card(vagueId, value) {
+      if (!value) return;
 
-                const contents = document.createElement('div');
-                contents.className = 'folder-contents';
-
-                const contentsInFolder = Object.keys(state.placements).filter(name => state.placements[name] === cat);
-                if (contentsInFolder.length === 0) {
-                    contents.innerHTML = `<span style="font-size:11px; color:#aaa; font-style:italic; text-align:center; margin:auto 0;">Empty Folder</span>`;
-                } else {
-                    contentsInFolder.forEach(name => {
-                        const card = document.createElement('div');
-                        card.className = 'drag-chip';
-                        card.style.margin = '0';
-                        card.style.cursor = 'pointer';
-                        card.innerHTML = `<span>📄 ${name}</span>`;
-                        card.onclick = (e) => {
-                            e.stopPropagation();
-                            delete state.placements[name];
-                            renderLevel4Decks();
-                        };
-                        contents.appendChild(card);
-                    });
-                }
-
-                folder.appendChild(contents);
-                folders.appendChild(folder);
-            });
+      // Evict duplicate placements
+      for (const key in appState.act2.placements) {
+        if (appState.act2.placements[key] === value) {
+          delete appState.act2.placements[key];
         }
+      }
 
-        function handleDropL4(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('drag-over');
-            const label = e.dataTransfer.getData('text/plain');
-            const folderName = e.currentTarget.getAttribute('data-folder');
-            if (label && folderName) {
-                state.placements[label] = folderName;
-                renderLevel4Decks();
-            }
+      appState.act2.placements[vagueId] = value;
+      renderAct2();
+    }
+
+    function clearAct2Slot(vagueId, ev) {
+      if (ev) ev.stopPropagation();
+      delete appState.act2.placements[vagueId];
+      renderAct2();
+    }
+
+    function verifyAct2() {
+      const placements = appState.act2.placements;
+      let incorrect = 0;
+      
+      ACT2_DATA.forEach(item => {
+        const sidebarBtn = document.querySelector(`.portal-sidebar-btn[data-vague="${item.id}"]`);
+        if (!sidebarBtn) return;
+
+        if (placements[item.id] === item.standard) {
+          sidebarBtn.className = "portal-sidebar-btn correct-drop";
+        } else {
+          incorrect++;
+          sidebarBtn.className = "portal-sidebar-btn incorrect-drop";
+          setTimeout(() => {
+            sidebarBtn.style.borderColor = 'var(--border-grey-dark)';
+            sidebarBtn.style.background = 'var(--bg-white)';
+            delete placements[item.id];
+            renderAct2();
+          }, 1500);
         }
+      });
 
-        function handleL4FolderClick(folderName) {
-            if (state.selectedCardId) {
-                state.placements[state.selectedCardId] = folderName;
-                state.selectedCardId = null;
-                renderLevel4Decks();
-            }
-        }
-
-        // --- LEVEL 5 IMPLEMENTATION ---
-        function loadLevel5Task() {
-            const container = document.getElementById('levelContainer');
-            const level = levelData[4];
-            const task = level.tasks[state.l5TaskIdx];
-
-            container.innerHTML = `
-        <p style="font-size:13px; color:#555; font-weight:bold; margin-bottom:8px;">${level.instruction}</p>
-        <p style="font-size:12.5px; font-weight:bold; color:#b30000; margin-bottom:8px;">${task.scenario}</p>
+      if (incorrect === 0) {
+        appState.act2.completed = true;
+        triggerToast("Sidebar renamed successfully!");
         
-        <div class="l5-options-list">
-          ${task.options.map((opt, idx) => `
-            <button class="l5-option-btn" onclick="selectL5Option(${idx}, this)">
-              Route: ${opt.text}
-            </button>
-          `).join('')}
-        </div>
-      `;
+        // Render explanation in place of deck
+        const deck = document.getElementById('act2-chip-deck');
+        deck.parentElement.innerHTML = `
+          <div style="background:var(--bg-white); border:1px solid #c6f6d5; padding:12px; border-radius:var(--radius-md); font-size:12px; color:#22543d; line-height:1.5;">
+            <strong>✓ Usability Recap: Information Scent Established!</strong><br>
+            Renaming the sidebar items directly in the menu makes the portal self-explanatory. Placing standardized terms ('Fees' and 'Resources') helps users navigate with high predictability.
+          </div>
+        `;
+      } else {
+        appState.mistakesCount += incorrect;
+        triggerToast(`Friction: ${incorrect} incorrectly assigned sidebar labels have been reset.`);
+      }
+    }
+
+    // --- LEVEL 2 ACTIVITY 1: BREADCRUMB BUILDER ---
+    function renderAct3() {
+      actSelectedCard = null;
+      const challenge = ACT3_DATA[appState.act3.challengeIndex];
+      
+      // Update prompt
+      document.getElementById('act3-task-prompt').innerHTML = challenge.prompt;
+
+      // Render slots
+      const slotsRow = document.getElementById('act3-slots-row');
+      slotsRow.innerHTML = '';
+
+      for (let i = 0; i < 3; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'breadcrumb-slot-box';
+        slot.setAttribute('data-slot', i);
+        
+        const placedVal = appState.act3.placements[i];
+        if (placedVal) {
+          slot.classList.add('filled');
+          slot.innerText = placedVal;
+        } else {
+          slot.innerText = `Node Slot ${i + 1}`;
         }
 
-        function selectL5Option(idx, el) {
-            const level = levelData[4];
-            const task = level.tasks[state.l5TaskIdx];
-            const option = task.options[idx];
+        // Drag events
+        slot.addEventListener('dragover', onDragOver);
+        slot.addEventListener('dragleave', onDragLeave);
+        slot.addEventListener('drop', (ev) => {
+          ev.preventDefault();
+          ev.currentTarget.classList.remove('dragover');
+          const value = ev.dataTransfer.getData("text/plain");
+          placeAct3Card(i, value);
+        });
 
-            const buttons = document.querySelectorAll('.l5-option-btn');
-            buttons.forEach(btn => btn.disabled = true);
+        // Click events
+        slot.addEventListener('click', () => {
+          if (actSelectedCard) {
+            placeAct3Card(i, actSelectedCard);
+            actSelectedCard = null;
+          } else if (appState.act3.placements[i]) {
+            delete appState.act3.placements[i];
+            renderAct3();
+          }
+        });
 
-            if (option.correct) {
-                state.score += 10;
-                state.correctAnswers++;
-                state.levelPassed = true; // Temporary flag for task check
+        slotsRow.appendChild(slot);
 
-                el.classList.add('correct-path');
-                showFeedback("Correct! That is the shortest, most logical route path.", 'correct');
-                updateHUD();
-
-                setTimeout(() => {
-                    state.l5TaskIdx++;
-                    if (state.l5TaskIdx < level.tasks.length) {
-                        loadLevel5Task();
-                        showFeedback("", 'normal');
-                    } else {
-                        // End of game!
-                        document.getElementById('checkBtn').style.display = 'none';
-                        document.getElementById('nextBtn').disabled = false;
-                        showFeedback("All tasks completed! Click 'Next Level' to view the final scorecard certificate.", 'correct');
-                    }
-                }, 1500);
-            } else {
-                state.score = Math.max(0, state.score - 5);
-                state.mistakesCount++;
-                state.levelPassed = false;
-
-                el.classList.add('wrong-path');
-                showFeedback("Incorrect! That path takes an unnecessary detour or maps to wrong directories.", 'wrong');
-                updateHUD();
-                updateObservation();
-
-                // Highlight correct path
-                buttons.forEach((btn, bIdx) => {
-                    if (task.options[bIdx].correct) {
-                        btn.classList.add('correct-path');
-                    }
-                });
-
-                setTimeout(() => {
-                    state.l5TaskIdx++;
-                    if (state.l5TaskIdx < level.tasks.length) {
-                        loadLevel5Task();
-                        showFeedback("", 'normal');
-                    } else {
-                        document.getElementById('checkBtn').style.display = 'none';
-                        document.getElementById('nextBtn').disabled = false;
-                        showFeedback("All tasks completed! Click 'Next Level' to view the final scorecard certificate.", 'correct');
-                    }
-                }, 3000);
-            }
+        if (i < 2) {
+          const arrow = document.createElement('span');
+          arrow.className = 'breadcrumb-arrow';
+          arrow.innerText = '→';
+          slotsRow.appendChild(arrow);
         }
+      }
 
-        // --- ANSWER VERIFICATION LOGIC ---
-        function checkCurrentLevel() {
-            const levelIdx = state.level;
-            const level = levelData[levelIdx];
+      // Render remaining choices
+      const deck = document.getElementById('act3-chip-deck');
+      deck.innerHTML = '';
 
-            let isCorrect = true;
-            let incorrectCount = 0;
+      const placedValues = Object.values(appState.act3.placements);
+      const remaining = shuffleArray(challenge.options.filter(opt => !placedValues.includes(opt)));
 
-            if (levelIdx === 0) {
-                // Level 1: Find exam results page
-                const activeTab = state.l1Path[state.l1Path.length - 1];
-                if (activeTab === 'Exam Results') {
-                    isCorrect = true;
-                } else {
-                    isCorrect = false;
-                    incorrectCount = 1;
-                }
-            }
-            else if (levelIdx === 1) {
-                // Level 2: Drag and Drop Navigation Items
-                const totalKeys = Object.keys(level.mapping).length;
-                const placedKeys = Object.keys(state.placements).length;
+      if (remaining.length === 0) {
+        deck.innerHTML = `<p style="font-size: 11px; color:#38a169; font-weight:bold; font-style:italic;">Breadcrumb sequence complete. Click 'Check Answer'.</p>`;
+      } else {
+        remaining.forEach(nodeName => {
+          const chip = document.createElement('div');
+          chip.className = 'drag-card-chip';
+          chip.draggable = true;
+          chip.innerText = nodeName;
 
-                if (placedKeys < totalKeys) {
-                    alert("Please fill all dropzone labels before checking!");
-                    return;
-                }
+          chip.addEventListener('dragstart', (ev) => onDragStart(ev, nodeName));
+          chip.addEventListener('click', () => handleCardSelect(nodeName, chip));
 
-                for (const poorKey in level.mapping) {
-                    const slotBox = document.querySelector(`.dropzone-box[data-poor="${poorKey}"]`);
-                    const correctVal = level.mapping[poorKey];
-                    const placedVal = state.placements[poorKey];
+          deck.appendChild(chip);
+        });
+      }
+    }
 
-                    if (placedVal === correctVal) {
-                        if (slotBox) slotBox.className = "dropzone-box correct";
-                    } else {
-                        isCorrect = false;
-                        incorrectCount++;
-                        if (slotBox) {
-                            slotBox.className = "dropzone-box wrong";
-                            setTimeout(() => slotBox.className = "dropzone-box", 600);
-                            delete state.placements[poorKey];
-                        }
-                    }
-                }
-                renderLevel2Decks();
-            }
-            else if (levelIdx === 2) {
-                // Level 3: Breadcrumb Builder
-                const challenge = level.challenges[state.l3ChallengeIdx];
-                const slotsFilled = [state.placements[0], state.placements[1], state.placements[2]];
+    function placeAct3Card(slotIdx, value) {
+      if (!value) return;
 
-                if (slotsFilled.includes(undefined)) {
-                    alert("Please fill all 3 breadcrumb slots before checking!");
-                    return;
-                }
-
-                // Verify correct hierarchy sequence
-                let challengeErrors = 0;
-                slotsFilled.forEach((val, slotIdx) => {
-                    const slotBox = document.querySelector(`.breadcrumb-slot[data-slot="${slotIdx}"]`);
-                    if (val === challenge.correct[slotIdx]) {
-                        if (slotBox) slotBox.className = "breadcrumb-slot correct";
-                    } else {
-                        challengeErrors++;
-                        if (slotBox) {
-                            slotBox.className = "breadcrumb-slot wrong";
-                            setTimeout(() => slotBox.className = "breadcrumb-slot", 600);
-                            delete state.placements[slotIdx];
-                        }
-                    }
-                });
-
-                renderLevel3Decks();
-
-                if (challengeErrors === 0) {
-                    // Correct challenge
-                    state.score += 10;
-                    state.correctAnswers++;
-                    updateHUD();
-                    showFeedback("Correct! Breadcrumb sequence is well structured.", 'correct');
-
-                    setTimeout(() => {
-                        state.l3ChallengeIdx++;
-                        if (state.l3ChallengeIdx < level.challenges.length) {
-                            state.placements = {};
-                            loadLevel3Challenge();
-                            showFeedback("", 'normal');
-                        } else {
-                            // Level complete!
-                            state.levelPassed = true;
-                            document.getElementById('nextBtn').disabled = false;
-                            document.getElementById('checkBtn').disabled = true;
-                            showFeedback("All breadcrumb tasks successfully built! Click 'Next Level' to proceed.", 'correct');
-                        }
-                    }, 1500);
-                    return;
-                } else {
-                    isCorrect = false;
-                    incorrectCount = challengeErrors;
-                }
-            }
-            else if (levelIdx === 3) {
-                // Level 4: Fix Bad Navigation Structure
-                const totalPages = level.pages.length;
-                const placedPages = Object.keys(state.placements).length;
-
-                if (placedPages < totalPages) {
-                    alert("Please organize all 4 page cards into folders before checking!");
-                    return;
-                }
-
-                level.pages.forEach(p => {
-                    const correctCat = p.category;
-                    const placedCat = state.placements[p.name];
-
-                    if (placedCat !== correctCat) {
-                        isCorrect = false;
-                        incorrectCount++;
-                        delete state.placements[p.name]; // return to deck
-                    }
-                });
-
-                renderLevel4Decks();
-
-                // Add visual highlights to folders
-                document.querySelectorAll('.folder-box').forEach(folder => {
-                    const cat = folder.getAttribute('data-folder');
-                    const misplacedInFolder = level.pages.filter(p => state.placements[p.name] === cat && p.category !== cat);
-                    if (misplacedInFolder.length > 0) {
-                        folder.className = "folder-box wrong";
-                        setTimeout(() => folder.className = "folder-box", 600);
-                    } else {
-                        folder.className = "folder-box correct";
-                    }
-                });
-            }
-            else if (levelIdx === 4) {
-                // Level 5: Final wayfinding challenge (checked instantly during option clicks)
-                return;
-            }
-
-            // Process check outputs
-            if (isCorrect) {
-                state.score += 10;
-                state.correctAnswers++;
-                state.levelPassed = true;
-                updateHUD();
-
-                document.getElementById('nextBtn').disabled = false;
-                document.getElementById('checkBtn').disabled = true;
-
-                showFeedback("Excellent! Your navigation audit for this level is 100% correct.", 'correct');
-            } else {
-                state.score = Math.max(0, state.score - 5);
-                state.mistakesCount++;
-                updateHUD();
-                updateObservation();
-
-                showFeedback(`Audit Failed! You made mistakes. Points deducted. Wrong items returned to deck. Re-audit and check again.`, 'wrong');
-            }
+      // Evict duplicate
+      for (const key in appState.act3.placements) {
+        if (appState.act3.placements[key] === value) {
+          delete appState.act3.placements[key];
         }
+      }
 
-        // --- SCORECARD RENDERER ---
-        function showFinalScorecard() {
-            const container = document.getElementById('levelContainer');
-            document.getElementById('checkBtn').style.display = 'none';
-            document.getElementById('hintBtn').style.display = 'none';
-            document.getElementById('resetBtn').style.display = 'none';
-            document.getElementById('nextBtn').style.display = 'none';
-            document.getElementById('feedbackText').innerText = '';
+      appState.act3.placements[slotIdx] = value;
+      renderAct3();
+    }
 
-            // Calculate Badge
-            const totalPossibleQuestions = 10; // Level 1 (1) + Level 2 (1) + Level 3 (3) + Level 4 (1) + Level 5 (4)
-            const accuracyPercent = Math.round((state.correctAnswers / (state.correctAnswers + state.mistakesCount)) * 100) || 0;
+    function verifyAct3() {
+      const challenge = ACT3_DATA[appState.act3.challengeIndex];
+      let incorrect = 0;
 
-            let badge = "Beginner Navigator";
-            if (accuracyPercent >= 80) {
-                badge = "Wayfinding Master 🏆";
-            } else if (accuracyPercent >= 60) {
-                badge = "Smart Navigator 🧭";
-            }
+      for (let i = 0; i < 3; i++) {
+        const slotEl = document.querySelector(`.breadcrumb-slot-box[data-slot="${i}"]`);
+        if (!slotEl) continue;
 
-            container.innerHTML = `
-        <div class="scorecard">
-          <div class="scorecard-heading">Auditor Certificate</div>
-          <p style="font-size:12.5px; color:#555; margin:0;">Wayfinding, Navigation & Signposts Audit complete!</p>
+        const val = appState.act3.placements[i];
+        if (val === challenge.correct[i]) {
+          slotEl.className = "breadcrumb-slot-box correct-node filled";
+        } else {
+          incorrect++;
+          slotEl.className = "breadcrumb-slot-box wrong-node filled";
           
-          <div class="badge-unveiled">${badge}</div>
+          setTimeout(() => {
+            slotEl.className = "breadcrumb-slot-box";
+            delete appState.act3.placements[i];
+            renderAct3();
+          }, 1200);
+        }
+      }
 
-          <table class="scorecard-table">
-            <tr style="display: none;">
-              <th>Final Score:</th>
-              <td style="color:#b30000; font-size:15px;">⭐ ${state.score} points</td>
-            </tr>
-            <tr>
-              <th>Audit Accuracy:</th>
-              <td>${accuracyPercent}%</td>
-            </tr>
-            <tr>
-              <th>Mistakes Made:</th>
-              <td>${state.mistakesCount} errors</td>
-            </tr>
-            <tr>
-              <th>Hints Used:</th>
-              <td>${state.hintsCount} hints</td>
-            </tr>
-          </table>
+      if (incorrect === 0) {
+        triggerToast("Task complete! Breadcrumb hierarchy matches sitemap.");
+        setTimeout(() => {
+          appState.act3.challengeIndex++;
+          if (appState.act3.challengeIndex < ACT3_DATA.length) {
+            appState.act3.placements = {};
+            renderAct3();
+          } else {
+            appState.act3.completed = true;
+            triggerToast("All breadcrumbs built successfully.");
+            
+            // Show recap card
+            const deck = document.getElementById('act3-chip-deck');
+            deck.parentElement.innerHTML = `
+              <div style="background:var(--bg-white); border:1px solid #c6f6d5; padding:12px; border-radius:var(--radius-md); font-size:12px; color:#22543d; line-height:1.5;">
+                <strong>✓ Structural Scaffolding complete!</strong><br>
+                Breadcrumbs act as wayfinding indicators, detailing parent-child hierarchies. They represent a location footprint rather than chronological click pathways.
+              </div>
+            `;
+          }
+        }, 1500);
+      } else {
+        appState.mistakesCount += incorrect;
+        triggerToast(`Wayfinding alert: ${incorrect} breadcrumb components placed in incorrect levels.`);
+      }
+    }
 
-          <div style="font-size:11.5px; text-align:left; background:#fff; padding:10px; border-radius:6px; border:1.5px solid #eee; line-height:1.45;">
-            <b>Short Summary:</b> You audited standard click routes, corrected vague labels (renamed Money to Fees, Stuff to Resources), arranged sequential breadcrumbs, re-categorized misplaced menu sheets, and solved task routes under usability rules.
+    // --- LEVEL 2 ACTIVITY 2: REPAIR BROKEN BREADCRUMBS ---
+    function renderAct4() {
+      actSelectedCard = null;
+      const scenario = ACT4_DATA[appState.act4.challengeIndex];
+
+      document.getElementById('act4-task-prompt').innerHTML = scenario.prompt;
+
+      // Render slots row
+      const slotsRow = document.getElementById('act4-slots-row');
+      slotsRow.innerHTML = '';
+
+      scenario.nodes.forEach((nodeVal, idx) => {
+        const slot = document.createElement('div');
+        slot.className = 'breadcrumb-slot-box';
+        slot.setAttribute('data-slot', idx);
+
+        if (nodeVal !== null) {
+          slot.classList.add('filled');
+          slot.innerText = nodeVal;
+          slot.style.borderStyle = 'solid';
+        } else {
+          // Editable broken node
+          const userPlacedVal = appState.act4.placements[idx];
+          if (userPlacedVal) {
+            slot.classList.add('filled');
+            slot.innerText = userPlacedVal;
+            slot.style.borderColor = 'var(--primary-red)';
+          } else {
+            slot.innerHTML = `<span style="color:var(--primary-red); font-weight:700;">[ Broken Node ]</span>`;
+            slot.style.border = '2px dashed var(--primary-red)';
+          }
+
+          // Drag Events
+          slot.addEventListener('dragover', onDragOver);
+          slot.addEventListener('dragleave', onDragLeave);
+          slot.addEventListener('drop', (ev) => {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('dragover');
+            const value = ev.dataTransfer.getData("text/plain");
+            placeAct4Card(idx, value);
+          });
+
+          // Click Events
+          slot.addEventListener('click', () => {
+            if (actSelectedCard) {
+              placeAct4Card(idx, actSelectedCard);
+              actSelectedCard = null;
+            } else if (appState.act4.placements[idx]) {
+              delete appState.act4.placements[idx];
+              renderAct4();
+            }
+          });
+        }
+
+        slotsRow.appendChild(slot);
+
+        if (idx < 2) {
+          const arrow = document.createElement('span');
+          arrow.className = 'breadcrumb-arrow';
+          arrow.innerText = '→';
+          slotsRow.appendChild(arrow);
+        }
+      });
+
+      // Render deck
+      const deck = document.getElementById('act4-chip-deck');
+      deck.innerHTML = '';
+
+      const placedValues = Object.values(appState.act4.placements);
+      const remaining = shuffleArray(scenario.options.filter(opt => !placedValues.includes(opt)));
+
+      if (remaining.length === 0) {
+        deck.innerHTML = `<p style="font-size: 11px; color:#38a169; font-weight:bold; font-style:italic;">Repair node inserted. Click 'Check Answer'.</p>`;
+      } else {
+        remaining.forEach(nodeName => {
+          const chip = document.createElement('div');
+          chip.className = 'drag-card-chip';
+          chip.draggable = true;
+          chip.innerText = nodeName;
+
+          chip.addEventListener('dragstart', (ev) => onDragStart(ev, nodeName));
+          chip.addEventListener('click', () => handleCardSelect(nodeName, chip));
+
+          deck.appendChild(chip);
+        });
+      }
+    }
+
+    function placeAct4Card(slotIdx, value) {
+      if (!value) return;
+      appState.act4.placements[slotIdx] = value;
+      renderAct4();
+    }
+
+    function verifyAct4() {
+      const scenario = ACT4_DATA[appState.act4.challengeIndex];
+      let isCorrect = true;
+
+      if (appState.act4.challengeIndex === 0 || appState.act4.challengeIndex === 2) {
+        // Repair slots
+        const targetIdx = scenario.correctIndex;
+        const placed = appState.act4.placements[targetIdx];
+        const slotEl = document.querySelector(`.breadcrumb-slot-box[data-slot="${targetIdx}"]`);
+        
+        if (placed === scenario.correctValue) {
+          if (slotEl) slotEl.className = "breadcrumb-slot-box correct-node filled";
+        } else {
+          isCorrect = false;
+          if (slotEl) {
+            slotEl.className = "breadcrumb-slot-box wrong-node filled";
+            setTimeout(() => {
+              slotEl.className = "breadcrumb-slot-box";
+              delete appState.act4.placements[targetIdx];
+              renderAct4();
+            }, 1200);
+          }
+        }
+      } else {
+        // Scenario 2: verify full order
+        for (let i = 0; i < 3; i++) {
+          const slotEl = document.querySelector(`.breadcrumb-slot-box[data-slot="${i}"]`);
+          const val = appState.act4.placements[i];
+          if (val === scenario.correct[i]) {
+            if (slotEl) slotEl.className = "breadcrumb-slot-box correct-node filled";
+          } else {
+            isCorrect = false;
+            if (slotEl) {
+              slotEl.className = "breadcrumb-slot-box wrong-node filled";
+              setTimeout(() => {
+                slotEl.className = "breadcrumb-slot-box";
+                delete appState.act4.placements[i];
+                renderAct4();
+              }, 1200);
+            }
+          }
+        }
+      }
+
+      if (isCorrect) {
+        triggerToast("Correct repair applied! Scenario cleared.");
+        setTimeout(() => {
+          appState.act4.challengeIndex++;
+          if (appState.act4.challengeIndex < ACT4_DATA.length) {
+            appState.act4.placements = {};
+            renderAct4();
+          } else {
+            appState.act4.completed = true;
+            triggerToast("All wayfinding paths repaired successfully.");
+            
+            const deck = document.getElementById('act4-chip-deck');
+            deck.parentElement.innerHTML = `
+              <div style="background:var(--bg-white); border:1px solid #c6f6d5; padding:12px; border-radius:var(--radius-md); font-size:12px; color:#22543d; line-height:1.5;">
+                <strong>✓ Location Awareness restored!</strong><br>
+                Fixing breadcrumb parent tags prevents location confusion. Standardized trails provide stable wayfinding hooks for student profiles.
+              </div>
+            `;
+          }
+        }, 1500);
+      } else {
+        appState.mistakesCount++;
+        triggerToast("Friction alert: The chosen repair node fails to correct the sitemap hierarchy.");
+      }
+    }
+
+    // --- LEVEL 3 ACTIVITY 1: NAVIGATION FLOW CHALLENGE (MULTI-SCENARIO APPS & HEATMAPS) ---
+    function renderAct5() {
+      if (appState.act5.completed) {
+        compileAct5Report();
+        return;
+      }
+
+      const task = ACT5_DATA[appState.act5.taskIndex];
+      
+      // Update task text
+      document.getElementById('act5-task-prompt').innerHTML = task.task;
+
+      // Update mock portal text and branding colors dynamically
+      document.getElementById('act5-portal-header-title').innerText = task.title;
+      document.getElementById('act5-portal-url').innerText = task.url;
+
+      const portalArea = document.getElementById('act5-portal-area');
+      portalArea.style.setProperty('--primary-red', task.themeColor);
+      portalArea.style.setProperty('--primary-red-hover', task.themeColor);
+      portalArea.style.setProperty('--primary-red-dim', task.themeColorLight);
+      portalArea.style.setProperty('--primary-red-border', task.themeColorBorder);
+
+      // Render animated breadcrumbs
+      const breadContainer = document.getElementById('act5-breadcrumbs');
+      breadContainer.innerHTML = '<span>You are here: </span>';
+      appState.act5.path.forEach((node, idx) => {
+        const item = document.createElement('span');
+        item.className = 'breadcrumb-node-anim';
+        if (idx < appState.act5.path.length - 1) {
+          item.innerHTML = `<span class="breadcrumb-item-link" onclick="navigateAct5('${node}')">${node}</span> <span class="breadcrumb-arrow" style="margin:0 4px;">→</span> `;
+        } else {
+          item.innerHTML = `<span style="font-weight: 700; color: var(--text-main);">${node}</span>`;
+        }
+        breadContainer.appendChild(item);
+      });
+
+      // Render sidebar based on active task sitemap
+      const sidebar = document.getElementById('act5-sidebar');
+      sidebar.innerHTML = '';
+
+      const activeSidebarTag = appState.act5.path[1] || 'Home';
+
+      task.sidebar.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'portal-sidebar-btn';
+        if (item === activeSidebarTag) btn.classList.add('active');
+        btn.innerText = item;
+        btn.onclick = (e) => {
+          applyClickPulse(btn);
+          navigateAct5(item);
+        };
+        sidebar.appendChild(btn);
+      });
+
+      // Render viewport mock cards
+      const viewport = document.getElementById('act5-viewport');
+      viewport.innerHTML = '';
+
+      const screenKey = activeSidebarTag === 'Home' ? 'Home' : activeSidebarTag;
+      const screenData = task.screens[screenKey];
+
+      if (screenData) {
+        const card = document.createElement('div');
+        card.className = 'portal-view-card active';
+        
+        let optionsHtml = '';
+        shuffleArray(screenData.options).forEach(opt => {
+          optionsHtml += `
+            <div class="portal-option-card" onclick="clickAct5Target('${opt}', this)">
+              📄 ${opt}
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="portal-headline">${screenData.headline}</div>
+          <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:8px;">Locate the target option: <strong>${task.target}</strong></p>
+          <div class="portal-options-grid">
+            ${optionsHtml}
           </div>
+        `;
+        viewport.appendChild(card);
+      }
+    }
 
-          <button onclick="initGame()" style="margin-top:10px; align-self:center;">Restart Simulation</button>
+    function navigateAct5(category) {
+      if (appState.act5.completed) return;
+      appState.act5.clicks++;
+
+      if (category === 'Home' || category === 'Dashboard') {
+        appState.act5.path = ['Home'];
+      } else {
+        appState.act5.path = ['Home', category];
+      }
+
+      renderAct5();
+    }
+
+    function clickAct5Target(pageName, clickEl) {
+      if (appState.act5.completed) return;
+      applyClickPulse(clickEl);
+      appState.act5.clicks++;
+
+      const task = ACT5_DATA[appState.act5.taskIndex];
+      
+      if (pageName === task.target) {
+        // Success! Log stats
+        appState.act5.stats.push({
+          taskName: task.target,
+          optimal: task.optimalClicks,
+          clicks: appState.act5.clicks,
+          errors: appState.act5.errors,
+          appTitle: task.title,
+          appType: task.appType
+        });
+
+        triggerToast("Correct item found! Loading next scenario...");
+        
+        // Progress tasks
+        appState.act5.taskIndex++;
+        appState.act5.clicks = 0;
+        appState.act5.errors = 0;
+        appState.act5.path = ['Home'];
+
+        if (appState.act5.taskIndex < ACT5_DATA.length) {
+          renderAct5();
+        } else {
+          appState.act5.completed = true;
+          document.getElementById('act5-task-prompt').style.display = 'none';
+          
+          // Re-render final mockup to show heatmap overlay options
+          renderFinalHeatmapBase();
+          compileAct5Report();
+        }
+      } else {
+        // Mistake
+        appState.act5.errors++;
+        appState.mistakesCount++;
+        
+        // Visual shake feedback
+        const portal = document.getElementById('act5-portal-area');
+        portal.classList.add('shake-animation');
+        setTimeout(() => portal.classList.remove('shake-animation'), 400);
+
+        triggerToast(`Friction warning: Navigated to '${pageName}' instead of target '${task.target}'.`);
+      }
+    }
+
+    // Render a stable base view of the final railway booking portal so the heatmap can overlay onto it
+    function renderFinalHeatmapBase() {
+      // Use the last railway booking app metadata to draw a static display sitemap
+      const task = ACT5_DATA[3]; 
+      document.getElementById('act5-portal-header-title').innerText = `${task.title} (Heatmap View)`;
+      document.getElementById('act5-portal-url').innerText = task.url;
+
+      const portalArea = document.getElementById('act5-portal-area');
+      portalArea.style.setProperty('--primary-red', task.themeColor);
+      portalArea.style.setProperty('--primary-red-hover', task.themeColor);
+      portalArea.style.setProperty('--primary-red-dim', task.themeColorLight);
+      portalArea.style.setProperty('--primary-red-border', task.themeColorBorder);
+
+      // Render breadcrumbs
+      const breadContainer = document.getElementById('act5-breadcrumbs');
+      breadContainer.innerHTML = '<span>You are here: </span>' + 
+        '<span class="breadcrumb-node-anim"><span class="breadcrumb-item-link">Home</span> <span class="breadcrumb-arrow">→</span></span>' +
+        '<span class="breadcrumb-node-anim"><span class="breadcrumb-item-link">Timetables</span> <span class="breadcrumb-arrow">→</span></span>' +
+        '<span class="breadcrumb-node-anim"><span style="font-weight:700; color:var(--text-main);">Train Schedule</span></span>';
+
+      // Render sidebar
+      const sidebar = document.getElementById('act5-sidebar');
+      sidebar.innerHTML = '';
+      task.sidebar.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'portal-sidebar-btn';
+        if (item === 'Timetables') btn.classList.add('active');
+        btn.innerText = item;
+        sidebar.appendChild(btn);
+      });
+
+      // Render viewport option cards
+      const viewport = document.getElementById('act5-viewport');
+      viewport.innerHTML = `
+        <div class="portal-view-card active" style="position:relative;">
+          <div class="portal-headline">Transit Timetables</div>
+          <div class="portal-options-grid">
+            <div class="portal-option-card" id="heatmap-opt-correct">📄 Train Schedule</div>
+            <div class="heatmap-wrong-card portal-option-card" id="heatmap-opt-wrong1">📄 Station Info</div>
+            <div class="heatmap-wrong-card portal-option-card" id="heatmap-opt-wrong2">📄 Live Tracking</div>
+          </div>
+          
+          <!-- Heatmap overlays will be injected here inside this wrapper -->
+          <div class="heatmap-overlay" id="act5-heatmap-wrapper">
+            <!-- Heatmap overlay tags -->
+            <div class="heatmap-label-overlay heatmap-most-clicked" style="top: -6px; left: -140px; width: 130px; height: 36px;">Most Clicked (Timetables)</div>
+            <div class="heatmap-label-overlay heatmap-optimal" style="top: 36px; left: 8px; width: 140px; height: 42px;">Optimal Target</div>
+            <div class="heatmap-label-overlay heatmap-wrong-turn" style="top: 36px; left: 160px; width: 140px; height: 42px;">Wrong Turn (Station Info)</div>
+            <div class="heatmap-label-overlay heatmap-backtrack" style="top: -42px; left: 8px; width: 120px; height: 30px;">Backtrack (Home Link)</div>
+          </div>
         </div>
       `;
-        }
+    }
 
-        // --- DYNAMIC OBSERVATION UPDATER ---
-        function updateObservation() {
-            const el = document.getElementById('observationText');
-            if (state.mistakesCount === 0) {
-                el.innerText = "Observation: With clear category names and structured breadcrumbs, user accuracy is 100%. Signposts act as a visual lifeline.";
-            } else {
-                el.innerText = `Observation: User detours detected. Cryptic navigation links and misplaced menu items caused ${state.mistakesCount} tester errors. Adjusting signposts immediately resolves user confusion.`;
-            }
-        }
+    function toggleAct5Heatmap() {
+      appState.act5.heatmapVisible = !appState.act5.heatmapVisible;
+      
+      const wrapper = document.getElementById('act5-heatmap-wrapper');
+      const staticSidebarBtns = document.querySelectorAll('#act5-sidebar .portal-sidebar-btn');
+      const staticOptionCards = document.querySelectorAll('#act5-viewport .portal-option-card');
+      const breadLinks = document.querySelectorAll('#act5-breadcrumbs .breadcrumb-item-link');
 
-        window.onload = initGame;
-    </script>
+      if (appState.act5.heatmapVisible) {
+        wrapper.classList.add('show');
+        
+        // Highlight elements visually
+        staticSidebarBtns.forEach(btn => {
+          if (btn.innerText === 'Timetables') btn.classList.add('heatmap-most-clicked');
+        });
+        
+        const correctCard = document.getElementById('heatmap-opt-correct');
+        if (correctCard) correctCard.classList.add('heatmap-optimal');
+
+        const wrong1 = document.getElementById('heatmap-opt-wrong1');
+        if (wrong1) wrong1.classList.add('heatmap-wrong-turn');
+
+        breadLinks.forEach(link => {
+          if (link.innerText === 'Home') link.classList.add('heatmap-backtrack');
+        });
+
+        document.getElementById('btn-toggle-heatmap').innerText = "Hide Heatmap Analysis Overlay";
+      } else {
+        wrapper.classList.remove('show');
+        
+        // Clear classes
+        staticSidebarBtns.forEach(btn => btn.classList.remove('heatmap-most-clicked'));
+        const correctCard = document.getElementById('heatmap-opt-correct');
+        if (correctCard) correctCard.classList.remove('heatmap-optimal');
+
+        const wrong1 = document.getElementById('heatmap-opt-wrong1');
+        if (wrong1) wrong1.classList.remove('heatmap-wrong-turn');
+
+        breadLinks.forEach(link => link.classList.remove('heatmap-backtrack'));
+
+        document.getElementById('btn-toggle-heatmap').innerText = "Show Heatmap Analysis Overlay";
+      }
+    }
+
+    function compileAct5Report() {
+      const container = document.getElementById('act5-report-container');
+      container.style.display = 'block';
+
+      let sumOptimal = 0;
+      let sumClicks = 0;
+      let sumErrors = 0;
+
+      let rowsHtml = '';
+      appState.act5.stats.forEach(stat => {
+        sumOptimal += stat.optimal;
+        sumClicks += stat.clicks;
+        sumErrors += stat.errors;
+        
+        const efficiency = Math.round((stat.optimal / stat.clicks) * 100);
+        rowsHtml += `
+          <tr style="border-bottom:1px solid var(--border-grey); font-size:12px;">
+            <td style="padding:8px; font-weight:600;">${stat.appTitle} (${stat.taskName})</td>
+            <td style="padding:8px; text-align:center;">${stat.optimal}</td>
+            <td style="padding:8px; text-align:center;">${stat.clicks}</td>
+            <td style="padding:8px; text-align:center; color:${stat.errors > 0 ? 'var(--primary-red)' : '#38a169'};">${stat.errors}</td>
+            <td style="padding:8px; text-align:right; font-weight:bold; color:${efficiency >= 80 ? '#38a169' : '#dd6b20'};">${efficiency}%</td>
+          </tr>
+        `;
+      });
+
+      const totalEfficiency = Math.round((sumOptimal / sumClicks) * 100);
+
+      container.innerHTML = `
+        <div class="lab-card" style="border: 2px solid var(--primary-red-border); animation: scaleIn 0.4s ease; margin-bottom: 24px;">
+          <div class="lab-card-header" style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px;">
+            <div>
+              <h3 class="lab-card-title" style="color:var(--primary-red);">Automated Navigation Efficiency Report</h3>
+              <div class="lab-card-subtitle">Comparison index logs across 4 application prototypes:</div>
+            </div>
+            <button class="btn-lab btn-lab-primary" id="btn-toggle-heatmap" onclick="toggleAct5Heatmap()">Show Heatmap Analysis Overlay</button>
+          </div>
+          
+          <table style="width:100%; border-collapse:collapse; margin-bottom:16px;">
+            <thead>
+              <tr style="background:var(--bg-grey); border-bottom:1.5px solid var(--border-grey-dark); font-size:11px; text-transform:uppercase; color:var(--text-muted); text-align:left;">
+                <th style="padding:8px;">Application Scenario</th>
+                <th style="padding:8px; text-align:center;">Optimal Clicks</th>
+                <th style="padding:8px; text-align:center;">Actual Clicks</th>
+                <th style="padding:8px; text-align:center;">Detours</th>
+                <th style="padding:8px; text-align:right;">Efficiency Index</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+              <tr style="background:var(--primary-red-dim); border-top:2px solid var(--primary-red); font-weight:bold; font-size:13px;">
+                <td style="padding:10px; color:var(--primary-red-hover);">Average Laboratory Index</td>
+                <td style="padding:10px; text-align:center;">${sumOptimal}</td>
+                <td style="padding:10px; text-align:center;">${sumClicks}</td>
+                <td style="padding:10px; text-align:center; color:var(--primary-red-hover);">${sumErrors}</td>
+                <td style="padding:10px; text-align:right; color:var(--primary-red-hover); font-size:14px;">${totalEfficiency}%</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- HEATMAP VISUAL LEGEND -->
+          <div class="heatmap-legend" style="display: flex; gap: 16px; margin-top: 12px; background: var(--bg-grey); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-grey-dark); font-size: 11px;">
+            <span style="font-weight: bold; text-transform: uppercase;">Heatmap Overlay Legend:</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; background: rgba(239, 68, 68, 0.3); border: 1px solid #ef4444; border-radius: 2px;"></span> Most Clicked</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; background: rgba(245, 158, 11, 0.3); border: 1px dashed #f59e0b; border-radius: 2px;"></span> Wrong Turn Detour</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; background: rgba(59, 130, 246, 0.3); border: 1px dotted #3b82f6; border-radius: 2px;"></span> Backtrack</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; box-shadow: 0 0 4px #38a169; border: 1px solid #38a169; border-radius: 2px;"></span> Optimal Route</span>
+          </div>
+
+          <div style="font-size:12px; color:var(--text-muted); line-height:1.5; background:var(--bg-grey); padding:12px; border-radius:var(--radius-md); margin-top:12px;">
+            <strong>Heuristic Analysis:</strong> Across various apps, deep click structures lower average navigation efficiency. Designing flat architectures with high information scent makes workflows predictable and minimizes backtrack loops.
+          </div>
+        </div>
+      `;
+    }
+
+    // --- LEVEL 3 ACTIVITY 2: NAVIGATION AUDIT CAPSTONE ---
+    const AUDIT_DEFECTS = {
+      'label': {
+        corrected: "Resources",
+        metricKey: "label",
+        title: "Label Clarity",
+        desc: "Defect 1: Vague labels decrease predictability. Renaming 'Study Stuff' to 'Resources' provides clear information scent."
+      },
+      'duplicate': {
+        corrected: null, // Removed
+        metricKey: "duplicate",
+        title: "Consistency",
+        desc: "Defect 2: Duplicate paths raise cognitive load. Removing the duplicate Timetable from Profile keeps sitemaps clean."
+      },
+      'depth': {
+        corrected: "Explore: Academic → Grades",
+        metricKey: "depth",
+        title: "Click Depth",
+        desc: "Defect 3: Extreme click depth leads to fatigue. Flattening grades to 2 clicks improves access time."
+      },
+      'misgrouped': {
+        corrected: "Pay Tuition (Moved)",
+        metricKey: "misgrouped",
+        title: "Signposts",
+        desc: "Defect 4: Grouping items under wrong categories violates expectations. Moving Pay Tuition to Fees restores logic."
+      },
+      'active-state': {
+        corrected: "Attendance Record Highlighted",
+        metricKey: "active-state",
+        title: "Active States",
+        desc: "Defect 5: Missing active indicator leaves users lost. Highlighting active tabs provides orientation feedback."
+      },
+      'breadcrumb': {
+        corrected: "Home → Profile → Details",
+        metricKey: "breadcrumb",
+        title: "Breadcrumbs",
+        desc: "Defect 6: Inaccurate breadcrumbs cause disorientation. Correcting the parent item to Profile restores wayfinding accuracy."
+      }
+    };
+
+    function renderAct6() {
+      // Setup counts on the screen is done via updating the dashboard cards in solveDefect
+    }
+
+    function solveDefect(key) {
+      if (appState.act6.defectsSolved.includes(key)) return;
+
+      appState.act6.defectsSolved.push(key);
+      triggerToast(`Audit Match: Solved ${key.replace('-', ' ')} defect!`);
+
+      // Update the dashboard card
+      const card = document.getElementById(`metric-${key}`);
+      const badge = document.getElementById(`badge-${key}`);
+      if (card && badge) {
+        card.classList.add('pass');
+        badge.innerText = "PASS";
+      }
+
+      // Show callout on the element in the mockup
+      const itemElement = document.getElementById(`defect-${key}`);
+      if (itemElement) {
+        itemElement.classList.add('solved');
+        const labelText = AUDIT_DEFECTS[key].title;
+        
+        // Remove old callout if exists
+        const oldCallout = itemElement.querySelector('.audit-resolved-callout');
+        if (oldCallout) oldCallout.remove();
+
+        const callout = document.createElement('span');
+        callout.className = 'audit-resolved-callout';
+        callout.innerText = `[Resolved: ${labelText}]`;
+        itemElement.appendChild(callout);
+      }
+
+      // Update visual styles inside mockup in-place
+      if (key === 'label') {
+        document.getElementById('defect-label-text').innerHTML = "📄 Resources";
+        document.getElementById('defect-label').style.background = "rgba(56,161,105,0.05)";
+        document.getElementById('defect-label').style.borderColor = "#38a169";
+      } else if (key === 'duplicate') {
+        document.getElementById('defect-duplicate').style.display = 'none';
+      } else if (key === 'depth') {
+        document.getElementById('defect-depth-text').innerText = "Explore: Academic → Semester GPA (2 Clicks)";
+        document.getElementById('defect-depth').style.background = "rgba(56,161,105,0.05)";
+        document.getElementById('defect-depth').style.borderColor = "#38a169";
+      } else if (key === 'misgrouped') {
+        document.getElementById('defect-misgrouped-text').innerText = "Pay Tuition (Financial)";
+        document.getElementById('defect-misgrouped').style.background = "rgba(56,161,105,0.05)";
+        document.getElementById('defect-misgrouped').style.borderColor = "#38a169";
+      } else if (key === 'active-state') {
+        document.getElementById('defect-active-state').style.background = "var(--primary-red)";
+        document.getElementById('defect-active-state').style.color = "#fff";
+      } else if (key === 'breadcrumb') {
+        document.getElementById('defect-breadcrumb-text').innerText = "Home → Profile → Details";
+        document.getElementById('defect-breadcrumb-text').style.color = "#38a169";
+      }
+
+      if (appState.act6.defectsSolved.length === 6) {
+        appState.act6.completed = true;
+        compileAct6Report();
+      }
+    }
+
+    function compileAct6Report() {
+      const container = document.getElementById('act6-report-container');
+      container.style.display = 'block';
+
+      container.innerHTML = `
+        <div class="lab-card" style="border: 2px solid #38a169; animation: scaleIn 0.4s ease;">
+          <div class="lab-card-header">
+            <h3 class="lab-card-title" style="color:#276749;">Navigation Audit Report Summary</h3>
+            <div class="lab-card-subtitle">Audited and corrected sitemap wayfinding parameters:</div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.5;">
+            <div><strong>1. Vague Label Resolved:</strong> Renamed 'Study Stuff' to 'Resources' to build standard information scent.</div>
+            <div><strong>2. Duplicate Links Eliminated:</strong> Removed the duplicate Timetable reference from Profile dashboard.</div>
+            <div><strong>3. Flattened Tree Structure:</strong> Decreased click depth of grades from 6 levels to 2 levels.</div>
+            <div><strong>4. Grouping Restored:</strong> Placed 'Pay Tuition' under financial categories instead of support.</div>
+            <div><strong>5. Active Signpost Highlighted:</strong> Active indicator styled on sidebar item to define orientation.</div>
+            <div><strong>6. Correct Breadcrumb Trail:</strong> Aligned path to match parent-child directories (Home → Profile).</div>
+          </div>
+
+          <div style="font-size:12px; color:var(--text-muted); line-height:1.5; background:var(--bg-grey); padding:12px; border-radius:var(--radius-md); margin-top:14px;">
+            <strong>Conclusion:</strong> Conducting heuristic navigation audits solves critical usability friction points, ensuring users maintain orientation throughout their sessions.
+          </div>
+        </div>
+      `;
+    }
+
+    // --- CHECK ANSWERS FOR FOOTER ---
+    function checkCurrentActivity() {
+      const viewId = appState.activeView;
+      if (viewId === 'welcome') return;
+
+      if (viewId === 'act-1') {
+        if (appState.act1.completed) {
+          triggerToast("Activity already completed successfully.");
+        } else {
+          triggerAct1Error(appState.act1.path[appState.act1.path.length - 1]);
+        }
+      } else if (viewId === 'act-2') {
+        const keys = Object.keys(appState.act2.placements);
+        if (keys.length < ACT2_DATA.length) {
+          triggerToast("Action warning: Please rename all 4 vague menu items before checking.");
+        } else {
+          verifyAct2();
+        }
+      } else if (viewId === 'act-3') {
+        const slots = [appState.act3.placements[0], appState.act3.placements[1], appState.act3.placements[2]];
+        if (slots.includes(undefined)) {
+          triggerToast("Action warning: Please fill all 3 slot nodes before checking.");
+        } else {
+          verifyAct3();
+        }
+      } else if (viewId === 'act-4') {
+        const scenario = ACT4_DATA[appState.act4.challengeIndex];
+        if (appState.act4.challengeIndex === 0 || appState.act4.challengeIndex === 2) {
+          if (!appState.act4.placements[scenario.correctIndex]) {
+            triggerToast("Action warning: Please fill the broken slot before checking.");
+            return;
+          }
+        } else {
+          // scenario 2: check all 3
+          const slots = [appState.act4.placements[0], appState.act4.placements[1], appState.act4.placements[2]];
+          if (slots.includes(undefined)) {
+            triggerToast("Action warning: Please fill all slots before checking.");
+            return;
+          }
+        }
+        verifyAct4();
+      } else if (viewId === 'act-5') {
+        if (appState.act5.completed) {
+          triggerToast("Activity already completed. Efficiency report generated.");
+        } else {
+          triggerToast("Task-in-progress. Click through mock portal to find active page.");
+        }
+      } else if (viewId === 'act-6') {
+        if (appState.act6.completed) {
+          triggerToast("Activity completed. All 6 defects solved.");
+        } else {
+          triggerToast(`Inspect portal and click active defects. Current: ${appState.act6.defectsSolved.length}/6`);
+        }
+      }
+    }
+
+    // --- PROGRESSIVE HINT CONTROLLER ---
+    function toggleHintPopover() {
+      const popover = document.getElementById('hint-popover');
+      if (!popover) return;
+      popover.classList.toggle('open');
+      if (popover.classList.contains('open')) {
+        appState.hintIndex = 0;
+        appState.hintsCount++;
+        renderActiveHint();
+      }
+    }
+
+    function renderActiveHint() {
+      const viewId = appState.activeView;
+      const hintList = appState.hints[viewId] || appState.hints['welcome'];
+      const textEl = document.getElementById('hint-text-content');
+      const dotsContainer = document.getElementById('hint-steps-container');
+      
+      if (textEl) {
+        textEl.innerText = hintList[appState.hintIndex];
+      }
+
+      if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        hintList.forEach((_, idx) => {
+          const dot = document.createElement('div');
+          dot.className = `hint-dot ${idx === appState.hintIndex ? 'active' : ''}`;
+          dotsContainer.appendChild(dot);
+        });
+      }
+    }
+
+    function advanceActiveHint() {
+      const viewId = appState.activeView;
+      const hintList = appState.hints[viewId] || appState.hints['welcome'];
+      
+      appState.hintIndex = (appState.hintIndex + 1) % hintList.length;
+      renderActiveHint();
+    }
+
+    // --- BOOTSTRAP INITIALIZATION ---
+    window.onload = () => {
+      navigateTo('welcome');
+    };
+  </script>
 </body>
-
 </html>
