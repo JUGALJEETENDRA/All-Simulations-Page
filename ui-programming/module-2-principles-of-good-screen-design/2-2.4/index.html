@@ -1,1 +1,3004 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Programming Simulation Lab — Content Ordering & List Design</title>
+  
+  <!-- Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* DESIGN SYSTEM: RED & WHITE ACADEMIC LAB THEME */
+    :root {
+      --primary-red: #c41e3a;
+      --primary-red-hover: #a7162d;
+      --primary-red-dim: rgba(196, 30, 58, 0.05);
+      --primary-red-border: rgba(196, 30, 58, 0.15);
+      --bg-white: #ffffff;
+      --bg-grey: #f7fafc;
+      --bg-grey-dark: #edf2f7;
+      --text-main: #1a202c;
+      --text-muted: #718096;
+      --border-grey: #e2e8f0;
+      --border-grey-dark: #cbd5e0;
+      
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+      
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+      
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.25s ease;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.04);
+      --shadow-card: 0 4px 20px rgba(0,0,0,0.02);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-white);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    /* APP HEADER styles */
+    .app-header {
+      height: 60px;
+      background: var(--bg-white);
+      border-bottom: 1.5px solid var(--border-grey);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+      border: 1px solid var(--border-grey);
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      color: var(--primary-red);
+      border-color: var(--primary-red-border);
+      background: var(--primary-red-dim);
+    }
+
+    .logo-mark {
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-red);
+      transform: rotate(45deg);
+      box-shadow: 0 0 6px var(--primary-red);
+    }
+
+    .logo-title {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .logo-tag {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: var(--bg-grey);
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-grey);
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* BUTTONS SYSTEM */
+    .btn-lab {
+      padding: 8px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .btn-lab-primary {
+      background-color: var(--primary-red);
+      color: var(--bg-white);
+      border: 1.5px solid var(--primary-red);
+    }
+
+    .btn-lab-primary:hover:not(:disabled) {
+      background-color: var(--primary-red-hover);
+      border-color: var(--primary-red-hover);
+    }
+
+    .btn-lab-secondary {
+      background-color: var(--bg-white);
+      color: var(--text-main);
+      border: 1.5px solid var(--border-grey-dark);
+    }
+
+    .btn-lab-secondary:hover:not(:disabled) {
+      background-color: var(--bg-grey);
+      border-color: var(--border-grey-dark);
+    }
+
+    .btn-lab-text {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 4px;
+    }
+
+    .btn-lab-text:hover {
+      color: var(--primary-red);
+    }
+
+    .btn-lab:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* MAIN BODY PANELS CONTAINER */
+    .app-body {
+      flex: 1;
+      display: flex;
+      height: calc(100vh - 110px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* SIDEBAR DIRECTORY */
+    .app-sidebar {
+      width: 260px;
+      background: var(--bg-grey);
+      border-right: 1px solid var(--border-grey);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 14px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding-left: 6px;
+    }
+
+    .nav-levels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .level-nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .level-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      padding: 6px;
+    }
+
+    .activity-nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding-left: 8px;
+      border-left: 1.5px solid var(--border-grey-dark);
+    }
+
+    .activity-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: left;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      transition: var(--transition-fast);
+      width: 100%;
+    }
+
+    .activity-nav-btn:hover {
+      background: var(--bg-grey-dark);
+      color: var(--text-main);
+    }
+
+    .activity-nav-btn.active {
+      background: var(--primary-red-dim);
+      color: var(--primary-red);
+      font-weight: 600;
+    }
+
+    .activity-nav-btn .dot {
+      width: 4px;
+      height: 4px;
+      background-color: var(--text-muted);
+      border-radius: 50%;
+    }
+
+    .activity-nav-btn.active .dot {
+      background-color: var(--primary-red);
+      box-shadow: 0 0 4px var(--primary-red);
+    }
+
+    /* CENTRAL PORT CONTAINER */
+    .app-viewport {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: var(--bg-white);
+      position: relative;
+      min-width: 0;
+    }
+
+    /* WELCOME VIEWPORT */
+    .welcome-viewport {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 24px;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: fadeSlideIn var(--transition-normal);
+    }
+
+    .welcome-viewport.active {
+      display: flex;
+    }
+
+    .welcome-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .welcome-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .welcome-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .welcome-mini-card {
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .welcome-mini-card strong {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .welcome-mini-card span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ACTIVITIES CANVAS PANELS */
+    .activity-viewport-panel {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      animation: fadeSlideIn var(--transition-normal);
+    }
+
+    .activity-viewport-panel.active {
+      display: flex;
+    }
+
+    /* COLLAPSIBLE RIGHT SYLLABUS PANEL */
+    .app-learning-panel {
+      width: 320px;
+      background: var(--bg-grey);
+      border-left: 1px solid var(--border-grey);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 110px);
+      max-height: calc(100vh - 110px);
+      transition: width var(--transition-normal);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .learning-panel-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+      width: 320px;
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .learning-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--primary-red);
+      padding-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .concept-topic-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .concept-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .concept-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+    }
+
+    .syllabus-text-box {
+      font-size: 12.5px;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-white);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-grey);
+    }
+
+    /* REUSABLE LAB CARDS */
+    .lab-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 14px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .lab-card-header {
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-grey);
+      padding-bottom: 8px;
+    }
+
+    .lab-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .lab-card-subtitle {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* INTERACTION LAB PANELS */
+    .hud-stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+      font-weight: bold;
+    }
+
+    .hud-stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hud-stat-val {
+      color: var(--primary-red);
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+
+    /* DRAGGABLE LIST STYLES */
+    .draggable-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      min-height: 100px;
+    }
+
+    .drag-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--bg-grey);
+      border: 1.5px solid var(--border-grey);
+      border-radius: var(--radius-md);
+      cursor: grab;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      user-select: none;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
+      position: relative;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+    }
+
+    .drag-item:hover {
+      background: var(--bg-grey-dark);
+      border-color: var(--border-grey-dark);
+    }
+
+    .drag-item.dragging {
+      opacity: 0.4;
+      background: var(--primary-red-dim);
+      border-color: var(--primary-red-border);
+    }
+
+    .drag-item::before {
+      content: "⋮⋮";
+      margin-right: 12px;
+      color: var(--text-muted);
+      font-size: 16px;
+      letter-spacing: -1px;
+    }
+
+    .drag-item.correct {
+      border-color: #2f855a;
+      background-color: #f0fff4;
+    }
+
+    .drag-item.incorrect {
+      border-color: var(--primary-red);
+      background-color: #fff5f5;
+    }
+
+    /* BADGES */
+    .list-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      margin-left: auto;
+    }
+
+    .list-badge.red {
+      background-color: #fff5f5;
+      color: #c53030;
+      border: 1px solid #feb2b2;
+    }
+
+    .list-badge.orange {
+      background-color: #fffaf0;
+      color: #dd6b20;
+      border: 1px solid #fbd38d;
+    }
+
+    .list-badge.green {
+      background-color: #f0fff4;
+      color: #38a169;
+      border: 1px solid #9ae6b4;
+    }
+
+    .list-badge.grey {
+      background-color: #edf2f7;
+      color: #4a5568;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* EXPLANATION AND FEEDBACK BANNERS */
+    .feedback-banner {
+      display: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 12px;
+      animation: fadeIn var(--transition-normal);
+    }
+
+    .feedback-banner.success {
+      background: #f0fff4;
+      border: 1.5px solid #c6f6d5;
+      color: #22543d;
+    }
+
+    .feedback-banner.error {
+      background: #fff5f5;
+      border: 1.5px solid #fed7d7;
+      color: #742a2a;
+    }
+
+    /* ACTIVITY 1.2: DECK & STRATEGY SLOTS GRID */
+    .strategy-workspace {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .situations-deck {
+      background: var(--bg-grey);
+      border: 1.5px dashed var(--border-grey-dark);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 250px;
+    }
+
+    .situations-deck-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+
+    .strategy-slots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .strategy-slot-card {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all var(--transition-fast);
+      min-height: 140px;
+    }
+
+    .strategy-slot-card.drag-over {
+      border-color: var(--primary-red);
+      background: var(--primary-red-dim);
+    }
+
+    .strategy-slot-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-grey);
+      padding-bottom: 8px;
+    }
+
+    .strategy-drop-zone {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+      background: var(--bg-grey);
+      border: 1px dashed var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      padding: 8px;
+    }
+
+    .strategy-drop-zone .empty-tip {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .situation-chip {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-grey-dark);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: grab;
+      width: 100%;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .situation-chip.dragging {
+      opacity: 0.4;
+    }
+
+    /* ACTIVITY 2.2: TAB PERSONAS */
+    .persona-tabs-row {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1.5px solid var(--border-grey);
+      margin-bottom: 16px;
+    }
+
+    .persona-tab-btn {
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+    }
+
+    .persona-tab-btn:hover {
+      color: var(--text-main);
+    }
+
+    .persona-tab-btn.active {
+      color: var(--primary-red);
+      border-bottom-color: var(--primary-red);
+    }
+
+    /* ACTIVITY 3.1: MULTI-GROUP GRID */
+    .grouping-workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .pills-pool {
+      background: var(--bg-grey);
+      border: 1.5px dashed var(--border-grey-dark);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 60px;
+      align-items: center;
+    }
+
+    .grouping-pills-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .draggable-pill {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-grey);
+      padding: 6px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: grab;
+      box-shadow: var(--shadow-sm);
+      user-select: none;
+      transition: transform var(--transition-fast);
+    }
+
+    .draggable-pill.dragging {
+      opacity: 0.4;
+    }
+
+    .draggable-pill.correct {
+      border-color: #2f855a;
+      background-color: #f0fff4;
+      color: #22543d;
+    }
+
+    .draggable-pill.incorrect {
+      border-color: var(--primary-red);
+      background-color: #fff5f5;
+      color: #742a2a;
+    }
+
+    .grouping-pills-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .grouping-bin-box {
+      background: var(--bg-white);
+      border: 1.5px solid var(--border-grey);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 180px;
+    }
+
+    .grouping-bin-box.drag-over {
+      border-color: var(--primary-red);
+      background: var(--primary-red-dim);
+    }
+
+    .grouping-bin-header {
+      background: var(--bg-grey-dark);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1.5px solid var(--border-grey);
+    }
+
+    .grouping-drop-zone {
+      flex: 1;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: var(--bg-white);
+    }
+
+    /* ACTIVITY 3.2: CAPSTONE AUDIT WORKSPACE */
+    .audit-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      min-height: auto;
+    }
+
+    .mock-dashboard-outer {
+      background: #edf2f7;
+      border: 2px solid var(--border-grey-dark);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .mock-dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #cbd5e0;
+      padding-bottom: 6px;
+    }
+
+    .mock-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 12px;
+      color: #4a5568;
+      text-transform: uppercase;
+    }
+
+    .mock-pills-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mock-pill {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e0;
+    }
+
+    .mock-pill.red { background: #e53e3e; }
+    .mock-pill.yellow { background: #dd6b20; }
+    .mock-pill.green { background: #38a169; }
+
+    /* MOCK LIST / WIDGET ROWS */
+    .mock-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mock-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    /* Hover defect trigger outline */
+    .mock-card.defect-active {
+      border: 1.5px dashed var(--primary-red);
+      box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.08);
+    }
+
+    .mock-card.defect-active:hover {
+      border-style: solid;
+      background: #fff5f5;
+    }
+
+    .mock-card.defect-resolved {
+      border: 1.5px solid #2f855a !important;
+      background: #f0fff4 !important;
+      box-shadow: none !important;
+    }
+
+    .mock-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .mock-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .mock-card-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-top: 4px;
+    }
+
+    .mock-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 11px;
+    }
+
+    .mock-card-badge {
+      padding: 2px 6px;
+      background: #edf2f7;
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 700;
+    }
+
+    /* RESOLVED CALLOUT MARKER */
+    .resolved-tag {
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      background: #38a169;
+      color: white;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+      display: none;
+    }
+
+    .mock-card.defect-resolved .resolved-tag {
+      display: block;
+    }
+
+    /* CAPSTONE REPAIR INSPECTOR SIDEBAR */
+    .audit-inspector-panel {
+      background: var(--bg-grey);
+      border: 1.5px solid var(--border-grey-dark);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .inspector-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1.5px solid var(--border-grey);
+      padding-bottom: 6px;
+    }
+
+    .defect-alert-placeholder {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 20px 10px;
+      border: 1.5px dashed var(--border-grey);
+      background: var(--bg-white);
+      border-radius: var(--radius-md);
+      line-height: 1.4;
+    }
+
+    .inspector-active-box {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .defect-badge {
+      background: #fff5f5;
+      color: #c53030;
+      border: 1px solid #feb2b2;
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .inspector-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .inspector-desc {
+      font-size: 11.5px;
+      color: var(--text-main);
+      line-height: 1.35;
+      background: var(--bg-white);
+      padding: 6px 8px;
+      border: 1px solid var(--border-grey);
+      border-radius: var(--radius-md);
+    }
+
+    .repair-select {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 11.5px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-grey-dark);
+      background: var(--bg-white);
+      font-weight: 600;
+    }
+
+    .repair-select:focus {
+      border-color: var(--primary-red);
+      outline: none;
+    }
+
+    /* AUDIT METRIC GAUGES */
+    .audit-dashboard-banner {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .audit-metric-card {
+      background: var(--bg-grey);
+      border: 1px solid var(--border-grey-dark);
+      border-radius: var(--radius-md);
+      padding: 4px 6px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .metric-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .metric-status {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #c53030;
+    }
+
+    .metric-status.pass {
+      color: #2f855a;
+    }
+
+    /* FINAL RADAR REPORT TABLE */
+    .final-report-wrapper {
+      margin-top: 24px;
+      background: #f7fafc;
+      border: 1.5px solid #cbd5e0;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      animation: zoomIn var(--transition-normal);
+    }
+
+    .report-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--primary-red);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .report-table th, .report-table td {
+      border: 1px solid #cbd5e0;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    .report-table th {
+      background: #edf2f7;
+      font-weight: 700;
+    }
+
+    /* HINT POPOVER */
+    .hint-popover-panel {
+      position: absolute;
+      top: 70px;
+      right: 24px;
+      width: 320px;
+      background: var(--bg-white);
+      border: 1.5px solid var(--primary-red);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      animation: fadeSlideIn var(--transition-fast);
+    }
+
+    .hint-popover-panel.open {
+      display: flex;
+    }
+
+    .hint-popover-header {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary-red);
+      border-bottom: 1px solid var(--border-grey);
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hint-popover-close {
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .hint-popover-close:hover {
+      color: var(--text-main);
+    }
+
+    .hint-popover-body {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text-main);
+    }
+
+    /* FOOTER STATUS ROW */
+    .app-footer {
+      height: 50px;
+      background: var(--bg-grey);
+      border-top: 1.5px solid var(--border-grey);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .footer-status-tag {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+      background: var(--bg-grey-dark);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .shake-animation {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- APP HEADER -->
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="index.html" class="back-link" title="Back to main modules listing">◂</a>
+      <div class="logo-mark"></div>
+      <div class="logo-title">Content Ordering & List Lab</div>
+      <div class="logo-tag">M2.4</div>
+    </div>
+    
+    <div class="header-center">
+      <button class="btn-lab btn-lab-secondary" onclick="toggleHintPopover()">💡 Show Hint</button>
+      <button class="btn-lab btn-lab-secondary" id="btn-toggle-learning" onclick="toggleLearningPanel()">📕 Concept Explorer</button>
+    </div>
+  </header>
+
+  <!-- HINT POPOVER -->
+  <div class="hint-popover-panel" id="hint-popover">
+    <div class="hint-popover-header">
+      <span>💡 Usability Directive</span>
+      <span class="hint-popover-close" onclick="toggleHintPopover()">✕</span>
+    </div>
+    <div class="hint-popover-body" id="hint-popover-text">
+      Select an activity from the sidebar directory to unlock specific usability instructions.
+    </div>
+  </div>
+
+  <!-- APP BODY CONTAINER -->
+  <div class="app-body">
+
+    <!-- LEFT SIDEBAR NAVIGATION DIRECTORY -->
+    <aside class="app-sidebar">
+      <div class="sidebar-section">
+        <span class="sidebar-section-title">Directory</span>
+        <div class="nav-levels-list">
+          
+          <!-- Level 1 -->
+          <div class="level-nav-item">
+            <div class="level-header">Level 1: Understanding Ordering</div>
+            <div class="activity-nav-list">
+              <button class="activity-nav-btn active" id="btn-nav-act-1" onclick="navigateTo('act-1')">
+                <span class="dot"></span> 1.1 Dashboard Prioritize
+              </button>
+              <button class="activity-nav-btn" id="btn-nav-act-2" onclick="navigateTo('act-2')">
+                <span class="dot"></span> 1.2 Strategy Selection
+              </button>
+            </div>
+          </div>
+          
+          <!-- Level 2 -->
+          <div class="level-nav-item">
+            <div class="level-header">Level 2: Context Ordering</div>
+            <div class="activity-nav-list">
+              <button class="activity-nav-btn" id="btn-nav-act-3" onclick="navigateTo('act-3')">
+                <span class="dot"></span> 2.1 Urgency Ordering
+              </button>
+              <button class="activity-nav-btn" id="btn-nav-act-4" onclick="navigateTo('act-4')">
+                <span class="dot"></span> 2.2 Goal-Oriented Ordering
+              </button>
+            </div>
+          </div>
+          
+          <!-- Level 3 -->
+          <div class="level-nav-item">
+            <div class="level-header">Level 3: Professional Org</div>
+            <div class="activity-nav-list">
+              <button class="activity-nav-btn" id="btn-nav-act-5" onclick="navigateTo('act-5')">
+                <span class="dot"></span> 3.1 Content Grouping
+              </button>
+              <button class="activity-nav-btn" id="btn-nav-act-6" onclick="navigateTo('act-6')">
+                <span class="dot"></span> 3.2 Capstone UX Audit
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTRAL WORKSPACE -->
+    <main class="app-viewport">
+
+      <!-- WELCOME VIEWPORT -->
+      <section class="welcome-viewport active" id="panel-welcome">
+        <h2 class="welcome-title">Content Ordering & List Design Laboratory</h2>
+        <p class="welcome-desc">
+          Welcome to the Content Ordering Simulation Lab. In this laboratory, you will study how to order, group, and structure interface lists using Human-Centered Design principles. You will prioritize dashboard elements, map alignment strategies, group mixed items, and perform a Capstone UX Audit on a broken interface.
+        </p>
+        <div class="welcome-card-grid">
+          <div class="welcome-mini-card">
+            <strong>1. Prioritize</strong>
+            <span>Establish visual hierarchy by organizing items based on importance.</span>
+          </div>
+          <div class="welcome-mini-card">
+            <strong>2. Group & Chunk</strong>
+            <span>Reduce cognitive load by combining related items under header sections.</span>
+          </div>
+          <div class="welcome-mini-card">
+            <strong>3. Evaluate</strong>
+            <span>Identify weak layout hierarchies and inspect dashboard usability defects.</span>
+          </div>
+        </div>
+        <button class="btn-lab btn-lab-primary" style="margin-top: 10px;" onclick="navigateTo('act-1')">Begin Simulation Lab</button>
+      </section>
+
+      <!-- ACTIVITY 1.1 PANEL -->
+      <section class="activity-viewport-panel" id="panel-act-1">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <span class="lab-card-title">Activity 1.1: Dashboard Prioritization</span>
+            <p class="lab-card-subtitle">Arrange the following system cards on a main corporate profile workspace based on operational importance. Put the most critical items at the top.</p>
+          </div>
+
+          <div class="hud-stats-row">
+            <div class="hud-stat-badge">Task Context: <span class="hud-stat-val">Business Dashboard</span></div>
+            <div class="hud-stat-badge">Status: <span id="act1-status" class="hud-stat-val" style="color:#718096">UNSOLVED</span></div>
+          </div>
+
+          <!-- Draggable List -->
+          <div class="draggable-list" id="act1-list">
+            <!-- Dynamic elements will render here -->
+          </div>
+
+          <div class="feedback-banner success" id="act1-feedback-success"></div>
+          <div class="feedback-banner error" id="act1-feedback-error"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY 1.2 PANEL -->
+      <section class="activity-viewport-panel" id="panel-act-2">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <span class="lab-card-title">Activity 1.2: Ordering Strategy Selection</span>
+            <p class="lab-card-subtitle">Match each specific portal situation context with the most optimal ordering strategy by dragging the situation chips onto the strategy cards.</p>
+          </div>
+
+          <div class="hud-stats-row">
+            <div class="hud-stat-badge">Matches Done: <span id="act2-count" class="hud-stat-val">0 / 4</span></div>
+            <div class="hud-stat-badge">Status: <span id="act2-status" class="hud-stat-val" style="color:#718096">UNSOLVED</span></div>
+          </div>
+
+          <div class="strategy-workspace">
+            <div>
+              <div class="situations-deck-title">Portal Situations</div>
+              <div class="situations-deck" id="act2-situations-deck">
+                <!-- Situation chips will go here -->
+              </div>
+            </div>
+
+            <div class="strategy-slots-grid">
+              
+              <div class="strategy-slot-card" data-expected="urgency">
+                <div class="strategy-slot-header">⚠️ Priority & Urgency</div>
+                <div class="strategy-drop-zone" id="act2-zone-urgency">
+                  <span class="empty-tip">Drag fitting situation chip here</span>
+                </div>
+              </div>
+
+              <div class="strategy-slot-card" data-expected="alphabetical">
+                <div class="strategy-slot-header">🔤 Alphabetical Order</div>
+                <div class="strategy-drop-zone" id="act2-zone-alphabetical">
+                  <span class="empty-tip">Drag fitting situation chip here</span>
+                </div>
+              </div>
+
+              <div class="strategy-slot-card" data-expected="chronological">
+                <div class="strategy-slot-header">⏱️ Chronological Sequence</div>
+                <div class="strategy-drop-zone" id="act2-zone-chronological">
+                  <span class="empty-tip">Drag fitting situation chip here</span>
+                </div>
+              </div>
+
+              <div class="strategy-slot-card" data-expected="frequency">
+                <div class="strategy-slot-header">📈 Frequency & Popularity</div>
+                <div class="strategy-drop-zone" id="act2-zone-frequency">
+                  <span class="empty-tip">Drag fitting situation chip here</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="feedback-banner success" id="act2-feedback-success"></div>
+          <div class="feedback-banner error" id="act2-feedback-error"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY 2.1 PANEL -->
+      <section class="activity-viewport-panel" id="panel-act-3">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <span class="lab-card-title">Activity 2.1: Urgency Ordering</span>
+            <p class="lab-card-subtitle">Arrange these sprint notification alerts from top (Highest Urgency) to bottom (Lowest Urgency) based on business impact and deadline proximity.</p>
+          </div>
+
+          <div class="hud-stats-row">
+            <div class="hud-stat-badge">Task Context: <span class="hud-stat-val">Project Dashboard</span></div>
+            <div class="hud-stat-badge">Status: <span id="act3-status" class="hud-stat-val" style="color:#718096">UNSOLVED</span></div>
+          </div>
+
+          <!-- Draggable list for Activity 2.1 -->
+          <div class="draggable-list" id="act3-list">
+            <!-- Draggable items will render dynamically -->
+          </div>
+
+          <div class="feedback-banner success" id="act3-feedback-success"></div>
+          <div class="feedback-banner error" id="act3-feedback-error"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY 2.2 PANEL -->
+      <section class="activity-viewport-panel" id="panel-act-4">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <span class="lab-card-title">Activity 2.2: Goal-Oriented Ordering</span>
+            <p class="lab-card-subtitle">Reorder the interface cards to match the selected user persona's main objective. Both personas must be successfully solved to pass this activity.</p>
+          </div>
+
+          <div class="persona-tabs-row">
+            <button class="persona-tab-btn active" id="tab-act4-customer" onclick="switchAct4Persona('customer')">🛒 Customer Persona</button>
+            <button class="persona-tab-btn" id="tab-act4-manager" onclick="switchAct4Persona('manager')">🏢 Inventory Manager Persona</button>
+          </div>
+
+          <div class="hud-stats-row">
+            <div class="hud-stat-badge">Current Persona Target: <span id="act4-persona-goal" class="hud-stat-val" style="color:#c41e3a">Quick purchase path</span></div>
+            <div class="hud-stat-badge">Status: <span id="act4-status" class="hud-stat-val" style="color:#718096">UNSOLVED</span></div>
+          </div>
+
+          <!-- Draggable list for Active Persona -->
+          <div class="draggable-list" id="act4-list">
+            <!-- Dynamic elements load here -->
+          </div>
+
+          <div class="feedback-banner success" id="act4-feedback-success"></div>
+          <div class="feedback-banner error" id="act4-feedback-error"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY 3.1 PANEL -->
+      <section class="activity-viewport-panel" id="panel-act-5">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <span class="lab-card-title">Activity 3.1: Content Grouping Challenge</span>
+            <p class="lab-card-subtitle">Reduce cognitive clutter. Sort the 12 dashboard pills from the pool into their correct logical category buckets below.</p>
+          </div>
+
+          <div class="hud-stats-row">
+            <div class="hud-stat-badge">Pills Classified: <span id="act5-count" class="hud-stat-val">0 / 12</span></div>
+            <div class="hud-stat-badge">Status: <span id="act5-status" class="hud-stat-val" style="color:#718096">UNSOLVED</span></div>
+          </div>
+
+          <div class="grouping-workspace">
+            <div class="pills-pool">
+              <div class="grouping-pills-title">Uncategorized Dashboard Elements</div>
+              <div class="item-pool" id="act5-pills-pool" style="display:flex; flex-wrap:wrap; gap:8px; width:100%; min-height:40px;">
+                <!-- Draggable pills go here -->
+              </div>
+            </div>
+
+            <div class="grouping-pills-row" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+              <div class="grouping-bin-box">
+                <div class="grouping-bin-header">🚨 Fulfillment & Orders</div>
+                <div class="grouping-drop-zone" id="act5-zone-fulfillment" data-expected="fulfillment"></div>
+              </div>
+
+              <div class="grouping-bin-box">
+                <div class="grouping-bin-header">📦 Inventory & Catalog</div>
+                <div class="grouping-drop-zone" id="act5-zone-inventory" data-expected="inventory"></div>
+              </div>
+
+              <div class="grouping-bin-box">
+                <div class="grouping-bin-header">📊 Analytics & Marketing</div>
+                <div class="grouping-drop-zone" id="act5-zone-analytics" data-expected="analytics"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feedback-banner success" id="act5-feedback-success"></div>
+          <div class="feedback-banner error" id="act5-feedback-error"></div>
+        </div>
+      </section>
+
+      <!-- ACTIVITY 3.2 (CAPSTONE) PANEL -->
+      <section class="activity-viewport-panel" id="panel-act-6">
+        <div class="lab-card">
+          <div class="lab-card-header">
+            <span class="lab-card-title">Activity 3.2: Content Ordering UX Audit</span>
+            <p class="lab-card-subtitle">Analyze the cluttered mockup interface on the left. Click on the highlighted outline defects, and choose the correct repair action to fix them.</p>
+          </div>
+
+          <!-- USABILITY STATS RADAR DISPLAY -->
+          <div class="audit-dashboard-banner">
+            <div class="audit-metric-card">
+              <span class="metric-label">Prioritization</span>
+              <span class="metric-status" id="metric-prioritization">FAIL</span>
+            </div>
+            <div class="audit-metric-card">
+              <span class="metric-label">Grouping</span>
+              <span class="metric-status" id="metric-grouping">FAIL</span>
+            </div>
+            <div class="audit-metric-card">
+              <span class="metric-label">Scan Speed</span>
+              <span class="metric-status" id="metric-scanspeed">FAIL</span>
+            </div>
+            <div class="audit-metric-card">
+              <span class="metric-label">Hierarchy</span>
+              <span class="metric-status" id="metric-hierarchy">FAIL</span>
+            </div>
+            <div class="audit-metric-card">
+              <span class="metric-label">Readability</span>
+              <span class="metric-status" id="metric-readability">FAIL</span>
+            </div>
+            <div class="audit-metric-card">
+              <span class="metric-label">Discoverability</span>
+              <span class="metric-status" id="metric-discoverability">FAIL</span>
+            </div>
+          </div>
+
+          <div class="audit-grid">
+            <!-- MOCKUP PANEL (LEFT) -->
+            <div class="mock-dashboard-outer" id="audit-mockup-frame">
+              <div class="mock-dashboard-header" id="audit-mock-header">
+                <span class="mock-title" id="audit-mock-title">Dashboard (Alphabetical Mode)</span>
+                <div class="mock-pills-row">
+                  <span class="mock-pill red"></span>
+                  <span class="mock-pill yellow"></span>
+                  <span class="mock-pill green"></span>
+                </div>
+              </div>
+
+              <div class="mock-list-container" id="audit-list-layout">
+                <!-- Cards render here. Clicking opens inspector -->
+              </div>
+
+              <!-- RADAR REPORT TAB -->
+              <div class="final-report-wrapper" id="act6-report-panel" style="display:none; margin-top:0; padding:0; border:none; background:transparent;">
+                <table class="report-table" style="background:#ffffff">
+                  <thead>
+                    <tr>
+                      <th>HCD Usability Dimension</th>
+                      <th>Status</th>
+                      <th>Usability Improvement Benefit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Prioritization</strong></td>
+                      <td><span style="color:#2f855a; font-weight:bold">✓ PASS</span></td>
+                      <td>Urgent tasks (server crash) are positioned immediately at the top to secure direct executive attention.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Grouping & Chunking</strong></td>
+                      <td><span style="color:#2f855a; font-weight:bold">✓ PASS</span></td>
+                      <td>Logical headers separate alerts from general profile items, reducing visual friction and cognitive noise.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Scan Efficiency</strong></td>
+                      <td><span style="color:#2f855a; font-weight:bold">✓ PASS</span></td>
+                      <td>Labels are condensed into actionable phrases instead of verbose paragraphs, lowering interaction costs.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Information Hierarchy</strong></td>
+                      <td><span style="color:#2f855a; font-weight:bold">✓ PASS</span></td>
+                      <td>Infrastructure widgets are placed above secondary promotional elements based on operational risk.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Readability</strong></td>
+                      <td><span style="color:#2f855a; font-weight:bold">✓ PASS</span></td>
+                      <td>Uniform casing rules avoid chaotic visual signals, aligning the text fields consistently.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Discoverability</strong></td>
+                      <td><span style="color:#2f855a; font-weight:bold">✓ PASS</span></td>
+                      <td>Alerts utilize high-contrast warning badges instead of uniform status labels, accelerating identification.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- REPAIR INSPECTOR PANEL (RIGHT) -->
+            <div class="audit-inspector-panel">
+              <div class="inspector-title">Defect Repair Panel</div>
+              
+              <div class="defect-alert-placeholder" id="inspector-placeholder">
+                Click on any card with a red dotted border in the mockup to inspect its usability defect and apply a HCD repair.
+              </div>
+
+              <div class="inspector-active-box" id="inspector-active-box">
+                <div class="defect-badge" id="inspector-defect-badge">Defect Detected</div>
+                
+                <span class="inspector-label">Usability Flaw</span>
+                <p class="inspector-desc" id="inspector-flaw-desc">-</p>
+
+                <span class="inspector-label">HCD Remediation Action</span>
+                <select class="repair-select" id="inspector-repair-select" onchange="applyAuditRepair()">
+                  <option value="">-- Select optimal repair action --</option>
+                  <option value="sort-urgency">Sort by Urgency (Priority)</option>
+                  <option value="group-sections">Group items into distinct semantic sections</option>
+                  <option value="shorten-label">Shorten labels to action-oriented text</option>
+                  <option value="standard-casing">Apply standardized casing rules</option>
+                  <option value="high-contrast">Apply high-contrast color badges</option>
+                  <option value="move-infrastructure">Rearrange visual order to put infrastructure statistics on top</option>
+                </select>
+              </div>
+
+              <!-- FEEDBACK BANNER SUCCESS -->
+              <div class="feedback-banner success" id="act6-feedback-success" style="margin-top:10px; display:none;"></div>
+
+              <div style="margin-top:auto">
+                <button class="btn-lab btn-lab-primary" style="width:100%" id="btn-generate-report" disabled onclick="compileAuditReport()">Generate Audit Report</button>
+              </div>
+            </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SYLLABUS THEORY PANEL -->
+    <aside class="app-learning-panel" id="learning-panel">
+      <div class="learning-panel-content">
+        <div class="learning-header">Concept Explorer</div>
+        
+        <div class="concept-topic-group">
+          <div class="concept-label">Current Concept</div>
+          <div class="concept-value" id="learning-concept">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Definition</div>
+          <div class="syllabus-text-box" id="learning-definition">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Real-world Example</div>
+          <div class="syllabus-text-box" id="learning-example">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Heuristic Best Practice</div>
+          <div class="syllabus-text-box" id="learning-best-practice">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Common Mistakes</div>
+          <div class="syllabus-text-box" id="learning-mistake">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Design Tip</div>
+          <div class="syllabus-text-box" id="learning-design-tip">-</div>
+        </div>
+
+        <div class="concept-topic-group">
+          <div class="concept-label">Why This Matters</div>
+          <div class="syllabus-text-box" id="learning-why-matters">-</div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- APP FOOTER Controls -->
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span>Location:</span>
+      <span class="footer-status-tag" id="footer-status-view">Welcome Screen</span>
+    </div>
+    
+    <div class="footer-right">
+      <button class="btn-lab btn-lab-secondary" onclick="navigatePrev()">◀ Prev Activity</button>
+      <button class="btn-lab btn-lab-secondary" onclick="resetActiveActivity()">🔄 Restart</button>
+      <button class="btn-lab btn-lab-primary" id="btn-footer-check" onclick="checkCurrentActivity()">Check Answer ✓</button>
+      <button class="btn-lab btn-lab-secondary" onclick="navigateNext()">Next Activity ▶</button>
+    </div>
+  </footer>
+
+  <script>
+    // GLOBAL APP STATE
+    const appState = {
+      activeView: 'welcome',
+      act1: {
+        solved: false,
+        items: [
+          { id: 'notifications', title: 'Critical Notifications', text: '🚨 System alert: 4 critical security warnings pending database patch.', importance: 1 },
+          { id: 'payments', title: 'Pending Payments', text: '💳 Tuition Payment: $1,240.00 outstanding. Due in 3 days.', importance: 2 },
+          { id: 'balance', title: 'Account Balance', text: '📊 Current balance: $4,580.20 USD.', importance: 3 },
+          { id: 'transactions', title: 'Recent Transactions', text: '📄 Last payment: $15.50 (Library cafe) committed.', importance: 4 },
+          { id: 'offers', title: 'Offers & Promotions', text: '🎁 Special student bundle: Get 20% off creative software licenses.', importance: 5 },
+          { id: 'help', title: 'Help Center', text: '💡 Need assistance? Contact the IT help desk or browse FAQs.', importance: 6 }
+        ]
+      },
+      act2: {
+        solved: false,
+        chips: [
+          { id: 'triage', text: '🏥 Triage Queue inside a Hospital ER', type: 'urgency' },
+          { id: 'directory', text: '📇 Corporate Employee Search Directory', type: 'alphabetical' },
+          { id: 'banking', text: '💸 Recent transaction log inside a banking application', type: 'chronological' },
+          { id: 'faq', text: '❓ Frequently Read Articles list in a help system', type: 'frequency' }
+        ],
+        matches: {
+          urgency: null,
+          alphabetical: null,
+          chronological: null,
+          frequency: null
+        }
+      },
+      act3: {
+        solved: false,
+        items: [
+          { id: 'bug', title: 'Critical Bug: Payment processor throwing 500 error', badge: 'Critical', badgeClass: 'red', rank: 1 },
+          { id: 'invoice', title: 'Invoice Due: Cloud servers renewal payment today', badge: 'Urgent', badgeClass: 'orange', rank: 2 },
+          { id: 'meeting', title: 'Client Meeting: Sprint review with sponsor in 2 hours', badge: 'Upcoming', badgeClass: 'orange', rank: 3 },
+          { id: 'report', title: 'Weekly Report: Compile sprint velocity metrics', badge: 'Pending', badgeClass: 'grey', rank: 4 },
+          { id: 'party', title: 'Team Celebration: Plan lunch launch party details', badge: 'Optional', badgeClass: 'green', rank: 5 }
+        ]
+      },
+      act4: {
+        solved: false,
+        persona: 'customer', // 'customer' or 'manager'
+        solvedPersonas: {
+          customer: false,
+          manager: false
+        },
+        customerOrder: ['search', 'filters', 'products', 'reviews', 'wishlist', 'help'],
+        managerOrder: ['alerts', 'graph', 'shipments', 'catalog', 'feedback', 'settings'],
+        
+        customerItems: [
+          { id: 'search', title: '🔍 Search Bar Input', desc: 'Allows direct keyword lookup.', expectedRank: 1 },
+          { id: 'filters', title: '📐 Faceted Filtering Sidebar', desc: 'Refine products by size, price, and color.', expectedRank: 2 },
+          { id: 'products', title: '🛍️ Dynamic Products Grid', desc: 'Browse matched items and select models.', expectedRank: 3 },
+          { id: 'reviews', title: '⭐ Product Reviews & Ratings', desc: 'Verify customer satisfaction scores.', expectedRank: 4 },
+          { id: 'wishlist', title: '❤️ Wishlist Directory', desc: 'Save references for deferred purchases.', expectedRank: 5 },
+          { id: 'help', title: '❓ Customer Service Chatbot', desc: 'Support center contact link.', expectedRank: 6 }
+        ],
+        managerItems: [
+          { id: 'alerts', title: '🚨 Low Stock Alerts', desc: 'Immediate stock outages demanding reorder.', expectedRank: 1 },
+          { id: 'graph', title: '📊 Daily Revenue Graph', desc: 'High-level business performance monitor.', expectedRank: 2 },
+          { id: 'shipments', title: '🚚 Pending Shipments Queue', desc: 'Fulfillment logs to process.', expectedRank: 3 },
+          { id: 'catalog', title: '📦 Product Catalog editor', desc: 'Update details, weights, and items.', expectedRank: 4 },
+          { id: 'feedback', title: '💬 Store Customer Feedback', desc: 'Read recently submitted user feedback logs.', expectedRank: 5 },
+          { id: 'settings', title: '⚙️ Merchant settings', desc: 'Configure checkout and API variables.', expectedRank: 6 }
+        ]
+      },
+      act5: {
+        solved: false,
+        pills: [
+          { id: 'p1', text: 'Pending Shipments (12)', category: 'fulfillment' },
+          { id: 'p2', text: 'Return Requests (3)', category: 'fulfillment' },
+          { id: 'p3', text: 'Failed Payments (2)', category: 'fulfillment' },
+          { id: 'p4', text: 'New Orders (45)', category: 'fulfillment' },
+          { id: 'p5', text: 'Out of Stock Items', category: 'inventory' },
+          { id: 'p6', text: 'Bulk Price Editor', category: 'inventory' },
+          { id: 'p7', text: 'Product Categories', category: 'inventory' },
+          { id: 'p8', text: 'Low Inventory Alerts', category: 'inventory' },
+          { id: 'p9', text: 'Monthly Sales PDF', category: 'analytics' },
+          { id: 'p10', text: 'Coupon Code Creator', category: 'analytics' },
+          { id: 'p11', text: 'Active Campaigns', category: 'analytics' },
+          { id: 'p12', text: 'Conversion Rate Graph', category: 'analytics' }
+        ],
+        matches: {
+          fulfillment: [],
+          inventory: [],
+          analytics: []
+        }
+      },
+      act6: {
+        solved: false,
+        selectedDefect: null,
+        repairs: {
+          defect1: false, // Alphabetical crash status
+          defect2: false, // Mixed billing
+          defect3: false, // Verbose description
+          defect4: false, // Inconsistent casing
+          defect5: false, // Weak status color
+          defect6: false  // Infrastructure stats priority
+        },
+        defectsInfo: {
+          defect1: {
+            title: 'Critical Alert Hiding',
+            flaw: 'The server down notification is placed at the very bottom of the card list because the items are sorted alphabetically by title rather than by urgency.',
+            correctAction: 'sort-urgency'
+          },
+          defect2: {
+            title: 'Poor Item Grouping',
+            flaw: 'Billing payment options are mixed together with general documentation and help center directories inside a single list widget.',
+            correctAction: 'group-sections'
+          },
+          defect3: {
+            title: 'Excessive Verbose Descriptions',
+            flaw: 'Cards contain paragraphs of text instead of scannable, action-oriented titles, slowing down user discovery.',
+            correctAction: 'shorten-label'
+          },
+          defect4: {
+            title: 'Inconsistent Capitalization Casing',
+            flaw: 'Buttons and labels mix all-caps and sentence casing, creating chaotic visual weight patterns.',
+            correctAction: 'standard-casing'
+          },
+          defect5: {
+            title: 'Weak Visual Hierarchy on Alerts',
+            flaw: 'The API Offline notification utilizes a standard gray dot, failing to draw the eyes to a critical system block.',
+            correctAction: 'high-contrast'
+          },
+          defect6: {
+            title: 'Mismatched Priority Placement',
+            flaw: 'The coupon creation promo card is placed above core database and server health charts.',
+            correctAction: 'move-infrastructure'
+          }
+        }
+      }
+    };
+
+    // CONCEPT DEFINITIONS FOR DYNAMIC HCD LEARNING PANEL
+    const syllabusData = {
+      welcome: {
+        concept: "Introduction",
+        definition: "Content Ordering and List Design focuses on arranging items sequentially in a way that minimizes visual friction, reduces cognitive load, and matches users expectations.",
+        example: "A hospital emergency application lists patient files based on injury severity rather than name alphabetically.",
+        bestPractice: "Always organize lists based on urgency, frequency of access, or the primary user persona goals.",
+        mistake: "Forcing uniform structures (like alphabetical or alphabetical date sorting) on elements that carry critical status weights.",
+        designTip: "Group related list parameters using sub-headers to make them scannable.",
+        whyMatters: "Well-prioritized content layouts reduce scanning time, helping users complete actions with minimal stress."
+      },
+      'act-1': {
+        concept: "Prioritization",
+        definition: "Placing key operational elements at the top of a page according to business impact, and static support options at the bottom.",
+        example: "An enterprise analytics page highlights critical database exceptions before showing account preference fields.",
+        bestPractice: "Primary actionable widgets first, secondary resources next, help details last.",
+        mistake: "Giving equal visual weight to support FAQs and system alert banners.",
+        designTip: "Vary layout sizes and card shadows to represent card hierarchy levels.",
+        whyMatters: "Ensures essential items are captured instantly without requiring users to scroll down."
+      },
+      'act-2': {
+        concept: "Contextual Strategies",
+        definition: "Evaluating which ordering structure (priority, chronological, alphabetical, or popularity) matches the specific task.",
+        example: "An employee index uses alphabetical sorting, while transaction logs use reverse-chronological order.",
+        bestPractice: "Standardize sorting based on the user's information search behavior.",
+        mistake: "Using reverse-chronological timelines on directories where users search by text names.",
+        designTip: "Provide controls that let users switch sorting mechanisms dynamically.",
+        whyMatters: "Avoids frustration by matching the information layout with the student's retrieval mental model."
+      },
+      'act-3': {
+        concept: "Urgency Ordering",
+        definition: "Placing time-sensitive parameters first so that developers/managers can easily perform triage.",
+        example: "Ticket boards show critical server bugs first, then standard feature milestones.",
+        bestPractice: "Determine urgency metrics by combining deadline limits with business failure costs.",
+        mistake: "Sorting team celebration notices on the same level as active security threats.",
+        designTip: "Accompany urgent text fields with high-contrast alert indicators.",
+        whyMatters: "Directs visual attention to tasks that need immediate recovery fixes."
+      },
+      'act-4': {
+        concept: "Goal-Oriented Sequencing",
+        definition: "Adapting the sorting sequence of lists to align directly with a specific user objective or persona.",
+        example: "A customer sees product search bars at the top, while an admin sees low inventory alerts first.",
+        bestPractice: "Define user personas and map task priorities before structuring card templates.",
+        mistake: "Displaying the exact same dashboard layout for system administrators and end shoppers.",
+        designTip: "Use tab selectors to morph grid priorities depending on selected roles.",
+        whyMatters: "Increases task completion speed by sorting layouts according to what is relevant to the active user."
+      },
+      'act-5': {
+        concept: "Chunking & Grouping",
+        definition: "Segmenting scattered items into visual groups to avoid cognitive overload.",
+        example: "E-commerce portals cluster orders, pricing catalog, and analytics into discrete layout bins.",
+        bestPractice: "Limit category groups to 3-5 bins to maximize scannability.",
+        mistake: "Placing payment files, product descriptions, and support documents in a single layout stream.",
+        designTip: "Separate groups using borders or distinct background shades.",
+        whyMatters: "Improves discoverability by helping users search by category areas."
+      },
+      'act-6': {
+        concept: "UX Auditing & Remediation",
+        definition: "Analyzing a layout against usability heuristics, identifying hierarchy issues, and applying structural edits.",
+        example: "Finding that server alerts are hidden by alphabetical sorting and replacing them with urgency ranking.",
+        bestPractice: "Conduct visual audits to ensure critical status widgets always stand out.",
+        mistake: "Treating UI design as static art rather than checking it against actual user scanning behaviors.",
+        designTip: "Ensure headers are clear, status tags are recognizable, and details are concise.",
+        whyMatters: "Directly improves dashboard interaction speed, reducing system management friction."
+      }
+    };
+
+    // UTILITIES
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function showToast(message) {
+      const popText = document.getElementById('hint-popover-text');
+      popText.innerText = message;
+      document.getElementById('hint-popover').classList.add('open');
+    }
+
+    function toggleHintPopover() {
+      const panel = document.getElementById('hint-popover');
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+      } else {
+        const v = appState.activeView;
+        let hint = "Select an activity to view advice.";
+        if (v === 'act-1') hint = "Dashboard Prioritization: Put Critical Notifications (importance 1) first, followed by Payments, Balance, Transactions, Promotions, and Help center last.";
+        if (v === 'act-2') hint = "Strategy Selection: ER Triage goes to Priority/Urgency. Employee search is Alphabetical. Banking log is Chronological. Popular FAQs fits Frequency.";
+        if (v === 'act-3') hint = "Urgency Ordering: Rank critical payment bugs at the top, then server invoice warnings, sprint reviews, report metrics, and optional lunch parties at the bottom.";
+        if (v === 'act-4') hint = `Goal-Oriented: Customer persona expects search at the top, followed by filters, grid, reviews, wishlist, and help. Manager expects alerts first, then revenue graphs, shipments, inventory catalog, customer feedbacks, and settings at the bottom.`;
+        if (v === 'act-5') hint = "Grouping: Categories are Fulfillment & Orders (Shipments, Returns, Failed Payments, New Orders), Inventory & Catalog (Stock, Price, Category, Low alerts), and Analytics & Marketing (Sales PDF, Coupons, Campaigns, Graphs).";
+        if (v === 'act-6') hint = "UX Audit: Click the dashed cards. Remediation matches: Card 1 (alphabetical) -> sort-urgency. Card 2 (mixed billing) -> group-sections. Card 3 (verbose) -> shorten-label. Card 4 (capitalization) -> standard-casing. Card 5 (gray indicator) -> high-contrast. Card 6 (infrastructure stats below promo) -> move-infrastructure.";
+        
+        document.getElementById('hint-popover-text').innerText = hint;
+        panel.classList.add('open');
+      }
+    }
+
+    function toggleLearningPanel() {
+      const panel = document.getElementById('learning-panel');
+      const btn = document.getElementById('btn-toggle-learning');
+      if (panel.style.width === '0px' || panel.style.width === '0') {
+        panel.style.width = '320px';
+        btn.classList.add('btn-lab-primary');
+        btn.classList.remove('btn-lab-secondary');
+      } else {
+        panel.style.width = '0px';
+        btn.classList.remove('btn-lab-primary');
+        btn.classList.add('btn-lab-secondary');
+      }
+    }
+
+    // --- NAVIGATION ROUTING ---
+    function navigateTo(viewId) {
+      document.getElementById('hint-popover').classList.remove('open');
+
+      document.querySelectorAll('.activity-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const activeNav = document.getElementById(`btn-nav-${viewId}`);
+      if (activeNav) activeNav.classList.add('active');
+
+      document.querySelectorAll('.welcome-viewport, .activity-viewport-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      
+      const targetPanel = document.getElementById(viewId === 'welcome' ? 'panel-welcome' : `panel-${viewId}`);
+      if (targetPanel) targetPanel.classList.add('active');
+
+      appState.activeView = viewId;
+
+      const statusText = document.getElementById('footer-status-view');
+      if (statusText) {
+        if (viewId === 'welcome') statusText.innerText = "Welcome Screen";
+        else {
+          const actNum = viewId.replace('act-', '');
+          statusText.innerText = `Activity ${actNum}`;
+        }
+      }
+
+      const checkBtn = document.getElementById('btn-footer-check');
+      if (viewId === 'welcome') {
+        checkBtn.disabled = true;
+      } else {
+        checkBtn.disabled = false;
+      }
+
+      const syllabus = syllabusData[viewId] || syllabusData['welcome'];
+      document.getElementById('learning-concept').innerText = syllabus.concept;
+      document.getElementById('learning-definition').innerText = syllabus.definition;
+      document.getElementById('learning-example').innerText = syllabus.example;
+      document.getElementById('learning-best-practice').innerText = syllabus.bestPractice;
+      document.getElementById('learning-mistake').innerText = syllabus.mistake;
+      document.getElementById('learning-design-tip').innerText = syllabus.designTip;
+      document.getElementById('learning-why-matters').innerText = syllabus.whyMatters;
+
+      loadActivityData(viewId);
+    }
+
+    function navigatePrev() {
+      const views = ['welcome', 'act-1', 'act-2', 'act-3', 'act-4', 'act-5', 'act-6'];
+      const currentIdx = views.indexOf(appState.activeView);
+      if (currentIdx > 0) {
+        navigateTo(views[currentIdx - 1]);
+      }
+    }
+
+    function navigateNext() {
+      const views = ['welcome', 'act-1', 'act-2', 'act-3', 'act-4', 'act-5', 'act-6'];
+      const currentIdx = views.indexOf(appState.activeView);
+      if (currentIdx < views.length - 1) {
+        navigateTo(views[currentIdx + 1]);
+      }
+    }
+
+    function resetActiveActivity() {
+      const v = appState.activeView;
+      if (v === 'act-1') {
+        appState.act1.solved = false;
+        shuffleArray(appState.act1.items);
+        renderAct1();
+      } else if (v === 'act-2') {
+        appState.act2.solved = false;
+        appState.act2.matches = { urgency: null, alphabetical: null, chronological: null, frequency: null };
+        renderAct2();
+      } else if (v === 'act-3') {
+        appState.act3.solved = false;
+        shuffleArray(appState.act3.items);
+        renderAct3();
+      } else if (v === 'act-4') {
+        appState.act4.solved = false;
+        appState.act4.solvedPersonas = { customer: false, manager: false };
+        appState.act4.customerOrder = ['search', 'filters', 'products', 'reviews', 'wishlist', 'help'];
+        appState.act4.managerOrder = ['alerts', 'graph', 'shipments', 'catalog', 'feedback', 'settings'];
+        shuffleArray(appState.act4.customerItems);
+        shuffleArray(appState.act4.managerItems);
+        renderAct4();
+      } else if (v === 'act-5') {
+        appState.act5.solved = false;
+        appState.act5.matches = { fulfillment: [], inventory: [], analytics: [] };
+        renderAct5();
+      } else if (v === 'act-6') {
+        appState.act6.solved = false;
+        appState.act6.selectedDefect = null;
+        Object.keys(appState.act6.repairs).forEach(k => appState.act6.repairs[k] = false);
+        
+        document.getElementById('audit-list-layout').style.display = 'flex';
+        document.getElementById('audit-mock-header').style.display = 'flex';
+        document.getElementById('audit-mockup-frame').style.background = '#edf2f7';
+        document.getElementById('act6-report-panel').style.display = 'none';
+        document.getElementById('btn-generate-report').disabled = true;
+        document.getElementById('act6-feedback-success').style.display = 'none';
+        
+        document.getElementById('inspector-placeholder').style.display = 'block';
+        document.getElementById('inspector-active-box').style.display = 'none';
+
+        renderAct6();
+      }
+    }
+
+    // --- DRAG & DROP HANDLING UTILITIES ---
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+      draggedElement = this;
+      this.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', this.id);
+    }
+
+    function handleDragEnd() {
+      if (draggedElement) draggedElement.classList.remove('dragging');
+      draggedElement = null;
+      
+      document.querySelectorAll('.strategy-drop-zone, .grouping-drop-zone').forEach(zone => {
+        zone.classList.remove('drag-over');
+      });
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      this.classList.add('drag-over');
+    }
+
+    function handleDragLeave() {
+      this.classList.remove('drag-over');
+    }
+
+    // --- ACTIVITY 1.1 CONTROLLER ---
+    function renderAct1() {
+      const listContainer = document.getElementById('act1-list');
+      listContainer.innerHTML = '';
+
+      appState.act1.items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'drag-item';
+        div.draggable = true;
+        div.id = `act1-item-${item.id}`;
+        div.setAttribute('data-id', item.id);
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = `<strong>${item.title}</strong>: ${item.text}`;
+        div.appendChild(textSpan);
+
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragend', handleDragEnd);
+
+        listContainer.appendChild(div);
+      });
+
+      listContainer.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(listContainer, e.clientY);
+        const dragging = document.querySelector('.drag-item.dragging');
+        if (dragging) {
+          if (afterElement == null) {
+            listContainer.appendChild(dragging);
+          } else {
+            listContainer.insertBefore(dragging, afterElement);
+          }
+        }
+      });
+
+      document.getElementById('act1-status').innerText = appState.act1.solved ? '✓ SOLVED' : 'UNSOLVED';
+      document.getElementById('act1-status').style.color = appState.act1.solved ? '#38a169' : '#718096';
+      document.getElementById('act1-feedback-success').style.display = 'none';
+      document.getElementById('act1-feedback-error').style.display = 'none';
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.drag-item:not(.dragging)')];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function checkAct1() {
+      const listContainer = document.getElementById('act1-list');
+      const childNodes = [...listContainer.querySelectorAll('.drag-item')];
+      
+      const targetOrder = ['notifications', 'payments', 'balance', 'transactions', 'offers', 'help'];
+      let correct = true;
+
+      childNodes.forEach((node, index) => {
+        const id = node.getAttribute('data-id');
+        node.classList.remove('correct', 'incorrect');
+        if (id === targetOrder[index]) {
+          node.classList.add('correct');
+        } else {
+          node.classList.add('incorrect');
+          correct = false;
+        }
+      });
+
+      const successBox = document.getElementById('act1-feedback-success');
+      const errorBox = document.getElementById('act1-feedback-error');
+
+      if (correct) {
+        appState.act1.solved = true;
+        document.getElementById('act1-status').innerText = '✓ SOLVED';
+        document.getElementById('act1-status').style.color = '#38a169';
+        
+        successBox.style.display = 'block';
+        successBox.innerHTML = `<strong>Perfect Prioritization!</strong> You placed Critical Notifications first, followed by Payments, Account Balance, Transactions, Promotions, and Help resources. Placing operational exceptions at the top ensures issues are resolved quickly.`;
+        errorBox.style.display = 'none';
+      } else {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>Mismatched Hierarchy!</strong> Some elements are out of position. Review the red outlines. Place highly operational and critical warnings at the top.`;
+        successBox.style.display = 'none';
+      }
+    }
+
+    // --- ACTIVITY 1.2 CONTROLLER ---
+    function renderAct2() {
+      const deck = document.getElementById('act2-situations-deck');
+      deck.innerHTML = '';
+
+      appState.act2.chips.forEach(chip => {
+        const isMatched = Object.values(appState.act2.matches).some(v => v && v.id === chip.id);
+        if (!isMatched) {
+          const div = document.createElement('div');
+          div.className = 'situation-chip';
+          div.draggable = true;
+          div.id = `act2-chip-${chip.id}`;
+          div.setAttribute('data-id', chip.id);
+          div.setAttribute('data-type', chip.type);
+          div.innerText = chip.text;
+
+          div.addEventListener('dragstart', handleDragStart);
+          div.addEventListener('dragend', handleDragEnd);
+
+          deck.appendChild(div);
+        }
+      });
+
+      ['urgency', 'alphabetical', 'chronological', 'frequency'].forEach(key => {
+        const zone = document.getElementById(`act2-zone-${key}`);
+        zone.innerHTML = '';
+        
+        const matchedChip = appState.act2.matches[key];
+        if (matchedChip) {
+          const div = document.createElement('div');
+          div.className = 'situation-chip';
+          div.draggable = true;
+          div.id = `act2-chip-${matchedChip.id}`;
+          div.setAttribute('data-id', matchedChip.id);
+          div.setAttribute('data-type', matchedChip.type);
+          div.innerText = matchedChip.text;
+          
+          div.addEventListener('dragstart', handleDragStart);
+          div.addEventListener('dragend', handleDragEnd);
+          
+          zone.appendChild(div);
+        } else {
+          zone.innerHTML = `<span class="empty-tip">Drag fitting situation chip here</span>`;
+        }
+      });
+
+      const totalMatched = Object.values(appState.act2.matches).filter(x => x !== null).length;
+      document.getElementById('act2-count').innerText = `${totalMatched} / 4`;
+
+      document.getElementById('act2-status').innerText = appState.act2.solved ? '✓ SOLVED' : 'UNSOLVED';
+      document.getElementById('act2-status').style.color = appState.act2.solved ? '#38a169' : '#718096';
+
+      document.getElementById('act2-feedback-success').style.display = 'none';
+      document.getElementById('act2-feedback-error').style.display = 'none';
+    }
+
+    function initAct2DragOver() {
+      ['urgency', 'alphabetical', 'chronological', 'frequency'].forEach(key => {
+        const zone = document.getElementById(`act2-zone-${key}`);
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          this.classList.remove('drag-over');
+          
+          const chipId = e.dataTransfer.getData('text/plain');
+          const chipElement = document.getElementById(chipId);
+          if (!chipElement) return;
+
+          const chipDataId = chipElement.getAttribute('data-id');
+          const chipType = chipElement.getAttribute('data-type');
+          const chipText = chipElement.innerText;
+
+          Object.keys(appState.act2.matches).forEach(k => {
+            if (appState.act2.matches[k] && appState.act2.matches[k].id === chipDataId) {
+              appState.act2.matches[k] = null;
+            }
+          });
+
+          appState.act2.matches[key] = { id: chipDataId, type: chipType, text: chipText };
+          renderAct2();
+        });
+      });
+
+      const deck = document.getElementById('act2-situations-deck');
+      deck.addEventListener('dragover', handleDragOver);
+      deck.addEventListener('dragleave', handleDragLeave);
+      deck.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        const chipId = e.dataTransfer.getData('text/plain');
+        const chipElement = document.getElementById(chipId);
+        if (!chipElement) return;
+
+        const chipDataId = chipElement.getAttribute('data-id');
+        
+        Object.keys(appState.act2.matches).forEach(k => {
+          if (appState.act2.matches[k] && appState.act2.matches[k].id === chipDataId) {
+            appState.act2.matches[k] = null;
+          }
+        });
+        renderAct2();
+      });
+    }
+
+    function checkAct2() {
+      let correct = true;
+      let totalAssigned = 0;
+
+      Object.keys(appState.act2.matches).forEach(slotKey => {
+        const match = appState.act2.matches[slotKey];
+        if (match) {
+          totalAssigned++;
+          if (match.type !== slotKey) {
+            correct = false;
+          }
+        } else {
+          correct = false;
+        }
+      });
+
+      const successBox = document.getElementById('act2-feedback-success');
+      const errorBox = document.getElementById('act2-feedback-error');
+
+      if (totalAssigned < 4) {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>Unassigned slots!</strong> Place all four situation chips into their corresponding strategy zones before checking.`;
+        successBox.style.display = 'none';
+        return;
+      }
+
+      if (correct) {
+        appState.act2.solved = true;
+        document.getElementById('act2-status').innerText = '✓ SOLVED';
+        document.getElementById('act2-status').style.color = '#38a169';
+
+        successBox.style.display = 'block';
+        successBox.innerHTML = `<strong>Perfect Match!</strong> ER Triage utilizes <em>Priority</em>. Employee directories utilize <em>Alphabetical</em>. Transactions are <em>Chronological</em>, and help forums sort by <em>Frequency</em>. Your strategy alignment reduces search fatigue.`;
+        errorBox.style.display = 'none';
+      } else {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>Incorrect Selection!</strong> Some situations do not align with their best ordering strategies. Drag items to rearrange them and test again.`;
+        successBox.style.display = 'none';
+      }
+    }
+
+    // --- ACTIVITY 2.1 CONTROLLER ---
+    function renderAct3() {
+      const listContainer = document.getElementById('act3-list');
+      listContainer.innerHTML = '';
+
+      appState.act3.items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'drag-item';
+        div.draggable = true;
+        div.id = `act3-item-${item.id}`;
+        div.setAttribute('data-id', item.id);
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = `<strong>${item.title}</strong>`;
+        div.appendChild(textSpan);
+
+        const badge = document.createElement('span');
+        badge.className = `list-badge ${item.badgeClass}`;
+        badge.innerText = item.badge;
+        div.appendChild(badge);
+
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragend', handleDragEnd);
+
+        listContainer.appendChild(div);
+      });
+
+      listContainer.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(listContainer, e.clientY);
+        const dragging = document.querySelector('.drag-item.dragging');
+        if (dragging) {
+          if (afterElement == null) {
+            listContainer.appendChild(dragging);
+          } else {
+            listContainer.insertBefore(dragging, afterElement);
+          }
+        }
+      });
+
+      document.getElementById('act3-status').innerText = appState.act3.solved ? '✓ SOLVED' : 'UNSOLVED';
+      document.getElementById('act3-status').style.color = appState.act3.solved ? '#38a169' : '#718096';
+      document.getElementById('act3-feedback-success').style.display = 'none';
+      document.getElementById('act3-feedback-error').style.display = 'none';
+    }
+
+    function checkAct3() {
+      const listContainer = document.getElementById('act3-list');
+      const childNodes = [...listContainer.querySelectorAll('.drag-item')];
+      
+      const targetOrder = ['bug', 'invoice', 'meeting', 'report', 'party'];
+      let correct = true;
+
+      childNodes.forEach((node, index) => {
+        const id = node.getAttribute('data-id');
+        node.classList.remove('correct', 'incorrect');
+        if (id === targetOrder[index]) {
+          node.classList.add('correct');
+        } else {
+          node.classList.add('incorrect');
+          correct = false;
+        }
+      });
+
+      const successBox = document.getElementById('act3-feedback-success');
+      const errorBox = document.getElementById('act3-feedback-error');
+
+      if (correct) {
+        appState.act3.solved = true;
+        document.getElementById('act3-status').innerText = '✓ SOLVED';
+        document.getElementById('act3-status').style.color = '#38a169';
+        
+        successBox.style.display = 'block';
+        successBox.innerHTML = `<strong>Correct Urgency Ordering!</strong> You successfully prioritised the critical database bug at the top, cloud server payments second, time-sensitive client meetings third, status reports fourth, and social events at the bottom. This prevents blocking issues from being overlooked.`;
+        errorBox.style.display = 'none';
+      } else {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>Wrong Priority!</strong> The items are not ordered correctly by urgency. Put critical blockages and upcoming deadlines at the top.`;
+        successBox.style.display = 'none';
+      }
+    }
+
+    // --- ACTIVITY 2.2 CONTROLLER ---
+    function switchAct4Persona(personaKey) {
+      saveCurrentAct4Order();
+      appState.act4.persona = personaKey;
+      
+      document.querySelectorAll('.persona-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`tab-act4-${personaKey}`).classList.add('active');
+
+      const goalLabel = document.getElementById('act4-persona-goal');
+      if (personaKey === 'customer') {
+        goalLabel.innerText = "Quick purchase path";
+      } else {
+        goalLabel.innerText = "Inventory alert monitoring";
+      }
+
+      renderAct4();
+    }
+
+    function saveCurrentAct4Order() {
+      const listContainer = document.getElementById('act4-list');
+      const childNodes = [...listContainer.querySelectorAll('.drag-item')];
+      if (childNodes.length === 0) return;
+
+      const orderKeys = childNodes.map(node => node.getAttribute('data-id'));
+      if (appState.act4.persona === 'customer') {
+        appState.act4.customerOrder = orderKeys;
+      } else {
+        appState.act4.managerOrder = orderKeys;
+      }
+    }
+
+    function renderAct4() {
+      const listContainer = document.getElementById('act4-list');
+      listContainer.innerHTML = '';
+
+      const isCust = (appState.act4.persona === 'customer');
+      const orderKeys = isCust ? appState.act4.customerOrder : appState.act4.managerOrder;
+      const itemsList = isCust ? appState.act4.customerItems : appState.act4.managerItems;
+
+      orderKeys.forEach(key => {
+        const itemObj = itemsList.find(i => i.id === key);
+        if (itemObj) {
+          const div = document.createElement('div');
+          div.className = 'drag-item';
+          div.draggable = true;
+          div.id = `act4-item-${itemObj.id}`;
+          div.setAttribute('data-id', itemObj.id);
+
+          const textSpan = document.createElement('span');
+          textSpan.innerHTML = `<strong>${itemObj.title}</strong>: ${itemObj.desc}`;
+          div.appendChild(textSpan);
+
+          div.addEventListener('dragstart', handleDragStart);
+          div.addEventListener('dragend', handleDragEnd);
+
+          listContainer.appendChild(div);
+        }
+      });
+
+      listContainer.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(listContainer, e.clientY);
+        const dragging = document.querySelector('.drag-item.dragging');
+        if (dragging) {
+          if (afterElement == null) {
+            listContainer.appendChild(dragging);
+          } else {
+            listContainer.insertBefore(dragging, afterElement);
+          }
+        }
+      });
+
+      document.getElementById('act4-status').innerText = appState.act4.solved ? '✓ SOLVED' : 'UNSOLVED';
+      document.getElementById('act4-status').style.color = appState.act4.solved ? '#38a169' : '#718096';
+      document.getElementById('act4-feedback-success').style.display = 'none';
+      document.getElementById('act4-feedback-error').style.display = 'none';
+    }
+
+    function checkAct4() {
+      saveCurrentAct4Order();
+
+      const targetCustomer = ['search', 'filters', 'products', 'reviews', 'wishlist', 'help'];
+      const targetManager = ['alerts', 'graph', 'shipments', 'catalog', 'feedback', 'settings'];
+
+      let customerCorrect = true;
+      let managerCorrect = true;
+
+      appState.act4.customerOrder.forEach((val, idx) => {
+        if (val !== targetCustomer[idx]) customerCorrect = false;
+      });
+
+      appState.act4.managerOrder.forEach((val, idx) => {
+        if (val !== targetManager[idx]) managerCorrect = false;
+      });
+
+      appState.act4.solvedPersonas.customer = customerCorrect;
+      appState.act4.solvedPersonas.manager = managerCorrect;
+
+      const successBox = document.getElementById('act4-feedback-success');
+      const errorBox = document.getElementById('act4-feedback-error');
+
+      const activeContainer = document.getElementById('act4-list');
+      const childNodes = [...activeContainer.querySelectorAll('.drag-item')];
+      const activeTargets = (appState.act4.persona === 'customer') ? targetCustomer : targetManager;
+
+      childNodes.forEach((node, index) => {
+        const id = node.getAttribute('data-id');
+        node.classList.remove('correct', 'incorrect');
+        if (id === activeTargets[index]) {
+          node.classList.add('correct');
+        } else {
+          node.classList.add('incorrect');
+        }
+      });
+
+      if (customerCorrect && managerCorrect) {
+        appState.act4.solved = true;
+        document.getElementById('act4-status').innerText = '✓ SOLVED';
+        document.getElementById('act4-status').style.color = '#38a169';
+
+        successBox.style.display = 'block';
+        successBox.innerHTML = `<strong>Persona Alignment Solved!</strong> You configured both layouts perfectly. The Customer persona places the search bar at the top, while the Manager persona displays critical low stock alerts first.`;
+        errorBox.style.display = 'none';
+      } else {
+        errorBox.style.display = 'block';
+        let errorMsg = "<strong>Incorrect sorting!</strong> ";
+        if (!customerCorrect && appState.act4.persona === 'customer') {
+          errorMsg += "The Customer layout does not align with the fast purchase pathway. Arrange search and filters first.";
+        } else if (!managerCorrect && appState.act4.persona === 'manager') {
+          errorMsg += "The Manager layout does not highlight stock alerts first. Place alerts and stats at the top.";
+        } else {
+          errorMsg += "The current persona is correct, but your other tab persona has errors. Switch tabs and resolve.";
+        }
+        errorBox.innerHTML = errorMsg;
+        successBox.style.display = 'none';
+      }
+    }
+
+    // --- ACTIVITY 3.1 CONTROLLER ---
+    function renderAct5() {
+      const pool = document.getElementById('act5-pills-pool');
+      pool.innerHTML = '';
+
+      appState.act5.pills.forEach(pill => {
+        const isMatched = Object.values(appState.act5.matches).some(arr => arr.includes(pill.id));
+        if (!isMatched) {
+          const div = document.createElement('div');
+          div.className = 'draggable-pill';
+          div.draggable = true;
+          div.id = `act5-pill-${pill.id}`;
+          div.setAttribute('data-id', pill.id);
+          div.setAttribute('data-category', pill.category);
+          div.innerText = pill.text;
+
+          div.addEventListener('dragstart', handleDragStart);
+          div.addEventListener('dragend', handleDragEnd);
+
+          pool.appendChild(div);
+        }
+      });
+
+      ['fulfillment', 'inventory', 'analytics'].forEach(key => {
+        const zone = document.getElementById(`act5-zone-${key}`);
+        zone.innerHTML = '';
+
+        const matchedIds = appState.act5.matches[key] || [];
+        matchedIds.forEach(id => {
+          const pill = appState.act5.pills.find(p => p.id === id);
+          if (pill) {
+            const div = document.createElement('div');
+            div.className = 'draggable-pill';
+            div.draggable = true;
+            div.id = `act5-pill-${pill.id}`;
+            div.setAttribute('data-id', pill.id);
+            div.setAttribute('data-category', pill.category);
+            div.innerText = pill.text;
+
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragend', handleDragEnd);
+
+            zone.appendChild(div);
+          }
+        });
+      });
+
+      let classifiedCount = 0;
+      Object.keys(appState.act5.matches).forEach(k => {
+        classifiedCount += appState.act5.matches[k].length;
+      });
+      document.getElementById('act5-count').innerText = `${classifiedCount} / 12`;
+
+      document.getElementById('act5-status').innerText = appState.act5.solved ? '✓ SOLVED' : 'UNSOLVED';
+      document.getElementById('act5-status').style.color = appState.act5.solved ? '#38a169' : '#718096';
+      document.getElementById('act5-feedback-success').style.display = 'none';
+      document.getElementById('act5-feedback-error').style.display = 'none';
+    }
+
+    function initAct5DragOver() {
+      ['fulfillment', 'inventory', 'analytics'].forEach(key => {
+        const zone = document.getElementById(`act5-zone-${key}`);
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          this.classList.remove('drag-over');
+
+          const pillId = e.dataTransfer.getData('text/plain');
+          const pillElement = document.getElementById(pillId);
+          if (!pillElement) return;
+
+          const pillDataId = pillElement.getAttribute('data-id');
+
+          Object.keys(appState.act5.matches).forEach(k => {
+            appState.act5.matches[k] = appState.act5.matches[k].filter(id => id !== pillDataId);
+          });
+
+          appState.act5.matches[key].push(pillDataId);
+          renderAct5();
+        });
+      });
+
+      const pool = document.getElementById('act5-pills-pool');
+      pool.addEventListener('dragover', handleDragOver);
+      pool.addEventListener('dragleave', handleDragLeave);
+      pool.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+
+        const pillId = e.dataTransfer.getData('text/plain');
+        const pillElement = document.getElementById(pillId);
+        if (!pillElement) return;
+
+        const pillDataId = pillElement.getAttribute('data-id');
+
+        Object.keys(appState.act5.matches).forEach(k => {
+          appState.act5.matches[k] = appState.act5.matches[k].filter(id => id !== pillDataId);
+        });
+
+        renderAct5();
+      });
+    }
+
+    function checkAct5() {
+      let correct = true;
+      let totalPlaced = 0;
+
+      const successBox = document.getElementById('act5-feedback-success');
+      const errorBox = document.getElementById('act5-feedback-error');
+
+      ['fulfillment', 'inventory', 'analytics'].forEach(key => {
+        const matchedIds = appState.act5.matches[key] || [];
+        totalPlaced += matchedIds.length;
+
+        matchedIds.forEach(id => {
+          const pill = appState.act5.pills.find(p => p.id === id);
+          const element = document.getElementById(`act5-pill-${id}`);
+          if (element) {
+            element.classList.remove('correct', 'incorrect');
+            if (pill && pill.category === key) {
+              element.classList.add('correct');
+            } else {
+              element.classList.add('incorrect');
+              correct = false;
+            }
+          }
+        });
+      });
+
+      if (totalPlaced < 12) {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>Unfinished Classification!</strong> Drag all 12 elements from the pool container into their correct grouping boxes before verifying.`;
+        successBox.style.display = 'none';
+        return;
+      }
+
+      if (correct) {
+        appState.act5.solved = true;
+        document.getElementById('act5-status').innerText = '✓ SOLVED';
+        document.getElementById('act5-status').style.color = '#38a169';
+
+        successBox.style.display = 'block';
+        successBox.innerHTML = `<strong>Grouping Completed!</strong> Sorting items into Orders, Products, and Analytics structures reduces visual clutter. This improves search and scanning efficiency.`;
+        errorBox.style.display = 'none';
+      } else {
+        errorBox.style.display = 'block';
+        errorBox.innerHTML = `<strong>Categorization errors detected!</strong> Some items are placed in wrong dashboard groups. Review the red highlighted pills and re-sort.`;
+        successBox.style.display = 'none';
+      }
+    }
+
+    // --- ACTIVITY 3.2 (CAPSTONE UX AUDIT) CONTROLLER ---
+    const AUDIT_DEFECTS = [
+      { id: 'defect1', category: 'prioritization', key: 'sort-urgency' },
+      { id: 'defect2', category: 'grouping', key: 'group-sections' },
+      { id: 'defect3', category: 'scanspeed', key: 'shorten-label' },
+      { id: 'defect4', category: 'readability', key: 'standard-casing' },
+      { id: 'defect5', category: 'discoverability', key: 'high-contrast' },
+      { id: 'defect6', category: 'hierarchy', key: 'move-infrastructure' }
+    ];
+
+    function renderAct6() {
+      const container = document.getElementById('audit-list-layout');
+      
+      let allSolved = Object.values(appState.act6.repairs).every(v => v === true);
+      
+      if (allSolved && appState.act6.solved && document.getElementById('act6-report-panel').style.display === 'block') {
+        document.getElementById('audit-list-layout').style.display = 'none';
+        document.getElementById('audit-mock-header').style.display = 'none';
+        document.getElementById('audit-mockup-frame').style.background = '#ffffff';
+        document.getElementById('act6-report-panel').style.display = 'block';
+        
+        document.getElementById('inspector-placeholder').style.display = 'none';
+        document.getElementById('inspector-active-box').style.display = 'none';
+        
+        const successBox = document.getElementById('act6-feedback-success');
+        successBox.style.display = 'block';
+        successBox.innerHTML = `<strong>UX Audit Complete!</strong> All Content Ordering defects resolved successfully. The generated audit report highlights a 100% score in visual scan efficiency and prioritization.`;
+        
+        updateAuditGauges();
+        document.getElementById('btn-generate-report').disabled = false;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      const isSorted = appState.act6.repairs.defect1;
+      const isGrouped = appState.act6.repairs.defect2;
+      const isShortened = appState.act6.repairs.defect3;
+      const isCased = appState.act6.repairs.defect4;
+      const isHighContrast = appState.act6.repairs.defect5;
+      const isPrioritized = appState.act6.repairs.defect6;
+
+      const mockTitle = document.getElementById('audit-mock-title');
+      if (isSorted && isGrouped) {
+        mockTitle.innerText = "Audit Dashboard (Grouped & Prioritized)";
+      } else if (isSorted) {
+        mockTitle.innerText = "Audit Dashboard (Sorted by Urgency)";
+      } else {
+        mockTitle.innerText = "Audit Dashboard (Alphabetical Mode)";
+      }
+
+      let cards = [
+        {
+          id: 'defect4',
+          label: isCased ? 'Profile Settings' : 'UPDATE PROFILE SETTINGS & view notifications',
+          title: isCased ? 'Update Profile Settings' : '🔧 UPDATE PROFILE SETTINGS & view notifications',
+          desc: 'Manage account values and notification alerts.',
+          badge: 'General',
+          badgeClass: 'grey'
+        },
+        {
+          id: 'defect3',
+          label: 'Feedback',
+          title: isShortened ? '✉️ Submit Feedback Survey' : '💡 Feedback Request: Please click this button to fill out our extensive survey. We value your feedback a lot because we want to improve our dashboard for all developers.',
+          desc: isShortened ? 'Share your dashboard inputs.' : '',
+          badge: 'Optional',
+          badgeClass: 'green'
+        },
+        {
+          id: 'defect6',
+          title: '🎟️ PROMO WIDGET: Manage Discount Codes',
+          desc: 'Create coupons and active store advertising codes.',
+          badge: 'Marketing',
+          badgeClass: 'grey',
+          isPromo: true
+        },
+        {
+          id: 'defect2',
+          title: '💸 Payment Details & Docs',
+          desc: isGrouped ? 'Billing records and credit details.' : '💸 Payment Info: Your credit card ends in 4529. | ❓ Help Docs',
+          badge: isGrouped ? 'Billing' : 'Misc Support',
+          badgeClass: 'orange'
+        },
+        {
+          id: 'defect5',
+          title: '⚠️ API Gateway Status',
+          desc: isHighContrast ? 'API Gateway offline (Response 503)' : 'API Status: OFFLINE (Response Code 503) [Status: Unknown]',
+          badge: isHighContrast ? '● OFFLINE' : 'Status: Gray',
+          badgeClass: isHighContrast ? 'red' : 'grey'
+        },
+        {
+          id: 'defect1',
+          title: '🚨 CRITICAL Web Server CPU Exception',
+          desc: 'CPU load is at 99%. Server down alert pending recovery.',
+          badge: 'Critical Emergency',
+          badgeClass: 'red',
+          isAlert: true
+        }
+      ];
+
+      if (isSorted) {
+        const serverCardIdx = cards.findIndex(c => c.id === 'defect1');
+        if (serverCardIdx !== -1) {
+          const [serverCard] = cards.splice(serverCardIdx, 1);
+          cards.unshift(serverCard);
+        }
+      }
+
+      if (isPrioritized) {
+        const promoIdx = cards.findIndex(c => c.id === 'defect6');
+        if (promoIdx !== -1) {
+          const [promoCard] = cards.splice(promoIdx, 1);
+          cards.push(promoCard);
+        }
+      }
+
+      cards.forEach(c => {
+        const isDefectResolved = appState.act6.repairs[c.id];
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = `mock-card ${isDefectResolved ? 'defect-resolved' : 'defect-active'}`;
+        cardDiv.id = `mock-card-${c.id}`;
+        cardDiv.onclick = () => inspectDefect(c.id);
+
+        const label = document.createElement('div');
+        label.className = 'mock-card-label';
+        label.innerText = c.badge || 'System Parameters';
+        cardDiv.appendChild(label);
+
+        const title = document.createElement('div');
+        title.className = 'mock-card-title';
+        title.innerText = c.title;
+        cardDiv.appendChild(title);
+
+        if (c.desc) {
+          const desc = document.createElement('div');
+          desc.className = 'mock-card-desc';
+          desc.innerText = c.desc;
+          cardDiv.appendChild(desc);
+        }
+
+        const resolvedTag = document.createElement('span');
+        resolvedTag.className = 'resolved-tag';
+        resolvedTag.innerText = '✓ REMEDIATED';
+        cardDiv.appendChild(resolvedTag);
+
+        container.appendChild(cardDiv);
+      });
+
+      updateAuditGauges();
+
+      allSolved = Object.values(appState.act6.repairs).every(v => v === true);
+      document.getElementById('btn-generate-report').disabled = !allSolved;
+
+      if (allSolved) {
+        appState.act6.solved = true;
+      }
+    }
+
+    function inspectDefect(defectId) {
+      appState.act6.selectedDefect = defectId;
+      
+      document.getElementById('inspector-placeholder').style.display = 'none';
+      const activeBox = document.getElementById('inspector-active-box');
+      activeBox.style.display = 'flex';
+
+      const info = appState.act6.defectsInfo[defectId];
+      document.getElementById('inspector-defect-badge').innerText = `Defect: ${info.title}`;
+      document.getElementById('inspector-flaw-desc').innerText = info.flaw;
+
+      const select = document.getElementById('inspector-repair-select');
+      if (appState.act6.repairs[defectId]) {
+        select.value = info.correctAction;
+      } else {
+        select.value = "";
+      }
+    }
+
+    function applyAuditRepair() {
+      const defectId = appState.act6.selectedDefect;
+      if (!defectId) return;
+
+      const select = document.getElementById('inspector-repair-select');
+      const action = select.value;
+      const expected = appState.act6.defectsInfo[defectId].correctAction;
+
+      if (action === expected) {
+        appState.act6.repairs[defectId] = true;
+        showToast(`Remediation Success! ${appState.act6.defectsInfo[defectId].title} has been resolved.`);
+        renderAct6();
+      } else {
+        appState.act6.repairs[defectId] = false;
+        showToast("Incorrect repair action! Choose the HCD remediation action that directly resolves this usability flaw.");
+      }
+    }
+
+    function updateAuditGauges() {
+      const r = appState.act6.repairs;
+      
+      const setMetric = (id, pass) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerText = pass ? 'PASS' : 'FAIL';
+          el.className = `metric-status ${pass ? 'pass' : ''}`;
+        }
+      };
+
+      setMetric('metric-prioritization', r.defect1);
+      setMetric('metric-grouping', r.defect2);
+      setMetric('metric-scanspeed', r.defect3);
+      setMetric('metric-readability', r.defect4);
+      setMetric('metric-discoverability', r.defect5);
+      setMetric('metric-hierarchy', r.defect6);
+    }
+
+    function compileAuditReport() {
+      document.getElementById('audit-list-layout').style.display = 'none';
+      document.getElementById('audit-mock-header').style.display = 'none';
+      document.getElementById('audit-mockup-frame').style.background = '#ffffff';
+      document.getElementById('act6-report-panel').style.display = 'block';
+      
+      document.getElementById('inspector-placeholder').style.display = 'none';
+      document.getElementById('inspector-active-box').style.display = 'none';
+
+      const successBox = document.getElementById('act6-feedback-success');
+      successBox.style.display = 'block';
+      successBox.innerHTML = `<strong>UX Audit Complete!</strong> All Content Ordering defects resolved successfully. The generated audit report highlights a 100% score in visual scan efficiency and prioritization.`;
+    }
+
+    // --- ACTIVITY BOOTSTRAPPER ---
+    function loadActivityData(viewId) {
+      if (viewId === 'act-1') {
+        if (!appState.act1.solved) {
+          shuffleArray(appState.act1.items);
+        }
+        renderAct1();
+      } else if (viewId === 'act-2') {
+        renderAct2();
+      } else if (viewId === 'act-3') {
+        if (!appState.act3.solved) {
+          shuffleArray(appState.act3.items);
+        }
+        renderAct3();
+      } else if (viewId === 'act-4') {
+        if (!appState.act4.solved) {
+          shuffleArray(appState.act4.customerItems);
+          shuffleArray(appState.act4.managerItems);
+        }
+        renderAct4();
+      } else if (viewId === 'act-5') {
+        renderAct5();
+      } else if (viewId === 'act-6') {
+        renderAct6();
+      }
+    }
+
+    // --- FOOTER VALIDATOR ROUTINES ---
+    function checkCurrentActivity() {
+      const v = appState.activeView;
+      
+      if (v === 'act-1') {
+        checkAct1();
+      } else if (v === 'act-2') {
+        checkAct2();
+      } else if (v === 'act-3') {
+        checkAct3();
+      } else if (v === 'act-4') {
+        checkAct4();
+      } else if (v === 'act-5') {
+        checkAct5();
+      } else if (v === 'act-6') {
+        if (appState.act6.solved) {
+          compileAuditReport();
+        } else {
+          showToast("Find and click all 6 outlined defects on the mockup and resolve them to compile the report.");
+        }
+      }
+    }
+
+    // --- INITIALIZE ON WINDOW LOAD ---
+    window.onload = () => {
+      initAct2DragOver();
+      initAct5DragOver();
+      navigateTo('welcome');
+    };
+  </script>
+</body>
+</html>
