@@ -1,1 +1,172 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.5 Network Effects Arcade</title>
+    <style>
+        :root {
+            --red: #d32f2f;
+            --dark: #b71c1c;
+            --light: #ffcdd2;
+            --bg: #f8f8f8;
+            --white: #fff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--red);
+            text-transform: uppercase;
+            text-align: center;
+            border-bottom: 3px solid var(--red);
+        }
+
+        .game {
+            background: var(--white);
+            border: 2px solid var(--red);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 5px 5px 0 var(--light);
+        }
+
+        h2 {
+            color: var(--dark);
+            margin-top: 0;
+        }
+
+        button {
+            background: var(--red);
+            color: var(--white);
+            border: 2px solid var(--dark);
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: var(--white);
+            color: var(--red);
+        }
+
+        .box {
+            background: var(--light);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px dashed var(--red);
+            margin-bottom: 15px;
+        }
+
+        .race-track {
+            width: 100%;
+            background: #ddd;
+            height: 20px;
+            margin-bottom: 5px;
+        }
+
+        .racer {
+            height: 100%;
+            background: var(--red);
+            width: 10%;
+            transition: 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>2.5 Platform & Network Effects</h1>
+
+        <div class="game">
+            <h2>Sim 1: Viral Web Builder</h2>
+            <p>Click inside the box to add a user. Watch Metcalfe's Law (N² connections) in action!</p>
+            <div id="s1-canvas" onclick="s1Add()"
+                style="height:150px; background:var(--bg); border:2px solid var(--red); position:relative; cursor:crosshair; overflow:hidden;">
+            </div>
+            <p style="text-align:center; font-weight:bold;">Users: <span id="s1-n" style="color:var(--red)">0</span> |
+                Connections (Value): <span id="s1-c" style="color:var(--red)">0</span></p>
+        </div>
+
+        <div class="game">
+            <h2>Sim 2: Linear vs Exponential</h2>
+            <p>Click "Advance Time" to watch a traditional pipeline business compete with a platform network.</p>
+            <label>Traditional Pipeline (Linear)</label>
+            <div class="race-track">
+                <div class="racer" id="r1" style="background:#555"></div>
+            </div>
+            <label>Digital Platform (Exponential)</label>
+            <div class="race-track">
+                <div class="racer" id="r2"></div>
+            </div>
+            <button onclick="s2Race()">Advance Time</button>
+        </div>
+
+        <div class="game">
+            <h2>Sim 3: Critical Mass Threshold</h2>
+            <p>Networks die if they don't reach critical mass. Keep clicking to acquire users before they churn!</p>
+            <div class="box" style="font-size: 2em; color:var(--red);"><span id="s3-val">10</span> Users</div>
+            <button onclick="s3Click()" id="s3-btn">Acquire User (+1)</button>
+            <p id="s3-res" style="text-align:center; font-weight:bold; color:var(--red);"></p>
+        </div>
+    </div>
+
+    <script>
+        // Sim 1
+        let s1Nodes = 0;
+        function s1Add() {
+            s1Nodes++;
+            document.getElementById('s1-n').innerText = s1Nodes;
+            document.getElementById('s1-c').innerText = (s1Nodes * (s1Nodes - 1)) / 2; // Metcalfe formula
+            let d = document.createElement('div');
+            d.style.cssText = `position:absolute; width:10px; height:10px; background:var(--red); border-radius:50%; left:${Math.random() * 90}%; top:${Math.random() * 90}%;`;
+            document.getElementById('s1-canvas').appendChild(d);
+        }
+        // Sim 2
+        let s2T = 1; let r1 = 10; let r2 = 2;
+        function s2Race() {
+            r1 += 10; // linear
+            r2 = Math.pow(r2, 1.4); // exponential
+            if (r1 > 100) r1 = 100; if (r2 > 100) r2 = 100;
+            document.getElementById('r1').style.width = r1 + "%";
+            document.getElementById('r2').style.width = r2 + "%";
+            if (r2 >= 100) document.getElementById('r2').innerHTML = "<span style='color:white; font-size:12px; padding-left:5px;'>Overtook!</span>";
+        }
+        // Sim 3
+        let s3U = 10; let s3Active = true;
+        setInterval(() => {
+            if (s3Active && s3U > 0 && s3U < 30) {
+                s3U--; document.getElementById('s3-val').innerText = s3U;
+            }
+        }, 1000);
+        function s3Click() {
+            if (!s3Active) return;
+            s3U += 2; document.getElementById('s3-val').innerText = s3U;
+            if (s3U >= 30) {
+                s3Active = false;
+                document.getElementById('s3-res').innerText = "CRITICAL MASS REACHED! The network sustains itself.";
+                document.getElementById('s3-btn').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

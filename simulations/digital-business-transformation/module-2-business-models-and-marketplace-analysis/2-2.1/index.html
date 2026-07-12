@@ -1,1 +1,161 @@
-<!-- Blank Simulation -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.1 Revenue Models Arcade</title>
+    <style>
+        :root {
+            --red: #d32f2f;
+            --dark: #b71c1c;
+            --light: #ffcdd2;
+            --bg: #f8f8f8;
+            --white: #fff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--red);
+            text-transform: uppercase;
+            text-align: center;
+            border-bottom: 3px solid var(--red);
+        }
+
+        .game {
+            background: var(--white);
+            border: 2px solid var(--red);
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 5px 5px 0 var(--light);
+        }
+
+        h2 {
+            color: var(--dark);
+            margin-top: 0;
+        }
+
+        button {
+            background: var(--red);
+            color: var(--white);
+            border: 2px solid var(--dark);
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: var(--white);
+            color: var(--red);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .box {
+            background: var(--light);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px dashed var(--red);
+            margin-bottom: 15px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--red);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>2.1 E-Business Revenue Models</h1>
+
+        <div class="game">
+            <h2>Sim 1: The Revenue Sorter</h2>
+            <p>Sort the customer scenario into the correct model!</p>
+            <div class="box" id="s1-text">"I play this game for free, but paid $5 for a digital sword."</div>
+            <div class="grid-2">
+                <button onclick="s1Guess('Subscription')">Subscription</button>
+                <button onclick="s1Guess('Freemium')">Freemium</button>
+                <button onclick="s1Guess('Transaction')">Transaction Fee</button>
+                <button onclick="s1Guess('Ad-Supported')">Ad-Supported</button>
+            </div>
+        </div>
+
+        <div class="game">
+            <h2>Sim 2: Monetization Mixer</h2>
+            <p>Adjust the sliders to see how digital businesses make millions.</p>
+            <label>Active Users: <span id="s2-u-val">100,000</span></label>
+            <input type="range" id="s2-u" min="10000" max="1000000" step="10000" value="100000"
+                oninput="s2Calc()"><br><br>
+            <label>Subscribers (5% conversion at $10/mo)</label>
+            <input type="range" id="s2-s" min="1" max="10" value="5" oninput="s2Calc()"><br><br>
+            <div class="box" style="font-size: 1.5em; color: var(--red);">Monthly Revenue: $<span
+                    id="s2-rev">50,000</span></div>
+        </div>
+
+        <div class="game">
+            <h2>Sim 3: The Pivot Strategy</h2>
+            <p>Your Ad-Supported news site is losing advertisers. Choose a pivot to survive:</p>
+            <div id="s3-res" class="box" style="display:none;"></div>
+            <button onclick="s3Pivot('paywall')">Erect a strict Subscription Paywall</button>
+            <button onclick="s3Pivot('freemium')">Offer a Freemium "Ad-Free" Tier</button>
+            <button onclick="s3Pivot('transaction')">Sell merchandise (Transaction)</button>
+        </div>
+    </div>
+
+    <script>
+        // Sim 1 Logic
+        const s1Q = [{ q: "I play this game for free, but paid $5 for a digital sword.", a: "Freemium" }, { q: "I pay a flat $10/mo for movies.", a: "Subscription" }];
+        let s1I = 0;
+        function s1Guess(g) {
+            let b = document.getElementById('s1-text');
+            if (g === s1Q[s1I].a) {
+                b.innerHTML = `<span style="color:red">CORRECT!</span>`;
+                s1I = (s1I + 1) % s1Q.length;
+                setTimeout(() => b.innerText = s1Q[s1I].q, 1000);
+            } else { b.innerHTML = "WRONG!"; setTimeout(() => b.innerText = s1Q[s1I].q, 1000); }
+        }
+        // Sim 2 Logic
+        function s2Calc() {
+            let u = document.getElementById('s2-u').value;
+            let c = document.getElementById('s2-s').value;
+            document.getElementById('s2-u-val').innerText = parseInt(u).toLocaleString();
+            let rev = u * (c / 100) * 10;
+            document.getElementById('s2-rev').innerText = rev.toLocaleString();
+        }
+        // Sim 3 Logic
+        function s3Pivot(t) {
+            let r = document.getElementById('s3-res');
+            r.style.display = 'block';
+            if (t === 'paywall') r.innerHTML = "Traffic dropped 90%. Hard pivots are risky!";
+            if (t === 'freemium') r.innerHTML = "SUCCESS! Casual users stay, loyalists pay to remove ads.";
+            if (t === 'transaction') r.innerHTML = "FAILED. News readers don't want to buy t-shirts.";
+        }
+    </script>
+</body>
+
+</html>
