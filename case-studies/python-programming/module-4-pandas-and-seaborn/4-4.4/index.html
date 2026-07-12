@@ -1,2277 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seaborn Design Studio - Data Visualization Academy</title>
-  <!-- Google Fonts for Modern Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-  
+  <title>Data Visualization: Healthcare Dashboard Analytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* --- CSS Reset & Variables --- */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
     :root {
-      --primary-red: #D32F2F;
-      --primary-red-hover: #B71C1C;
-      --light-red-bg: #FFEBEE;
-      --light-red-border: #FFCDD2;
-      --pure-white: #FFFFFF;
-      --off-white: #F9F9F9;
-      --text-dark: #212121;
-      --text-muted: #666666;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-      --border-radius-sm: 8px;
-      --border-radius-md: 16px;
-      --border-radius-lg: 24px;
-      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --bg-canvas: #f8f7f4;
+      --tech-blue: #2c5282;
+      --alert-orange: #c05621;
+      --text-main: #1a202c;
+      --seaborn-teal: #319795;
+      --grid-line: #e2e8f0;
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--off-white);
-      color: var(--text-dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* --- Background Vector Grid --- */
-    .bg-grid {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-image: 
-        radial-gradient(var(--light-red-border) 1px, transparent 1px),
-        radial-gradient(var(--light-red-border) 1px, transparent 1px);
-      background-size: 24px 24px;
-      background-position: 0 0, 12px 12px;
-      opacity: 0.35;
-      z-index: -1;
-    }
-
-    /* --- Header Bar --- */
-    header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 2px solid var(--light-red-border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .brand-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--primary-red);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--pure-white);
-      font-weight: 800;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
-    }
-
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--primary-red);
-      letter-spacing: -0.5px;
-    }
-
-    /* Header Nav Nodes */
-    .level-nav-hud {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--off-white);
-      padding: 0.35rem;
-      border-radius: var(--border-radius-lg);
-      border: 1.5px solid var(--light-red-border);
-    }
-
-    .hud-node {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--pure-white);
-      border: 1.5px solid var(--light-red-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .hud-node.unlocked {
-      color: var(--primary-red);
-      border-color: var(--primary-red);
-    }
-
-    .hud-node.active {
-      background: var(--primary-red);
-      color: var(--pure-white);
-      border-color: var(--primary-red);
-      box-shadow: 0 3px 8px rgba(211, 47, 47, 0.25);
-    }
-
-    .hud-node-line {
-      width: 20px;
-      height: 2px;
-      background: var(--light-red-border);
-    }
-
-    .hud-node-line.unlocked {
-      background: var(--primary-red);
-    }
-
-    /* Navigation controls */
-    .hud-stats {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-
-    /* Buttons styling */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: var(--border-radius-sm);
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      border: none;
-      outline: none;
-    }
-
-    .btn-primary {
-      background: var(--primary-red);
-      color: var(--pure-white);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: var(--primary-red-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      background: var(--pure-white);
-      color: var(--primary-red);
-      border: 1.5px solid var(--primary-red);
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: var(--light-red-bg);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* --- Main Workspace Layout --- */
-    main {
-      flex: 1;
-      padding: 2rem;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    /* --- Theory & Steps Card (At the top, spanning full width) --- */
-    .theory-panel {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.25rem 1.75rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .theory-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--primary-red);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .theory-steps {
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--light-red-border);
-    }
-
-    .theory-steps-title {
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 0.35rem;
-      color: var(--text-dark);
-    }
-
-    /* --- Inline Status Banner --- */
-    #status-banner {
-      display: none;
-      background: #E8F5E9;
-      border: 2px solid #2E7D32;
-      color: #1B5E20;
-      padding: 0.9rem 1.25rem;
-      border-radius: var(--border-radius-md);
-      font-weight: 600;
-      font-size: 0.9rem;
-      animation: pop-in 0.3s ease-out;
-    }
-
-    /* --- Main Split Workspace --- */
-    .game-workspace {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    /* Playground Left Panel */
-    .playground-panel {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      min-height: 480px;
-    }
-
-    .playground-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1.5px solid var(--light-red-border);
-      padding-bottom: 0.75rem;
-    }
-
-    .playground-title-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .playground-title {
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--text-dark);
-    }
-
-    .playground-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
-    }
-
-    .playground-controls {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .sandbox-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 1.25rem;
-      position: relative;
-    }
-
-    /* Code Terminal Right Panel */
-    .terminal-panel {
-      background: #1E1E1E;
-      border-radius: var(--border-radius-md);
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      flex-direction: column;
-      min-height: 480px;
-    }
-
-    .terminal-header {
-      background: #2D2D2D;
-      padding: 0.75rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #3C3C3C;
-    }
-
-    .terminal-dots {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .terminal-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .terminal-dot.red { background: #FF5F56; }
-    .terminal-dot.yellow { background: #FFBD2E; }
-    .terminal-dot.green { background: #27C93F; }
-
-    .terminal-title {
-      color: #A0A0A0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .terminal-body {
-      flex: 1;
-      padding: 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-family: 'IBM+Plex+Sans', sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
       line-height: 1.6;
-      color: #D4D4D4;
-      overflow-y: auto;
     }
 
-    .code-line {
-      display: flex;
-      gap: 1rem;
-      opacity: 0.85;
-      transition: opacity var(--transition-fast);
+    .serif {
+      font-family: 'IBM+Plex+Serif', serif;
     }
 
-    .code-line.active {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 2px solid var(--primary-red);
-      padding-left: 2px;
-    }
-
-    .code-num {
-      color: #858585;
-      text-align: right;
-      width: 20px;
-      user-select: none;
-    }
-
-    .code-text {
-      white-space: pre-wrap;
-    }
-
-    /* Code Highlighting classes */
-    .token-comment { color: #6A9955; font-style: italic; }
-    .token-keyword { color: #C586C0; font-weight: 600; }
-    .token-string { color: #CE9178; }
-    .token-method { color: #DCDCAA; }
-    .token-number { color: #B5CEA8; }
-    .token-builtin { color: #569CD6; }
-
-    .terminal-explainer {
-      background: #252526;
-      border-top: 1px solid #3C3C3C;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: #D4D4D4;
-    }
-
-    .explainer-icon {
-      font-size: 1.2rem;
-    }
-
-    /* --- Interactive Drag & Drop --- */
-    .drag-chips-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .drag-chip {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      padding: 0.5rem 1rem;
+    .mono {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--primary-red);
-      cursor: grab;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow var(--transition-fast), transform var(--transition-fast);
-      touch-action: none;
     }
 
-    .drag-chip:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
+    .technical-image-container {
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
     }
 
-    .drag-chip.dragging {
-      opacity: 0.8;
-      cursor: grabbing;
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
+    /* Python Syntax Highlighting */
+    .kw {
+      color: #c05621;
+      font-weight: bold;
     }
 
-    .drop-cell {
-      border: 2px dashed var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--off-white);
-      transition: all var(--transition-fast);
+    .str {
+      color: #2c5282;
     }
 
-    .drop-cell.hovered {
-      background: var(--light-red-bg);
-      border-color: var(--primary-red);
-      transform: scale(1.02);
+    .cmt {
+      color: #718096;
+      font-style: italic;
     }
 
-    .drop-cell.filled {
-      border-style: solid;
-      border-color: var(--primary-red);
-      background: var(--pure-white);
+    .func {
+      color: #805ad5;
     }
 
-    /* --- Activity Custom Visualizers --- */
+    .lib {
+      color: #319795;
+      font-weight: bold;
+    }
 
-    /* Activity 1.1: Makeover plot container */
-    .makeover-plot-view {
-      width: 100%;
-      max-width: 440px;
-      height: 240px;
-      border: 2px solid #B0BEC5;
-      border-radius: var(--border-radius-sm);
-      background: #E0E0E0; /* dull matplotlib grey */
-      display: flex;
-      flex-direction: column;
-      padding: 1.5rem;
+    /* Chart Canvas Constraints */
+    .chart-container {
       position: relative;
-      transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .makeover-gridline {
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: rgba(0, 0, 0, 0.1);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .makeover-gridlines-container {
-      position: absolute;
-      top: 2rem;
-      bottom: 2rem;
-      left: 2rem;
-      right: 2rem;
-      pointer-events: none;
-    }
-
-    .makeover-bars-row {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-around;
-      position: relative;
-      z-index: 5;
-    }
-
-    .makeover-bar-node {
-      width: 44px;
-      height: 30%;
-      background: #1f77b4; /* default standard blue */
-      border-radius: 2px 2px 0 0;
-      transition: all 0.5s ease;
-    }
-
-    /* Activity 1.2: Client matching */
-    .client-card-box {
       width: 100%;
-      max-width: 440px;
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.25rem;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      box-shadow: var(--shadow-sm);
+      height: 250px;
     }
 
-    .client-avatar {
-      font-size: 3rem;
-      animation: hover-bounce 2s ease-in-out infinite;
+    /* Seaborn visual representation */
+    .sns-grid {
+      background-color: #eaeaf2;
+      border: 1px solid #cbd5e0;
     }
 
-    /* Activity 2.1: Scanner Beam overlay */
-    .detective-plot-box {
-      width: 100%;
-      max-width: 440px;
-      height: 240px;
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      position: relative;
-      overflow: hidden;
-      background: #FFF;
+    .sns-line {
+      border-bottom: 1px solid white;
     }
 
-    .scanner-beam {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 4px;
-      background: rgba(211, 47, 47, 0.6);
-      box-shadow: 0 0 10px rgba(211, 47, 47, 0.8);
-      pointer-events: none;
-      display: none;
-    }
 
-    .plot-dot-particle {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--primary-red);
-      position: absolute;
-      transition: all 0.35s ease;
-    }
+    /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+    @media print {
 
-    /* Activity 2.2: Connecting puzzle */
-    .puzzle-grid-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      width: 100%;
-      max-width: 440px;
-    }
+      /* Reset body/html defaults for clean printing */
+      html,
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
 
-    .puzzle-slot-target {
-      border: 2px dashed var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      height: 50px;
-      background: var(--off-white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      transition: all var(--transition-fast);
-    }
+      /* Keep overflow visible to prevent multi-page cropping/clipping */
+      html,
+      body,
+      main,
+      section,
+      div,
+      pre,
+      code,
+      table,
+      tr,
+      td,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        position: static !important;
+      }
 
-    /* Level 3: Client Visualization Studio */
-    .approval-meter-track {
-      width: 100%;
-      max-width: 440px;
-      height: 16px;
-      background: #ECEFF1;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #CFD8DC;
-      margin-top: 0.5rem;
-    }
+      /* Ensure structural blocks break elegantly across pages */
+      pre,
+      blockquote,
+      table,
+      tr,
+      img,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
 
-    .approval-meter-fill {
-      height: 100%;
-      width: 40%;
-      background: #4CAF50;
-      transition: width 0.4s ease;
-    }
+      /* Avoid orphaned headers at the bottom of a page */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
 
-    /* Level 3 Boss tournament */
-    .boss-battle-view {
-      width: 100%;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .boss-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .boss-hp-track {
-      flex: 1;
-      height: 14px;
-      background: #ECEFF1;
-      border-radius: 7px;
-      overflow: hidden;
-      border: 1px solid #CFD8DC;
-    }
-
-    .boss-hp-fill {
-      height: 100%;
-      width: 100%;
-      background: #E53935;
-      transition: width 0.35s ease;
-    }
-
-    .player-hp-fill {
-      height: 100%;
-      width: 100%;
-      background: #4CAF50;
-      transition: width 0.35s ease;
-    }
-
-    .battle-options-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    .battle-option-btn {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      text-align: left;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .battle-option-btn:hover {
-      border-color: var(--primary-red);
-      background: var(--light-red-bg);
-      transform: translateX(2px);
-    }
-
-    /* --- Interactive dialogues --- */
-    dialog {
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.75rem;
-      max-width: 480px;
-      width: 90%;
-      margin: auto;
-      box-shadow: var(--shadow-lg);
-      outline: none;
-      font-family: 'Outfit', sans-serif;
-    }
-
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(4px);
-    }
-
-    .dialog-header {
-      font-weight: 800;
-      color: var(--primary-red);
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .dialog-body {
-      font-size: 0.9rem;
-      color: var(--text-dark);
-      line-height: 1.5;
-      margin-bottom: 1.25rem;
-    }
-
-    .dialog-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-    }
-
-    /* Footer styling */
-    footer {
-      background: rgba(255, 255, 255, 0.95);
-      border-top: 1px solid var(--light-red-border);
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    /* --- Animations definitions --- */
-    @keyframes pop-in {
-      0% { transform: scale(0.95); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes hover-bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    #confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
+      /* Hide interactive/non-printable UI elements */
+      nav,
+      footer,
+      button,
+      .no-print,
+      [class*="sticky"],
+      [class*="fixed"] {
+        display: none !important;
+      }
     }
   </style>
 </head>
-<body>
 
-  <div class="bg-grid"></div>
-  <canvas id="confetti-canvas"></canvas>
+<body class="antialiased">
 
-  <!-- Navigation header -->
-  <header>
-    <div class="brand">
-      <div class="brand-logo">🎨</div>
-      <div class="brand-title">Seaborn Design Studio</div>
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-teal-600 flex items-center justify-center text-white font-bold rounded">VIZ</div>
+        <span class="font-bold tracking-tighter uppercase">Engineering Dossier</span>
+      </div>
+      <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+        <a href="#theory" class="hover:text-black transition">Foundations</a>
+        <a href="#datatypes" class="hover:text-black transition">Data Mapping</a>
+        <a href="#case" class="hover:text-black transition">Case Study: Healthcare</a>
+        <a href="#lab" class="text-teal-700 font-bold">Interactive Dashboard</a>
+      </div>
     </div>
+  </nav>
 
-    <!-- Level switching node indicators -->
-    <div class="level-nav-hud">
-      <div class="hud-node active" id="node-1" onclick="switchLevel(1)">1</div>
-      <div class="hud-node-line" id="line-1"></div>
-      <div class="hud-node" id="node-2" onclick="switchLevel(2)">2</div>
-      <div class="hud-node-line" id="line-2"></div>
-      <div class="hud-node" id="node-3" onclick="switchLevel(3)">3</div>
-    </div>
-
-    <!-- Navigation controls -->
-    <div class="hud-stats">
-      <button class="btn btn-outline" id="btn-prev-level" onclick="changeLevel(-1)">◀ Prev Level</button>
-      <button class="btn btn-primary" id="btn-next-level" onclick="changeLevel(1)">Next Level ▶</button>
+  <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+    <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Statistical Data Visualization</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      An engineering report on utilizing Seaborn to map complex, heterogeneous healthcare data into intuitive,
+      human-readable statistical graphics.
+    </p>
+    <div class="mt-8 flex justify-center space-x-4">
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ref: Module
+        4-4.4</span>
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ver: 2026.Q3</span>
     </div>
   </header>
 
-  <!-- Main Grid Workspace -->
-  <main>
-    
-    <!-- Dynamic Theory and Steps Panel (Full Width) -->
-    <div class="theory-panel" id="theory-panel">
-      <div class="theory-title">
-        <span>📖</span> <span id="theory-title-text">Topic Theory</span>
-      </div>
-      <p id="theory-desc-text" style="font-size:0.85rem; color:var(--text-dark); margin-bottom: 0.5rem;"></p>
-      <div class="theory-steps">
-        <div class="theory-steps-title">🛠️ Steps to Perform Simulation:</div>
-        <ul id="theory-steps-list" style="margin-left: 1.25rem; font-size: 0.8rem; color: var(--text-muted);">
-          <!-- Populated dynamically -->
-        </ul>
-      </div>
-    </div>
+  <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
 
-    <!-- Status Banner for alerts and complete states -->
-    <div id="status-banner"></div>
+    <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div class="space-y-6">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-teal-600">01. Theoretical Foundations</h2>
+        <h3 class="serif text-4xl leading-snug">The Seaborn Abstraction Layer</h3>
+        <p>
+          While Matplotlib is a powerful, low-level rendering engine, building complex statistical plots (like
+          heatmaps or violin plots) requires extensive boilerplate code. <strong>Seaborn</strong> acts as a
+          high-level abstraction layer over Matplotlib, specifically designed to work natively with Pandas
+          DataFrames.
+        </p>
+        <p>
+          Seaborn automates the mapping of dataset variables to visual properties (colors, sizes, axes) and
+          automatically calculates statistical aggregations (like confidence intervals and regression lines)
+          before rendering the final SVG or Canvas output.
+        </p>
+        <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-gray-800">
+          <p class="text-sm font-bold uppercase mb-2">Architectural Note:</p>
+          <p class="italic text-gray-700">Matplotlib asks: "Draw a line from point A to B." Seaborn asks:
+            "What is the relationship between 'Age' and 'Blood Pressure', grouped by 'Gender'?"</p>
+        </div>
+      </div>
 
-    <!-- Gameplay panels split grid -->
-    <div class="game-workspace" id="game-workspace">
-      
-      <!-- Left Panel: Playground Simulator -->
-      <div class="playground-panel">
-        <div class="playground-header">
-          <div class="playground-title-wrapper">
-            <span class="playground-title" id="active-title">Activity Title</span>
-            <span class="playground-subtitle" id="active-subtitle">Select options or drag elements below</span>
+      <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-slate-400">The Visual Pipeline</h4>
+        <div class="space-y-4 font-mono text-sm flex flex-col items-center">
+          <div class="w-full bg-red-900/30 border border-red-600 p-4 rounded text-center">
+            <span class="text-red-400 font-bold">Pandas DataFrame</span><br>
+            Raw tabular data (Age, BP, Cholesterol)
           </div>
-          <div class="playground-controls">
-            <button class="btn btn-outline" id="btn-prev-act" onclick="navigateActivity(-1)" style="padding: 0.4rem 0.8rem;">◀ Prev</button>
-            <button class="btn btn-outline" id="btn-next-act" onclick="navigateActivity(1)" style="padding: 0.4rem 0.8rem;">Next ▶</button>
-            <button class="btn btn-outline" onclick="showHint()" style="padding: 0.4rem 0.8rem;">💡 Hint</button>
-            <button class="btn btn-outline" onclick="resetActiveActivity()" style="padding: 0.4rem 0.8rem;">🔄 Reset</button>
+          <div class="text-teal-500 font-bold">↓ Seaborn Interpretation ↓</div>
+          <div class="w-full bg-teal-900/30 border border-teal-600 p-4 rounded text-center">
+            <span class="text-teal-400 font-bold">Statistical Aggregation</span><br>
+            Calculate Means, KDEs, Regressions natively
+          </div>
+          <div class="text-blue-500 font-bold">↓ Matplotlib Rendering ↓</div>
+          <div class="w-full bg-blue-900/30 border border-blue-600 p-4 rounded text-center">
+            <span class="text-blue-400 font-bold">Pixel / SVG Output</span><br>
+            Draw actual axes, grids, and colored pixels.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="datatypes" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">02. Charting by Data Type</h2>
+        <h3 class="serif text-4xl mb-6">Choosing the Right Geometry</h3>
+        <p class="mb-4">
+          The type of plot generated relies entirely on the mathematical nature of the data being analyzed.
+          Seaborn supports different functional families for different data relationships.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="technical-image-container border-t-4 border-t-blue-500">
+          <h4 class="font-bold text-lg mb-2">Relational Data</h4>
+          <p class="text-sm text-gray-600 mb-4">Shows how two <strong>numerical</strong> (continuous)
+            variables relate to each other.</p>
+          <ul class="text-xs font-mono space-y-1 text-gray-700 mb-4">
+            <li>• sns.scatterplot()</li>
+            <li>• sns.lineplot()</li>
+          </ul>
+          <div class="bg-gray-100 p-2 rounded text-[10px] italic">Example: Weight vs. Blood Pressure</div>
+        </div>
+
+        <div class="technical-image-container border-t-4 border-t-green-500">
+          <h4 class="font-bold text-lg mb-2">Categorical Data</h4>
+          <p class="text-sm text-gray-600 mb-4">Shows relations between a <strong>categorical</strong>
+            variable (text/groups) and a numerical variable.</p>
+          <ul class="text-xs font-mono space-y-1 text-gray-700 mb-4">
+            <li>• sns.barplot()</li>
+            <li>• sns.boxplot()</li>
+          </ul>
+          <div class="bg-gray-100 p-2 rounded text-[10px] italic">Example: Drug Treatment Type vs. Recovery
+            Time</div>
+        </div>
+
+        <div class="technical-image-container border-t-4 border-t-purple-500">
+          <h4 class="font-bold text-lg mb-2">Distribution Data</h4>
+          <p class="text-sm text-gray-600 mb-4">Shows the underlying frequency or spread of a <strong>single
+              numerical</strong> dataset.</p>
+          <ul class="text-xs font-mono space-y-1 text-gray-700 mb-4">
+            <li>• sns.histplot()</li>
+            <li>• sns.kdeplot()</li>
+          </ul>
+          <div class="bg-gray-100 p-2 rounded text-[10px] italic">Example: Distribution of Patient Ages in
+            Ward</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="case" class="space-y-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div class="space-y-6">
+          <h2 class="text-sm font-black uppercase tracking-[0.3em] text-teal-700">03. Industry Architecture
+          </h2>
+          <h3 class="serif text-4xl">Healthcare Patient Dashboard</h3>
+          <p>
+            A hospital administration needs to visualize patient recovery metrics. The raw data contains
+            mixed types: "Treatment_Protocol" (Categorical/String), "Age" (Numerical/Int), and
+            "Recovery_Days" (Numerical/Float).
+          </p>
+          <p>
+            Instead of manually separating this data into distinct lists for Matplotlib, the engineer passes
+            the entire Pandas DataFrame to Seaborn. By setting <code>hue="Treatment_Protocol"</code>,
+            Seaborn automatically splits the data, applies statistical colors, and generates a legend in a
+            single line of code.
+          </p>
+        </div>
+
+        <div class="technical-image-container">
+          <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-gray-500">Seaborn
+            Implementation Logic</h4>
+          <div class="font-mono text-[11px] bg-slate-900 p-6 rounded text-gray-300 shadow-inner overflow-x-auto">
+            <span class="kw">import</span> seaborn <span class="kw">as</span> sns<br>
+            <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt<br><br>
+
+            <span class="cmt"># 1. Apply standardized visual theme</span><br>
+            <span class="lib">sns</span>.<span class="func">set_theme</span>(style=<span
+              class="str">"whitegrid"</span>)<br><br>
+
+            <span class="cmt"># 2. Generate Categorical Boxplot in one line</span><br>
+            <span class="lib">sns</span>.<span class="func">boxplot</span>(<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;data=df_patients, <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;x=<span class="str">"Treatment_Protocol"</span>, <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;y=<span class="str">"Recovery_Days"</span>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;palette=<span class="str">"Set2"</span><br>
+            )<br><br>
+
+            <span class="cmt"># 3. Add context and render</span><br>
+            <span class="func">plt</span>.<span class="func">title</span>(<span class="str">"Recovery
+              Efficacy by Protocol"</span>)<br>
+            <span class="func">plt</span>.<span class="func">show</span>()
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab" class="bg-black text-white p-12 rounded-3xl">
+      <h3 class="serif text-4xl mb-8 text-center">Interactive Visualization Dashboard</h3>
+      <p class="text-center text-sm text-gray-400 italic mb-12">Simulating Seaborn's ability to map data types to
+        visual geometries.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <div class="col-span-1 space-y-6">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-teal-500">Seaborn Syntax Simulator</h4>
+
+          <div class="space-y-4 font-mono text-sm bg-white/5 border border-white/10 p-6 rounded-xl">
+            <div>
+              <label class="block text-gray-400 text-xs mb-2">Plot Geometry (sns.*)</label>
+              <select id="plotType" onchange="updateDashboard()"
+                class="w-full bg-black border border-gray-600 rounded p-2 text-white outline-none">
+                <option value="scatter">sns.scatterplot()</option>
+                <option value="bar">sns.barplot()</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-gray-400 text-xs mb-2">X Axis (data=df)</label>
+              <select id="xAxis" onchange="updateDashboard()"
+                class="w-full bg-black border border-gray-600 rounded p-2 text-white outline-none">
+                <option value="age">x="Patient_Age" (Numerical)</option>
+                <option value="ward">x="Hospital_Ward" (Categorical)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-gray-400 text-xs mb-2">Color Grouping</label>
+              <select id="hue" onchange="updateDashboard()"
+                class="w-full bg-black border border-gray-600 rounded p-2 text-white outline-none">
+                <option value="none">hue=None</option>
+                <option value="gender">hue="Gender"</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="errorLog" class="text-[10px] text-red-400 font-mono h-8"></div>
+        </div>
+
+        <div class="col-span-2 bg-white rounded p-4 relative h-80">
+          <h4 class="text-[10px] font-bold uppercase tracking-widest mb-2 text-gray-500 text-center" id="chartTitle">
+            Output Generation</h4>
+          <div class="chart-container">
+            <canvas id="dashboardChart"></canvas>
           </div>
         </div>
 
-        <div class="sandbox-container" id="sandbox-content">
-          <!-- Dynamic sandbox content goes here -->
-        </div>
       </div>
-
-      <!-- Right Panel: Python Code & Explanation -->
-      <div class="terminal-panel">
-        <div class="terminal-header">
-          <div class="terminal-dots">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-          </div>
-          <div class="terminal-title">live_seaborn_design.py</div>
-          <div style="width: 40px;"></div>
-        </div>
-
-        <div class="terminal-body" id="code-lines-container">
-          <!-- Code statements populated here -->
-        </div>
-
-        <div class="terminal-explainer">
-          <span class="explainer-icon">💡</span>
-          <p id="code-explainer-text">Actions you take on the playground will generate equivalent Seaborn styling statements here.</p>
-        </div>
-      </div>
-
-    </div>
+    </section>
 
   </main>
 
-  <!-- Interactive Hint Dialogue -->
-  <dialog id="hint-dialog">
-    <h3 class="dialog-header">💡 Design Hint</h3>
-    <div class="dialog-body" id="hint-dialog-text">
-      Analyze parameter styling rules carefully.
-    </div>
-    <div class="dialog-footer">
-      <button class="btn btn-primary" onclick="closeHint()">Got it</button>
-    </div>
-  </dialog>
-
-  <!-- Interactive Victory Badge Dialogue -->
-  <dialog id="badge-dialog">
-    <h3 class="dialog-header">🏆 Design Studio Award</h3>
-    <div class="dialog-body" id="badge-dialog-text">
-      Congratulations!
-    </div>
-    <div class="dialog-footer">
-      <button class="btn btn-primary" onclick="document.getElementById('badge-dialog').close()">Awesome</button>
-    </div>
-  </dialog>
-
-  <!-- Confetti and Main Script Logic -->
   <script>
-    /* --- Mock Audio Effects System --- */
-    const audio = {
-      click() {},
-      success() {},
-      error() {},
-      unlock() {}
-    };
-
-    /* --- Confetti Engine --- */
-    class ConfettiShower {
-      constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
-        this.active = false;
-      }
-      start() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.particles = [];
-        for (let i = 0; i < 100; i++) {
-          this.particles.push({
-            x: Math.random() * this.canvas.width,
-            y: Math.random() * this.canvas.height - this.canvas.height,
-            r: Math.random() * 6 + 4,
-            d: Math.random() * this.canvas.height,
-            color: `hsl(${Math.random() * 25 + 345}, 85%, ${Math.random() * 20 + 50}%)`, // Crimson palette
-            tilt: Math.random() * 10 - 5,
-            tiltAngleIncremental: Math.random() * 0.07 + 0.02,
-            tiltAngle: 0
-          });
-        }
-        this.active = true;
-        this.animate();
-      }
-      stop() {
-        this.active = false;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      }
-      animate() {
-        if (!this.active) return;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        let remaining = false;
-        this.particles.forEach((p) => {
-          p.tiltAngle += p.tiltAngleIncremental;
-          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
-          p.x += Math.sin(p.tiltAngle);
-          p.tilt = Math.sin(p.tiltAngle - p.r / 2) * 5;
-
-          if (p.y <= this.canvas.height) {
-            remaining = true;
-          }
-
-          this.ctx.beginPath();
-          this.ctx.lineWidth = p.r;
-          this.ctx.strokeStyle = p.color;
-          this.ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
-          this.ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
-          this.ctx.stroke();
-        });
-
-        if (remaining && this.active) {
-          requestAnimationFrame(() => this.animate());
-        }
-      }
-    }
-
-    const confetti = new ConfettiShower('confetti-canvas');
-
-    /* --- Global State Management --- */
-    const state = {
-      currentLevel: 1,
-      currentActivity: null,
-      completedActivities: [],
-      unlockedLevels: [1, 2, 3]
-    };
-
-    const activitiesOrder = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2'];
-
-    function loadState() {
-      const saved = localStorage.getItem('seaborn_detective_progress');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          state.completedActivities = parsed.completedActivities || [];
-          state.unlockedLevels = parsed.unlockedLevels || [1, 2, 3];
-          state.currentLevel = parsed.currentLevel || 1;
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      updateHUD();
-    }
-
-    function saveState() {
-      localStorage.setItem('seaborn_detective_progress', JSON.stringify({
-        completedActivities: state.completedActivities,
-        unlockedLevels: state.unlockedLevels,
-        currentLevel: state.currentLevel
-      }));
-    }
-
-    function updateHUD() {
-      for (let i = 1; i <= 3; i++) {
-        const node = document.getElementById(`node-${i}`);
-        node.classList.toggle('unlocked', state.unlockedLevels.includes(i));
-        node.classList.toggle('active', state.currentLevel === i);
-        
-        if (i < 3) {
-          const line = document.getElementById(`line-${i}`);
-          line.classList.toggle('unlocked', state.unlockedLevels.includes(i + 1));
-        }
-      }
-
-      document.getElementById('btn-prev-level').disabled = (state.currentLevel === 1);
-      document.getElementById('btn-next-level').disabled = (state.currentLevel === 3);
-    }
-
-    /* --- Python Code Syntax Formatter --- */
-    function formatPythonCode(rawText, activeLineIndex = null) {
-      const container = document.getElementById('code-lines-container');
-      container.innerHTML = '';
-
-      const lines = rawText.split('\n');
-      lines.forEach((line, idx) => {
-        const lineWrapper = document.createElement('div');
-        lineWrapper.className = 'code-line';
-        if (idx === activeLineIndex) {
-          lineWrapper.classList.add('active');
-        }
-
-        const numSpan = document.createElement('span');
-        numSpan.className = 'code-num';
-        numSpan.innerText = idx + 1;
-
-        const textSpan = document.createElement('span');
-        textSpan.className = 'code-text';
-
-        let highlighted = line;
-        
-        if (highlighted.trim().startsWith('#')) {
-          highlighted = `<span class="token-comment">${escapeHtml(highlighted)}</span>`;
-        } else {
-          highlighted = highlighted.replace(/(['"])(.*?)\1/g, '<span class="token-string">"$2"</span>');
-          
-          const keywords = ['import', 'as', 'from', 'return', 'def', 'if', 'else', 'for', 'in', 'print'];
-          keywords.forEach(kw => {
-            const regex = new RegExp(`\\b${kw}\\b`, 'g');
-            highlighted = highlighted.replace(regex, `<span class="token-keyword">${kw}</span>`);
-          });
-
-          highlighted = highlighted.replace(/\b(pd|numpy|df|sns|plt)\b/g, '<span class="token-builtin">$1</span>');
-
-          highlighted = highlighted.replace(/\b(set_style|set_palette|scatterplot|lineplot|barplot|pairplot|relplot|show|despine)\b/g, '<span class="token-method">$1</span>');
-          
-          highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>');
-        }
-
-        textSpan.innerHTML = highlighted;
-        lineWrapper.appendChild(numSpan);
-        lineWrapper.appendChild(textSpan);
-        container.appendChild(lineWrapper);
-      });
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
-    }
-
-    /* --- Dynamic Level Instructions Database --- */
-    function updateTheoryAndSteps(actKey) {
-      const theoryTitle = document.getElementById('theory-title-text');
-      const theoryDesc = document.getElementById('theory-desc-text');
-      const theoryStepsList = document.getElementById('theory-steps-list');
-
-      const contents = {
-        '1-1': {
-          title: 'Seaborn Aesthetics & Makeover',
-          desc: 'Seaborn wraps Matplotlib with professional formatting defaults. Styles (e.g. <code>darkgrid</code>, <code>whitegrid</code>, <code>ticks</code>) manage grids and background fills. Palettes (e.g. <code>deep</code>, <code>pastel</code>, <code>muted</code>) organize harmonious marker color mapping.',
-          steps: [
-            'Drag a style card (e.g. <strong>darkgrid</strong>) onto the dull Matplotlib chart area.',
-            'Drag a color palette card (e.g. <strong>pastel</strong>) onto the chart bar elements.',
-            'Observe grid changes, axis ticks, and color values updating live.'
-          ]
-        },
-        '1-2': {
-          title: 'Client Theme Matcher',
-          desc: 'Professional visualizations adapt layout styling to context. A financial report requires plain grids, gaming dashboards fit dark palettes, and scientific journals demand gray borders and axis ticks.',
-          steps: [
-            'Read the active client visualization request card.',
-            'Drag the appropriate theme pairing combination (e.g. pastel for children).',
-            'Gain client design satisfaction values.'
-          ]
-        },
-        '2-1': {
-          title: 'Visual Relationship Laboratory',
-          desc: 'Seaborn targets dataset dependencies directly. <code>sns.scatterplot()</code> shows coordinates grouping, <code>sns.relplot()</code> tracks relational data splits, and <code>sns.pairplot()</code> auto-generates matrices of distributions across numeric features.',
-          steps: [
-            'Drag scanning analyzer tools (Scatterplot lens, Pairplot scanner) onto dataset nodes.',
-            'Observe particles group into positive, negative, or clustered trends.',
-            'Verify compiled python execution code lines.'
-          ]
-        },
-        '2-2': {
-          title: 'Variable Plot Puzzle',
-          desc: 'Matching variables to chart types is a core visualization skill. Scatterplots display two continuous variables; barplots group continuous counts over categories; pairplots map grid matrices of multiple combinations.',
-          steps: [
-            'Check dataset variable cards on the layout sandbox.',
-            'Connect variable profiles to equivalent Seaborn plot types.',
-            'Unlock visual puzzle shards to build a premium dashboard layout.'
-          ]
-        },
-        '3-1': {
-          title: 'Client Visualization Studio',
-          desc: 'Designers organize plot types, color palettes, and grid contexts to match business requirements, aiming to optimize readability and chart accessibility.',
-          steps: [
-            'Check hospital/bank client design guidelines.',
-            'Drag style tokens to configure theme, palette, and chart parameters.',
-            'Increase the live approval meter value to 100% to submit.'
-          ]
-        },
-        '3-2': {
-          title: 'Seaborn Design Tournament',
-          desc: 'Put your color palette rules, theme configurations, and clutter-reduction concepts to the test in a quick-fire combat simulator against an AI visual expert!',
-          steps: [
-            'Analyze Seaborn styling challenges.',
-            'Tap correct equivalent code blocks quickly to land attacks.',
-            'Keep player health full to defeat the AI expert designer!'
-          ]
-        }
-      };
-
-      const selected = contents[actKey];
-      if (selected) {
-        theoryTitle.innerText = selected.title;
-        theoryDesc.innerHTML = selected.desc;
-        theoryStepsList.innerHTML = selected.steps.map(step => `<li>${step}</li>`).join('');
-      }
-    }
-
-    function showHint() {
-      const hints = {
-        '1-1': 'Drag darkgrid onto the plot background, then pastel or deep onto the blue bars. Seaborn updates styling variables instantly!',
-        '1-2': 'Children dashboards match pastel styles. Financial monitors fit darkgrid + deep. Research papers match white style with ticks.',
-        '2-1': 'Scatterplot lens targets two variables. Pairplot creates matrix tiles of dimensions. Relplot is the base relational grid.',
-        '2-2': 'Continuous X vs Y matches Scatterplot. Time variables match Lineplot. Multi-variable comparisons fit Pairplots.',
-        '3-1': 'Hospital needs: scatterplot, darkgrid, and muted palette. Adjust elements to max out the client satisfaction bar.',
-        '3-2': 'Look out for set_theme/set_style syntax. Remember: despine() removes the top/right axes boxes to reduce screen clutter.'
-      };
-      document.getElementById('hint-dialog-text').innerText = hints[state.currentActivity] || 'Perform active tasks on the playground.';
-      document.getElementById('hint-dialog').showModal();
-    }
-
-    function closeHint() {
-      document.getElementById('hint-dialog').close();
-    }
-
-    function showStatusBanner(msg, type = 'success') {
-      const banner = document.getElementById('status-banner');
-      banner.innerHTML = msg;
-      banner.style.display = 'block';
-      if (type === 'success') {
-        banner.style.background = '#E8F5E9';
-        banner.style.borderColor = '#2E7D32';
-        banner.style.color = '#1B5E20';
-      } else {
-        banner.style.background = '#FFEBEE';
-        banner.style.borderColor = '#D32F2F';
-        banner.style.color = '#C62828';
-      }
-    }
-
-    function hideStatusBanner() {
-      document.getElementById('status-banner').style.display = 'none';
-    }
-
-    function switchLevel(lvlNum) {
-      state.currentLevel = lvlNum;
-      hideStatusBanner();
-      startActivity(lvlNum, 1);
-    }
-
-    function changeLevel(dir) {
-      const target = state.currentLevel + dir;
-      if (target >= 1 && target <= 3) {
-        state.currentLevel = target;
-        hideStatusBanner();
-        startActivity(target, 1);
-      }
-    }
-
-    function navigateActivity(dir) {
-      if (!state.currentActivity) return;
-      const idx = activitiesOrder.indexOf(state.currentActivity);
-      const targetIdx = idx + dir;
-      if (targetIdx >= 0 && targetIdx < activitiesOrder.length) {
-        const parts = activitiesOrder[targetIdx].split('-');
-        const lvl = parseInt(parts[0]);
-        const act = parseInt(parts[1]);
-        hideStatusBanner();
-        startActivity(lvl, act);
-      }
-    }
-
-    function awardProgress() {
-      saveState();
-      updateHUD();
-    }
-
-    /* --- Drag & Drop Core Pointer Engines --- */
-    let dragObj = null;
-    let offset = { x: 0, y: 0 };
-    let dropTargets = [];
-    let currentDropHover = null;
-    let dragCallback = null;
-
-    function initDraggable(element, callback) {
-      element.addEventListener('pointerdown', (e) => {
-        audio.click();
-        dragObj = element;
-        dragObj.classList.add('dragging');
-        
-        offset = {
-          x: e.clientX,
-          y: e.clientY
-        };
-
-        dragCallback = callback;
-        element.setPointerCapture(e.pointerId);
-        dropTargets = Array.from(document.querySelectorAll('.drop-cell, .makeover-plot-view, .client-card-box, .detective-plot-box, .puzzle-slot-target'));
-      });
-
-      element.addEventListener('pointermove', (e) => {
-        if (dragObj !== element) return;
-        
-        const dx = e.clientX - offset.x;
-        const dy = e.clientY - offset.y;
-        
-        element.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
-
-        let hovered = null;
-        for (let target of dropTargets) {
-          const rect = target.getBoundingClientRect();
-          if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            hovered = target;
-            break;
-          }
-        }
-
-        if (hovered !== currentDropHover) {
-          if (currentDropHover) currentDropHover.classList.remove('hovered');
-          currentDropHover = hovered;
-          if (currentDropHover) currentDropHover.classList.add('hovered');
-        }
-      });
-
-      element.addEventListener('pointerup', (e) => {
-        if (dragObj !== element) return;
-        element.releasePointerCapture(e.pointerId);
-        
-        dragObj.classList.remove('dragging');
-        element.style.transform = '';
-
-        if (currentDropHover) {
-          currentDropHover.classList.remove('hovered');
-          if (dragCallback) {
-            dragCallback(element, currentDropHover);
-          }
-        } else {
-          element.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-          element.style.transform = 'translate(0px, 0px)';
-          setTimeout(() => { element.style.transition = ''; }, 350);
-        }
-
-        dragObj = null;
-        currentDropHover = null;
-      });
-
-      element.addEventListener('pointercancel', (e) => {
-        if (dragObj !== element) return;
-        dragObj.classList.remove('dragging');
-        element.style.transform = 'translate(0px, 0px)';
-        dragObj = null;
-        currentDropHover = null;
-      });
-    }
-
-    /* --- Activities Setup & Initialization --- */
-    function startActivity(lvl, act) {
-      state.currentActivity = `${lvl}-${act}`;
-      state.currentLevel = lvl;
-      updateHUD();
-      updateTheoryAndSteps(state.currentActivity);
-      
-      const container = document.getElementById('sandbox-content');
-      container.innerHTML = '';
-
-      const idx = activitiesOrder.indexOf(state.currentActivity);
-      document.getElementById('btn-prev-act').disabled = (idx === 0);
-      document.getElementById('btn-next-act').disabled = (idx === activitiesOrder.length - 1);
-
-      if (state.currentActivity === '1-1') {
-        setupActivity11(container);
-      } else if (state.currentActivity === '1-2') {
-        setupActivity12(container);
-      } else if (state.currentActivity === '2-1') {
-        setupActivity21(container);
-      } else if (state.currentActivity === '2-2') {
-        setupActivity22(container);
-      } else if (state.currentActivity === '3-1') {
-        setupActivity31(container);
-      } else if (state.currentActivity === '3-2') {
-        setupActivity32(container);
-      }
-    }
-
-    function resetActiveActivity() {
-      if (!state.currentActivity) return;
-      const parts = state.currentActivity.split('-');
-      const lvl = parseInt(parts[0]);
-      const act = parseInt(parts[1]);
-      hideStatusBanner();
-      startActivity(lvl, act);
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 1.1: CHART MAKEOVER STUDIO
-       ========================================================================= */
-    const makeoverState11 = {
-      style: 'default', // default, darkgrid, whitegrid, ticks
-      palette: 'default', // default, deep, pastel, muted
-      context: 'paper',
-      despine: false
-    };
-
-    function setupActivity11(container) {
-      document.getElementById('active-title').innerText = 'Activity 1.1 — Chart Makeover Studio';
-      document.getElementById('active-subtitle').innerText = 'Toggle despine, scale context, and drag style/palette cards to match specifications.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; width:100%; max-width:440px; margin-bottom:0.5rem;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100; font-weight:800;">Target Plot Requirements</span>
-          <span style="font-size:0.8rem; color:#E65100; font-weight:700;">Style: darkgrid | Palette: deep | Context: talk | Despine: Yes</span>
-        </div>
-
-        <div class="makeover-plot-view" id="makeover-plot" style="font-size: 0.85rem; border:2px solid #B0BEC5;">
-          <div class="makeover-gridlines-container" id="makeover-grids">
-            <div class="makeover-gridline" style="top:25%;"></div>
-            <div class="makeover-gridline" style="top:50%;"></div>
-            <div class="makeover-gridline" style="top:75%;"></div>
-          </div>
-          <div class="makeover-bars-row">
-            <div class="makeover-bar-node" id="bar-0" style="height:45%;"></div>
-            <div class="makeover-bar-node" id="bar-1" style="height:70%;"></div>
-            <div class="makeover-bar-node" id="bar-2" style="height:35%;"></div>
-            <div class="makeover-bar-node" id="bar-3" style="height:90%;"></div>
-          </div>
-        </div>
-
-        <div style="display:flex; gap:1rem; align-items:center; width:100%; max-width:440px; justify-content:center; margin-top:0.25rem; font-size:0.8rem;">
-          <label style="display:flex; align-items:center; gap:0.25rem; font-weight:700; cursor:pointer;">
-            <input type="checkbox" id="makeover-despine-check" onchange="toggleDespine11(this.checked)"> Enable Despine
-          </label>
-          <span style="color:var(--text-muted);">|</span>
-          <button class="btn btn-outline" id="ctx-paper-btn" onclick="setContext11('paper')" style="padding:0.25rem 0.5rem; font-size:0.7rem;">Paper Scale</button>
-          <button class="btn btn-outline" id="ctx-talk-btn" onclick="setContext11('talk')" style="padding:0.25rem 0.5rem; font-size:0.7rem;">Talk Scale</button>
-        </div>
-
-        <div class="drag-chips-container" id="makeover-chips">
-          <div class="drag-chip" data-type="style" data-val="darkgrid" style="background:#FFF5F5;">darkgrid</div>
-          <div class="drag-chip" data-type="style" data-val="whitegrid" style="background:#FFF5F5;">whitegrid</div>
-          <div class="drag-chip" data-type="style" data-val="ticks" style="background:#FFF5F5;">ticks</div>
-          <div class="drag-chip" data-type="palette" data-val="deep">deep</div>
-          <div class="drag-chip" data-type="palette" data-val="pastel">pastel</div>
-          <div class="drag-chip" data-type="palette" data-val="muted">muted</div>
-        </div>
-      `;
-
-      makeoverState11.style = 'default';
-      makeoverState11.palette = 'default';
-      makeoverState11.context = 'paper';
-      makeoverState11.despine = false;
-
-      setContext11('paper');
-      loadMakeoverCode11();
-
-      document.querySelectorAll('#makeover-chips .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const type = item.dataset.type;
-          const val = item.dataset.val;
-
-          audio.success();
-          if (type === 'style') {
-            makeoverState11.style = val;
-            applyMakeoverStyle11(val);
-          } else if (type === 'palette') {
-            makeoverState11.palette = val;
-            applyMakeoverPalette11(val);
-          }
-
-          item.style.display = 'none';
-          loadMakeoverCode11();
-          checkMakeoverCompletion11();
-        });
-      });
-    }
-
-    function toggleDespine11(checked) {
-      audio.click();
-      makeoverState11.despine = checked;
-      const plot = document.getElementById('makeover-plot');
-      if (checked) {
-        plot.style.borderTopColor = 'transparent';
-        plot.style.borderRightColor = 'transparent';
-      } else {
-        plot.style.borderTopColor = '#B0BEC5';
-        plot.style.borderRightColor = '#B0BEC5';
-      }
-      loadMakeoverCode11();
-      checkMakeoverCompletion11();
-    }
-
-    function setContext11(ctx) {
-      audio.click();
-      makeoverState11.context = ctx;
-      document.getElementById('ctx-paper-btn').classList.toggle('btn-primary', ctx === 'paper');
-      document.getElementById('ctx-paper-btn').classList.toggle('btn-outline', ctx !== 'paper');
-      document.getElementById('ctx-talk-btn').classList.toggle('btn-primary', ctx === 'talk');
-      document.getElementById('ctx-talk-btn').classList.toggle('btn-outline', ctx !== 'talk');
-
-      const plot = document.getElementById('makeover-plot');
-      plot.style.fontSize = ctx === 'talk' ? '1.15rem' : '0.85rem';
-      
-      loadMakeoverCode11();
-      checkMakeoverCompletion11();
-    }
-
-    function applyMakeoverStyle11(style) {
-      const plot = document.getElementById('makeover-plot');
-      const grids = document.querySelectorAll('.makeover-gridline');
-
-      if (style === 'darkgrid') {
-        plot.style.background = '#EAEAF2';
-        plot.style.borderColor = 'transparent';
-        grids.forEach(g => {
-          g.style.background = '#FFF';
-          g.style.opacity = '1';
-        });
-      } else if (style === 'whitegrid') {
-        plot.style.background = '#FFF';
-        plot.style.borderColor = '#CFD8DC';
-        grids.forEach(g => {
-          g.style.background = '#ECEFF1';
-          g.style.opacity = '1';
-        });
-      } else if (style === 'ticks') {
-        plot.style.background = '#FFF';
-        plot.style.borderColor = '#263238';
-        grids.forEach(g => {
-          g.style.opacity = '0';
-        });
-      }
-    }
-
-    function applyMakeoverPalette11(palette) {
-      const colors = {
-        deep: ['#4C72B0', '#DD8452', '#55A868', '#C44E52'],
-        pastel: ['#A1C9F4', '#FFB3FD', '#8DE5A1', '#FF9F9B'],
-        muted: ['#4878D0', '#EE854A', '#6ACC64', '#D65F5F']
-      };
-
-      const setColors = colors[palette] || ['#1f77b4', '#1f77b4', '#1f77b4', '#1f77b4'];
-      setColors.forEach((col, idx) => {
-        const bar = document.getElementById(`bar-${idx}`);
-        if (bar) bar.style.backgroundColor = col;
-      });
-    }
-
-    function loadMakeoverCode11() {
-      let codeStr = `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Configure Seaborn chart parameters:\n`;
-      if (makeoverState11.style !== 'default') {
-        codeStr += `sns.set_style("${makeoverState11.style}")\n`;
-      }
-      if (makeoverState11.palette !== 'default') {
-        codeStr += `sns.set_palette("${makeoverState11.palette}")\n`;
-      }
-      codeStr += `sns.set_context("${makeoverState11.context}")\n`;
-      if (makeoverState11.despine) {
-        codeStr += `sns.despine()\n`;
-      }
-      codeStr += `\nsns.barplot(x=["A","B","C","D"], y=[45, 70, 35, 90])\nplt.show()`;
-      formatPythonCode(codeStr, 4);
-    }
-
-    function checkMakeoverCompletion11() {
-      if (makeoverState11.style === 'darkgrid' && 
-          makeoverState11.palette === 'deep' && 
-          makeoverState11.context === 'talk' && 
-          makeoverState11.despine === true) {
-        confetti.start();
-        setTimeout(() => confetti.stop(), 3000);
-
-        document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Chart Makeover Complete!</span>`;
-        if (!state.completedActivities.includes('1-1')) {
-          state.completedActivities.push('1-1');
-          awardProgress();
-        }
-        showStatusBanner("🎉 Plot makeover finished! Seaborn talk specifications matched. Click <strong>Next ▶</strong> at the top.");
-      }
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 1.2: THEME MATCH CHALLENGE
-       ========================================================================= */
-    const challengeState12 = {
-      mission: 0,
-      missions: [
-        {
-          client: '👶 Children\'s App Dashboard',
-          task: 'Wants friendly, warm pastel colors, grids, and very large readable fonts for kids.',
-          style: 'whitegrid',
-          palette: 'pastel',
-          context: 'poster',
-          code: `sns.set_style("whitegrid")\nsns.set_palette("pastel")\nsns.set_context("poster")`
-        },
-        {
-          client: '📰 Academic Journal Paper',
-          task: 'Requires plain layout, gray axis ticks, compact font dimensions, and muted palettes.',
-          style: 'ticks',
-          palette: 'muted',
-          context: 'paper',
-          code: `sns.set_style("ticks")\nsns.set_palette("muted")\nsns.set_context("paper")`
-        },
-        {
-          client: '📈 Financial Analytics board',
-          task: 'Demands deep colors, grids, and standard high-contrast presentation fonts.',
-          style: 'darkgrid',
-          palette: 'deep',
-          context: 'talk',
-          code: `sns.set_style("darkgrid")\nsns.set_palette("deep")\nsns.set_context("talk")`
-        }
-      ],
-      slots: { style: null, palette: null, context: null }
-    };
-
-    function setupActivity12(container) {
-      document.getElementById('active-title').innerText = 'Activity 1.2 — Theme Match Challenge';
-      document.getElementById('active-subtitle').innerText = 'Match the correct style, palette, and context scale variables to satisfy client profiles.';
-
-      container.innerHTML = `
-        <div class="client-card-box" id="client-box" style="margin-bottom:0.5rem; width:100%; max-width:440px;">
-          <div class="client-avatar">👦</div>
-          <h3 id="client-name" style="font-weight:800; font-size:1.05rem;">Children's App Dashboard</h3>
-          <p id="client-task" style="font-size:0.75rem; color:var(--text-muted);">Wants friendly, warm pastel colors and clear layout guidelines.</p>
-        </div>
-
-        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.5rem; width:100%; max-width:440px; margin-bottom:0.5rem;">
-          <div class="drop-cell filter-port-cell" id="match-style-port" data-slot="style" style="height:65px;">
-            <span class="filter-port-label">Style</span>
-            <span style="font-size:0.6rem; color:var(--text-muted);">Drop here</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="match-palette-port" data-slot="palette" style="height:65px;">
-            <span class="filter-port-label">Palette</span>
-            <span style="font-size:0.6rem; color:var(--text-muted);">Drop here</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="match-context-port" data-slot="context" style="height:65px;">
-            <span class="filter-port-label">Context</span>
-            <span style="font-size:0.6rem; color:var(--text-muted);">Drop here</span>
-          </div>
-        </div>
-
-        <div class="drag-chips-container" id="match-chips">
-          <div class="drag-chip" data-slot="style" data-val="whitegrid" style="background:#FFF5F5;">whitegrid</div>
-          <div class="drag-chip" data-slot="style" data-val="darkgrid" style="background:#FFF5F5;">darkgrid</div>
-          <div class="drag-chip" data-slot="style" data-val="ticks" style="background:#FFF5F5;">ticks</div>
-          
-          <div class="drag-chip" data-slot="palette" data-val="pastel">pastel</div>
-          <div class="drag-chip" data-slot="palette" data-val="deep">deep</div>
-          <div class="drag-chip" data-slot="palette" data-val="muted">muted</div>
-
-          <div class="drag-chip" data-slot="context" data-val="paper">paper</div>
-          <div class="drag-chip" data-slot="context" data-val="talk">talk</div>
-          <div class="drag-chip" data-slot="context" data-val="poster">poster</div>
-        </div>
-      `;
-
-      challengeState12.slots = { style: null, palette: null, context: null };
-      loadChallengeMission12();
-
-      document.querySelectorAll('#match-chips .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const slot = target.dataset.slot;
-          const chipSlot = item.dataset.slot;
-
-          if (slot !== chipSlot) {
-            audio.error();
-            item.style.transform = 'translate(0px, 0px)';
-            return;
-          }
-
-          audio.success();
-          challengeState12.slots[slot] = item.dataset.val;
-          target.innerHTML = `
-            <span class="filter-port-label" style="color:var(--primary-red); font-weight:800;">${slot}</span>
-            <span style="font-weight:800; font-size:0.75rem;">${item.dataset.val}</span>
-          `;
-          target.classList.add('filled');
-          item.style.display = 'none';
-
-          verifyThemeMatch12();
-        });
-      });
-    }
-
-    function loadChallengeMission12() {
-      const active = challengeState12.missions[challengeState12.mission];
-      document.getElementById('client-name').innerText = active.client;
-      document.getElementById('client-task').innerText = active.task;
-      document.getElementById('client-box').querySelector('.client-avatar').innerText = active.client.split(' ')[0];
-
-      const codeStr = `import seaborn as sns\n\n# Client Project: ${active.client}\n# Match style, palette, and context configurations...\n`;
-      formatPythonCode(codeStr, 3);
-    }
-
-    function verifyThemeMatch12() {
-      if (challengeState12.slots.style && challengeState12.slots.palette && challengeState12.slots.context) {
-        const active = challengeState12.missions[challengeState12.mission];
-        const correct = 
-          challengeState12.slots.style === active.style &&
-          challengeState12.slots.palette === active.palette &&
-          challengeState12.slots.context === active.context;
-
-        if (correct) {
-          audio.success();
-          showStatusBanner("✔ Client approved! Theme specifications matched successfully.", 'success');
-          
-          const codeStr = `import seaborn as sns\n\n# Settings applied successfully:\n${active.code}\n\n# Plot generation configured.`;
-          formatPythonCode(codeStr, 4);
-
-          setTimeout(() => {
-            challengeState12.mission++;
-            if (challengeState12.mission < challengeState12.missions.length) {
-              setupActivity12(document.getElementById('sandbox-content'));
-            } else {
-              concludeChallenge12();
-            }
-          }, 1600);
-        } else {
-          audio.error();
-          showStatusBanner("❌ Client rejected! The styling context parameters do not match guidelines.", 'error');
-          setTimeout(() => {
-            setupActivity12(document.getElementById('sandbox-content'));
-          }, 1200);
-        }
-      }
-    }
-
-    function concludeChallenge12() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Client Dashboards Configured!</span>`;
-      if (!state.completedActivities.includes('1-2')) {
-        state.completedActivities.push('1-2');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Theme Match Challenge completed! Level 2 unlocked. Click <strong>Next ▶</strong> at the top.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 2.1: RELATIONSHIP DETECTIVE
-       ========================================================================= */
-    const detectiveState21 = {
-      round: 0,
-      activeTool: null,
-      rounds: [
-        {
-          name: 'Housing Size vs Price',
-          type: 'positive',
-          label: 'Positive Correlation',
-          desc: 'Records show prices scaling higher with property dimensions.',
-          points: [
-            { x: 15, y: 18 }, { x: 25, y: 28 }, { x: 35, y: 32 }, { x: 45, y: 48 }, { x: 55, y: 52 }, { x: 65, y: 68 }, { x: 75, y: 72 }, { x: 85, y: 88 },
-            { x: 20, y: 24 }, { x: 40, y: 38 }, { x: 60, y: 54 }, { x: 80, y: 78 }
-          ]
-        },
-        {
-          name: 'Customer Count vs Store Temperature',
-          type: 'none',
-          label: 'No Correlation',
-          desc: 'Data points are scattered randomly across the grid container.',
-          points: [
-            { x: 20, y: 80 }, { x: 40, y: 20 }, { x: 60, y: 70 }, { x: 80, y: 40 }, { x: 30, y: 50 }, { x: 50, y: 90 }, { x: 70, y: 10 }, { x: 90, y: 60 },
-            { x: 15, y: 35 }, { x: 45, y: 55 }, { x: 65, y: 85 }, { x: 85, y: 25 }
-          ]
-        },
-        {
-          name: 'Grade Ratings vs Absences',
-          type: 'negative',
-          label: 'Negative Correlation',
-          desc: 'Grade performance drops consistently as absences scale higher.',
-          points: [
-            { x: 15, y: 85 }, { x: 25, y: 75 }, { x: 35, y: 68 }, { x: 45, y: 52 }, { x: 55, y: 48 }, { x: 65, y: 32 }, { x: 75, y: 28 }, { x: 85, y: 15 },
-            { x: 30, y: 70 }, { x: 50, y: 50 }, { x: 70, y: 30 }
-          ]
-        }
-      ]
-    };
-
-    function setupActivity21(container) {
-      document.getElementById('active-title').innerText = 'Activity 2.1 — Relationship Detective';
-      document.getElementById('active-subtitle').innerText = 'Drag scanning tools onto coordinate charts, analyze particles, and identify correlation types.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#ECEFF1; border-color:#B0BEC5; width:100%; max-width:440px; margin-bottom:0.5rem;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#37474F; font-weight:800;" id="detective-round-label">Round 1</span>
-          <span class="target-array-vals" id="detective-task-label" style="font-size:0.8rem; color:#37474F;">Scan dataset: Housing Size vs Price</span>
-        </div>
-
-        <div class="detective-plot-box" id="detective-plot">
-          <div class="scanner-beam" id="scan-beam"></div>
-          <!-- Random scattered points rendered dynamically -->
-        </div>
-
-        <div class="drag-chips-container" id="detective-chips" style="margin-top:0.25rem;">
-          <div class="drag-chip" data-tool="scatterplot" style="background:#FFF5F5;">Scatterplot Lens</div>
-          <div class="drag-chip" data-tool="pairplot" style="background:#FFF5F5;">Pairplot Matrix</div>
-        </div>
-
-        <div id="detective-options-box" style="display:none; flex-direction:column; gap:0.5rem; width:100%; max-width:440px; margin-top:0.25rem;">
-          <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-align:center;">Identify scanned pattern:</span>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-            <button class="btn btn-outline" onclick="verifyRelationship21('positive')" style="padding:0.4rem; font-size:0.75rem;">Positive Correlation</button>
-            <button class="btn btn-outline" onclick="verifyRelationship21('negative')" style="padding:0.4rem; font-size:0.75rem;">Negative Correlation</button>
-            <button class="btn btn-outline" onclick="verifyRelationship21('none')" style="padding:0.4rem; font-size:0.75rem;">No Correlation</button>
-            <button class="btn btn-outline" onclick="verifyRelationship21('outliers')" style="padding:0.4rem; font-size:0.75rem;">Clustered Outliers</button>
-          </div>
-        </div>
-      `;
-
-      loadDetectiveRound21();
-
-      document.querySelectorAll('#detective-chips .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const tool = item.dataset.tool;
-          if (target.id === 'detective-plot') {
-            runRelationshipScan21(tool);
-            item.style.display = 'none';
-          } else {
-            item.style.transform = 'translate(0px, 0px)';
-          }
-        });
-      });
-    }
-
-    function loadDetectiveRound21() {
-      const active = detectiveState21.rounds[detectiveState21.round];
-      document.getElementById('detective-round-label').innerText = `Round ${detectiveState21.round + 1} of 3`;
-      document.getElementById('detective-task-label').innerText = `Scan dataset: ${active.name}`;
-
-      const plot = document.getElementById('detective-plot');
-      // Wipe old points but keep beam
-      plot.querySelectorAll('.plot-dot-particle').forEach(p => p.remove());
-
-      active.points.forEach(pt => {
-        const dot = document.createElement('div');
-        dot.className = 'plot-dot-particle';
-        dot.style.left = `${pt.x}%`;
-        dot.style.bottom = `${pt.y}%`;
-        plot.appendChild(dot);
-      });
-
-      const codeStr = `import seaborn as sns\nimport pandas as pd\ndf = pd.read_csv('dataset_${detectiveState21.round + 1}.csv')\n\n# relationships lookup...`;
-      formatPythonCode(codeStr, 4);
-    }
-
-    function runRelationshipScan21(tool) {
-      audio.success();
-      detectiveState21.activeTool = tool;
-      const beam = document.getElementById('scan-beam');
-      beam.style.top = '0px';
-      beam.style.display = 'block';
-      
-      let pos = 0;
-      const interval = setInterval(() => {
-        pos += 8;
-        beam.style.top = `${pos}px`;
-        if (pos >= 240) {
-          clearInterval(interval);
-          beam.style.display = 'none';
-          document.getElementById('detective-chips').style.display = 'none';
-          document.getElementById('detective-options-box').style.display = 'flex';
-        }
-      }, 30);
-    }
-
-    function verifyRelationship21(choice) {
-      const active = detectiveState21.rounds[detectiveState21.round];
-      if (choice === active.type) {
-        audio.success();
-        showStatusBanner(`✔ Correct! Scanned pattern matches: ${active.label}.`, 'success');
-
-        let codeStr = `import seaborn as sns\nimport pandas as pd\ndf = pd.read_csv('dataset_${detectiveState21.round + 1}.csv')\n\n`;
-        if (detectiveState21.activeTool === 'scatterplot') {
-          codeStr += `# Plotting continuous parameters:\nsns.scatterplot(x="X", y="Y", data=df)\n# Pattern matches: ${active.label}`;
-        } else {
-          codeStr += `# Comparing variables across grids:\nsns.pairplot(df)\n# Pattern matches: ${active.label}`;
-        }
-        formatPythonCode(codeStr, 5);
-
-        setTimeout(() => {
-          detectiveState21.round++;
-          if (detectiveState21.round < detectiveState21.rounds.length) {
-            setupActivity21(document.getElementById('sandbox-content'));
-          } else {
-            concludeDetective21();
-          }
-        }, 1600);
-      } else {
-        audio.error();
-        showStatusBanner("❌ Pattern mismatch! Look at coordinate distribution lines and try again.", 'error');
-      }
-    }
-
-    function concludeDetective21() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Datasets Inspected & Classified!</span>`;
-      if (!state.completedActivities.includes('2-1')) {
-        state.completedActivities.push('2-1');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Relationship Detective completed! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 2.2: DATA MATCH PUZZLE
-       ========================================================================= */
-    const puzzleState22 = {
-      score: 0,
-      connections: [
-        { desc: 'Height vs Weight continuous indices', target: 'scatterplot' },
-        { desc: 'Monthly company sales trajectories', target: 'lineplot' },
-        { desc: 'Revenue counts grouped by category', target: 'barplot' },
-        { desc: 'Multi-column pair correlations matrix', target: 'pairplot' },
-        { desc: 'Relational data grids divided by variables', target: 'relplot' }
-      ]
-    };
-
-    function setupActivity22(container) {
-      document.getElementById('active-title').innerText = 'Activity 2.2 — Variable Plot Matcher';
-      document.getElementById('active-subtitle').innerText = 'Connect data variables to appropriate Seaborn plot types.';
-
-      // Shuffle dataset cards
-      const shuffledData = [...puzzleState22.connections].sort(() => Math.random() - 0.5);
-
-      container.innerHTML = `
-        <div class="puzzle-grid-box" style="gap: 0.5rem; max-width: 460px;">
-          <!-- Left side: Description cards -->
-          <div style="display:flex; flex-direction:column; gap:0.4rem;">
-            ${shuffledData.map(item => `
-              <div class="drag-chip" data-target="${item.target}" style="padding:0.4rem; text-align:center; height:42px; font-size:0.7rem; width:100%; border-color:#FFCDD2; display:flex; align-items:center; justify-content:center;">
-                ${item.desc}
-              </div>
-            `).join('')}
-          </div>
-
-          <!-- Right side: Drop zones -->
-          <div style="display:flex; flex-direction:column; gap:0.4rem;">
-            <div class="drop-cell puzzle-slot-target" data-plot="scatterplot" style="height:42px; font-size:0.75rem;">sns.scatterplot()</div>
-            <div class="drop-cell puzzle-slot-target" data-plot="lineplot" style="height:42px; font-size:0.75rem;">sns.lineplot()</div>
-            <div class="drop-cell puzzle-slot-target" data-plot="barplot" style="height:42px; font-size:0.75rem;">sns.barplot()</div>
-            <div class="drop-cell puzzle-slot-target" data-plot="pairplot" style="height:42px; font-size:0.75rem;">sns.pairplot()</div>
-            <div class="drop-cell puzzle-slot-target" data-plot="relplot" style="height:42px; font-size:0.75rem;">sns.relplot()</div>
-          </div>
-        </div>
-      `;
-
-      puzzleState22.score = 0;
-      loadPuzzleCode22();
-
-      document.querySelectorAll('.puzzle-grid-box .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const plot = target.dataset.plot;
-          const targetPlot = item.dataset.target;
-
-          if (plot !== targetPlot) {
-            audio.error();
-            item.style.transform = 'translate(0px, 0px)';
-            return;
-          }
-
-          audio.success();
-          puzzleState22.score++;
-          target.innerHTML = `<span style="color:#2E7D32; font-weight:800;">✔ Matched</span>`;
-          target.classList.add('filled');
-          item.style.display = 'none';
-
-          loadPuzzleCode22();
-          checkPuzzleCompletion22();
-        });
-      });
-    }
-
-    function loadPuzzleCode22() {
-      const codeStr = `import seaborn as sns\n\n# Mapping dataset criteria to visual layouts:\n# Match continuous vs categoric variables...\n# Score: ${puzzleState22.score} / 5 matches verified.`;
-      formatPythonCode(codeStr, 3);
-    }
-
-    function checkPuzzleCompletion22() {
-      if (puzzleState22.score === 5) {
-        confetti.start();
-        setTimeout(() => confetti.stop(), 3000);
-
-        document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Variables Matched Successfully!</span>`;
-        if (!state.completedActivities.includes('2-2')) {
-          state.completedActivities.push('2-2');
-          awardProgress();
-        }
-        showStatusBanner("🎉 Match Puzzle completed! Level 3 unlocked. Click <strong>Next ▶</strong> at the top.");
-      }
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 3.1: CLIENT VISUALIZATION STUDIO
-       ========================================================================= */
-    const studioState31 = {
-      slots: { style: null, palette: null, plot: null, context: null, despine: null }
-    };
-
-    function setupActivity31(container) {
-      document.getElementById('active-title').innerText = 'Activity 3.1 — Client Visualization Studio';
-      document.getElementById('active-subtitle').innerText = 'Configure all 5 styling, palette, plot type, context scale, and despine settings to satisfy the client brief.';
-
-      container.innerHTML = `
-        <div class="client-card-box" style="margin-bottom:0.5rem; width:100%; max-width:440px;">
-          <h4 style="font-weight:800; color:var(--primary-red); font-size:0.95rem;">Hospital Medical Report Project</h4>
-          <p style="font-size:0.7rem; color:var(--text-muted); line-height:1.25;">Brief: Continuous scatter coordinates, clean darkgrid background, soft pastel colors, large presentation talk scale, and top/right boundary lines despine-removed.</p>
-          <div class="approval-meter-track" style="height:12px; margin-top:0.4rem;">
-            <div class="approval-meter-fill" id="approval-bar" style="width:20%;"></div>
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:0.25rem; width:100%; max-width:460px; margin-bottom:0.5rem;">
-          <div class="drop-cell filter-port-cell" id="studio-style" data-slot="style" style="height:60px;">
-            <span class="filter-port-label" style="font-size:0.55rem;">Style</span>
-            <span style="font-size:0.55rem; color:var(--text-muted);">Drop</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="studio-palette" data-slot="palette" style="height:60px;">
-            <span class="filter-port-label" style="font-size:0.55rem;">Palette</span>
-            <span style="font-size:0.55rem; color:var(--text-muted);">Drop</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="studio-plot" data-slot="plot" style="height:60px;">
-            <span class="filter-port-label" style="font-size:0.55rem;">Plot</span>
-            <span style="font-size:0.55rem; color:var(--text-muted);">Drop</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="studio-context" data-slot="context" style="height:60px;">
-            <span class="filter-port-label" style="font-size:0.55rem;">Context</span>
-            <span style="font-size:0.55rem; color:var(--text-muted);">Drop</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="studio-despine" data-slot="despine" style="height:60px;">
-            <span class="filter-port-label" style="font-size:0.55rem;">Despine</span>
-            <span style="font-size:0.55rem; color:var(--text-muted);">Drop</span>
-          </div>
-        </div>
-
-        <div class="drag-chips-container" id="studio-chips">
-          <div class="drag-chip" data-slot="style" data-val="darkgrid" style="background:#FFF5F5; padding:0.4rem; font-size:0.75rem;">darkgrid</div>
-          <div class="drag-chip" data-slot="style" data-val="ticks" style="background:#FFF5F5; padding:0.4rem; font-size:0.75rem;">ticks</div>
-          
-          <div class="drag-chip" data-slot="palette" data-val="pastel" style="padding:0.4rem; font-size:0.75rem;">pastel</div>
-          <div class="drag-chip" data-slot="palette" data-val="deep" style="padding:0.4rem; font-size:0.75rem;">deep</div>
-
-          <div class="drag-chip" data-slot="plot" data-val="scatterplot" style="padding:0.4rem; font-size:0.75rem;">scatterplot</div>
-          <div class="drag-chip" data-slot="plot" data-val="barplot" style="padding:0.4rem; font-size:0.75rem;">barplot</div>
-
-          <div class="drag-chip" data-slot="context" data-val="talk" style="padding:0.4rem; font-size:0.75rem;">talk</div>
-          <div class="drag-chip" data-slot="context" data-val="paper" style="padding:0.4rem; font-size:0.75rem;">paper</div>
-
-          <div class="drag-chip" data-slot="despine" data-val="yes" style="padding:0.4rem; font-size:0.75rem;">despine-yes</div>
-          <div class="drag-chip" data-slot="despine" data-val="no" style="padding:0.4rem; font-size:0.75rem;">despine-no</div>
-        </div>
-      `;
-
-      studioState31.slots = { style: null, palette: null, plot: null, context: null, despine: null };
-      loadStudioCode31();
-
-      document.querySelectorAll('#studio-chips .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const slot = target.dataset.slot;
-          const chipSlot = item.dataset.slot;
-
-          if (slot !== chipSlot) {
-            audio.error();
-            item.style.transform = 'translate(0px, 0px)';
-            return;
-          }
-
-          audio.success();
-          studioState31.slots[slot] = item.dataset.val;
-          target.innerHTML = `
-            <span class="filter-port-label" style="color:var(--primary-red); font-size:0.5rem; font-weight:800;">${slot}</span>
-            <span style="font-weight:800; font-size:0.65rem;">${item.dataset.val}</span>
-          `;
-          target.classList.add('filled');
-          item.style.display = 'none';
-
-          updateStudioApproval31();
-        });
-      });
-    }
-
-    function updateStudioApproval31() {
-      let count = 0;
-      let correctCount = 0;
-      
-      if (studioState31.slots.style) {
-        count++;
-        if (studioState31.slots.style === 'darkgrid') correctCount++;
-      }
-      if (studioState31.slots.palette) {
-        count++;
-        if (studioState31.slots.palette === 'pastel') correctCount++;
-      }
-      if (studioState31.slots.plot) {
-        count++;
-        if (studioState31.slots.plot === 'scatterplot') correctCount++;
-      }
-      if (studioState31.slots.context) {
-        count++;
-        if (studioState31.slots.context === 'talk') correctCount++;
-      }
-      if (studioState31.slots.despine) {
-        count++;
-        if (studioState31.slots.despine === 'yes') correctCount++;
-      }
-
-      const val = 20 + (correctCount * 16);
-      document.getElementById('approval-bar').style.width = `${val}%`;
-
-      loadStudioCode31();
-
-      if (correctCount === 5) {
-        setTimeout(concludeStudio31, 1500);
-      } else if (count === 5) {
-        audio.error();
-        showStatusBanner("❌ Designer feedback: Mismatch detected! Verify palette, context scales, and boundaries carefully.", 'error');
-        setTimeout(() => {
-          setupActivity31(document.getElementById('sandbox-content'));
-        }, 1500);
-      }
-    }
-
-    function loadStudioCode31() {
-      let codeStr = `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Design Studio Configurations:\n`;
-      if (studioState31.slots.style) codeStr += `sns.set_style("${studioState31.slots.style}")\n`;
-      if (studioState31.slots.palette) codeStr += `sns.set_palette("${studioState31.slots.palette}")\n`;
-      if (studioState31.slots.context) codeStr += `sns.set_context("${studioState31.slots.context}")\n`;
-      if (studioState31.slots.plot) codeStr += `sns.${studioState31.slots.plot}(x="Dosage", y="HeartRate", data=df)\n`;
-      if (studioState31.slots.despine === 'yes') codeStr += `sns.despine()\n`;
-      codeStr += `plt.show()`;
-      formatPythonCode(codeStr, 4);
-    }
-
-    function concludeStudio31() {
-      document.getElementById('approval-bar').style.width = '100%';
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Design Approved at 100% Satisfaction!</span>`;
-      if (!state.completedActivities.includes('3-1')) {
-        state.completedActivities.push('3-1');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Studio Client approved your visualization! Click <strong>Next ▶</strong> at the top.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 3.2: VISUALIZATION TOURNAMENT
-       ========================================================================= */
-    const battleState32 = {
-      bossHP: 100,
-      playerHP: 100,
-      round: 0,
-      rounds: [
-        {
-          task: 'Choose command to style plot borders and backgrounds:',
-          options: [
-            { text: 'sns.set_style("darkgrid")', correct: true },
-            { text: 'sns.set_palette("muted")', correct: false },
-            { text: 'sns.despine()', correct: false }
-          ],
-          code: `sns.set_style("darkgrid")`
-        },
-        {
-          task: 'Select command to remove top and right border spines:',
-          options: [
-            { text: 'sns.despine()', correct: true },
-            { text: 'sns.set_style("white")', correct: false },
-            { text: 'plt.grid(False)', correct: false }
-          ],
-          code: `sns.despine()`
-        },
-        {
-          task: 'Select the primary wrapper function for relational subplots:',
-          options: [
-            { text: 'sns.relplot()', correct: true },
-            { text: 'sns.scatterplot()', correct: false },
-            { text: 'sns.pairplot()', correct: false }
-          ],
-          code: `sns.relplot()`
-        },
-        {
-          task: 'Select command to set context for poster presentation font scales:',
-          options: [
-            { text: 'sns.set_context("poster")', correct: true },
-            { text: 'sns.set_style("poster")', correct: false },
-            { text: 'sns.set_palette("poster")', correct: false }
-          ],
-          code: `sns.set_context("poster")`
-        },
-        {
-          task: 'Select color palette suitable for sequential values data gradients:',
-          options: [
-            { text: 'sns.color_palette("Blues")', correct: true },
-            { text: 'sns.color_palette("pastel")', correct: false },
-            { text: 'sns.color_palette("bright")', correct: false }
-          ],
-          code: `sns.color_palette("Blues")`
-        }
-      ]
-    };
-
-    function setupActivity32(container) {
-      document.getElementById('active-title').innerText = 'Activity 3.2 — Visualization Tournament';
-      document.getElementById('active-subtitle').innerText = 'Defeat the AI Expert by picking optimal visualization methods quickly.';
-
-      container.innerHTML = `
-        <div class="boss-battle-view">
-          
-          <div class="boss-character-avatar">🎓</div>
-
-          <!-- Boss Health Bar -->
-          <div class="boss-bar-row">
-            <span>AI EXPERT HP</span>
-            <div class="boss-hp-track">
-              <div class="boss-hp-fill" id="boss-hp"></div>
-            </div>
-          </div>
-
-          <!-- Player Health Bar -->
-          <div class="boss-bar-row">
-            <span>YOUR HP</span>
-            <div class="boss-hp-track">
-              <div class="player-hp-fill" id="player-hp"></div>
-            </div>
-          </div>
-
-          <!-- Round question -->
-          <div class="target-array-hud" style="background:#FFEBEE; border-color:#FFCDD2; width:100%; margin-top:0.5rem;">
-            <span style="font-size:0.75rem; text-transform:uppercase; color:var(--primary-red);" id="battle-round-title">Combat Round 1</span>
-            <span class="target-array-vals" id="battle-task-text" style="font-size:0.85rem; color:var(--primary-red);">Choose style command:</span>
-          </div>
-
-          <div class="battle-options-grid" id="battle-options-box">
-            <!-- Shuffled options loaded dynamically -->
-          </div>
-
-        </div>
-      `;
-
-      battleState32.bossHP = 100;
-      battleState32.playerHP = 100;
-      battleState32.round = 0;
-      loadBattleRound32();
-    }
-
-    function loadBattleRound32() {
-      const active = battleState32.rounds[battleState32.round];
-      document.getElementById('battle-round-title').innerText = `Combat Round ${battleState32.round + 1}`;
-      document.getElementById('battle-task-text').innerText = active.task;
-
-      // Update HP fills
-      document.getElementById('boss-hp').style.width = `${battleState32.bossHP}%`;
-      document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
-
-      const optionsBox = document.getElementById('battle-options-box');
-      optionsBox.innerHTML = '';
-      const shuffledOptions = [...active.options].sort(() => Math.random() - 0.5);
-      shuffledOptions.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'battle-option-btn';
-        btn.innerText = opt.text;
-        btn.onclick = () => verifyBattleHit32(opt.correct, active.code);
-        optionsBox.appendChild(btn);
-      });
-
-      const codeStr = `import seaborn as sns\nimport matplotlib.pyplot as plt\n\n# Design Challenge Round ${battleState32.round + 1}:\n# Choose Seaborn optimization option...\n`;
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = 'Compare and choose the correct code token to launch a combat hit.';
-    }
-
-    function verifyBattleHit32(isCorrect, codeLine) {
-      if (isCorrect) {
-        audio.success();
-        battleState32.bossHP -= 20;
-        if (battleState32.bossHP < 0) battleState32.bossHP = 0;
-        showStatusBanner("💥 Direct Hit! AI HP decreased.", 'success');
-
-        const codeStr = `import seaborn as sns\n\n# Applied layout syntax:\n${codeLine}\n\n# Direct hit landed successfully! AI expert damaged.`;
-        formatPythonCode(codeStr, 3);
-      } else {
-        audio.error();
-        battleState32.playerHP -= 20;
-        if (battleState32.playerHP < 0) battleState32.playerHP = 0;
-        showStatusBanner("❌ Blocked! AI countered your visualization choice.", 'error');
-
-        const codeStr = `import seaborn as sns\n\n# Plot configuration parsing error!\n# Incorrect formatting choice deflection. Player hit.`;
-        formatPythonCode(codeStr, 3);
-      }
-
-      setTimeout(() => {
-        if (battleState32.bossHP <= 0) {
-          concludeBattle32();
-        } else if (battleState32.playerHP <= 0) {
-          audio.error();
-          showStatusBanner("💀 Defeat! HP depleted. Tapping next level restarts combat.", 'error');
-          setTimeout(() => {
-            setupActivity32(document.getElementById('sandbox-content'));
-          }, 1500);
-        } else {
-          battleState32.round++;
-          if (battleState32.round < battleState32.rounds.length) {
-            loadBattleRound32();
-          } else {
-            concludeBattle32();
-          }
-        }
-      }, 1600);
-    }
-
-    function concludeBattle32() {
-      document.getElementById('boss-hp').style.width = '0%';
-      document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
-
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `
-        <div style="text-align:center;">
-          <span style="font-size:3rem;">🏆</span>
-          <h3 style="color:#2E7D32; font-weight:800; margin-bottom:0.5rem;">AI Designer Defeated!</h3>
-          <p style="font-size:0.8rem; color:var(--text-muted);">Rank Gained: Master Visualization Designer</p>
-        </div>
-      `;
-
-      if (!state.completedActivities.includes('3-2')) {
-        state.completedActivities.push('3-2');
-        awardProgress();
-      }
-
-      // Show Congrats dialog
-      document.getElementById('badge-dialog-text').innerHTML = `
-        <p style="margin-bottom:0.5rem;">🎉 <strong>CONGRATULATIONS!</strong> You won the design tournament!</p>
-        <p>You unlocked the <strong>Master Visualization Designer</strong> badge! You finished all Seaborn activities.</p>
-      `;
-      document.getElementById('badge-dialog').showModal();
-
-      showStatusBanner("🎉 Tournament complete! Seaborn Visualizer Academy completed successfully!");
-    }
-
-
-    /* --- Initialization on Load --- */
-    window.addEventListener('load', () => {
-      loadState();
-      startActivity(1, 1);
+    // Interactive Dashboard Logic (Simulating Seaborn outputs via Chart.js)
+    const ctxDash = document.getElementById('dashboardChart').getContext('2d');
+    let currentChart = new Chart(ctxDash, {
+      type: 'scatter',
+      data: { datasets: [] },
+      options: { responsive: true, maintainAspectRatio: false }
     });
 
+    function updateDashboard() {
+      const plotType = document.getElementById('plotType').value;
+      const xAxis = document.getElementById('xAxis').value;
+      const hue = document.getElementById('hue').value;
+      const errorLog = document.getElementById('errorLog');
+      const chartTitle = document.getElementById('chartTitle');
+
+      errorLog.innerText = "";
+
+      // Validation: Cannot do scatter plot with categorical X axis easily in this basic sim
+      if (plotType === 'scatter' && xAxis === 'ward') {
+        errorLog.innerText = "ValueError: Scatterplot expects numerical x-axis in this context.";
+        currentChart.data.datasets = [];
+        currentChart.update();
+        chartTitle.innerText = "Error: Invalid Data Type Mapping";
+        return;
+      }
+      if (plotType === 'bar' && xAxis === 'age') {
+        errorLog.innerText = "Warning: Barplot with continuous X-axis causes visual clutter.";
+      }
+
+      // Generate Simulated Data
+      let newConfig = {
+        type: plotType === 'scatter' ? 'scatter' : 'bar',
+        data: { datasets: [] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: hue !== 'none' } },
+          scales: {
+            x: {
+              type: xAxis === 'ward' ? 'category' : 'linear',
+              title: { display: true, text: xAxis === 'ward' ? 'Hospital Ward' : 'Patient Age' }
+            },
+            y: {
+              title: { display: true, text: 'Recovery Time (Days)' }
+            }
+          }
+        }
+      };
+
+      // Populate Datasets based on 'Hue' selection
+      if (plotType === 'scatter') {
+        chartTitle.innerText = `sns.scatterplot(x="${xAxis}", y="Recovery_Days", hue="${hue}")`;
+
+        if (hue === 'none') {
+          newConfig.data.datasets.push({
+            label: 'All Patients',
+            backgroundColor: '#319795',
+            data: Array.from({ length: 40 }, () => ({ x: Math.random() * 60 + 20, y: Math.random() * 20 + 5 }))
+          });
+        } else {
+          newConfig.data.datasets.push({
+            label: 'Male',
+            backgroundColor: '#2c5282',
+            data: Array.from({ length: 20 }, () => ({ x: Math.random() * 60 + 20, y: Math.random() * 20 + 5 }))
+          });
+          newConfig.data.datasets.push({
+            label: 'Female',
+            backgroundColor: '#d53f8c',
+            data: Array.from({ length: 20 }, () => ({ x: Math.random() * 60 + 20, y: Math.random() * 20 + 5 }))
+          });
+        }
+      } else if (plotType === 'bar') {
+        chartTitle.innerText = `sns.barplot(x="${xAxis}", y="Recovery_Days", hue="${hue}")`;
+        newConfig.data.labels = xAxis === 'ward' ? ['Cardiology', 'ICU', 'Pediatrics'] : ['20', '40', '60', '80'];
+
+        if (hue === 'none') {
+          newConfig.data.datasets.push({
+            label: 'Avg Recovery',
+            backgroundColor: '#319795',
+            data: xAxis === 'ward' ? [12, 24, 8] : [5, 10, 15, 20]
+          });
+        } else {
+          newConfig.data.datasets.push({
+            label: 'Male',
+            backgroundColor: '#2c5282',
+            data: xAxis === 'ward' ? [14, 26, 9] : [6, 12, 16, 22]
+          });
+          newConfig.data.datasets.push({
+            label: 'Female',
+            backgroundColor: '#d53f8c',
+            data: xAxis === 'ward' ? [10, 22, 7] : [4, 8, 14, 18]
+          });
+        }
+      }
+
+      // Destroy and recreate to handle axis type changes cleanly
+      currentChart.destroy();
+      currentChart = new Chart(ctxDash, newConfig);
+    }
+
+    // Init
+    updateDashboard();
   </script>
 </body>
+
 </html>

@@ -1,2324 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pandas Data Detective - Sorting, Searching & Filtering</title>
-  <!-- Google Fonts for Modern Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-  
+  <title>Sorting & Regex: AI Recruitment Architecture</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* --- CSS Reset & Variables --- */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
     :root {
-      --primary-red: #D32F2F;
-      --primary-red-hover: #B71C1C;
-      --light-red-bg: #FFEBEE;
-      --light-red-border: #FFCDD2;
-      --pure-white: #FFFFFF;
-      --off-white: #F9F9F9;
-      --text-dark: #212121;
-      --text-muted: #666666;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-      --border-radius-sm: 8px;
-      --border-radius-md: 16px;
-      --border-radius-lg: 24px;
-      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --bg-canvas: #f8f7f4;
+      --tech-blue: #2c5282;
+      --alert-orange: #c05621;
+      --text-main: #1a202c;
+      --regex-pink: #d53f8c;
+      --sort-green: #38a169;
+      --grid-line: #e2e8f0;
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--off-white);
-      color: var(--text-dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* --- Background Vector Grid --- */
-    .bg-grid {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-image: 
-        radial-gradient(var(--light-red-border) 1px, transparent 1px),
-        radial-gradient(var(--light-red-border) 1px, transparent 1px);
-      background-size: 24px 24px;
-      background-position: 0 0, 12px 12px;
-      opacity: 0.35;
-      z-index: -1;
-    }
-
-    /* --- Header Bar --- */
-    header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 2px solid var(--light-red-border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .brand-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--primary-red);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--pure-white);
-      font-weight: 800;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
-    }
-
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--primary-red);
-      letter-spacing: -0.5px;
-    }
-
-    /* Header Nav Nodes */
-    .level-nav-hud {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--off-white);
-      padding: 0.35rem;
-      border-radius: var(--border-radius-lg);
-      border: 1.5px solid var(--light-red-border);
-    }
-
-    .hud-node {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--pure-white);
-      border: 1.5px solid var(--light-red-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .hud-node.unlocked {
-      color: var(--primary-red);
-      border-color: var(--primary-red);
-    }
-
-    .hud-node.active {
-      background: var(--primary-red);
-      color: var(--pure-white);
-      border-color: var(--primary-red);
-      box-shadow: 0 3px 8px rgba(211, 47, 47, 0.25);
-    }
-
-    .hud-node-line {
-      width: 20px;
-      height: 2px;
-      background: var(--light-red-border);
-    }
-
-    .hud-node-line.unlocked {
-      background: var(--primary-red);
-    }
-
-    /* Stats Panel */
-    .hud-stats {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-
-    /* Buttons styling */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: var(--border-radius-sm);
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      border: none;
-      outline: none;
-    }
-
-    .btn-primary {
-      background: var(--primary-red);
-      color: var(--pure-white);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: var(--primary-red-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      background: var(--pure-white);
-      color: var(--primary-red);
-      border: 1.5px solid var(--primary-red);
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: var(--light-red-bg);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* --- Main Workspace Layout --- */
-    main {
-      flex: 1;
-      padding: 2rem;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    /* --- Theory & Steps Card (At the top, spanning full width) --- */
-    .theory-panel {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.25rem 1.75rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .theory-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--primary-red);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .theory-steps {
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--light-red-border);
-    }
-
-    .theory-steps-title {
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 0.35rem;
-      color: var(--text-dark);
-    }
-
-    /* --- Inline Status Banner --- */
-    #status-banner {
-      display: none;
-      background: #E8F5E9;
-      border: 2px solid #2E7D32;
-      color: #1B5E20;
-      padding: 0.9rem 1.25rem;
-      border-radius: var(--border-radius-md);
-      font-weight: 600;
-      font-size: 0.9rem;
-      animation: pop-in 0.3s ease-out;
-    }
-
-    /* --- Main Split Workspace --- */
-    .game-workspace {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    /* Playground Left Panel */
-    .playground-panel {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      min-height: 480px;
-    }
-
-    .playground-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1.5px solid var(--light-red-border);
-      padding-bottom: 0.75rem;
-    }
-
-    .playground-title-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .playground-title {
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--text-dark);
-    }
-
-    .playground-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
-    }
-
-    .playground-controls {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .sandbox-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 1.25rem;
-      position: relative;
-    }
-
-    /* Code Terminal Right Panel */
-    .terminal-panel {
-      background: #1E1E1E;
-      border-radius: var(--border-radius-md);
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      flex-direction: column;
-      min-height: 480px;
-    }
-
-    .terminal-header {
-      background: #2D2D2D;
-      padding: 0.75rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #3C3C3C;
-    }
-
-    .terminal-dots {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .terminal-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .terminal-dot.red { background: #FF5F56; }
-    .terminal-dot.yellow { background: #FFBD2E; }
-    .terminal-dot.green { background: #27C93F; }
-
-    .terminal-title {
-      color: #A0A0A0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .terminal-body {
-      flex: 1;
-      padding: 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-family: 'IBM+Plex+Sans', sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
       line-height: 1.6;
-      color: #D4D4D4;
-      overflow-y: auto;
     }
 
-    .code-line {
-      display: flex;
-      gap: 1rem;
-      opacity: 0.85;
-      transition: opacity var(--transition-fast);
+    .serif {
+      font-family: 'IBM+Plex+Serif', serif;
     }
 
-    .code-line.active {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 2px solid var(--primary-red);
-      padding-left: 2px;
-    }
-
-    .code-num {
-      color: #858585;
-      text-align: right;
-      width: 20px;
-      user-select: none;
-    }
-
-    .code-text {
-      white-space: pre-wrap;
-    }
-
-    /* Code Highlighting classes */
-    .token-comment { color: #6A9955; font-style: italic; }
-    .token-keyword { color: #C586C0; font-weight: 600; }
-    .token-string { color: #CE9178; }
-    .token-method { color: #DCDCAA; }
-    .token-number { color: #B5CEA8; }
-    .token-builtin { color: #569CD6; }
-
-    .terminal-explainer {
-      background: #252526;
-      border-top: 1px solid #3C3C3C;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: #D4D4D4;
-    }
-
-    .explainer-icon {
-      font-size: 1.2rem;
-    }
-
-    /* --- Interactive Drag & Drop Classes --- */
-    .drag-chips-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .drag-chip {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      padding: 0.5rem 1rem;
+    .mono {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--primary-red);
-      cursor: grab;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow var(--transition-fast), transform var(--transition-fast);
-      touch-action: none;
     }
 
-    .drag-chip:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
+    .technical-image-container {
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
     }
 
-    .drag-chip.dragging {
-      opacity: 0.8;
-      cursor: grabbing;
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
+    /* Python Syntax Highlighting */
+    .kw {
+      color: #c05621;
+      font-weight: bold;
     }
 
-    .drop-cell {
-      border: 2px dashed var(--light-red-border);
-      border-radius: var(--border-radius-sm);
+    .str {
+      color: #2c5282;
+    }
+
+    .cmt {
+      color: #718096;
+      font-style: italic;
+    }
+
+    .func {
+      color: #805ad5;
+    }
+
+    .lib {
+      color: #e53e3e;
+      font-weight: bold;
+    }
+
+    /* Animation Styles for Sorting */
+    .sort-container {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--off-white);
-      transition: all var(--transition-fast);
-    }
-
-    .drop-cell.hovered {
-      background: var(--light-red-bg);
-      border-color: var(--primary-red);
-      transform: scale(1.02);
-    }
-
-    .drop-cell.filled {
-      border-style: solid;
-      border-color: var(--primary-red);
-      background: var(--pure-white);
-    }
-
-    /* --- Activity Specific Elements --- */
-
-    /* Activity 1.1: Data Sorting Arena */
-    .sorting-arena-container {
-      width: 100%;
-      max-width: 440px;
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      padding: 1rem;
-      position: relative;
-      height: 230px;
-      overflow: hidden;
-    }
-
-    .sorting-row {
-      display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
-      padding: 0.5rem 1rem;
-      background: var(--off-white);
-      border: 1px solid var(--light-red-border);
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 150px;
+      padding: 10px;
+      background: #f7fafc;
+      border: 1px solid var(--grid-line);
       border-radius: 8px;
-      font-size: 0.85rem;
-      font-family: 'JetBrains Mono', monospace;
-      position: absolute;
-      left: 1rem;
-      right: 1rem;
-      height: 38px;
-      align-items: center;
-      transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s;
+      gap: 4px;
     }
 
-    .sorting-row.header {
-      background: var(--light-red-bg);
-      font-weight: 700;
-      color: var(--primary-red);
-      border-color: var(--light-red-border);
-      z-index: 10;
-    }
-
-    .sorting-row.sorting-active {
-      background: #FFF9C4;
-      border-color: #FBC02D;
-    }
-
-    /* Activity 1.2: Search Hunter Visual Grid */
-    .search-hunter-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
+    .sort-bar {
       width: 100%;
-      max-width: 440px;
-    }
-
-    .search-row-node {
-      display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
-      padding: 0.5rem 1rem;
-      background: var(--pure-white);
-      border: 1.5px solid var(--light-red-border);
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--tech-blue);
       transition: all 0.3s ease;
-    }
-
-    .search-row-node.visiting {
-      background: #FFF59D;
-      border-color: #FBC02D;
-      transform: scale(1.02);
-    }
-
-    .search-row-node.matched {
-      background: #C8E6C9;
-      border-color: #388E3C;
-      font-weight: 700;
-      transform: scale(1.03);
-    }
-
-    .search-row-node.skipped {
-      opacity: 0.45;
-      background: #ECEFF1;
-    }
-
-    .stats-panel-box {
-      width: 100%;
-      max-width: 440px;
-      background: #F5F5F5;
-      border: 1px solid #E0E0E0;
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      font-size: 0.75rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 5px;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
       font-family: 'JetBrains Mono', monospace;
+      border-radius: 4px 4px 0 0;
     }
 
-    /* Activity 2.1: Filter Factory ports */
-    .filter-ports-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-      width: 100%;
-      max-width: 440px;
-    }
-
-    .filter-port-cell {
-      height: 60px;
-      font-size: 0.8rem;
-      text-align: center;
-      padding: 0.25rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .filter-port-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-
-    /* Activity 2.2: Regex Puzzle blocks */
-    .regex-slots-row {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: center;
-      width: 100%;
-      max-width: 440px;
-      margin: 1rem 0;
-    }
-
-    .regex-drop-slot {
-      width: 60px;
-      height: 60px;
-      border: 2px dashed var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1rem;
-      font-weight: 700;
-      background: var(--off-white);
-    }
-
-    .regex-chest-zone {
-      width: 120px;
-      height: 120px;
-      border: 3.5px dashed var(--primary-red);
-      border-radius: 50%;
-      background: var(--light-red-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.8rem;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .regex-chest-zone.hovered {
+    .sort-bar.active {
+      background-color: var(--alert-orange);
       transform: scale(1.05);
     }
 
-    /* Activity 3.1: Escape Room Dungeons */
-    .escape-dungeon-view {
-      width: 100%;
-      max-width: 440px;
-      height: 160px;
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      position: relative;
-      background: #FFF5F5;
-      overflow: hidden;
+    .sort-bar.sorted {
+      background-color: var(--sort-green);
     }
 
-    .dungeon-character {
-      width: 32px;
-      height: 32px;
-      background: var(--primary-red);
-      border-radius: 50%;
-      position: absolute;
-      left: 20px;
-      bottom: 20px;
-      transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFF;
-      font-size: 0.9rem;
-      box-shadow: 0 3px 8px rgba(211, 47, 47, 0.4);
-    }
-
-    .dungeon-gate {
-      width: 16px;
-      height: 60px;
-      background: #78909C;
-      position: absolute;
-      bottom: 0;
-      border-radius: 4px 4px 0 0;
-      transition: all 0.5s ease;
-    }
-
-    .dungeon-gate.open {
-      transform: translateY(-55px);
-      background: #4CAF50;
-      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-    }
-
-    /* Activity 3.2: Boss Battle widgets */
-    .boss-battle-view {
-      width: 100%;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .boss-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .boss-hp-track {
-      flex: 1;
-      height: 14px;
-      background: #ECEFF1;
-      border-radius: 7px;
-      overflow: hidden;
-      border: 1px solid #CFD8DC;
-    }
-
-    .boss-hp-fill {
-      height: 100%;
-      width: 100%;
-      background: #E53935;
-      transition: width 0.35s ease;
-    }
-
-    .player-hp-fill {
-      height: 100%;
-      width: 100%;
-      background: #4CAF50;
-      transition: width 0.35s ease;
-    }
-
-    .boss-character-avatar {
-      font-size: 3rem;
-      text-align: center;
-      animation: hover-bounce 2s ease-in-out infinite;
-    }
-
-    .battle-options-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    .battle-option-btn {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
+    /* Regex Lab Styles */
+    .regex-highlighter {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      text-align: left;
-      cursor: pointer;
-      transition: all var(--transition-fast);
+      font-size: 0.875rem;
+      background: #000;
+      color: #a0aec0;
+      padding: 1rem;
+      border-radius: 8px;
+      line-height: 1.8;
+      white-space: pre-wrap;
     }
 
-    .battle-option-btn:hover {
-      border-color: var(--primary-red);
-      background: var(--light-red-bg);
-      transform: translateX(2px);
+    .match-group {
+      background-color: rgba(213, 63, 140, 0.3);
+      border-bottom: 2px solid var(--regex-pink);
+      color: #fff;
+      padding: 0 2px;
+      border-radius: 2px;
+      transition: all 0.2s;
     }
 
-    /* --- Interactive dialogues --- */
-    dialog {
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.75rem;
-      max-width: 480px;
-      width: 90%;
-      margin: auto;
-      box-shadow: var(--shadow-lg);
-      outline: none;
-      font-family: 'Outfit', sans-serif;
-    }
+    /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+    @media print {
 
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(4px);
-    }
+      /* Reset body/html defaults for clean printing */
+      html,
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
 
-    .dialog-header {
-      font-weight: 800;
-      color: var(--primary-red);
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+      /* Keep overflow visible to prevent multi-page cropping/clipping */
+      html,
+      body,
+      main,
+      section,
+      div,
+      pre,
+      code,
+      table,
+      tr,
+      td,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        position: static !important;
+      }
 
-    .dialog-body {
-      font-size: 0.9rem;
-      color: var(--text-dark);
-      line-height: 1.5;
-      margin-bottom: 1.25rem;
-    }
+      /* Ensure structural blocks break elegantly across pages */
+      pre,
+      blockquote,
+      table,
+      tr,
+      img,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
 
-    .dialog-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-    }
+      /* Avoid orphaned headers at the bottom of a page */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
 
-    /* Footer styling */
-    footer {
-      background: rgba(255, 255, 255, 0.95);
-      border-top: 1px solid var(--light-red-border);
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    /* --- Animations definitions --- */
-    @keyframes pop-in {
-      0% { transform: scale(0.95); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes hover-bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    #confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
+      /* Hide interactive/non-printable UI elements */
+      nav,
+      footer,
+      button,
+      .no-print,
+      [class*="sticky"],
+      [class*="fixed"] {
+        display: none !important;
+      }
     }
   </style>
 </head>
-<body>
 
-  <div class="bg-grid"></div>
-  <canvas id="confetti-canvas"></canvas>
+<body class="antialiased">
 
-  <!-- Navigation header -->
-  <header>
-    <div class="brand">
-      <div class="brand-logo">🕵️</div>
-      <div class="brand-title">Data Detective</div>
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-pink-700 flex items-center justify-center text-white font-bold rounded">ALG</div>
+        <span class="font-bold tracking-tighter uppercase">Engineering Dossier</span>
+      </div>
+      <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+        <a href="#theory" class="hover:text-black transition">Foundations</a>
+        <a href="#sorting" class="hover:text-black transition">Sorting Logistics</a>
+        <a href="#regex" class="hover:text-black transition">Regex Pattern Engine</a>
+        <a href="#case" class="hover:text-black transition">Case Study: ATS</a>
+        <a href="#lab" class="text-pink-700 font-bold">Interactive Labs</a>
+      </div>
     </div>
+  </nav>
 
-    <!-- Level switching node indicators -->
-    <div class="level-nav-hud">
-      <div class="hud-node active" id="node-1" onclick="switchLevel(1)">1</div>
-      <div class="hud-node-line" id="line-1"></div>
-      <div class="hud-node" id="node-2" onclick="switchLevel(2)">2</div>
-      <div class="hud-node-line" id="line-2"></div>
-      <div class="hud-node" id="node-3" onclick="switchLevel(3)">3</div>
-    </div>
-
-    <!-- Navigation controls -->
-    <div class="hud-stats">
-      <button class="btn btn-outline" id="btn-prev-level" onclick="changeLevel(-1)">◀ Prev Level</button>
-      <button class="btn btn-primary" id="btn-next-level" onclick="changeLevel(1)">Next Level ▶</button>
+  <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+    <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Search & Organization Architectures</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      An engineering report on algorithmic data organization (Sorting by Label/Value) and unstructured data
+      extraction (Regular Expressions).
+    </p>
+    <div class="mt-8 flex justify-center space-x-4">
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ref: Module
+        4-4.3</span>
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ver: 2026.Q3</span>
     </div>
   </header>
 
-  <!-- Main Grid Workspace -->
-  <main>
-    
-    <!-- Dynamic Theory and Steps Panel (Full Width) -->
-    <div class="theory-panel" id="theory-panel">
-      <div class="theory-title">
-        <span>📖</span> <span id="theory-title-text">Topic Theory</span>
-      </div>
-      <p id="theory-desc-text" style="font-size:0.85rem; color:var(--text-dark); margin-bottom: 0.5rem;"></p>
-      <div class="theory-steps">
-        <div class="theory-steps-title">🛠️ Steps to Perform Simulation:</div>
-        <ul id="theory-steps-list" style="margin-left: 1.25rem; font-size: 0.8rem; color: var(--text-muted);">
-          <!-- Populated dynamically -->
-        </ul>
-      </div>
-    </div>
+  <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
 
-    <!-- Status Banner for alerts and complete states -->
-    <div id="status-banner"></div>
+    <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div class="space-y-6">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-pink-600">01. Theoretical Foundations</h2>
+        <h3 class="serif text-4xl leading-snug">Order and Extraction</h3>
+        <p>
+          Data engineering frequently faces two distinct problems: organizing structured data for efficiency
+          (<strong>Sorting</strong>) and finding specific data within unstructured chaos (<strong>Pattern
+            Matching</strong>).
+        </p>
+        <p>
+          <strong>Sorting</strong> (by label/key or by value) reduces algorithmic time complexity. Searching a
+          sorted database takes O(log N) time via Binary Search, compared to O(N) for unsorted data.
+          <strong>Regex (Regular Expressions)</strong> acts as a micro-language for defining search patterns
+          to extract entities (like emails or dates) from raw text blocks.
+        </p>
+        <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-gray-800">
+          <p class="text-sm font-bold uppercase mb-2">Architectural Note:</p>
+          <p class="italic text-gray-700">Never write a custom string parser if a Regex engine can handle it.
+            Regex runs in optimized C underlying the Python interpreter.</p>
+        </div>
+      </div>
 
-    <!-- Gameplay panels split grid -->
-    <div class="game-workspace" id="game-workspace">
-      
-      <!-- Left Panel: Playground Simulator -->
-      <div class="playground-panel">
-        <div class="playground-header">
-          <div class="playground-title-wrapper">
-            <span class="playground-title" id="active-title">Activity Title</span>
-            <span class="playground-subtitle" id="active-subtitle">Select options or drag elements below</span>
+      <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-slate-400">System Pipeline:
+          Unstructured to Structured</h4>
+        <div class="space-y-4 font-mono text-sm flex flex-col items-center">
+          <div class="w-full bg-slate-800 border border-slate-600 p-4 rounded text-center">
+            <span class="text-gray-400">Raw Text Block (PDF Resume)</span><br>
+            "Contact: j.doe99@email.com, Exp: 5 yrs"
           </div>
-          <div class="playground-controls">
-            <button class="btn btn-outline" id="btn-prev-act" onclick="navigateActivity(-1)" style="padding: 0.4rem 0.8rem;">◀ Prev</button>
-            <button class="btn btn-outline" id="btn-next-act" onclick="navigateActivity(1)" style="padding: 0.4rem 0.8rem;">Next ▶</button>
-            <button class="btn btn-outline" onclick="showHint()" style="padding: 0.4rem 0.8rem;">💡 Hint</button>
-            <button class="btn btn-outline" onclick="resetActiveActivity()" style="padding: 0.4rem 0.8rem;">🔄 Reset</button>
+          <div class="text-pink-500 font-bold">↓ Regex Extraction Engine ↓</div>
+          <div class="w-full bg-slate-800 border border-slate-600 p-4 rounded text-center">
+            <span class="text-gray-400">Structured DataFrame Row</span><br>
+            {'email': 'j.doe99@email.com', 'exp': 5}
+          </div>
+          <div class="text-blue-500 font-bold">↓ Algorithmic Sorting ↓</div>
+          <div class="w-full bg-blue-900/30 border border-blue-600 p-4 rounded text-center text-blue-200">
+            <span class="text-blue-400 font-bold">Sorted Database (By 'exp' Value DESC)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sorting" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">02. Sorting Architectures</h2>
+        <h3 class="serif text-4xl mb-6">Sort by Label vs. Sort by Value</h3>
+        <p class="mb-4">
+          In structured datasets (like Pandas DataFrames or Dictionaries), sorting occurs across two primary
+          axes.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="technical-image-container border-t-4 border-t-blue-500">
+          <h4 class="font-bold text-lg mb-2">Sort by Label (Index)</h4>
+          <p class="text-sm text-gray-600 mb-4">Organizes data based on the row identifier or dictionary key
+            (e.g., Alphabetical by Applicant ID). Crucial for fast indexed lookups.</p>
+          <div class="bg-gray-100 p-3 rounded font-mono text-xs text-gray-800">
+            <span class="cmt"># Pandas Implementation</span><br>
+            df = df.<span class="func">sort_index</span>(ascending=<span class="kw">True</span>)
           </div>
         </div>
 
-        <div class="sandbox-container" id="sandbox-content">
-          <!-- Dynamic sandbox content goes here -->
-        </div>
-      </div>
-
-      <!-- Right Panel: Python Code & Explanation -->
-      <div class="terminal-panel">
-        <div class="terminal-header">
-          <div class="terminal-dots">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
+        <div class="technical-image-container border-t-4 border-t-green-500">
+          <h4 class="font-bold text-lg mb-2">Sort by Value</h4>
+          <p class="text-sm text-gray-600 mb-4">Organizes data based on the contents of a specific column
+            (e.g., Highest to Lowest Experience Years). Crucial for ranking/filtering.</p>
+          <div class="bg-gray-100 p-3 rounded font-mono text-xs text-gray-800">
+            <span class="cmt"># Pandas Implementation</span><br>
+            df = df.<span class="func">sort_values</span>(by=<span class="str">'experience'</span>,
+            ascending=<span class="kw">False</span>)
           </div>
-          <div class="terminal-title">live_pandas_code.py</div>
-          <div style="width: 40px;"></div>
-        </div>
-
-        <div class="terminal-body" id="code-lines-container">
-          <!-- Code statements populated here -->
-        </div>
-
-        <div class="terminal-explainer">
-          <span class="explainer-icon">💡</span>
-          <p id="code-explainer-text">Actions you take on the playground will generate equivalent Pandas code statements here.</p>
         </div>
       </div>
+    </section>
 
-    </div>
+    <section id="regex" class="space-y-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div class="space-y-6">
+          <h2 class="text-sm font-black uppercase tracking-[0.3em] text-pink-700">03. Regular Expressions
+            (Regex)</h2>
+          <h3 class="serif text-4xl">The Pattern Matching Protocol</h3>
+          <p>
+            The <code>re</code> module in Python provides an interface to the regular expression engine.
+            Regex uses meta-characters to define search parameters.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-700 font-mono bg-gray-50 p-4 rounded border border-gray-200">
+            <li><strong>\d</strong> : Matches any digit (0-9).</li>
+            <li><strong>\w</strong> : Matches any alphanumeric character.</li>
+            <li><strong>+</strong> : Matches 1 or more of the preceding token.</li>
+            <li><strong>*</strong> : Matches 0 or more of the preceding token.</li>
+            <li><strong>[a-z]</strong> : Matches a specific range of characters.</li>
+          </ul>
+        </div>
+
+        <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+          <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-slate-400">Standard Extraction
+            Functions</h4>
+          <div class="font-mono text-[11px] space-y-4">
+            <div class="border-l-2 border-pink-500 pl-4">
+              <span class="cmt"># 1. Match (Checks only beginning of string)</span><br>
+              re.<span class="func">match</span>(<span class="str">r'ID-\d+'</span>, <span class="str">"ID-402
+                Approved"</span>) <span class="text-green-400"># Success</span>
+            </div>
+            <div class="border-l-2 border-blue-500 pl-4">
+              <span class="cmt"># 2. Search (Finds first instance anywhere)</span><br>
+              re.<span class="func">search</span>(<span class="str">r'\d{3}-\d{4}'</span>, <span class="str">"Call
+                555-1234 now."</span>)
+            </div>
+            <div class="border-l-2 border-green-500 pl-4">
+              <span class="cmt"># 3. FindAll (Returns list of all instances)</span><br>
+              emails = re.<span class="func">findall</span>(<span class="str">r'[\w.-]+@[\w.-]+'</span>,
+              raw_text)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="case" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-teal-700">04. Industry Application
+          Architecture</h2>
+        <h3 class="serif text-4xl mb-6">Applicant Tracking System (ATS)</h3>
+        <p class="mb-4">
+          Modern HR departments receive thousands of resumes daily. An ATS automates the screening process.
+          First, it ingests raw PDF text. Second, it uses <strong>Regex Pattern Matching</strong> to extract
+          specific entities: Emails, Phone Numbers, and Years of Experience.
+        </p>
+        <p>
+          Finally, the system stores these entities in a DataFrame and executes a <strong>Sort by
+            Value</strong> operation to rank candidates by experience, presenting only the top 10 to the
+          human recruiter.
+        </p>
+      </div>
+
+      <div class="technical-image-container">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-gray-500">ATS Python Logic Flow
+        </h4>
+        <div class="font-mono text-xs bg-slate-900 p-6 rounded text-gray-300 shadow-inner overflow-x-auto">
+          <span class="kw">import</span> re<br>
+          <span class="kw">import</span> pandas <span class="kw">as</span> pd<br><br>
+
+          <span class="cmt"># 1. Regex Engine: Define extraction patterns</span><br>
+          email_pattern = <span class="str">r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'</span><br>
+          exp_pattern = <span class="str">r'(\d+)\s+(?:years|yrs)\s+experience'</span><br><br>
+
+          <span class="cmt"># ... extraction loop over resumes ...</span><br><br>
+
+          <span class="cmt"># 2. DataFrame Construction</span><br>
+          df = pd.<span class="func">DataFrame</span>(extracted_data_list)<br><br>
+
+          <span class="cmt"># 3. Sort by Value (Rank highest experience first)</span><br>
+          ranked_candidates = df.<span class="func">sort_values</span>(by=<span class="str">'Years_Exp'</span>,
+          ascending=<span class="kw">False</span>)<br><br>
+
+          <span class="cmt"># 4. Sort by Label (Organize Alphabetically by ID if needed)</span><br>
+          indexed_db = df.<span class="func">set_index</span>(<span class="str">'Applicant_ID'</span>).<span
+            class="func">sort_index</span>()
+        </div>
+      </div>
+    </section>
+
+    <section id="lab" class="bg-black text-white p-12 rounded-3xl">
+      <h3 class="serif text-4xl mb-8 text-center">Interactive Systems Lab</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+        <div class="space-y-4">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-pink-500">Regex Extraction Engine
+            (re.findall)</h4>
+          <p class="text-sm text-gray-400 italic">Select a pattern to extract entities from the unstructured
+            resume block.</p>
+
+          <div class="flex gap-2 font-mono text-[10px]">
+            <button onclick="applyRegex('email')"
+              class="flex-1 py-2 bg-slate-800 hover:bg-pink-900 border border-slate-600 hover:border-pink-500 rounded transition">Extract
+              Emails</button>
+            <button onclick="applyRegex('phone')"
+              class="flex-1 py-2 bg-slate-800 hover:bg-pink-900 border border-slate-600 hover:border-pink-500 rounded transition">Extract
+              Phones</button>
+            <button onclick="applyRegex('clear')"
+              class="flex-1 py-2 bg-red-900/50 hover:bg-red-800 border border-red-800 rounded transition text-red-300">Clear
+              Engine</button>
+          </div>
+
+          <div class="regex-highlighter relative" id="regexBox">
+            Jane Doe
+            Software Engineer
+            Contact me at jane.doe_88@gmail.com or via phone at 555-0198.
+            Alternative email: jdoe.work@corp.net.
+            5 years experience in Python.
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-blue-500">Algorithmic Sorting Simulator
+          </h4>
+          <p class="text-sm text-gray-400 italic">Visualizing DataFrame <code>sort_values()</code> logic
+            (Bubble Sort execution representation).</p>
+
+          <div class="flex gap-2 font-mono text-[10px] mb-4">
+            <button onclick="startSort()"
+              class="flex-1 py-2 bg-blue-900 hover:bg-blue-800 border border-blue-600 rounded transition"
+              id="sortBtn">Execute sort_values(asc=True)</button>
+            <button onclick="shuffleBars()"
+              class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded transition text-gray-300">Randomize
+              Dataset</button>
+          </div>
+
+          <div class="sort-container" id="sortVisualizer">
+          </div>
+          <div class="text-center text-xs font-mono text-gray-500 mt-2" id="sortStats">O(n) Operations: 0
+          </div>
+        </div>
+
+      </div>
+    </section>
 
   </main>
 
-  <!-- Interactive Hint Dialogue -->
-  <dialog id="hint-dialog">
-    <h3 class="dialog-header">💡 Educational Insight</h3>
-    <div class="dialog-body" id="hint-dialog-text">
-      Analyze elements closely to find patterns.
-    </div>
-    <div class="dialog-footer">
-      <button class="btn btn-primary" onclick="closeHint()">Got it</button>
-    </div>
-  </dialog>
-
-  <!-- Interactive Victory Badge Dialogue -->
-  <dialog id="badge-dialog">
-    <h3 class="dialog-header">🏆 Achievement Unlocked!</h3>
-    <div class="dialog-body" id="badge-dialog-text">
-      Congratulations!
-    </div>
-    <div class="dialog-footer">
-      <button class="btn btn-primary" onclick="document.getElementById('badge-dialog').close()">Awesome</button>
-    </div>
-  </dialog>
-
-  <!-- Confetti and Main Script Logic -->
   <script>
-    /* --- Mock Audio Effects System --- */
-    const audio = {
-      click() {},
-      success() {},
-      error() {},
-      unlock() {}
-    };
+    // --- REGEX LAB LOGIC ---
+    const rawText = `Jane Doe\nSoftware Engineer\nContact me at jane.doe_88@gmail.com or via phone at 555-0198.\nAlternative email: jdoe.work@corp.net.\n5 years experience in Python.`;
 
-    /* --- Confetti Engine --- */
-    class ConfettiShower {
-      constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
-        this.active = false;
-      }
-      start() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.particles = [];
-        for (let i = 0; i < 100; i++) {
-          this.particles.push({
-            x: Math.random() * this.canvas.width,
-            y: Math.random() * this.canvas.height - this.canvas.height,
-            r: Math.random() * 6 + 4,
-            d: Math.random() * this.canvas.height,
-            color: `hsl(${Math.random() * 25 + 345}, 85%, ${Math.random() * 20 + 50}%)`, // Crimson palette
-            tilt: Math.random() * 10 - 5,
-            tiltAngleIncremental: Math.random() * 0.07 + 0.02,
-            tiltAngle: 0
-          });
-        }
-        this.active = true;
-        this.animate();
-      }
-      stop() {
-        this.active = false;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      }
-      animate() {
-        if (!this.active) return;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        let remaining = false;
-        this.particles.forEach((p) => {
-          p.tiltAngle += p.tiltAngleIncremental;
-          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
-          p.x += Math.sin(p.tiltAngle);
-          p.tilt = Math.sin(p.tiltAngle - p.r / 2) * 5;
+    function applyRegex(type) {
+      const box = document.getElementById('regexBox');
+      let highlightedText = rawText;
 
-          if (p.y <= this.canvas.height) {
-            remaining = true;
-          }
-
-          this.ctx.beginPath();
-          this.ctx.lineWidth = p.r;
-          this.ctx.strokeStyle = p.color;
-          this.ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
-          this.ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
-          this.ctx.stroke();
-        });
-
-        if (remaining && this.active) {
-          requestAnimationFrame(() => this.animate());
-        }
+      if (type === 'email') {
+        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
+        highlightedText = rawText.replace(emailRegex, '<span class="match-group">$1</span>');
+      } else if (type === 'phone') {
+        const phoneRegex = /(\d{3}-\d{4})/gi;
+        highlightedText = rawText.replace(phoneRegex, '<span class="match-group">$1</span>');
       }
+
+      box.innerHTML = highlightedText;
     }
 
-    const confetti = new ConfettiShower('confetti-canvas');
 
-    /* --- Global State Management --- */
-    const state = {
-      currentLevel: 1,
-      currentActivity: null,
-      completedActivities: [],
-      unlockedLevels: [1, 2, 3]
-    };
+    // --- SORTING LAB LOGIC ---
+    let barsData = [];
+    const numBars = 12;
+    let isSorting = false;
 
-    const activitiesOrder = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2'];
-
-    function loadState() {
-      const saved = localStorage.getItem('pandas_detective_progress');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          state.completedActivities = parsed.completedActivities || [];
-          state.unlockedLevels = parsed.unlockedLevels || [1, 2, 3];
-          state.currentLevel = parsed.currentLevel || 1;
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      updateHUD();
+    function initBars() {
+      barsData = Array.from({ length: numBars }, () => Math.floor(Math.random() * 100) + 10);
+      renderSortBars([], 0);
+      document.getElementById('sortStats').innerText = "O(n) Operations: 0";
     }
 
-    function saveState() {
-      localStorage.setItem('pandas_detective_progress', JSON.stringify({
-        completedActivities: state.completedActivities,
-        unlockedLevels: state.unlockedLevels,
-        currentLevel: state.currentLevel
-      }));
+    function shuffleBars() {
+      if (isSorting) return;
+      initBars();
     }
 
-    function updateHUD() {
-      for (let i = 1; i <= 3; i++) {
-        const node = document.getElementById(`node-${i}`);
-        node.classList.toggle('unlocked', state.unlockedLevels.includes(i));
-        node.classList.toggle('active', state.currentLevel === i);
-        
-        if (i < 3) {
-          const line = document.getElementById(`line-${i}`);
-          line.classList.toggle('unlocked', state.unlockedLevels.includes(i + 1));
-        }
-      }
-
-      document.getElementById('btn-prev-level').disabled = (state.currentLevel === 1);
-      document.getElementById('btn-next-level').disabled = (state.currentLevel === 3);
-    }
-
-    /* --- Python Code Syntax Formatter --- */
-    function formatPythonCode(rawText, activeLineIndex = null) {
-      const container = document.getElementById('code-lines-container');
+    function renderSortBars(activeIndices = [], sortedCount = 0) {
+      const container = document.getElementById('sortVisualizer');
       container.innerHTML = '';
 
-      const lines = rawText.split('\n');
-      lines.forEach((line, idx) => {
-        const lineWrapper = document.createElement('div');
-        lineWrapper.className = 'code-line';
-        if (idx === activeLineIndex) {
-          lineWrapper.classList.add('active');
+      const maxVal = Math.max(...barsData);
+
+      barsData.forEach((val, idx) => {
+        const bar = document.createElement('div');
+        const heightPct = (val / maxVal) * 100;
+
+        bar.className = 'sort-bar';
+        bar.style.height = `${Math.max(10, heightPct)}%`;
+        bar.innerText = val;
+
+        if (activeIndices.includes(idx)) {
+          bar.classList.add('active');
+        }
+        // If it's in the sorted portion at the end
+        if (idx >= barsData.length - sortedCount && sortedCount > 0) {
+          bar.classList.add('sorted');
         }
 
-        const numSpan = document.createElement('span');
-        numSpan.className = 'code-num';
-        numSpan.innerText = idx + 1;
-
-        const textSpan = document.createElement('span');
-        textSpan.className = 'code-text';
-
-        let highlighted = line;
-        
-        if (highlighted.trim().startsWith('#')) {
-          highlighted = `<span class="token-comment">${escapeHtml(highlighted)}</span>`;
-        } else {
-          highlighted = highlighted.replace(/(['"])(.*?)\1/g, '<span class="token-string">"$2"</span>');
-          
-          const keywords = ['import', 'as', 'from', 'return', 'def', 'if', 'else', 'for', 'in', 'print'];
-          keywords.forEach(kw => {
-            const regex = new RegExp(`\\b${kw}\\b`, 'g');
-            highlighted = highlighted.replace(regex, `<span class="token-keyword">${kw}</span>`);
-          });
-
-          highlighted = highlighted.replace(/\b(pd|numpy|df|result)\b/g, '<span class="token-builtin">$1</span>');
-
-          highlighted = highlighted.replace(/\b(sort_index|sort_values|ascending|contains|startswith|endswith|str|mean|count|describe|info|head|tail|shape|loc)\b/g, '<span class="token-method">$1</span>');
-          
-          highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>');
-        }
-
-        textSpan.innerHTML = highlighted;
-        lineWrapper.appendChild(numSpan);
-        lineWrapper.appendChild(textSpan);
-        container.appendChild(lineWrapper);
+        container.appendChild(bar);
       });
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
-    }
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-    /* --- Dynamic Level Instructions Database --- */
-    function updateTheoryAndSteps(actKey) {
-      const theoryTitle = document.getElementById('theory-title-text');
-      const theoryDesc = document.getElementById('theory-desc-text');
-      const theoryStepsList = document.getElementById('theory-steps-list');
+    async function startSort() {
+      if (isSorting) return;
+      isSorting = true;
+      document.getElementById('sortBtn').disabled = true;
+      document.getElementById('sortBtn').classList.add('opacity-50');
 
-      const contents = {
-        '1-1': {
-          title: 'Sorting DataFrames',
-          desc: 'Pandas provides sorting utilities to order rows. Use <code>sort_values(by="Column")</code> to rearrange rows alphabetically or numerically. Toggling <code>ascending=False</code> flips the sorting direction. To restore sorting by row sequence indices, call <code>sort_index()</code>.',
-          steps: [
-            'Read the active sorting objective shown on the mission HUD.',
-            'Select a sorting query criteria parameter.',
-            'Tap <strong>▶ Run Sort animation</strong> to watch the rows slide and swap locations live.'
-          ]
-        },
-        '1-2': {
-          title: 'Data Searching Techniques',
-          desc: 'Finding target entries matches execution lookups. A <strong>Linear Search</strong> scans rows one-by-one from top to bottom (O(N) complexity). A <strong>Binary Search</strong> halves sorting indexes in logarithmic splits (O(log N)), which works much faster but strictly requires the column to be sorted beforehand!',
-          steps: [
-            'Look at the target record query on the detective scanner.',
-            'Choose an search technique: <strong>Linear Scan</strong> or <strong>Binary Split</strong>.',
-            'Observe rows visited, comparisons made, and scan speed efficiency calculations.'
-          ]
-        },
-        '2-1': {
-          title: 'Boolean Filtering conditions',
-          desc: 'Filtering extracts sub-tables matching boolean conditions. A condition like <code>df["Marks"] > 80</code> creates a True/False series. Passing this series back into index brackets <code>df[df["Marks"] > 80]</code> drops False rows, filtering records at C-speed without loops!',
-          steps: [
-            'Drag column and value comparison chips (e.g. <code>Marks</code>, <code>&gt;</code>, <code>80</code>) into the filter machine port.',
-            'Click <strong>Filter Table</strong> to trigger scanning operations.',
-            'Matching entries turn green and drop into the output result sub-table.'
-          ]
-        },
-        '2-2': {
-          title: 'Regex Pattern Matching',
-          desc: 'String columns can be scanned using regular expressions via <code>df["Col"].str.contains()</code>, <code>startswith()</code>, or <code>endswith()</code>. Assembling token patterns like <code>^A</code> (starts with A) or <code>edu$</code> (ends with edu) targets search rules exactly.',
-          steps: [
-            'Read the target string pattern query requirement (e.g. find names starting with A).',
-            'Drag regex puzzle block tokens (like <code>^</code>, <code>A</code>, <code>.*</code>) in order into the template slot.',
-            'Tapping the key matches the chest, opening targeted values from the dataset.'
-          ]
-        },
-        '3-1': {
-          title: 'Mystery Escape Dungeon',
-          desc: 'Data detectives must apply searching, sorting, and pattern matches to unlock secure vaults. Resolving queries progressively unlocks path gates to escape.',
-          steps: [
-            'Read the gate locked query conditions at the bottom of the dungeon floor.',
-            'Write the correct Pandas command syntax by picking options.',
-            'Unlock all 3 secure gates to escape the dungeon rooms successfully!'
-          ]
-        },
-        '3-2': {
-          title: 'Data Analyst Boss Battle',
-          desc: 'Put your sorting, searching, and regex skills to the test in a quick-fire combat simulator against an AI Analyst! Quick, accurate decisions keep health values full.',
-          steps: [
-            'Analyze the query challenge shown on the boss screen.',
-            'Select the correct equivalent Pandas syntax command buttons quickly.',
-            'Defeat the AI boss by landing accurate answer hits, avoiding health damage.'
-          ]
-        }
-      };
+      let ops = 0;
+      const n = barsData.length;
 
-      const selected = contents[actKey];
-      if (selected) {
-        theoryTitle.innerText = selected.title;
-        theoryDesc.innerHTML = selected.desc;
-        theoryStepsList.innerHTML = selected.steps.map(step => `<li>${step}</li>`).join('');
-      }
-    }
+      // Visualizing a simple bubble sort to show algorithmic swapping
+      for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+          renderSortBars([j, j + 1], i);
+          await sleep(100);
+          ops++;
+          document.getElementById('sortStats').innerText = `O(n) Operations: ${ops}`;
 
-    function showHint() {
-      const hints = {
-        '1-1': 'Select Marks or Name. Toggle descending for Highest->Lowest (ascending=False). Tapping sort index resets order to primary indices!',
-        '1-2': 'Binary search is O(log N) and much faster than Linear search, but it fails if the data is not sorted first! Click Sort by Name or Sort by ID first.',
-        '2-1': 'Combine chips in order: [Column Name] -> [Comparison Operator] -> [Value Card]. Example: Marks, >, 80.',
-        '2-2': 'Carats ^ match starts of strings. Dollars $ match ends. Example: Name starting with A is ^ + A + .*',
-        '3-1': 'Gate 1 requires sort_values(by="Exp", ascending=False). Gate 2 requires df["City"] == "Mumbai". Gate 3 requires str.contains("an").',
-        '3-2': 'Speed counts! Check if ascending=True/False is set for sorting direction, and match str.contains/startswith/endswith for pattern queries.'
-      };
-      document.getElementById('hint-dialog-text').innerText = hints[state.currentActivity] || 'Complete steps on the workspace.';
-      document.getElementById('hint-dialog').showModal();
-    }
-
-    function closeHint() {
-      document.getElementById('hint-dialog').close();
-    }
-
-    function showStatusBanner(msg, type = 'success') {
-      const banner = document.getElementById('status-banner');
-      banner.innerHTML = msg;
-      banner.style.display = 'block';
-      if (type === 'success') {
-        banner.style.background = '#E8F5E9';
-        banner.style.borderColor = '#2E7D32';
-        banner.style.color = '#1B5E20';
-      } else {
-        banner.style.background = '#FFEBEE';
-        banner.style.borderColor = '#D32F2F';
-        banner.style.color = '#C62828';
-      }
-    }
-
-    function hideStatusBanner() {
-      document.getElementById('status-banner').style.display = 'none';
-    }
-
-    function switchLevel(lvlNum) {
-      state.currentLevel = lvlNum;
-      hideStatusBanner();
-      startActivity(lvlNum, 1);
-    }
-
-    function changeLevel(dir) {
-      const target = state.currentLevel + dir;
-      if (target >= 1 && target <= 3) {
-        state.currentLevel = target;
-        hideStatusBanner();
-        startActivity(target, 1);
-      }
-    }
-
-    function navigateActivity(dir) {
-      if (!state.currentActivity) return;
-      const idx = activitiesOrder.indexOf(state.currentActivity);
-      const targetIdx = idx + dir;
-      if (targetIdx >= 0 && targetIdx < activitiesOrder.length) {
-        const parts = activitiesOrder[targetIdx].split('-');
-        const lvl = parseInt(parts[0]);
-        const act = parseInt(parts[1]);
-        hideStatusBanner();
-        startActivity(lvl, act);
-      }
-    }
-
-    function awardProgress() {
-      saveState();
-      updateHUD();
-    }
-
-    /* --- Drag & Drop Core Pointer Engines --- */
-    let dragObj = null;
-    let offset = { x: 0, y: 0 };
-    let dropTargets = [];
-    let currentDropHover = null;
-    let dragCallback = null;
-
-    function initDraggable(element, callback) {
-      element.addEventListener('pointerdown', (e) => {
-        audio.click();
-        dragObj = element;
-        dragObj.classList.add('dragging');
-        
-        offset = {
-          x: e.clientX,
-          y: e.clientY
-        };
-
-        dragCallback = callback;
-        element.setPointerCapture(e.pointerId);
-        dropTargets = Array.from(document.querySelectorAll('.drop-cell, .regex-drop-slot, .regex-chest-zone'));
-      });
-
-      element.addEventListener('pointermove', (e) => {
-        if (dragObj !== element) return;
-        
-        const dx = e.clientX - offset.x;
-        const dy = e.clientY - offset.y;
-        
-        element.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
-
-        let hovered = null;
-        for (let target of dropTargets) {
-          const rect = target.getBoundingClientRect();
-          if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            hovered = target;
-            break;
+          if (barsData[j] > barsData[j + 1]) {
+            // Swap
+            [barsData[j], barsData[j + 1]] = [barsData[j + 1], barsData[j]];
+            renderSortBars([j, j + 1], i);
+            await sleep(100);
           }
         }
-
-        if (hovered !== currentDropHover) {
-          if (currentDropHover) currentDropHover.classList.remove('hovered');
-          currentDropHover = hovered;
-          if (currentDropHover) currentDropHover.classList.add('hovered');
-        }
-      });
-
-      element.addEventListener('pointerup', (e) => {
-        if (dragObj !== element) return;
-        element.releasePointerCapture(e.pointerId);
-        
-        dragObj.classList.remove('dragging');
-        element.style.transform = '';
-
-        if (currentDropHover) {
-          currentDropHover.classList.remove('hovered');
-          if (dragCallback) {
-            dragCallback(element, currentDropHover);
-          }
-        } else {
-          element.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-          element.style.transform = 'translate(0px, 0px)';
-          setTimeout(() => { element.style.transition = ''; }, 350);
-        }
-
-        dragObj = null;
-        currentDropHover = null;
-      });
-
-      element.addEventListener('pointercancel', (e) => {
-        if (dragObj !== element) return;
-        dragObj.classList.remove('dragging');
-        element.style.transform = 'translate(0px, 0px)';
-        dragObj = null;
-        currentDropHover = null;
-      });
-    }
-
-    /* --- Activities Setup & Initialization --- */
-    function startActivity(lvl, act) {
-      state.currentActivity = `${lvl}-${act}`;
-      state.currentLevel = lvl;
-      updateHUD();
-      updateTheoryAndSteps(state.currentActivity);
-      
-      const container = document.getElementById('sandbox-content');
-      container.innerHTML = '';
-
-      const idx = activitiesOrder.indexOf(state.currentActivity);
-      document.getElementById('btn-prev-act').disabled = (idx === 0);
-      document.getElementById('btn-next-act').disabled = (idx === activitiesOrder.length - 1);
-
-      if (state.currentActivity === '1-1') {
-        setupActivity11(container);
-      } else if (state.currentActivity === '1-2') {
-        setupActivity12(container);
-      } else if (state.currentActivity === '2-1') {
-        setupActivity21(container);
-      } else if (state.currentActivity === '2-2') {
-        setupActivity22(container);
-      } else if (state.currentActivity === '3-1') {
-        setupActivity31(container);
-      } else if (state.currentActivity === '3-2') {
-        setupActivity32(container);
-      }
-    }
-
-    function resetActiveActivity() {
-      if (!state.currentActivity) return;
-      const parts = state.currentActivity.split('-');
-      const lvl = parseInt(parts[0]);
-      const act = parseInt(parts[1]);
-      hideStatusBanner();
-      startActivity(lvl, act);
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 1.1: DATA SORTING ARENA
-       ========================================================================= */
-    const sortState11 = {
-      data: [
-        { idx: 0, name: 'Liam', marks: 74 },
-        { idx: 1, name: 'Alex', marks: 82 },
-        { idx: 2, name: 'John', marks: 65 },
-        { idx: 3, name: 'Emma', marks: 95 }
-      ],
-      mission: 0, // index of active sorting task
-      missions: [
-        { text: 'Sort by Marks (Highest ➔ Lowest)', by: 'marks', asc: false, code: `result = df.sort_values(by="Marks", ascending=False)` },
-        { text: 'Sort by Name (A ➔ Z)', by: 'name', asc: true, code: `result = df.sort_values(by="Name", ascending=True)` },
-        { text: 'Sort by Index (Ascending)', by: 'idx', asc: true, code: `result = df.sort_index(ascending=True)` }
-      ]
-    };
-
-    function setupActivity11(container) {
-      document.getElementById('active-title').innerText = 'Activity 1.1 — Data Sorting Arena';
-      document.getElementById('active-subtitle').innerText = 'Sort row elements based on column sorting criteria.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; width:100%; max-width:440px;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100;">Active Sort Mission</span>
-          <span class="target-array-vals" id="sort-mission-text" style="font-size:0.95rem; color:#E65100;">Sort by Marks (Highest ➔ Lowest)</span>
-        </div>
-
-        <div class="sorting-arena-container" id="arena-table">
-          <div class="sorting-row header" style="top:10px;">
-            <span>Index</span>
-            <span>Name</span>
-            <span>Marks</span>
-          </div>
-          <!-- Rows will render dynamically with absolute top positions -->
-        </div>
-
-        <div style="display:flex; gap:0.5rem;">
-          <button class="btn btn-primary" onclick="runSortingAnimation11()">▶ Run Sort</button>
-          <button class="btn btn-outline" onclick="resetSortArena11()">🔄 Reset</button>
-        </div>
-      `;
-
-      sortState11.mission = 0;
-      resetSortArena11();
-    }
-
-    function resetSortArena11() {
-      const arena = document.getElementById('arena-table');
-      // Wipe old dynamic rows
-      document.querySelectorAll('.sorting-row:not(.header)').forEach(r => r.remove());
-
-      // Reset initial values layout
-      sortState11.data = [
-        { idx: 0, name: 'Liam', marks: 74 },
-        { idx: 1, name: 'Alex', marks: 82 },
-        { idx: 2, name: 'John', marks: 65 },
-        { idx: 3, name: 'Emma', marks: 95 }
-      ];
-
-      renderArenaRows11();
-      loadActiveSortMission11();
-    }
-
-    function renderArenaRows11() {
-      const arena = document.getElementById('arena-table');
-      sortState11.data.forEach((item, posIndex) => {
-        let row = document.getElementById(`row-${item.idx}`);
-        if (!row) {
-          row = document.createElement('div');
-          row.className = 'sorting-row';
-          row.id = `row-${item.idx}`;
-          row.innerHTML = `
-            <span>${item.idx}</span>
-            <span>${item.name}</span>
-            <span>${item.marks}</span>
-          `;
-          arena.appendChild(row);
-        }
-        // Calculate offset: header takes 10px + 38px + 10px gap = 58px. Each row is 38px + 6px gap = 44px
-        row.style.top = `${58 + (posIndex * 44)}px`;
-      });
-    }
-
-    function loadActiveSortMission11() {
-      const mission = sortState11.missions[sortState11.mission];
-      document.getElementById('sort-mission-text').innerText = mission.text;
-
-      const codeStr = `import pandas as pd\ndf = pd.DataFrame({\n  "Name": ["Liam", "Alex", "John", "Emma"],\n  "Marks": [74, 82, 65, 95]\n})\n\n# Target Mission:\n# ${mission.text}\n\n# Click 'Run Sort' to rearrange table.`;
-      formatPythonCode(codeStr, 7);
-      document.getElementById('code-explainer-text').innerText = 'Sorting rearrangement shifts indices or values element offsets.';
-    }
-
-    function runSortingAnimation11() {
-      audio.click();
-      const mission = sortState11.missions[sortState11.mission];
-
-      // Perform javascript array sorting
-      const sorted = [...sortState11.data].sort((a, b) => {
-        let valA = a[mission.by];
-        let valB = b[mission.by];
-        if (typeof valA === 'string') {
-          return mission.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-        }
-        return mission.asc ? valA - valB : valB - valA;
-      });
-
-      // Visually animate positions
-      sortState11.data = sorted;
-      renderArenaRows11();
-
-      // Highlight sorting action
-      document.querySelectorAll('.sorting-row:not(.header)').forEach(r => r.classList.add('sorting-active'));
-      setTimeout(() => {
-        document.querySelectorAll('.sorting-row:not(.header)').forEach(r => r.classList.remove('sorting-active'));
-      }, 700);
-
-      // Render updated Python code terminal
-      const codeStr = `import pandas as pd\ndf = pd.DataFrame({\n  "Name": ["Liam", "Alex", "John", "Emma"],\n  "Marks": [74, 82, 65, 95]\n})\n\n# Sort executed successfully:\n${mission.code}\n\n# Output DataFrame matches target order!`;
-      formatPythonCode(codeStr, 7);
-      document.getElementById('code-explainer-text').innerText = `${mission.code} updates layout structures.`;
-
-      // Cycle missions
-      setTimeout(() => {
-        sortState11.mission++;
-        if (sortState11.mission < sortState11.missions.length) {
-          loadActiveSortMission11();
-        } else {
-          concludeActivity11();
-        }
-      }, 1600);
-    }
-
-    function concludeActivity11() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Data Sorting Arena Tasks Cleared!</span>`;
-      if (!state.completedActivities.includes('1-1')) {
-        state.completedActivities.push('1-1');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Data sorting completed successfully! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 1.2: SEARCH HUNTER
-       ========================================================================= */
-    const searchState12 = {
-      isSorted: false,
-      data: [
-        { idx: 0, id: 101, name: 'Liam', marks: 74 },
-        { idx: 1, id: 102, name: 'Alex', marks: 82 },
-        { idx: 2, id: 103, name: 'John', marks: 65 },
-        { idx: 3, id: 104, name: 'Emma', marks: 95 },
-        { idx: 4, id: 105, name: 'Sophia', marks: 88 },
-        { idx: 5, id: 106, name: 'Sophia', marks: 78 } // duplicated sophia
-      ],
-      target: { name: 'Emma', id: 104 },
-      scanInterval: null
-    };
-
-    function setupActivity12(container) {
-      document.getElementById('active-title').innerText = 'Activity 1.2 — Search Hunter';
-      document.getElementById('active-subtitle').innerText = 'Compare Linear vs. Binary search lookups on unsorted/sorted DataFrames.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#ECEFF1; border-color:#B0BEC5; width:100%; max-width:440px;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#37474F;">Detective Target Scanner</span>
-          <span class="target-array-vals" style="font-size:0.95rem; color:#37474F;">Find record where: Name == "Emma" (ID: 104)</span>
-        </div>
-
-        <div class="search-hunter-list" id="search-list-box">
-          <!-- Populated dynamically -->
-        </div>
-
-        <div class="stats-panel-box">
-          <div>Rows Visited: <span id="stats-visited" style="color:var(--primary-red); font-weight:700;">0</span></div>
-          <div>Comparisons: <span id="stats-comps" style="color:var(--primary-red); font-weight:700;">0</span></div>
-          <div>Efficiency: <span id="stats-eff" style="color:var(--primary-red); font-weight:700;">-</span></div>
-          <div>Time Elapsed: <span id="stats-time" style="color:var(--primary-red); font-weight:700;">0ms</span></div>
-        </div>
-
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
-          <button class="btn btn-outline" onclick="sortListForSearch12()">📶 Sort Dataset (by Name)</button>
-          <button class="btn btn-primary" onclick="runSearchHunter12('linear')">🔍 Linear Scan</button>
-          <button class="btn btn-primary" onclick="runSearchHunter12('binary')">⚡ Binary Split</button>
-          <button class="btn btn-outline" onclick="resetSearchHunter12()">🔄 Reset</button>
-        </div>
-      `;
-
-      resetSearchHunter12();
-    }
-
-    function resetSearchHunter12() {
-      if (searchState12.scanInterval) clearInterval(searchState12.scanInterval);
-      searchState12.isSorted = false;
-      searchState12.data = [
-        { idx: 0, id: 101, name: 'Liam', marks: 74 },
-        { idx: 1, id: 102, name: 'Alex', marks: 82 },
-        { idx: 2, id: 103, name: 'John', marks: 65 },
-        { idx: 3, id: 104, name: 'Emma', marks: 95 },
-        { idx: 4, id: 105, name: 'Sophia', marks: 88 }
-      ];
-      renderSearchList12();
-      
-      document.getElementById('stats-visited').innerText = 0;
-      document.getElementById('stats-comps').innerText = 0;
-      document.getElementById('stats-eff').innerText = '-';
-      document.getElementById('stats-time').innerText = '0ms';
-
-      const codeStr = `import pandas as pd\ndf = pd.read_csv('students.csv')\n\n# Target query: Name == "Emma"\n# Select Linear Scan O(N) or Binary Split O(log N) search methods...`;
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = 'Data searching performance is measured by comparisons made to find targets.';
-    }
-
-    function renderSearchList12() {
-      const box = document.getElementById('search-list-box');
-      box.innerHTML = '';
-      searchState12.data.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'search-row-node';
-        row.id = `s-node-${index}`;
-        row.innerHTML = `
-          <span>[${index}] ID: ${item.id}</span>
-          <span>Name: ${item.name}</span>
-          <span>Marks: ${item.marks}</span>
-        `;
-        box.appendChild(row);
-      });
-    }
-
-    function sortListForSearch12() {
-      audio.click();
-      searchState12.isSorted = true;
-      searchState12.data.sort((a, b) => a.name.localeCompare(b.name));
-      renderSearchList12();
-      showStatusBanner("Dataset sorted alphabetically by name. Binary search is now unlocked!");
-
-      const codeStr = `import pandas as pd\ndf = pd.read_csv('students.csv')\n\n# Sort dataset first:\ndf = df.sort_values(by="Name")\n\n# Array indices are now ordered. ready for Binary search!`;
-      formatPythonCode(codeStr, 3);
-    }
-
-    function runSearchHunter12(mode) {
-      audio.click();
-      if (searchState12.scanInterval) clearInterval(searchState12.scanInterval);
-      hideStatusBanner();
-
-      // Clear old styles
-      document.querySelectorAll('.search-row-node').forEach(node => {
-        node.className = 'search-row-node';
-      });
-
-      if (mode === 'binary' && !searchState12.isSorted) {
-        audio.error();
-        showStatusBanner("⚠️ Error: Binary search fails on unsorted layouts! Sort the dataset first.", 'error');
-        return;
       }
 
-      let visited = 0;
-      let comparisons = 0;
-      let startTime = performance.now();
-
-      if (mode === 'linear') {
-        let currentIdx = 0;
-        searchState12.scanInterval = setInterval(() => {
-          if (currentIdx >= searchState12.data.length) {
-            clearInterval(searchState12.scanInterval);
-            audio.error();
-            showStatusBanner("❌ Target not found!", 'error');
-            return;
-          }
-
-          const node = document.getElementById(`s-node-${currentIdx}`);
-          node.classList.add('visiting');
-          visited++;
-          comparisons++;
-          document.getElementById('stats-visited').innerText = visited;
-          document.getElementById('stats-comps').innerText = comparisons;
-          document.getElementById('stats-time').innerText = `${Math.round(performance.now() - startTime)}ms`;
-
-          if (searchState12.data[currentIdx].name === searchState12.target.name) {
-            clearInterval(searchState12.scanInterval);
-            audio.success();
-            node.className = 'search-row-node matched';
-            document.getElementById('stats-eff').innerText = 'O(N) - Linear';
-            
-            const codeStr = `import pandas as pd\ndf = pd.read_csv('students.csv')\n\n# Linear boolean search scan:\nresult = df[df["Name"] == "Emma"]\n# Scanned index ${currentIdx} sequentially to locate target.`;
-            formatPythonCode(codeStr, 4);
-            
-            setTimeout(concludeActivity12, 1800);
-          } else {
-            setTimeout(() => {
-              node.classList.remove('visiting');
-              node.classList.add('skipped');
-            }, 300);
-            currentIdx++;
-          }
-        }, 600);
-      } 
-      
-      else if (mode === 'binary') {
-        // Binary search logic
-        let low = 0;
-        let high = searchState12.data.length - 1;
-        
-        searchState12.scanInterval = setInterval(() => {
-          if (low > high) {
-            clearInterval(searchState12.scanInterval);
-            audio.error();
-            showStatusBanner("❌ Target not found!", 'error');
-            return;
-          }
-
-          let mid = Math.floor((low + high) / 2);
-          const node = document.getElementById(`s-node-${mid}`);
-          node.classList.add('visiting');
-          visited++;
-          comparisons++;
-          document.getElementById('stats-visited').innerText = visited;
-          document.getElementById('stats-comps').innerText = comparisons;
-          document.getElementById('stats-time').innerText = `${Math.round(performance.now() - startTime)}ms`;
-
-          let midVal = searchState12.data[mid].name;
-          if (midVal === searchState12.target.name) {
-            clearInterval(searchState12.scanInterval);
-            audio.success();
-            node.className = 'search-row-node matched';
-            document.getElementById('stats-eff').innerText = 'O(log N) - Fast';
-            
-            const codeStr = `import pandas as pd\ndf = pd.read_csv('students.csv').sort_values(by="Name")\n\n# Binary split Search locator:\n# df is indexed. mid lookup matching:\nresult = df.loc[df["Name"] == "Emma"]`;
-            formatPythonCode(codeStr, 4);
-
-            setTimeout(concludeActivity12, 1800);
-          } else {
-            setTimeout(() => {
-              node.classList.remove('visiting');
-              node.classList.add('skipped');
-            }, 300);
-
-            if (midVal < searchState12.target.name) {
-              low = mid + 1;
-            } else {
-              high = mid - 1;
-            }
-          }
-        }, 1000);
-      }
+      renderSortBars([], n); // All sorted
+      isSorting = false;
+      document.getElementById('sortBtn').disabled = false;
+      document.getElementById('sortBtn').classList.remove('opacity-50');
+      document.getElementById('sortStats').innerText += " (Sort Complete)";
     }
 
-    function concludeActivity12() {
-      if (searchState12.scanInterval) clearInterval(searchState12.scanInterval);
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Search Mission Target Located!</span>`;
-      if (!state.completedActivities.includes('1-2')) {
-        state.completedActivities.push('1-2');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Search Hunter completed! You unlocked Level 2. Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 2.1: FILTER FACTORY
-       ========================================================================= */
-    const factoryState21 = {
-      missions: [
-        { task: 'Filter students: Marks > 80', col: 'Marks', op: '>', val: '80', code: `df[df["Marks"] > 80]` },
-        { task: 'Filter employees: Dept == "IT"', col: 'Dept', op: '==', val: 'IT', code: `df[df["Dept"] == "IT"]` }
-      ],
-      currentIdx: 0,
-      slots: { col: null, op: null, val: null }
-    };
-
-    function setupActivity21(container) {
-      document.getElementById('active-title').innerText = 'Activity 2.1 — Filter Factory Machine';
-      document.getElementById('active-subtitle').innerText = 'Drag filter condition tokens to extract matching rows.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; width:100%; max-width:440px;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100;">Active Filter Mission</span>
-          <span class="target-array-vals" id="filter-mission-text" style="font-size:0.95rem; color:#E65100;">Filter students: Marks > 80</span>
-        </div>
-
-        <div class="filter-ports-container">
-          <div class="drop-cell filter-port-cell" id="f-port-col" data-slot="col">
-            <span class="filter-port-label">Column Name</span>
-            <span style="font-size:0.7rem; color:var(--text-muted);">Drop here</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="f-port-op" data-slot="op">
-            <span class="filter-port-label">Operator</span>
-            <span style="font-size:0.7rem; color:var(--text-muted);">Drop here</span>
-          </div>
-          <div class="drop-cell filter-port-cell" id="f-port-val" data-slot="val">
-            <span class="filter-port-label">Target Value</span>
-            <span style="font-size:0.7rem; color:var(--text-muted);">Drop here</span>
-          </div>
-        </div>
-
-        <div class="drag-chips-container" id="filter-chips">
-          <div class="drag-chip" data-val="Marks" data-slot="col" style="background:#FFF5F5;">Marks</div>
-          <div class="drag-chip" data-val="Dept" data-slot="col" style="background:#FFF5F5;">Dept</div>
-          <div class="drag-chip" data-val=">" data-slot="op">&gt;</div>
-          <div class="drag-chip" data-val="==" data-slot="op">==</div>
-          <div class="drag-chip" data-val="80" data-slot="val">80</div>
-          <div class="drag-chip" data-val="IT" data-slot="val">"IT"</div>
-        </div>
-
-        <button class="btn btn-primary" id="btn-run-filter-21" style="display:none;" onclick="executeFilterFactory21()">⚡ Run Filter Machine</button>
-      `;
-
-      factoryState21.currentIdx = 0;
-      factoryState21.slots = { col: null, op: null, val: null };
-      loadMission21();
-
-      document.querySelectorAll('#filter-chips .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const slotName = target.dataset.slot;
-          const chipSlot = item.dataset.slot;
-
-          if (slotName !== chipSlot) {
-            audio.error();
-            item.style.transform = 'translate(0px, 0px)';
-            return;
-          }
-
-          audio.success();
-          factoryState21.slots[slotName] = item.dataset.val;
-          target.innerHTML = `
-            <span class="filter-port-label" style="color:var(--primary-red); font-weight:800;">Filled</span>
-            <span style="font-family:\'JetBrains Mono\'; font-weight:800; font-size:0.95rem;">${item.dataset.val}</span>
-          `;
-          target.classList.add('filled');
-          item.style.display = 'none';
-
-          checkFilterCompileButton21();
-        });
-      });
-    }
-
-    function loadMission21() {
-      const active = factoryState21.missions[factoryState21.currentIdx];
-      document.getElementById('filter-mission-text').innerText = active.task;
-
-      const codeStr = `import pandas as pd\ndf = pd.read_csv('data.csv')\n\n# Configure boolean filter brackets df[df["Col"] op val]:\n# Drag matching chips to the port inputs below...\n`;
-      formatPythonCode(codeStr, 4);
-      document.getElementById('code-explainer-text').innerText = 'Boolean filter comparisons produce truth tables to index rows.';
-    }
-
-    function checkFilterCompileButton21() {
-      if (factoryState21.slots.col && factoryState21.slots.op && factoryState21.slots.val) {
-        document.getElementById('btn-run-filter-21').style.display = 'inline-flex';
-      }
-    }
-
-    function executeFilterFactory21() {
-      const active = factoryState21.missions[factoryState21.currentIdx];
-      const match = 
-        factoryState21.slots.col === active.col &&
-        factoryState21.slots.op === active.op &&
-        factoryState21.slots.val.replace(/['"]/g, '') === active.val;
-
-      if (match) {
-        audio.success();
-        showStatusBanner("✔ Filter matched! Compiling output DataFrame...", 'success');
-        document.getElementById('btn-run-filter-21').style.display = 'none';
-
-        const codeStr = `import pandas as pd\ndf = pd.read_csv('data.csv')\n\n# Filter evaluated successfully:\nresult = ${active.code}\n\n# Extracted rows matching condition printed:`;
-        formatPythonCode(codeStr, 4);
-
-        setTimeout(() => {
-          factoryState21.currentIdx++;
-          if (factoryState21.currentIdx < factoryState21.missions.length) {
-            // Wipes slots and reload
-            setupActivity21(document.getElementById('sandbox-content'));
-          } else {
-            concludeActivity21();
-          }
-        }, 1600);
-      } else {
-        audio.error();
-        showStatusBanner("❌ Filter parameters do not match active mission requirements! Tapping reset is advised.", 'error');
-      }
-    }
-
-    function concludeActivity21() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Filter Factory Puzzles Solved!</span>`;
-      if (!state.completedActivities.includes('2-1')) {
-        state.completedActivities.push('2-1');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Filter Factory completed! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 2.2: REGEX PUZZLE LAB
-       ========================================================================= */
-    const regexState22 = {
-      missions: [
-        { task: 'Match: Names starting with A', pattern: '^A.*', display: '^ A .*', code: `df[df["Name"].str.contains('^A', regex=True)]` },
-        { task: 'Match: Emails ending in .edu', pattern: '.*\\.edu$', display: '.* .edu $', code: `df[df["Email"].str.contains('\\.edu$', regex=True)]` }
-      ],
-      currentIdx: 0,
-      slots: [null, null, null]
-    };
-
-    function setupActivity22(container) {
-      document.getElementById('active-title').innerText = 'Activity 2.2 — Regex Puzzle Lab';
-      document.getElementById('active-subtitle').innerText = 'Assemble regular expressions blocks to unlock data records.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; width:100%; max-width:440px;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100;">Active Regex Mission</span>
-          <span class="target-array-vals" id="regex-mission-text" style="font-size:0.95rem; color:#E65100;">Match: Names starting with A</span>
-        </div>
-
-        <div class="regex-slots-row">
-          <div class="regex-drop-slot" data-idx="0">1</div>
-          <div class="regex-drop-slot" data-idx="1">2</div>
-          <div class="regex-drop-slot" data-idx="2">3</div>
-        </div>
-
-        <div class="drag-chips-container" id="regex-chips">
-          <div class="drag-chip" data-token="^">^</div>
-          <div class="drag-chip" data-token="A">A</div>
-          <div class="drag-chip" data-token=".*">.*</div>
-          <div class="drag-chip" data-token=".edu">.edu</div>
-          <div class="drag-chip" data-token="$">$</div>
-        </div>
-
-        <div class="regex-chest-zone" id="regex-chest">
-          🔑
-        </div>
-      `;
-
-      regexState22.currentIdx = 0;
-      regexState22.slots = [null, null, null];
-      loadRegexMission22();
-
-      document.querySelectorAll('#regex-chips .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const sIdx = parseInt(target.dataset.idx);
-          if (isNaN(sIdx)) return;
-
-          audio.success();
-          regexState22.slots[sIdx] = item.dataset.token;
-          target.innerText = item.dataset.token;
-          target.style.borderColor = 'var(--primary-red)';
-          target.style.background = '#FFF';
-          item.style.display = 'none';
-
-          checkRegexChestUnlock22();
-        });
-      });
-    }
-
-    function loadRegexMission22() {
-      const active = regexState22.missions[regexState22.currentIdx];
-      document.getElementById('regex-mission-text').innerText = active.task;
-
-      const codeStr = `import pandas as pd\ndf = pd.read_csv('students.csv')\n\n# Target Regex Filter:\n# Assemble blocks in matching order...\nresult = df[df["Col"].str.contains(pattern, regex=True)]`;
-      formatPythonCode(codeStr, 4);
-      document.getElementById('code-explainer-text').innerText = 'contains() with regex=True allows searching entries using structured anchors.';
-    }
-
-    function checkRegexChestUnlock22() {
-      // If all three slots are filled, pulse the chest key
-      if (regexState22.slots.filter(x => x !== null).length === 3) {
-        const chest = document.getElementById('regex-chest');
-        chest.style.borderColor = '#4CAF50';
-        chest.innerHTML = '🔓';
-        
-        // Add click helper to trigger validation
-        chest.onclick = () => validateRegexChallenge22();
-      }
-    }
-
-    function validateRegexChallenge22() {
-      const active = regexState22.missions[regexState22.currentIdx];
-      const builtPattern = regexState22.slots.join(' ');
-
-      if (builtPattern === active.display) {
-        audio.success();
-        showStatusBanner("✔ Regex Matched! File Chest opened successfully.", 'success');
-        
-        const codeStr = `import pandas as pd\ndf = pd.read_csv('students.csv')\n\n# Regex compiled successfully:\n${active.code}\n\n# Output matching entries printed:`;
-        formatPythonCode(codeStr, 4);
-
-        setTimeout(() => {
-          regexState22.currentIdx++;
-          if (regexState22.currentIdx < regexState22.missions.length) {
-            setupActivity22(document.getElementById('sandbox-content'));
-          } else {
-            concludeActivity22();
-          }
-        }, 1600);
-      } else {
-        audio.error();
-        showStatusBanner("❌ Compiled expression fails to match target format! Reloading chest locks...", 'error');
-        setTimeout(() => {
-          setupActivity22(document.getElementById('sandbox-content'));
-        }, 1200);
-      }
-    }
-
-    function concludeActivity22() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Pattern Lock Chests Unlocked!</span>`;
-      if (!state.completedActivities.includes('2-2')) {
-        state.completedActivities.push('2-2');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Regex Puzzle Lab completed! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 3.1: MYSTERY ESCAPE DUNGEON
-       ========================================================================= */
-    const dungeonState31 = {
-      gate: 0, // 0, 1, 2
-      gates: [
-        {
-          task: 'Gate 1: Find the employee with the highest salary.',
-          options: [
-            { text: 'df.sort_values("Salary", ascending=False).head(1)', correct: true },
-            { text: 'df.sort_values("Salary", ascending=True).head(1)', correct: false },
-            { text: 'df.sort_index().tail(1)', correct: false }
-          ],
-          code: `result = df.sort_values("Salary", ascending=False).head(1)`
-        },
-        {
-          task: 'Gate 2: Filter employees living in Mumbai.',
-          options: [
-            { text: 'df[df["City"] == "Mumbai"]', correct: true },
-            { text: 'df[df["City"] != "Mumbai"]', correct: false },
-            { text: 'df.sort_values(by="City")', correct: false }
-          ],
-          code: `result = df[df["City"] == "Mumbai"]`
-        },
-        {
-          task: 'Gate 3: Find names containing the string "an".',
-          options: [
-            { text: 'df[df["Name"].str.contains("an")]', correct: true },
-            { text: 'df[df["Name"].str.startswith("an")]', correct: false },
-            { text: 'df[df["Name"].str.endswith("an")]', correct: false }
-          ],
-          code: `result = df[df["Name"].str.contains("an")]`
-        }
-      ]
-    };
-
-    function setupActivity31(container) {
-      document.getElementById('active-title').innerText = 'Activity 3.1 — Escape Dungeon Room';
-      document.getElementById('active-subtitle').innerText = 'Solve secure database locks to traverse gates and escape.';
-
-      container.innerHTML = `
-        <div class="escape-dungeon-view">
-          <div class="dungeon-character" id="dungeon-char">🕵️</div>
-          <div class="dungeon-gate" id="gate-node-0" style="left:120px;"></div>
-          <div class="dungeon-gate" id="gate-node-1" style="left:240px;"></div>
-          <div class="dungeon-gate" id="gate-node-2" style="left:360px;"></div>
-        </div>
-
-        <div class="target-array-hud" style="background:#ECEFF1; border-color:#B0BEC5; width:100%; max-width:440px; margin-top:0.5rem;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#37474F;" id="escape-gate-label">Gate 1 Lock Challenge</span>
-          <span class="target-array-vals" id="escape-gate-task" style="font-size:0.85rem; color:#37474F;">Find the employee with the highest salary.</span>
-        </div>
-
-        <div class="battle-options-grid" id="escape-options-box">
-          <!-- Options rendered dynamically -->
-        </div>
-      `;
-
-      dungeonState31.gate = 0;
-      loadDungeonGate31();
-    }
-
-    function loadDungeonGate31() {
-      const active = dungeonState31.gates[dungeonState31.gate];
-      document.getElementById('escape-gate-label').innerText = `Gate ${dungeonState31.gate + 1} Lock Challenge`;
-      document.getElementById('escape-gate-task').innerText = active.task;
-
-      // Animate character position: Gate 0 -> 20px, Gate 1 -> 140px, Gate 2 -> 260px, Done -> 380px
-      const char = document.getElementById('dungeon-char');
-      char.style.left = `${20 + (dungeonState31.gate * 120)}px`;
-
-      const optionsBox = document.getElementById('escape-options-box');
-      optionsBox.innerHTML = '';
-      const shuffledOptions = [...active.options].sort(() => Math.random() - 0.5);
-      shuffledOptions.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'battle-option-btn';
-        btn.innerText = opt.text;
-        btn.onclick = () => verifyDungeonOption31(opt.correct, active.code);
-        optionsBox.appendChild(btn);
-      });
-
-      const codeStr = `import pandas as pd\ndf = pd.read_csv('employees.csv')\n\n# Solve Lock Query ${dungeonState31.gate + 1}...\n# Match options shown on playground:`;
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = 'Unlocking dungeons requires applying targeted boolean indexing logic.';
-    }
-
-    function verifyDungeonOption31(isCorrect, codeLine) {
-      if (isCorrect) {
-        audio.success();
-        document.getElementById(`gate-node-${dungeonState31.gate}`).classList.add('open');
-        showStatusBanner(`✔ Correct! Gate ${dungeonState31.gate + 1} unlocked.`, 'success');
-
-        const codeStr = `import pandas as pd\ndf = pd.read_csv('employees.csv')\n\n# Unlocked Gate ${dungeonState31.gate + 1}:\n${codeLine}\n\n# Character moving to next chamber...`;
-        formatPythonCode(codeStr, 4);
-
-        setTimeout(() => {
-          dungeonState31.gate++;
-          if (dungeonState31.gate < dungeonState31.gates.length) {
-            loadDungeonGate31();
-          } else {
-            concludeActivity31();
-          }
-        }, 1600);
-      } else {
-        audio.error();
-        showStatusBanner("❌ Wrong query syntax! Alarm triggered, try again.", 'error');
-      }
-    }
-
-    function concludeActivity31() {
-      const char = document.getElementById('dungeon-char');
-      char.style.left = '380px';
-
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Escaped all Dungeon Chambers!</span>`;
-      if (!state.completedActivities.includes('3-1')) {
-        state.completedActivities.push('3-1');
-        awardProgress();
-      }
-      showStatusBanner("🎉 Escape Dungeon completed! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 3.2: BOSS BATTLE
-       ========================================================================= */
-    const battleState32 = {
-      bossHP: 100,
-      playerHP: 100,
-      round: 0,
-      rounds: [
-        {
-          task: 'Sort table by Marks descending:',
-          options: [
-            { text: 'df.sort_values(by="Marks", ascending=False)', correct: true },
-            { text: 'df.sort_values(by="Marks", ascending=True)', correct: false },
-            { text: 'df.sort_index()', correct: false }
-          ],
-          code: `result = df.sort_values(by="Marks", ascending=False)`
-        },
-        {
-          task: 'Filter records matching emails ending in .com:',
-          options: [
-            { text: 'df[df["Email"].str.endswith(".com")]', correct: true },
-            { text: 'df[df["Email"].str.contains("^.com")]', correct: false },
-            { text: 'df[df["Email"].str.startswith(".com")]', correct: false }
-          ],
-          code: `result = df[df["Email"].str.endswith(".com")]`
-        },
-        {
-          task: 'Filter rows where Name starts with "R":',
-          options: [
-            { text: 'df[df["Name"].str.startswith("R")]', correct: true },
-            { text: 'df[df["Name"].str.contains("R$")]', correct: false },
-            { text: 'df.sort_values(by="Name")', correct: false }
-          ],
-          code: `result = df[df["Name"].str.startswith("R")]`
-        }
-      ]
-    };
-
-    function setupActivity32(container) {
-      document.getElementById('active-title').innerText = 'Activity 3.2 — Data Analyst Boss Battle';
-      document.getElementById('active-subtitle').innerText = 'Defeat the AI Analyst by matching query methods quickly.';
-
-      container.innerHTML = `
-        <div class="boss-battle-view">
-          
-          <div class="boss-character-avatar">🤖</div>
-
-          <!-- Boss Health Bar -->
-          <div class="boss-bar-row">
-            <span>BOSS HP</span>
-            <div class="boss-hp-track">
-              <div class="boss-hp-fill" id="boss-hp"></div>
-            </div>
-          </div>
-
-          <!-- Player Health Bar -->
-          <div class="boss-bar-row">
-            <span>YOUR HP</span>
-            <div class="boss-hp-track">
-              <div class="player-hp-fill" id="player-hp"></div>
-            </div>
-          </div>
-
-          <!-- Round question -->
-          <div class="target-array-hud" style="background:#FFEBEE; border-color:#FFCDD2; width:100%; margin-top:0.5rem;">
-            <span style="font-size:0.75rem; text-transform:uppercase; color:var(--primary-red);" id="battle-round-title">Combat Round 1</span>
-            <span class="target-array-vals" id="battle-task-text" style="font-size:0.85rem; color:var(--primary-red);">Sort table by Marks descending:</span>
-          </div>
-
-          <div class="battle-options-grid" id="battle-options-box">
-            <!-- Buttons populated dynamically -->
-          </div>
-
-        </div>
-      `;
-
-      battleState32.bossHP = 100;
-      battleState32.playerHP = 100;
-      battleState32.round = 0;
-      loadBattleRound32();
-    }
-
-    function loadBattleRound32() {
-      const active = battleState32.rounds[battleState32.round];
-      document.getElementById('battle-round-title').innerText = `Combat Round ${battleState32.round + 1}`;
-      document.getElementById('battle-task-text').innerText = active.task;
-
-      // Update HP fills
-      document.getElementById('boss-hp').style.width = `${battleState32.bossHP}%`;
-      document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
-
-      const optionsBox = document.getElementById('battle-options-box');
-      optionsBox.innerHTML = '';
-      const shuffledOptions = [...active.options].sort(() => Math.random() - 0.5);
-      shuffledOptions.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'battle-option-btn';
-        btn.innerText = opt.text;
-        btn.onclick = () => verifyBattleHit32(opt.correct, active.code);
-        optionsBox.appendChild(btn);
-      });
-
-      const codeStr = `import pandas as pd\n\n# Combat Round Query ${battleState32.round + 1}:\n# Match equivalent python execution lines...\nresult = pandas_command`;
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = 'Select matching commands to land hits on the AI boss.';
-    }
-
-    function verifyBattleHit32(isCorrect, codeLine) {
-      if (isCorrect) {
-        audio.success();
-        battleState32.bossHP -= 34;
-        if (battleState32.bossHP < 0) battleState32.bossHP = 0;
-        showStatusBanner("💥 Direct Hit! You damaged the AI Boss.", 'success');
-
-        const codeStr = `import pandas as pd\n\n# Command compiled successfully:\n${codeLine}\n\n# Landing direct damage hit! Boss health reduced.`;
-        formatPythonCode(codeStr, 3);
-      } else {
-        audio.error();
-        battleState32.playerHP -= 34;
-        if (battleState32.playerHP < 0) battleState32.playerHP = 0;
-        showStatusBanner("❌ Shield Deflected! The AI analyst counter-hit you.", 'error');
-
-        const codeStr = `import pandas as pd\n\n# Command compilation failed!\n# Blocked execution error. Player damaged.`;
-        formatPythonCode(codeStr, 3);
-      }
-
-      setTimeout(() => {
-        if (battleState32.bossHP <= 0) {
-          concludeBattle32();
-        } else if (battleState32.playerHP <= 0) {
-          audio.error();
-          showStatusBanner("💀 Defeat! Player health depleted. Tapping next level restarts the battle.", 'error');
-          setTimeout(() => {
-            setupActivity32(document.getElementById('sandbox-content'));
-          }, 1500);
-        } else {
-          battleState32.round++;
-          if (battleState32.round < battleState32.rounds.length) {
-            loadBattleRound32();
-          } else {
-            concludeBattle32();
-          }
-        }
-      }, 1600);
-    }
-
-    function concludeBattle32() {
-      document.getElementById('boss-hp').style.width = '0%';
-      document.getElementById('player-hp').style.width = `${battleState32.playerHP}%`;
-
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `
-        <div style="text-align:center;">
-          <span style="font-size:3rem;">🏆</span>
-          <h3 style="color:#2E7D32; font-weight:800; margin-bottom:0.5rem;">AI Boss Defeated!</h3>
-          <p style="font-size:0.8rem; color:var(--text-muted);">Rank Gained: Master Data Detective</p>
-        </div>
-      `;
-
-      if (!state.completedActivities.includes('3-2')) {
-        state.completedActivities.push('3-2');
-        awardProgress();
-      }
-
-      // Show Congrats dialog
-      document.getElementById('badge-dialog-text').innerHTML = `
-        <p style="margin-bottom:0.5rem;">🎉 <strong>VICTORY!</strong> You defeated the AI Data Analyst!</p>
-        <p>You unlocked the <strong>Master Data Detective</strong> rank! All Sorting, Searching, and Filtering modules are complete.</p>
-      `;
-      document.getElementById('badge-dialog').showModal();
-
-      showStatusBanner("🎉 Boss Battle complete! All simulation levels finished successfully!");
-    }
-
-
-    /* --- Initialization on Load --- */
-    window.addEventListener('load', () => {
-      loadState();
-      startActivity(1, 1);
-    });
-
+    // Initialize on load
+    initBars();
   </script>
 </body>
-</html>
 
+</html>

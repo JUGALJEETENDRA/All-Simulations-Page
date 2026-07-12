@@ -4,2311 +4,598 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pandas Data Academy - Interactive Playgrounds</title>
-  <!-- Google Fonts for Modern Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;800&display=swap"
-    rel="stylesheet">
-
+  <title>Pandas Data Analytics: Retail Dashboard Case Study</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* --- CSS Reset & Variables --- */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
     :root {
-      --primary-red: #D32F2F;
-      --primary-red-hover: #B71C1C;
-      --light-red-bg: #FFEBEE;
-      --light-red-border: #FFCDD2;
-      --pure-white: #FFFFFF;
-      --off-white: #F9F9F9;
-      --text-dark: #212121;
-      --text-muted: #666666;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-      --border-radius-sm: 8px;
-      --border-radius-md: 16px;
-      --border-radius-lg: 24px;
-      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --bg-canvas: #f8f7f4;
+      --tech-blue: #2c5282;
+      --alert-orange: #c05621;
+      --text-main: #1a202c;
+      --pandas-magenta: #e53e3e;
+      /* Distinctive color for Pandas module */
+      --grid-line: #e2e8f0;
     }
 
     body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--off-white);
-      color: var(--text-dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* --- Background Vector Grid --- */
-    .bg-grid {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-image:
-        radial-gradient(var(--light-red-border) 1px, transparent 1px),
-        radial-gradient(var(--light-red-border) 1px, transparent 1px);
-      background-size: 24px 24px;
-      background-position: 0 0, 12px 12px;
-      opacity: 0.35;
-      z-index: -1;
-    }
-
-    /* --- Header Bar --- */
-    header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 2px solid var(--light-red-border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .brand-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--primary-red);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--pure-white);
-      font-weight: 800;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
-    }
-
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--primary-red);
-      letter-spacing: -0.5px;
-    }
-
-    /* Header Nav Nodes */
-    .level-nav-hud {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--off-white);
-      padding: 0.35rem;
-      border-radius: var(--border-radius-lg);
-      border: 1.5px solid var(--light-red-border);
-    }
-
-    .hud-node {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--pure-white);
-      border: 1.5px solid var(--light-red-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .hud-node.unlocked {
-      color: var(--primary-red);
-      border-color: var(--primary-red);
-    }
-
-    .hud-node.active {
-      background: var(--primary-red);
-      color: var(--pure-white);
-      border-color: var(--primary-red);
-      box-shadow: 0 3px 8px rgba(211, 47, 47, 0.25);
-    }
-
-    .hud-node-line {
-      width: 20px;
-      height: 2px;
-      background: var(--light-red-border);
-    }
-
-    .hud-node-line.unlocked {
-      background: var(--primary-red);
-    }
-
-    /* Stats Panel */
-    .hud-stats {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-weight: 700;
-      font-size: 0.9rem;
-      background: var(--off-white);
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--border-radius-sm);
-      border: 1.5px solid var(--light-red-border);
-    }
-
-    .stat-val {
-      color: var(--primary-red);
-    }
-
-    /* Buttons styling */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: var(--border-radius-sm);
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      border: none;
-      outline: none;
-    }
-
-    .btn-primary {
-      background: var(--primary-red);
-      color: var(--pure-white);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: var(--primary-red-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      background: var(--pure-white);
-      color: var(--primary-red);
-      border: 1.5px solid var(--primary-red);
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: var(--light-red-bg);
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* --- Main Workspace Layout --- */
-    main {
-      flex: 1;
-      padding: 2rem;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    /* --- Theory & Steps Card (At the top, spanning full width) --- */
-    .theory-panel {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.25rem 1.75rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .theory-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--primary-red);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .theory-steps {
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--light-red-border);
-    }
-
-    .theory-steps-title {
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 0.35rem;
-      color: var(--text-dark);
-    }
-
-    /* --- Inline Status Banner --- */
-    #status-banner {
-      display: none;
-      background: #E8F5E9;
-      border: 2px solid #2E7D32;
-      color: #1B5E20;
-      padding: 0.9rem 1.25rem;
-      border-radius: var(--border-radius-md);
-      font-weight: 600;
-      font-size: 0.9rem;
-      animation: pop-in 0.3s ease-out;
-    }
-
-    /* --- Main Split Workspace --- */
-    .game-workspace {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    /* Playground Left Panel */
-    .playground-panel {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.5rem;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      min-height: 480px;
-    }
-
-    .playground-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1.5px solid var(--light-red-border);
-      padding-bottom: 0.75rem;
-    }
-
-    .playground-title-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .playground-title {
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--text-dark);
-    }
-
-    .playground-subtitle {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
-    }
-
-    .playground-controls {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .sandbox-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 1.25rem;
-      position: relative;
-    }
-
-    /* Code Terminal Right Panel */
-    .terminal-panel {
-      background: #1E1E1E;
-      border-radius: var(--border-radius-md);
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      flex-direction: column;
-      min-height: 480px;
-    }
-
-    .terminal-header {
-      background: #2D2D2D;
-      padding: 0.75rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #3C3C3C;
-    }
-
-    .terminal-dots {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .terminal-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .terminal-dot.red {
-      background: #FF5F56;
-    }
-
-    .terminal-dot.yellow {
-      background: #FFBD2E;
-    }
-
-    .terminal-dot.green {
-      background: #27C93F;
-    }
-
-    .terminal-title {
-      color: #A0A0A0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .terminal-body {
-      flex: 1;
-      padding: 1.5rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-family: 'IBM+Plex+Sans', sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
       line-height: 1.6;
-      color: #D4D4D4;
-      overflow-y: auto;
     }
 
-    .code-line {
-      display: flex;
-      gap: 1rem;
-      opacity: 0.85;
-      transition: opacity var(--transition-fast);
+    .serif {
+      font-family: 'IBM+Plex+Serif', serif;
     }
 
-    .code-line.active {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 2px solid var(--primary-red);
-      padding-left: 2px;
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .code-num {
-      color: #858585;
-      text-align: right;
-      width: 20px;
-      user-select: none;
+    .technical-image-container {
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
     }
 
-    .code-text {
-      white-space: pre-wrap;
+    /* Python Syntax Highlighting */
+    .kw {
+      color: #c05621;
+      font-weight: bold;
     }
 
-    /* Code Highlighting classes */
-    .token-comment {
-      color: #6A9955;
+    .str {
+      color: #2c5282;
+    }
+
+    .cmt {
+      color: #718096;
       font-style: italic;
     }
 
-    .token-keyword {
-      color: #C586C0;
-      font-weight: 600;
+    .func {
+      color: #805ad5;
     }
 
-    .token-string {
-      color: #CE9178;
+    .lib {
+      color: #e53e3e;
+      font-weight: bold;
     }
 
-    .token-method {
-      color: #DCDCAA;
-    }
-
-    .token-number {
-      color: #B5CEA8;
-    }
-
-    .token-builtin {
-      color: #569CD6;
-    }
-
-    .terminal-explainer {
-      background: #252526;
-      border-top: 1px solid #3C3C3C;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: #D4D4D4;
-    }
-
-    .explainer-icon {
-      font-size: 1.2rem;
-    }
-
-    /* --- Interactive Drag & Drop Classes --- */
-    .drag-chips-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .drag-chip {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      padding: 0.5rem 1rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--primary-red);
-      cursor: grab;
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow var(--transition-fast), transform var(--transition-fast);
-      touch-action: none;
-    }
-
-    .drag-chip:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
-    }
-
-    .drag-chip.dragging {
-      opacity: 0.8;
-      cursor: grabbing;
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
-    }
-
-    .drop-cell {
-      border: 2px dashed var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--off-white);
-      transition: all var(--transition-fast);
-    }
-
-    .drop-cell.hovered {
-      background: var(--light-red-bg);
-      border-color: var(--primary-red);
-      transform: scale(1.02);
-    }
-
-    .drop-cell.filled {
-      border-style: solid;
-      border-color: var(--primary-red);
-      background: var(--pure-white);
-    }
-
-    /* --- Activity Specific Elements --- */
-
-    /* Activity 1.1: DataFrame Constructor Grid */
-    .df-grid-constructor {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.5rem;
-      width: 100%;
-      max-width: 440px;
-    }
-
-    .constructor-header-cell {
-      height: 44px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .constructor-value-cell {
-      height: 48px;
-      font-size: 0.9rem;
-    }
-
-    /* Activity 1.2: Series vs DataFrame folders */
-    .sorting-folders-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      width: 100%;
-      max-width: 460px;
-      margin-top: 1rem;
-    }
-
-    .sorting-folder {
-      border: 3px dashed var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.5rem;
-      height: 160px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      background: var(--pure-white);
-      transition: all var(--transition-medium);
-    }
-
-    .sorting-folder.hovered {
-      border-color: var(--primary-red);
-      background: var(--light-red-bg);
-      transform: scale(1.02);
-    }
-
-    .folder-icon {
-      font-size: 3rem;
-      transition: transform var(--transition-fast);
-    }
-
-    .sorting-folder.hovered .folder-icon {
-      transform: scale(1.15) rotate(5deg);
-    }
-
-    .folder-title {
-      font-weight: 800;
-      font-size: 1rem;
-      color: var(--primary-red);
-    }
-
-    /* Activity 2.1: File Explorer Adventure */
-    .file-explorer {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      width: 100%;
-      max-width: 440px;
-    }
-
-    .file-card {
-      background: var(--pure-white);
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: grab;
-      box-shadow: var(--shadow-sm);
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-      touch-action: none;
-    }
-
-    .file-card.dragging {
-      opacity: 0.7;
-      z-index: 1000;
-    }
-
-    .file-icon {
-      font-size: 2.2rem;
-    }
-
-    .file-name {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-align: center;
-      color: var(--text-dark);
-    }
-
-    .pandas-import-machine {
-      width: 100%;
-      max-width: 440px;
-      height: 180px;
-      border: 3.5px dashed var(--primary-red);
-      border-radius: var(--border-radius-md);
-      background: var(--light-red-bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      position: relative;
-      overflow: hidden;
-      transition: all var(--transition-medium);
-    }
-
-    .machine-conveyor {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 12px;
-      background: repeating-linear-gradient(45deg, var(--primary-red), var(--primary-red) 10px, #FFF 10px, #FFF 20px);
-      animation: conveyor-move 1.5s linear infinite;
-      animation-play-state: paused;
-    }
-
-    .pandas-import-machine.active .machine-conveyor {
-      animation-play-state: running;
-    }
-
-    /* Activity 2.2: Export Factory layout */
-    .export-layout-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      width: 100%;
-    }
-
-    .dataframe-source-card {
-      background: var(--pure-white);
-      border: 2px solid var(--primary-red);
-      border-radius: var(--border-radius-sm);
-      padding: 0.75rem 1rem;
-      cursor: grab;
-      box-shadow: var(--shadow-md);
-      touch-action: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 800;
-      color: var(--primary-red);
-    }
-
-    .export-machines-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .export-machine {
-      border: 2.5px dashed var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.25rem 0.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      background: var(--pure-white);
-      transition: all var(--transition-medium);
-    }
-
-    .export-machine.hovered {
-      border-color: var(--primary-red);
-      background: var(--light-red-bg);
-      transform: translateY(-2px);
-    }
-
-    .export-machine-title {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: var(--text-dark);
-    }
-
-    /* Activity 3.1: Data Detective */
-    .detective-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-    }
-
-    .detective-table {
+    /* DataFrame Visualization Styles */
+    .df-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
-      background: var(--pure-white);
-      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      text-align: right;
+      background: white;
     }
 
-    .detective-table th {
-      background: var(--light-red-bg);
-      color: var(--primary-red);
-      font-weight: 700;
-      padding: 0.6rem;
-      border-bottom: 2px solid var(--light-red-border);
+    .df-table th,
+    .df-table td {
+      border: 1px solid var(--grid-line);
+      padding: 4px 8px;
     }
 
-    .detective-table td {
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid var(--light-red-border);
-    }
-
-    .detective-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .detective-grid-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-      align-items: center;
-    }
-
-    .magnifying-lens-drop {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 4px dashed var(--primary-red);
-      background: var(--off-white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      transition: all var(--transition-fast);
-    }
-
-    .magnifying-lens-drop.hovered {
-      background: var(--light-red-bg);
-      transform: scale(1.05);
-    }
-
-    /* Activity 3.2: Dashboard Builder Grid */
-    .dashboard-workspace-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 500px;
-    }
-
-    .dashboard-layout-template {
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1rem;
-      background: #F5F5F5;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .dashboard-drop-box {
-      background: var(--pure-white);
-      border: 1.5px dashed var(--light-red-border);
-      border-radius: var(--border-radius-sm);
-      height: 70px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem;
-      transition: all var(--transition-fast);
-    }
-
-    .dashboard-drop-box.hovered {
-      border-color: var(--primary-red);
-      background: var(--light-red-bg);
-    }
-
-    .dashboard-drop-title {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 0.25rem;
-    }
-
-    /* --- Interactive overlay / screen alerts --- */
-    dialog {
-      border: 2px solid var(--light-red-border);
-      border-radius: var(--border-radius-md);
-      padding: 1.75rem;
-      max-width: 480px;
-      width: 90%;
-      margin: auto;
-      box-shadow: var(--shadow-lg);
-      outline: none;
-      font-family: 'Outfit', sans-serif;
-    }
-
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(4px);
-    }
-
-    .dialog-header {
-      font-weight: 800;
-      color: var(--primary-red);
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .dialog-body {
-      font-size: 0.9rem;
-      color: var(--text-dark);
-      line-height: 1.5;
-      margin-bottom: 1.25rem;
-    }
-
-    .dialog-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-    }
-
-    /* Progress bar HUD */
-    .progress-bar-container {
-      width: 100%;
-      height: 8px;
-      background: var(--light-red-border);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 0.5rem;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--primary-red);
-      border-radius: 4px;
-      transition: width var(--transition-medium);
-    }
-
-    /* Footer styling */
-    footer {
-      background: rgba(255, 255, 255, 0.95);
-      border-top: 1px solid var(--light-red-border);
-      padding: 1rem 2rem;
+    .df-table th {
+      background-color: #f7fafc;
+      font-weight: bold;
+      color: #4a5568;
       text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
     }
 
-    /* --- Animations definitions --- */
-    @keyframes pop-in {
-      0% {
-        transform: scale(0.95);
-        opacity: 0;
+    .df-table .index-col {
+      background-color: #edf2f7;
+      font-weight: bold;
+      text-align: center;
+      color: #4a5568;
+    }
+
+    .highlight-col {
+      background-color: #fff5f5;
+    }
+
+    .highlight-row {
+      background-color: #ebf8ff;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 250px;
+    }
+
+    /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+    @media print {
+
+      /* Reset body/html defaults for clean printing */
+      html,
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
-      100% {
-        transform: scale(1);
-        opacity: 1;
+      /* Keep overflow visible to prevent multi-page cropping/clipping */
+      html,
+      body,
+      main,
+      section,
+      div,
+      pre,
+      code,
+      table,
+      tr,
+      td,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        position: static !important;
       }
-    }
 
-    @keyframes conveyor-move {
-      0% {
-        background-position: 0 0;
+      /* Ensure structural blocks break elegantly across pages */
+      pre,
+      blockquote,
+      table,
+      tr,
+      img,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
 
-      100% {
-        background-position: 28px 0;
+      /* Avoid orphaned headers at the bottom of a page */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        page-break-after: avoid;
+        break-after: avoid;
       }
-    }
 
-    @keyframes spin {
-      100% {
-        transform: rotate(360deg);
+      /* Hide interactive/non-printable UI elements */
+      nav,
+      footer,
+      button,
+      .no-print,
+      [class*="sticky"],
+      [class*="fixed"] {
+        display: none !important;
       }
-    }
-
-    .spinning {
-      animation: spin 0.8s linear infinite;
-    }
-
-    /* Table animations */
-    .row-anim {
-      animation: row-slide-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      opacity: 0;
-      transform: translateY(12px);
-    }
-
-    @keyframes row-slide-in {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Canvas confetti */
-    #confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
     }
   </style>
 </head>
 
-<body>
+<body class="antialiased">
 
-  <div class="bg-grid"></div>
-  <canvas id="confetti-canvas"></canvas>
-
-  <!-- Navigation header -->
-  <header>
-    <div class="brand">
-      <div class="brand-logo">P</div>
-      <div class="brand-title">Pandas Academy</div>
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-red-600 flex items-center justify-center text-white font-bold rounded">PD</div>
+        <span class="font-bold tracking-tighter uppercase">Engineering Dossier</span>
+      </div>
+      <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+        <a href="#theory" class="hover:text-black transition">Foundations</a>
+        <a href="#io" class="hover:text-black transition">Data Ingestion</a>
+        <a href="#stats" class="hover:text-black transition">Statistical Methods</a>
+        <a href="#case" class="hover:text-black transition">Case Study: Retail</a>
+        <a href="#lab" class="text-red-600 font-bold">DataFrame Lab</a>
+      </div>
     </div>
+  </nav>
 
-    <!-- Active Level Nodes Indicator -->
-    <div class="level-nav-hud">
-      <div class="hud-node active" id="node-1" onclick="switchLevel(1)">1</div>
-      <div class="hud-node-line" id="line-1"></div>
-      <div class="hud-node" id="node-2" onclick="switchLevel(2)">2</div>
-      <div class="hud-node-line" id="line-2"></div>
-      <div class="hud-node" id="node-3" onclick="switchLevel(3)">3</div>
-    </div>
-
-    <!-- Navigation controls -->
-    <div class="hud-stats">
-      <button class="btn btn-outline" id="btn-prev-level" onclick="changeLevel(-1)">◀ Prev Level</button>
-      <button class="btn btn-primary" id="btn-next-level" onclick="changeLevel(1)">Next Level ▶</button>
+  <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+    <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Tabular Architecture & Statistical
+      Aggregation</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      An engineering report on Pandas DataFrames, handling heterogeneous data types, I/O operations
+      (CSV/Excel/JSON), and applying statistical iterations for retail analytics.
+    </p>
+    <div class="mt-8 flex justify-center space-x-4">
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ref: Module
+        4-4.2</span>
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ver: 2026.Q3</span>
     </div>
   </header>
 
-  <!-- Main Grid Workspace -->
-  <main>
+  <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
 
-    <!-- Dynamic Theory and Steps Panel (Full Width) -->
-    <div class="theory-panel" id="theory-panel">
-      <div class="theory-title">
-        <span>📖</span> <span id="theory-title-text">Topic Theory</span>
-      </div>
-      <p id="theory-desc-text" style="font-size:0.85rem; color:var(--text-dark); margin-bottom: 0.5rem;"></p>
-      <div class="theory-steps">
-        <div class="theory-steps-title">🛠️ Steps to Perform Simulation:</div>
-        <ul id="theory-steps-list" style="margin-left: 1.25rem; font-size: 0.8rem; color: var(--text-muted);">
-          <!-- Populated dynamically -->
+    <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div class="space-y-6">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-red-600">01. Theoretical Foundations</h2>
+        <h3 class="serif text-4xl leading-snug">The DataFrame Abstraction</h3>
+        <p>
+          While NumPy is built for homogenous numerical matrices, real-world business data is
+          <strong>heterogeneous</strong>. A single retail ledger contains dates (datetime), product names
+          (strings), quantities (integers), and prices (floats).
+        </p>
+        <p>
+          <strong>Pandas</strong> solves this by introducing two primary data structures:
+        </p>
+        <ul class="space-y-2 text-sm text-gray-700 list-none pl-0">
+          <li><span class="font-bold text-red-600">1. Series:</span> A 1D labeled array capable of holding any
+            data type. (Like a single column in Excel).</li>
+          <li><span class="font-bold text-red-600">2. DataFrame:</span> A 2D labeled data structure with
+            columns of potentially different types. (A collection of Series sharing an index).</li>
         </ul>
-      </div>
-    </div>
-
-    <!-- Status Banner for alerts and complete states -->
-    <div id="status-banner"></div>
-
-    <!-- Gameplay panels split grid -->
-    <div class="game-workspace" id="game-workspace">
-
-      <!-- Left Panel: Playground Simulator -->
-      <div class="playground-panel">
-        <div class="playground-header">
-          <div class="playground-title-wrapper">
-            <span class="playground-title" id="active-title">Activity Title</span>
-            <span class="playground-subtitle" id="active-subtitle">Select options or drag elements below</span>
-          </div>
-          <div class="playground-controls">
-            <button class="btn btn-outline" id="btn-prev-act" onclick="navigateActivity(-1)"
-              style="padding: 0.4rem 0.8rem;">◀ Prev</button>
-            <button class="btn btn-outline" id="btn-next-act" onclick="navigateActivity(1)"
-              style="padding: 0.4rem 0.8rem;">Next ▶</button>
-            <button class="btn btn-outline" onclick="showHint()" style="padding: 0.4rem 0.8rem;">💡 Hint</button>
-            <button class="btn btn-outline" onclick="resetActiveActivity()" style="padding: 0.4rem 0.8rem;">🔄 Reset</button>
-          </div>
-        </div>
-
-        <div class="sandbox-container" id="sandbox-content">
-          <!-- Dynamic sandbox content goes here -->
+        <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-gray-800">
+          <p class="text-sm font-bold uppercase mb-2">Architectural Note:</p>
+          <p class="italic text-gray-700">Pandas is built on top of NumPy. Each column in a DataFrame is
+            essentially a NumPy array, bringing C-level speed to complex relational datasets.</p>
         </div>
       </div>
 
-      <!-- Right Panel: Python Code & Explanation -->
-      <div class="terminal-panel">
-        <div class="terminal-header">
-          <div class="terminal-dots">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-          </div>
-          <div class="terminal-title">live_pandas_code.py</div>
-          <div style="width: 40px;"></div>
-        </div>
+      <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-slate-400">Anatomy of a DataFrame
+        </h4>
 
-        <div class="terminal-body" id="code-lines-container">
-          <!-- Code statements populated here -->
-        </div>
+        <div class="relative mt-8">
+          <div class="absolute -top-6 left-16 text-[10px] text-blue-400 font-mono">Columns (Series) →</div>
+          <div class="absolute top-8 -left-2 text-[10px] text-orange-400 font-mono -rotate-90 origin-top-left">
+            Index ↓</div>
 
-        <div class="terminal-explainer">
-          <span class="explainer-icon">💡</span>
-          <p id="code-explainer-text">Actions you take on the playground will generate equivalent Pandas code statements
-            here.</p>
+          <table class="df-table text-black">
+            <thead>
+              <tr>
+                <th class="index-col border-none bg-transparent"></th>
+                <th>OrderID <span class="block text-[8px] text-gray-400">int64</span></th>
+                <th>Product <span class="block text-[8px] text-gray-400">object</span></th>
+                <th>Revenue <span class="block text-[8px] text-gray-400">float64</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="index-col">0</td>
+                <td>1001</td>
+                <td>"Monitor"</td>
+                <td>1299.99</td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="index-col">1</td>
+                <td>1002</td>
+                <td>"Mouse"</td>
+                <td>149.50</td>
+              </tr>
+              <tr>
+                <td class="index-col">2</td>
+                <td>1003</td>
+                <td>"Keyboard"</td>
+                <td>89.00</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
+    </section>
 
-    </div>
+    <section id="io" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">02. Data Ingestion & I/O</h2>
+        <h3 class="serif text-4xl mb-6">Bridging Storage and Memory</h3>
+        <p class="mb-4">
+          Before analysis can occur, data must be loaded from persistent storage into RAM. Pandas provides
+          highly optimized I/O engines that automatically parse delimiters, infer data types, and construct
+          DataFrames from various file formats.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="technical-image-container border-t-4 border-t-blue-500">
+          <h4 class="font-bold text-lg mb-2">CSV (Comma Separated)</h4>
+          <p class="text-sm text-gray-600 mb-4">The universal standard for flat tabular data. Fast read/write
+            times.</p>
+          <div class="bg-gray-100 p-3 rounded font-mono text-[10px] text-gray-800">
+            <span class="cmt"># Ingestion</span><br>
+            df = pd.<span class="func">read_csv</span>(<span class="str">'sales.csv'</span>)<br><br>
+            <span class="cmt"># Export</span><br>
+            df.<span class="func">to_csv</span>(<span class="str">'clean.csv'</span>, index=<span
+              class="kw">False</span>)
+          </div>
+        </div>
+
+        <div class="technical-image-container border-t-4 border-t-green-500">
+          <h4 class="font-bold text-lg mb-2">Excel (.xlsx)</h4>
+          <p class="text-sm text-gray-600 mb-4">Enterprise standard. Supports multiple sheets and complex
+            formatting.</p>
+          <div class="bg-gray-100 p-3 rounded font-mono text-[10px] text-gray-800">
+            <span class="cmt"># Read specific sheet</span><br>
+            df = pd.<span class="func">read_excel</span>(<span class="str">'Q3.xlsx'</span>,
+            sheet_name=<span class="str">'July'</span>)<br><br>
+            <span class="cmt"># Export</span><br>
+            df.<span class="func">to_excel</span>(<span class="str">'report.xlsx'</span>)
+          </div>
+        </div>
+
+        <div class="technical-image-container border-t-4 border-t-yellow-500">
+          <h4 class="font-bold text-lg mb-2">JSON (JavaScript Object)</h4>
+          <p class="text-sm text-gray-600 mb-4">Hierarchical data structure commonly used in web APIs and
+            NoSQL DBs.</p>
+          <div class="bg-gray-100 p-3 rounded font-mono text-[10px] text-gray-800">
+            <span class="cmt"># Read API payload</span><br>
+            df = pd.<span class="func">read_json</span>(<span class="str">'api_dump.json'</span>)<br><br>
+            <span class="cmt"># Export records</span><br>
+            df.<span class="func">to_json</span>(<span class="str">'out.json'</span>, orient=<span
+              class="str">'records'</span>)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stats" class="space-y-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div class="space-y-6">
+          <h2 class="text-sm font-black uppercase tracking-[0.3em] text-orange-700">03. Statistical
+            Aggregation</h2>
+          <h3 class="serif text-4xl">Self-Learning: Math over Iteration</h3>
+          <p>
+            Instead of manually iterating over rows using <code>iterrows()</code> or
+            <code>itertuples()</code> (which are extremely slow and should be avoided), Pandas provides
+            vectorized statistical functions that operate on entire Series instantly.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-700 font-mono bg-gray-50 p-4 rounded border border-gray-200">
+            <li><strong>.mean()</strong>, <strong>.median()</strong>, <strong>.mode()</strong>: Central
+              tendency.</li>
+            <li><strong>.sum()</strong>, <strong>.count()</strong>: Totals and frequencies.</li>
+            <li><strong>.std()</strong>: Standard deviation (volatility).</li>
+            <li><strong>.cumsum()</strong>, <strong>.cumprod()</strong>: Cumulative totals over time.</li>
+            <li><strong>.describe()</strong>: Generates a complete statistical summary table.</li>
+          </ul>
+        </div>
+
+        <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+          <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-slate-400">Execution Console:
+            df.describe()</h4>
+          <div class="font-mono text-[10px] text-green-400">
+            >>> df['Revenue'].describe()<br>
+            <table class="mt-2 text-gray-300 w-full text-right border-collapse">
+              <tr class="border-b border-gray-700">
+                <td>count</td>
+                <td>1000.000000</td>
+              </tr>
+              <tr class="border-b border-gray-700">
+                <td>mean</td>
+                <td>245.500000</td>
+              </tr>
+              <tr class="border-b border-gray-700">
+                <td>std</td>
+                <td>112.300000</td>
+              </tr>
+              <tr class="border-b border-gray-700">
+                <td>min</td>
+                <td>12.990000</td>
+              </tr>
+              <tr class="border-b border-gray-700">
+                <td>25%</td>
+                <td>89.000000</td>
+              </tr>
+              <tr class="border-b border-gray-700">
+                <td>50%</td>
+                <td>149.500000</td>
+              </tr>
+              <tr class="border-b border-gray-700">
+                <td>75%</td>
+                <td>399.990000</td>
+              </tr>
+              <tr>
+                <td>max</td>
+                <td>1299.990000</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="case" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-teal-700">04. Case Study: Analytics
+          Architecture</h2>
+        <h3 class="serif text-4xl mb-6">Retail Sales Dashboard Pipeline</h3>
+        <p class="mb-4">
+          A major retail chain needs a daily dashboard to track revenue. The data engineer builds a pipeline
+          that ingests raw POS (Point of Sale) CSV files, applies Pandas statistical functions to aggregate
+          the data, and pipes the output into a visualization layer.
+        </p>
+      </div>
+
+      <div class="technical-image-container">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="font-mono text-xs bg-slate-900 p-6 rounded text-gray-300 shadow-inner">
+            <span class="kw">import</span> pandas <span class="kw">as</span> pd<br>
+            <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt<br><br>
+
+            <span class="cmt"># 1. I/O: Load flat file</span><br>
+            df = pd.<span class="func">read_csv</span>(<span class="str">'daily_sales.csv'</span>)<br><br>
+
+            <span class="cmt"># 2. Vectorized Math: Calculate Cumulative Revenue</span><br>
+            df[<span class="str">'Running_Total'</span>] = df[<span class="str">'Revenue'</span>].<span
+              class="func">cumsum</span>()<br><br>
+
+            <span class="cmt"># 3. Statistical Aggregation</span><br>
+            avg_order = df[<span class="str">'Revenue'</span>].<span class="func">mean</span>()<br>
+            <span class="func">print</span>(<span class="str">f"Avg Order Value:
+              ${avg_order}"</span>)<br><br>
+
+            <span class="cmt"># 4. Visualization Mapping</span><br>
+            <span class="lib">plt</span>.<span class="func">plot</span>(df[<span class="str">'Time'</span>],
+            df[<span class="str">'Running_Total'</span>])<br>
+            <span class="lib">plt</span>.<span class="func">show</span>()
+          </div>
+
+          <div class="bg-white p-4 border border-gray-200 rounded shadow-sm flex flex-col justify-between h-full">
+            <div class="text-center font-bold text-gray-700 mb-2">Live Metric: <span class="text-green-600"
+                id="liveMetric">Avg Order: $142.50</span></div>
+            <div class="chart-container">
+              <canvas id="caseStudyChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab" class="bg-black text-white p-12 rounded-3xl">
+      <h3 class="serif text-4xl mb-8 text-center">Interactive DataFrame Lab</h3>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="col-span-1 space-y-6">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-red-500">Method Executor</h4>
+          <p class="text-xs text-gray-400 italic">Apply Pandas methods to the simulated DataFrame below.</p>
+
+          <div class="flex flex-col gap-2 font-mono text-sm">
+            <button onclick="applyMethod('mean')"
+              class="py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded transition text-left px-4">df['Revenue'].mean()</button>
+            <button onclick="applyMethod('sum')"
+              class="py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded transition text-left px-4">df['Revenue'].sum()</button>
+            <button onclick="applyMethod('cumsum')"
+              class="py-2 bg-blue-900 hover:bg-blue-800 border border-blue-600 rounded transition text-left px-4 text-white">df['Revenue'].cumsum()</button>
+            <button onclick="resetDF()"
+              class="py-2 mt-4 bg-red-900 hover:bg-red-800 border border-red-600 rounded transition text-center font-bold text-white">Reset
+              DataFrame</button>
+          </div>
+
+          <div
+            class="bg-gray-900 border border-gray-700 p-4 rounded text-green-400 font-mono text-xs h-24 overflow-y-auto"
+            id="consoleOut">
+            System ready.
+          </div>
+        </div>
+
+        <div class="col-span-2 bg-white rounded p-4 overflow-hidden relative">
+          <h4 class="text-[10px] font-bold uppercase tracking-widest mb-2 text-gray-500">DataFrame Memory View
+          </h4>
+          <table class="df-table text-black w-full" id="interactiveDF">
+            <thead>
+              <tr>
+                <th class="index-col"></th>
+                <th>Time</th>
+                <th>Product</th>
+                <th id="col-rev">Revenue ($)</th>
+                <th id="col-new" class="hidden text-blue-600 bg-blue-50">Running_Total</th>
+              </tr>
+            </thead>
+            <tbody id="dfBody">
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
 
   </main>
 
-  <!-- Interactive Hint Dialogue -->
-  <dialog id="hint-dialog">
-    <h3 class="dialog-header">💡 Educational Insight</h3>
-    <div class="dialog-body" id="hint-dialog-text">
-      Analyze elements closely to find patterns.
-    </div>
-    <div class="dialog-footer">
-      <button class="btn btn-primary" onclick="closeHint()">Got it</button>
-    </div>
-  </dialog>
-
-  <!-- Interactive Victory Badge Dialogue -->
-  <dialog id="badge-dialog">
-    <h3 class="dialog-header">🏆 Achievement Unlocked!</h3>
-    <div class="dialog-body" id="badge-dialog-text">
-      Congratulations!
-    </div>
-    <div class="dialog-footer">
-      <button class="btn btn-primary" onclick="document.getElementById('badge-dialog').close()">Awesome</button>
-    </div>
-  </dialog>
-
-  <!-- Footer -->
-  <footer>
-    Designed for Python Module 4.2. Cherry & White Interactive Academy. Completely Offline.
-  </footer>
-
-  <!-- Confetti and Main Script Logic -->
   <script>
-    /* --- Mock Audio Effects System --- */
-    const audio = {
-      click() { },
-      success() { },
-      error() { },
-      unlock() { }
-    };
-
-    /* --- Confetti Engine --- */
-    class ConfettiShower {
-      constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
-        this.active = false;
+    // Case Study Chart
+    const ctxCase = document.getElementById('caseStudyChart').getContext('2d');
+    new Chart(ctxCase, {
+      type: 'line',
+      data: {
+        labels: ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM'],
+        datasets: [{
+          label: 'Cumulative Revenue ($)',
+          data: [120, 350, 480, 890, 1100, 1540],
+          borderColor: '#38a169',
+          backgroundColor: 'rgba(56, 161, 105, 0.1)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
       }
-      start() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.particles = [];
-        for (let i = 0; i < 100; i++) {
-          this.particles.push({
-            x: Math.random() * this.canvas.width,
-            y: Math.random() * this.canvas.height - this.canvas.height,
-            r: Math.random() * 6 + 4,
-            d: Math.random() * this.canvas.height,
-            color: `hsl(${Math.random() * 25 + 345}, 85%, ${Math.random() * 20 + 50}%)`, // Crimson palette
-            tilt: Math.random() * 10 - 5,
-            tiltAngleIncremental: Math.random() * 0.07 + 0.02,
-            tiltAngle: 0
-          });
-        }
-        this.active = true;
-        this.animate();
-      }
-      stop() {
-        this.active = false;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      }
-      animate() {
-        if (!this.active) return;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        let remaining = false;
-        this.particles.forEach((p) => {
-          p.tiltAngle += p.tiltAngleIncremental;
-          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
-          p.x += Math.sin(p.tiltAngle);
-          p.tilt = Math.sin(p.tiltAngle - p.r / 2) * 5;
-
-          if (p.y <= this.canvas.height) {
-            remaining = true;
-          }
-
-          this.ctx.beginPath();
-          this.ctx.lineWidth = p.r;
-          this.ctx.strokeStyle = p.color;
-          this.ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
-          this.ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
-          this.ctx.stroke();
-        });
-
-        if (remaining && this.active) {
-          requestAnimationFrame(() => this.animate());
-        }
-      }
-    }
-
-    const confetti = new ConfettiShower('confetti-canvas');
-
-    /* --- Global State Management --- */
-    const state = {
-      currentLevel: 1,
-      currentActivity: null, // "1-1", "1-2", etc.
-      completedActivities: [],
-      unlockedLevels: [1, 2, 3]
-    };
-
-    const activitiesOrder = ['1-1', '1-2', '2-1', '2-2', '3-1', '3-2'];
-
-    // Load state from localStorage if available
-    function loadState() {
-      const saved = localStorage.getItem('pandas_academy_progress');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          state.completedActivities = parsed.completedActivities || [];
-          state.unlockedLevels = parsed.unlockedLevels || [1, 2, 3];
-          state.currentLevel = parsed.currentLevel || 1;
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      updateHUD();
-    }
-
-    function saveState() {
-      localStorage.setItem('pandas_academy_progress', JSON.stringify({
-        completedActivities: state.completedActivities,
-        unlockedLevels: state.unlockedLevels,
-        currentLevel: state.currentLevel
-      }));
-    }
-
-    function updateHUD() {
-      // Update nodes active / unlocked states
-      for (let i = 1; i <= 3; i++) {
-        const node = document.getElementById(`node-${i}`);
-        node.classList.toggle('unlocked', state.unlockedLevels.includes(i));
-        node.classList.toggle('active', state.currentLevel === i);
-
-        if (i < 3) {
-          const line = document.getElementById(`line-${i}`);
-          line.classList.toggle('unlocked', state.unlockedLevels.includes(i + 1));
-        }
-      }
-
-      // Prev/Next Level buttons
-      document.getElementById('btn-prev-level').disabled = (state.currentLevel === 1);
-      document.getElementById('btn-next-level').disabled = (state.currentLevel === 3);
-    }
-
-    /* --- Python Code Syntax Formatter --- */
-    function formatPythonCode(rawText, activeLineIndex = null) {
-      const container = document.getElementById('code-lines-container');
-      container.innerHTML = '';
-
-      const lines = rawText.split('\n');
-      lines.forEach((line, idx) => {
-        const lineWrapper = document.createElement('div');
-        lineWrapper.className = 'code-line';
-        if (idx === activeLineIndex) {
-          lineWrapper.classList.add('active');
-        }
-
-        const numSpan = document.createElement('span');
-        numSpan.className = 'code-num';
-        numSpan.innerText = idx + 1;
-
-        const textSpan = document.createElement('span');
-        textSpan.className = 'code-text';
-
-        // Perform token highlighting via simple regex replacements
-        let highlighted = line;
-
-        // Match comments
-        if (highlighted.trim().startsWith('#')) {
-          highlighted = `<span class="token-comment">${escapeHtml(highlighted)}</span>`;
-        } else {
-          // Strings
-          highlighted = highlighted.replace(/(['"])(.*?)\1/g, '<span class="token-string">"$2"</span>');
-
-          // Keywords
-          const keywords = ['import', 'as', 'from', 'return', 'def', 'if', 'else', 'for', 'in', 'print'];
-          keywords.forEach(kw => {
-            const regex = new RegExp(`\\b${kw}\\b`, 'g');
-            highlighted = highlighted.replace(regex, `<span class="token-keyword">${kw}</span>`);
-          });
-
-          // Builtins/libraries
-          highlighted = highlighted.replace(/\b(pd|numpy|df)\b/g, '<span class="token-builtin">$1</span>');
-
-          // Methods
-          highlighted = highlighted.replace(/\b(DataFrame|Series|read_csv|read_json|read_excel|to_csv|to_json|to_excel|describe|mean|count|info|head|tail|shape|columns)\b/g, '<span class="token-method">$1</span>');
-
-          // Numbers
-          highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="token-number">$1</span>');
-        }
-
-        textSpan.innerHTML = highlighted;
-        lineWrapper.appendChild(numSpan);
-        lineWrapper.appendChild(textSpan);
-        container.appendChild(lineWrapper);
-      });
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
-    }
-
-    /* --- Dynamic Level Instructions Database --- */
-    function updateTheoryAndSteps(actKey) {
-      const theoryTitle = document.getElementById('theory-title-text');
-      const theoryDesc = document.getElementById('theory-desc-text');
-      const theoryStepsList = document.getElementById('theory-steps-list');
-
-      const contents = {
-        '1-1': {
-          title: 'Pandas DataFrames & Series',
-          desc: 'Pandas is the premier library for handling tabular structures in Python. A <strong>DataFrame</strong> represents a two-dimensional grid of rows and columns, similar to an Excel sheet. Each column in a DataFrame is a <strong>Series</strong> — a one-dimensional array labeled with index marks. DataFrames hold structural schemas where key-value items align sequentially.',
-          steps: [
-            'Drag the floating column headers <strong>Name, Age, Department, and Marks</strong> into the top header slots.',
-            'Drag student data cells into the rows below matching their types (e.g. Names under Name column).',
-            'Click <strong>⚙️ Build DataFrame</strong> to compile the structure, visualize python lines, and verify.'
-          ]
-        },
-        '1-2': {
-          title: 'Series vs. DataFrame Dimensions',
-          desc: 'A fundamental Pandas concept is dimensionality. A **Series** is a 1D labeled list (a single column of data with indexes). A **DataFrame** is a 2D matrix structure. Selecting a single column from a DataFrame yielding `df["Column"]` returns a Series, whereas multi-column extractions like `df[["Col1", "Col2"]]` return DataFrames.',
-          steps: [
-            'Inspect the random Python data structuresServed on the conveyor belt card.',
-            'Decide whether the structure represents a 1-Dimensional <strong>Series</strong> or a 2-Dimensional <strong>DataFrame</strong>.',
-            'Drag the card into the matching left (Series) or right (DataFrame) folder. Sort 4 cards correctly to pass.'
-          ]
-        },
-        '2-1': {
-          title: 'Pandas File Reading Functions',
-          desc: 'Data Engineers import datasets from diverse sources. Pandas features dynamic helpers to read standard formats instantly: <code>pd.read_csv()</code> parsing comma-delimited logs, <code>pd.read_json()</code> unfolding nested JavaScript structures, and <code>pd.read_excel()</code> scanning spreadsheet tabs.',
-          steps: [
-            'Look at the active <strong>Import Mission Card</strong> detailing the dataset query to import.',
-            'Search the local file explorer and identify the correct file type (CSV, JSON, or Excel).',
-            'Drag the file card into the <strong>Pandas Import Machine</strong> to run parsing operations.'
-          ]
-        },
-        '2-2': {
-          title: 'Pandas Output/Write Exporters',
-          desc: 'After executing cleanup,Analysts export DataFrames back to secondary stores. Pandas write functions match targets: <code>df.to_csv()</code> serializes elements separated by commas, <code>df.to_json()</code> compiles nested objects, and <code>df.to_excel()</code> generates binaries compatible with worksheets.',
-          steps: [
-            'A given DataFrame dataset is loaded inside the factory yard.',
-            'Read the active export target request (CSV, JSON, or Excel).',
-            'Drag the DataFrame card into the corresponding <strong>Format Export Machine</strong> below to trigger serialization.'
-          ]
-        },
-        '3-1': {
-          title: 'Exploratory Data Analysis Tools',
-          desc: 'Data Analysts use concise methods to inspect and summarize columns. Rather than looping, they invoke statistical helpers: <code>df.describe()</code> calculations of percentiles and means, <code>df.mean()</code> columns averages, <code>df.count()</code> valid values counter, and <code>df.info()</code> scanning data types and empty slots.',
-          steps: [
-            'An active Student Exam dataset is loaded in the table view.',
-            'Drag analytical tools from the toolbar (Magnifying Lens, Calculator, Counter, Clipboard) onto the dataset block.',
-            'Watch the live result recalculate instantly, observe the python query, and explore all 4 methods.'
-          ]
-        },
-        '3-2': {
-          title: 'Principal Report Dashboard',
-          desc: 'Reporting variables require targeting specific Pandas commands: <code>head(n)</code> to view top preview rows, <code>tail(n)</code> for recent trailing rows, <code>shape</code> to check structural counts, and <code>columns</code> to output labels list. Preparing clear reports keeps metrics clean.',
-          steps: [
-            'Drag the right widget cards into their matching dashboard zones (e.g. Head(3) into "First 3 Rows").',
-            'Check the resulting printed dashboard value and equivalent python command.',
-            'Once all dropzones are filled, click <strong>🎯 Submit Report</strong> to compile and evaluate dashboard layout grade!'
-          ]
-        }
-      };
-
-      const selected = contents[actKey];
-      if (selected) {
-        theoryTitle.innerText = selected.title;
-        theoryDesc.innerHTML = selected.desc;
-        theoryStepsList.innerHTML = selected.steps.map(step => `<li>${step}</li>`).join('');
-      }
-    }
-
-    /* --- Interactive overlay / screen warnings --- */
-    function showHint() {
-      const hints = {
-        '1-1': 'Match columns first: Name, Age, Department, Marks. Then drop Alex/Maya under Name, numbers 18/20 under Age, IT/CS under Department, and marks under Marks. Once done, tap compile!',
-        '1-2': 'Single dimension arrays or single brackets df["Column"] are Series. Key-value records, arrays of lists, or multi-brackets df[["Col1", "Col2"]] are DataFrames!',
-        '2-1': 'Read the mission card carefully. Match the extension: .csv is Comma Separated Values, .json is JavaScript Object Notation, and .xlsx is Microsoft Excel sheets.',
-        '2-2': 'Export to matching machines. to_csv() yields readable textual data with commas, to_json() builds nested key brackets, and to_excel() creates worksheets.',
-        '3-1': 'Drag Magnifying Glass for describe() summaries, Calculator for mean() column averages, Counter for count() metrics, and Clipboard for columns info(). Explore all four!',
-        '3-2': 'Drag df.head(3) to First 3 Rows, df.tail(3) to Last 3 Rows, df.shape to Dimensions, df.columns to Column Names, df.describe() to Summary Stats, and df.info() to Dataset Info.'
-      };
-      document.getElementById('hint-dialog-text').innerText = hints[state.currentActivity] || 'Drag items into slots to progress.';
-      document.getElementById('hint-dialog').showModal();
-    }
-
-    function closeHint() {
-      document.getElementById('hint-dialog').close();
-    }
-
-    // Wrap status banner changes
-    function showStatusBanner(msg, type = 'success') {
-      const banner = document.getElementById('status-banner');
-      banner.innerHTML = msg;
-      banner.style.display = 'block';
-      if (type === 'success') {
-        banner.style.background = '#E8F5E9';
-        banner.style.borderColor = '#2E7D32';
-        banner.style.color = '#1B5E20';
-      } else {
-        banner.style.background = '#FFEBEE';
-        banner.style.borderColor = '#D32F2F';
-        banner.style.color = '#C62828';
-      }
-    }
-
-    function hideStatusBanner() {
-      document.getElementById('status-banner').style.display = 'none';
-    }
-
-    /* --- Navigation Switches --- */
-    function switchLevel(lvlNum) {
-      state.currentLevel = lvlNum;
-      hideStatusBanner();
-      // Jump to first activity of level
-      startActivity(lvlNum, 1);
-    }
-
-    function changeLevel(dir) {
-      const target = state.currentLevel + dir;
-      if (target >= 1 && target <= 3) {
-        state.currentLevel = target;
-        hideStatusBanner();
-        startActivity(target, 1);
-      }
-    }
-
-    function navigateActivity(dir) {
-      if (!state.currentActivity) return;
-      const idx = activitiesOrder.indexOf(state.currentActivity);
-      const targetIdx = idx + dir;
-      if (targetIdx >= 0 && targetIdx < activitiesOrder.length) {
-        const parts = activitiesOrder[targetIdx].split('-');
-        const lvl = parseInt(parts[0]);
-        const act = parseInt(parts[1]);
-
-        hideStatusBanner();
-        startActivity(lvl, act);
-      }
-    }
-
-    function awardProgress(xpGained, starsGained) {
-      saveState();
-      updateHUD();
-    }
-
-    /* --- Drag & Drop Core Pointer Engines --- */
-    let dragObj = null;
-    let offset = { x: 0, y: 0 };
-    let dropTargets = [];
-    let currentDropHover = null;
-    let dragCallback = null;
-
-    function initDraggable(element, callback) {
-      element.addEventListener('pointerdown', (e) => {
-        audio.click();
-        dragObj = element;
-        dragObj.classList.add('dragging');
-
-        offset = {
-          x: e.clientX,
-          y: e.clientY
-        };
-
-        dragCallback = callback;
-        element.setPointerCapture(e.pointerId);
-
-        // Find suitable drop zones currently active in DOM
-        dropTargets = Array.from(document.querySelectorAll('.drop-cell, .sorting-folder, .pandas-import-machine, .export-machine, .magnifying-lens-drop, .dashboard-drop-box'));
-      });
-
-      element.addEventListener('pointermove', (e) => {
-        if (dragObj !== element) return;
-
-        const dx = e.clientX - offset.x;
-        const dy = e.clientY - offset.y;
-
-        element.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
-
-        let hovered = null;
-        for (let target of dropTargets) {
-          const rect = target.getBoundingClientRect();
-          if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            hovered = target;
-            break;
-          }
-        }
-
-        if (hovered !== currentDropHover) {
-          if (currentDropHover) currentDropHover.classList.remove('hovered');
-          currentDropHover = hovered;
-          if (currentDropHover) currentDropHover.classList.add('hovered');
-        }
-      });
-
-      element.addEventListener('pointerup', (e) => {
-        if (dragObj !== element) return;
-        element.releasePointerCapture(e.pointerId);
-
-        dragObj.classList.remove('dragging');
-        element.style.transform = '';
-
-        if (currentDropHover) {
-          currentDropHover.classList.remove('hovered');
-          if (dragCallback) {
-            dragCallback(element, currentDropHover);
-          }
-        } else {
-          // Springs back
-          element.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-          element.style.transform = 'translate(0px, 0px)';
-          setTimeout(() => { element.style.transition = ''; }, 350);
-        }
-
-        dragObj = null;
-        currentDropHover = null;
-      });
-
-      element.addEventListener('pointercancel', (e) => {
-        if (dragObj !== element) return;
-        dragObj.classList.remove('dragging');
-        element.style.transform = 'translate(0px, 0px)';
-        dragObj = null;
-        currentDropHover = null;
-      });
-    }
-
-    /* --- Activities Setup & Initialization --- */
-    function startActivity(lvl, act) {
-      state.currentActivity = `${lvl}-${act}`;
-      state.currentLevel = lvl;
-      updateHUD();
-      updateTheoryAndSteps(state.currentActivity);
-
-      const container = document.getElementById('sandbox-content');
-      container.innerHTML = ''; // wipe
-
-      // Nav controls disabled indicators
-      const idx = activitiesOrder.indexOf(state.currentActivity);
-      document.getElementById('btn-prev-act').disabled = (idx === 0);
-      document.getElementById('btn-next-act').disabled = (idx === activitiesOrder.length - 1);
-
-      if (state.currentActivity === '1-1') {
-        setupActivity11(container);
-      } else if (state.currentActivity === '1-2') {
-        setupActivity12(container);
-      } else if (state.currentActivity === '2-1') {
-        setupActivity21(container);
-      } else if (state.currentActivity === '2-2') {
-        setupActivity22(container);
-      } else if (state.currentActivity === '3-1') {
-        setupActivity31(container);
-      } else if (state.currentActivity === '3-2') {
-        setupActivity32(container);
-      }
-    }
-
-    function resetActiveActivity() {
-      if (!state.currentActivity) return;
-      const parts = state.currentActivity.split('-');
-      const lvl = parseInt(parts[0]);
-      const act = parseInt(parts[1]);
-      hideStatusBanner();
-      startActivity(lvl, act);
-    }
-
-    /* =========================================================================
-       ACTIVITY 1.1: DATAFRAME CONSTRUCTOR
-       ========================================================================= */
-    function setupActivity11(container) {
-      document.getElementById('active-title').innerText = 'Activity 1.1 — DataFrame Constructor';
-      document.getElementById('active-subtitle').innerText = 'Build a multi-column dataset by placing blocks.';
-
-      container.innerHTML = `
-        <div class="df-grid-constructor" id="constructor-grid">
-          <!-- Col headers drop zones -->
-          <div class="drop-cell constructor-header-cell" id="h-col-0" data-col="0" data-type="header">Drag Col</div>
-          <div class="drop-cell constructor-header-cell" id="h-col-1" data-col="1" data-type="header">Drag Col</div>
-          <div class="drop-cell constructor-header-cell" id="h-col-2" data-col="2" data-type="header">Drag Col</div>
-          <div class="drop-cell constructor-header-cell" id="h-col-3" data-col="3" data-type="header">Drag Col</div>
-          
-          <!-- Row 1 values drop zones -->
-          <div class="drop-cell constructor-value-cell" id="r0-col-0" data-row="0" data-col="0" data-type="value">Cell</div>
-          <div class="drop-cell constructor-value-cell" id="r0-col-1" data-row="0" data-col="1" data-type="value">Cell</div>
-          <div class="drop-cell constructor-value-cell" id="r0-col-2" data-row="0" data-col="2" data-type="value">Cell</div>
-          <div class="drop-cell constructor-value-cell" id="r0-col-3" data-row="0" data-col="3" data-type="value">Cell</div>
-        </div>
-
-        <div class="drag-chips-container" id="chips-1-1">
-          <!-- Headers -->
-          <div class="drag-chip" data-val="Name" data-type="header" style="background:#FFF5F5;">Name</div>
-          <div class="drag-chip" data-val="Age" data-type="header" style="background:#FFF5F5;">Age</div>
-          <div class="drag-chip" data-val="Dept" data-type="header" style="background:#FFF5F5;">Dept</div>
-          <div class="drag-chip" data-val="Marks" data-type="header" style="background:#FFF5F5;">Marks</div>
-          <!-- Values -->
-          <div class="drag-chip" data-val="Alex" data-type="value">Alex</div>
-          <div class="drag-chip" data-val="18" data-type="value">18</div>
-          <div class="drag-chip" data-val="IT" data-type="value">IT</div>
-          <div class="drag-chip" data-val="92" data-type="value">92</div>
-        </div>
-
-        <button class="btn btn-primary" id="btn-compile-1-1" style="display:none;" onclick="compileDataFrame11()">⚙️ Build DataFrame</button>
-      `;
-
-      const codeStr = `import pandas as pd\n\n# Configure columns mapping schema:\ndata = {}\n\n# Instantiate DataFrame:\ndf = pd.DataFrame(data)\n\n# Run compiler to construct DataFrame...`;
-      formatPythonCode(codeStr, 2);
-      document.getElementById('code-explainer-text').innerText = 'Drag values and column names to configure the DataFrame constructor parameters.';
-
-      // Initialize draggable elements
-      document.querySelectorAll('#chips-1-1 .drag-chip').forEach(chip => {
-        initDraggable(chip, (item, target) => {
-          const chipType = item.dataset.type;
-          const targetType = target.dataset.type;
-
-          if (chipType !== targetType) {
-            audio.error();
-            item.style.transform = 'translate(0px, 0px)';
-            return;
-          }
-
-          // Verification mapping
-          let correct = false;
-          if (chipType === 'header') {
-            const col = target.dataset.col;
-            const val = item.dataset.val;
-            // Align Name=0, Age=1, Dept=2, Marks=3
-            if ((col === '0' && val === 'Name') ||
-              (col === '1' && val === 'Age') ||
-              (col === '2' && val === 'Dept') ||
-              (col === '3' && val === 'Marks')) {
-              correct = true;
-            }
-          } else if (chipType === 'value') {
-            const col = target.dataset.col;
-            const val = item.dataset.val;
-            // Row 0 value matching
-            if ((col === '0' && val === 'Alex') ||
-              (col === '1' && val === '18') ||
-              (col === '2' && val === 'IT') ||
-              (col === '3' && val === '92')) {
-              correct = true;
-            }
-          }
-
-          if (correct) {
-            audio.success();
-            target.innerText = item.dataset.val;
-            target.classList.add('filled');
-            item.style.display = 'none'; // hide chip
-            checkCompileButton11();
-          } else {
-            audio.error();
-            item.style.transform = 'translate(0px, 0px)';
-          }
-        });
-      });
-    }
-
-    function checkCompileButton11() {
-      const headersFilled = Array.from(document.querySelectorAll('.constructor-header-cell.filled')).length === 4;
-      const valuesFilled = Array.from(document.querySelectorAll('.constructor-value-cell.filled')).length === 4;
-      if (headersFilled && valuesFilled) {
-        document.getElementById('btn-compile-1-1').style.display = 'inline-flex';
-      }
-    }
-
-    function compileDataFrame11() {
-      audio.success();
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      const codeStr = `import pandas as pd\n\n# Configure columns mapping schema:\ndata = {\n    "Name": ["Alex"],\n    "Age": [18],\n    "Dept": ["IT"],\n    "Marks": [92]\n}\n\n# Instantiate DataFrame:\ndf = pd.DataFrame(data)\n\n# Resulting DataFrame Table:\nprint(df)`;
-      formatPythonCode(codeStr, 12);
-
-      document.getElementById('code-explainer-text').innerText = 'pd.DataFrame() maps key lists directly to tabular index offset cells!';
-      document.getElementById('btn-compile-1-1').style.display = 'none';
-
-      if (!state.completedActivities.includes('1-1')) {
-        state.completedActivities.push('1-1');
-        awardProgress(100, 3);
-      }
-
-      showStatusBanner("🎉 DataFrame compiled successfully! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 1.2: SERIES VS DATAFRAME CHALLENGE
-       ========================================================================= */
-    const challengeState12 = {
-      queue: [],
-      current: null,
-      score: 0
-    };
-
-    function setupActivity12(container) {
-      document.getElementById('active-title').innerText = 'Activity 1.2 — Series vs DataFrame';
-      document.getElementById('active-subtitle').innerText = 'Sort variables based on index dimension properties.';
-
-      container.innerHTML = `
-        <div id="conveyor-card-spot" style="height: 100px; display: flex; align-items: center; justify-content: center; width: 100%;">
-          <!-- Active conveyor card rendered dynamically -->
-        </div>
-
-        <div class="sorting-folders-container">
-          <div class="sorting-folder" id="folder-series" data-target="Series">
-            <span class="folder-icon">📁</span>
-            <span class="folder-title">Series (1D)</span>
-            <span style="font-size:0.7rem; color:var(--text-muted);">Labeled List structure</span>
-          </div>
-
-          <div class="sorting-folder" id="folder-df" data-target="DataFrame">
-            <span class="folder-icon">📂</span>
-            <span class="folder-title">DataFrame (2D)</span>
-            <span style="font-size:0.7rem; color:var(--text-muted);">Tabular Row/Col grid</span>
-          </div>
-        </div>
-
-        <div style="font-weight:700; font-size:0.9rem;">Sorted Correctly: <span id="sort-score" style="color:var(--primary-red);">0</span> / 4</div>
-      `;
-
-      // Set conveyor card list
-      challengeState12.queue = [
-        { code: `pd.Series([10, 20, 30])`, type: 'Series', explainer: 'pd.Series([10, 20, 30]) builds a 1D labeled array.' },
-        { code: `pd.DataFrame({\n  "A": [1, 2],\n  "B": [3, 4]\n})`, type: 'DataFrame', explainer: 'This dict mapping holds 2 keys, building a 2D grid structure.' },
-        { code: `df["Age"]`, type: 'Series', explainer: 'Extracting a single column from a DataFrame yields a 1D Series!' },
-        { code: `df[["Name", "Marks"]]`, type: 'DataFrame', explainer: 'Extracting multiple columns creates a new 2D DataFrame.' }
-      ];
-      challengeState12.score = 0;
-      nextConveyorCard12();
-    }
-
-    function nextConveyorCard12() {
-      const container = document.getElementById('conveyor-card-spot');
-      if (challengeState12.queue.length === 0) {
-        concludeActivity12();
-        return;
-      }
-
-      challengeState12.current = challengeState12.queue.shift();
-
-      container.innerHTML = `
-        <div class="drag-chip" id="conveyor-card" style="padding:1rem; width:220px; text-align:center; font-size:0.8rem; background:#FFF5F5;" data-type="${challengeState12.current.type}">
-          ${challengeState12.current.code.replace(/\n/g, '<br>')}
-        </div>
-      `;
-
-      const codeStr = `import pandas as pd\n\n# Analyze structure type:\nitem = ${challengeState12.current.code}\n\n# Is it 1-Dimensional (Series) or 2-Dimensional (DataFrame)?`;
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = 'Check index brackets. Double brackets df[[]] extract DataFrames, single df[] extract Series.';
-
-      // Enable drag on the conveyor card
-      const card = document.getElementById('conveyor-card');
-      initDraggable(card, (item, target) => {
-        const folderTarget = target.dataset.target;
-        const currentType = item.dataset.type;
-
-        if (folderTarget === currentType) {
-          audio.success();
-          challengeState12.score++;
-          document.getElementById('sort-score').innerText = challengeState12.score;
-
-          item.style.transform = 'scale(0) rotate(720deg)';
-          item.style.transition = 'transform 0.4s';
-
-          setTimeout(() => {
-            nextConveyorCard12();
-          }, 400);
-        } else {
-          audio.error();
-          showStatusBanner(`❌ Wrong! ${challengeState12.current.explainer}`, 'error');
-          // Reset card position
-          item.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-          item.style.transform = 'translate(0px, 0px)';
-          setTimeout(() => { item.style.transition = ''; }, 350);
-        }
-      });
-    }
-
-    function concludeActivity12() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('conveyor-card-spot').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ Sorted Successfully!</span>`;
-
-      const codeStr = `import pandas as pd\n\n# Series dimension: 1D Array\n# DataFrame dimension: 2D Table\n\n# Level 1 Completed! All nodes unlocked.`;
-      formatPythonCode(codeStr, 4);
-
-      if (!state.completedActivities.includes('1-2')) {
-        state.completedActivities.push('1-2');
-        awardProgress(100, 3);
-      }
-
-      // Unlock Level 2
-      if (!state.unlockedLevels.includes(2)) {
-        state.unlockedLevels.push(2);
-      }
-
-      showStatusBanner("🎉 Level 1 completed! You unlocked Level 2. Click <strong>Next ▶</strong> at the top to proceed.");
-      saveState();
-      updateHUD();
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 2.1: FILE EXPLORER ADVENTURE
-       ========================================================================= */
-    const factoryState21 = {
-      missions: [
-        { task: 'Import the employees dataset (CSV format)', file: 'employees.csv', method: 'read_csv', code: `df = pd.read_csv('employees.csv')` },
-        { task: 'Import the balance sheet sheet layer (Excel format)', file: 'balance_sheet.xlsx', method: 'read_excel', code: `df = pd.read_excel('balance_sheet.xlsx')` },
-        { task: 'Import the real-time sensor metrics log (JSON format)', file: 'sensor_log.json', method: 'read_json', code: `df = pd.read_json('sensor_log.json')` }
-      ],
-      currentIdx: 0
-    };
-
-    function setupActivity21(container) {
-      document.getElementById('active-title').innerText = 'Activity 2.1 — File Explorer Adventure';
-      document.getElementById('active-subtitle').innerText = 'Match files with corresponding Pandas parsing commands.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; margin-bottom:1rem; width:100%; max-width:440px;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100;">Active Import Task</span>
-          <span class="target-array-vals" id="mission-text" style="font-size:0.95rem; color:#E65100;">Import the employees dataset (CSV format)</span>
-        </div>
-
-        <div class="file-explorer" id="explorer-files">
-          <div class="file-card" data-file="employees.csv">
-            <span class="file-icon">📄</span>
-            <span class="file-name">employees.csv</span>
-          </div>
-          <div class="file-card" data-file="sensor_log.json">
-            <span class="file-icon">📄</span>
-            <span class="file-name">sensor_log.json</span>
-          </div>
-          <div class="file-card" data-file="balance_sheet.xlsx">
-            <span class="file-icon">📈</span>
-            <span class="file-name">balance_sheet.xlsx</span>
-          </div>
-        </div>
-
-        <div class="pandas-import-machine" id="import-machine">
-          <span style="font-size:2.5rem;">📥</span>
-          <span style="font-weight:800; font-size:0.85rem; color:var(--primary-red);">Pandas Import Machine</span>
-          <span style="font-size:0.7rem; color:var(--text-muted);">Drop target file here</span>
-          <div class="machine-conveyor"></div>
-        </div>
-      `;
-
-      factoryState21.currentIdx = 0;
-      loadMission21();
-
-      // Setup draggables
-      document.querySelectorAll('#explorer-files .file-card').forEach(file => {
-        initDraggable(file, (item, target) => {
-          const droppedFile = item.dataset.file;
-          const targetFile = factoryState21.missions[factoryState21.currentIdx].file;
-
-          if (droppedFile === targetFile) {
-            audio.success();
-            animateImportMachine21(item);
-          } else {
-            audio.error();
-            showStatusBanner("❌ Invalid file format selected for this mission!", 'error');
-            item.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            item.style.transform = 'translate(0px, 0px)';
-            setTimeout(() => { item.style.transition = ''; }, 350);
-          }
-        });
-      });
-    }
-
-    function loadMission21() {
-      const activeMission = factoryState21.missions[factoryState21.currentIdx];
-      document.getElementById('mission-text').innerText = activeMission.task;
-
-      const codeStr = `import pandas as pd\n\n# Target: Load ${activeMission.file}\n# What parser should we call?\n\n# Drag file onto import machine...`;
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = 'CSV files are comma-delimited, Excel xlsx files are sheet arrays, and JSON is nested brackets.';
-    }
-
-    function animateImportMachine21(fileItem) {
-      const machine = document.getElementById('import-machine');
-      machine.classList.add('active');
-      fileItem.style.display = 'none';
-
-      const activeMission = factoryState21.missions[factoryState21.currentIdx];
-      const parsedText = `import pandas as pd\n\n# Loaded successfully:\n${activeMission.code}\n\n# Loaded row data:\n# index   value_nodes\n# 0       compiled_grid`;
-      formatPythonCode(parsedText, 3);
-      document.getElementById('code-explainer-text').innerText = `Running pd.${activeMission.method}() converts external file elements directly to a Pandas DataFrame table.`;
-
-      setTimeout(() => {
-        machine.classList.remove('active');
-        fileItem.style.display = 'flex';
-        fileItem.style.transform = 'translate(0px, 0px)';
-
-        factoryState21.currentIdx++;
-        if (factoryState21.currentIdx < factoryState21.missions.length) {
-          loadMission21();
-        } else {
-          concludeActivity21();
-        }
-      }, 1500);
-    }
-
-    function concludeActivity21() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ All Files Imported Successfully!</span>`;
-
-      if (!state.completedActivities.includes('2-1')) {
-        state.completedActivities.push('2-1');
-        awardProgress(100, 3);
-      }
-
-      showStatusBanner("🎉 File parsing completed successfully! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 2.2: EXPORT FACTORY
-       ========================================================================= */
-    const factoryState22 = {
-      missions: [
-        { format: 'CSV', text: 'Export DataFrame to text file separated by commas (output.csv)', machine: 'csv', code: `df.to_csv('output.csv', index=False)` },
-        { format: 'JSON', text: 'Export DataFrame to nested JavaScript array (output.json)', machine: 'json', code: `df.to_json('output.json')` },
-        { format: 'Excel', text: 'Export DataFrame to workbook sheet file (output.xlsx)', machine: 'excel', code: `df.to_excel('output.xlsx', index=False)` }
-      ],
-      currentIdx: 0
-    };
-
-    function setupActivity22(container) {
-      document.getElementById('active-title').innerText = 'Activity 2.2 — Export Factory';
-      document.getElementById('active-subtitle').innerText = 'Serialize variables back to secondary file directories.';
-
-      container.innerHTML = `
-        <div class="target-array-hud" style="background:#FFF3E0; border-color:#FFB74D; margin-bottom:1.5rem; width:100%; max-width:440px;">
-          <span style="font-size:0.75rem; text-transform:uppercase; color:#E65100;">Active Export Task</span>
-          <span class="target-array-vals" id="export-mission-text" style="font-size:0.95rem; color:#E65100;">Export DataFrame to text file separated by commas (output.csv)</span>
-        </div>
-
-        <div class="export-layout-wrapper">
-          <!-- Draggable DF source card -->
-          <div class="dataframe-source-card" id="df-export-card">
-            <span>📊</span>
-            <span>Source DataFrame [df]</span>
-          </div>
-
-          <div class="export-machines-row">
-            <div class="export-machine" data-machine="csv">
-              <span style="font-size:2rem;">📝</span>
-              <span class="export-machine-title">CSV Exporter</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">df.to_csv()</span>
-            </div>
-            
-            <div class="export-machine" data-machine="json">
-              <span style="font-size:2rem;">💻</span>
-              <span class="export-machine-title">JSON Exporter</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">df.to_json()</span>
-            </div>
-
-            <div class="export-machine" data-machine="excel">
-              <span style="font-size:2rem;">📁</span>
-              <span class="export-machine-title">Excel Exporter</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">df.to_excel()</span>
-            </div>
-          </div>
-        </div>
-      `;
-
-      factoryState22.currentIdx = 0;
-      loadMission22();
-
-      const exportCard = document.getElementById('df-export-card');
-      initDraggable(exportCard, (item, target) => {
-        const activeTarget = factoryState22.missions[factoryState22.currentIdx].machine;
-        const droppedTarget = target.dataset.machine;
-
-        if (droppedTarget === activeTarget) {
-          audio.success();
-          animateExportMachine22(item);
-        } else {
-          audio.error();
-          showStatusBanner("❌ Wrong exporter machine for this format request!", 'error');
-          item.style.transition = 'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-          item.style.transform = 'translate(0px, 0px)';
-          setTimeout(() => { item.style.transition = ''; }, 350);
-        }
-      });
-    }
-
-    function loadMission22() {
-      const activeMission = factoryState22.missions[factoryState22.currentIdx];
-      document.getElementById('export-mission-text').innerText = activeMission.text;
-
-      const codeStr = `import pandas as pd\n\n# Active DataFrame:\ndf = pd.DataFrame({"A": [1, 2], "B": [3, 4]})\n\n# Target: Export to ${activeMission.format} format...\n# Drag DataFrame into the correct machine below.`;
-      formatPythonCode(codeStr, 5);
-      document.getElementById('code-explainer-text').innerText = `Write functions export internal variables to secondary directories.`;
-    }
-
-    function animateExportMachine22(item) {
-      const activeMission = factoryState22.missions[factoryState22.currentIdx];
-      const exportedCode = `import pandas as pd\n\ndf = pd.DataFrame({"A": [1, 2], "B": [3, 4]})\n\n# DataFrame exported successfully:\n${activeMission.code}\n\n# Output stream closed.`;
-      formatPythonCode(exportedCode, 5);
-      document.getElementById('code-explainer-text').innerText = `${activeMission.code} maps values to outputs.`;
-
-      item.style.display = 'none';
-      setTimeout(() => {
-        item.style.display = 'flex';
-        item.style.transform = 'translate(0px, 0px)';
-
-        factoryState22.currentIdx++;
-        if (factoryState22.currentIdx < factoryState22.missions.length) {
-          loadMission22();
-        } else {
-          concludeActivity22();
-        }
-      }, 1500);
-    }
-
-    function concludeActivity22() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      document.getElementById('sandbox-content').innerHTML = `<span style="font-weight:800; color:#2E7D32;">✔ DataFrame Exported to all Formats!</span>`;
-
-      if (!state.completedActivities.includes('2-2')) {
-        state.completedActivities.push('2-2');
-        awardProgress(100, 3);
-      }
-
-      if (!state.unlockedLevels.includes(3)) {
-        state.unlockedLevels.push(3);
-      }
-
-      showStatusBanner("🎉 Level 2 completed! You unlocked Level 3. Click <strong>Next ▶</strong> at the top to proceed.");
-      saveState();
-      updateHUD();
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 3.1: DATA DETECTIVE
-       ========================================================================= */
-    const detectiveState = {
-      toolsTested: []
-    };
-
-    function setupActivity31(container) {
-      document.getElementById('active-title').innerText = 'Activity 3.1 — Data Detective';
-      document.getElementById('active-subtitle').innerText = 'Drag analysis tools on the dataset to extract statistics.';
-
-      container.innerHTML = `
-        <div class="detective-grid-container">
-          
-          <div class="detective-table-wrapper">
-            <table class="detective-table">
-              <thead>
-                <tr>
-                  <th>Roll</th>
-                  <th>Name</th>
-                  <th>Physics</th>
-                  <th>Chemistry</th>
-                  <th>Math</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>101</td><td>Alice</td><td>85</td><td>90</td><td>95</td></tr>
-                <tr><td>102</td><td>Bob</td><td>70</td><td>65</td><td>80</td></tr>
-                <tr><td>103</td><td>Charlie</td><td>90</td><td>85</td><td>88</td></tr>
-                <tr><td>104</td><td>Daisy</td><td>60</td><td>72</td><td>68</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div style="font-weight:700; font-size:0.85rem;">Analysis Tools Tested: <span id="tools-tested" style="color:var(--primary-red);">0</span> / 4</div>
-
-          <div class="drag-chips-container" id="detective-tools">
-            <div class="drag-chip" data-tool="describe">🔍 describe()</div>
-            <div class="drag-chip" data-tool="mean">🧮 mean()</div>
-            <div class="drag-chip" data-tool="count">📊 count()</div>
-            <div class="drag-chip" data-tool="info">📋 info()</div>
-          </div>
-
-          <div class="magnifying-lens-drop" id="lens-drop">
-            🔮
-          </div>
-
-        </div>
-      `;
-
-      detectiveState.toolsTested = [];
-      const codeStr = `import pandas as pd\n\n# Loaded Student Grades:\ndf = pd.read_csv('grades.csv')\n\n# Drag a statistical tool onto the crystal ball to inspect values...`;
-      formatPythonCode(codeStr, 4);
-      document.getElementById('code-explainer-text').innerText = 'Analytical tools inspect shapes, column types, averages, and bounds.';
-
-      // Enable draggables
-      document.querySelectorAll('#detective-tools .drag-chip').forEach(tool => {
-        initDraggable(tool, (item, target) => {
-          if (target && target.id === 'lens-drop') {
-            applyDetectiveTool(item.dataset.tool);
-            item.style.transform = 'translate(0px, 0px)';
-          }
-        });
-      });
-    }
-
-    function applyDetectiveTool(tool) {
-      audio.success();
-      let resultsHTML = '';
-      let codeStr = '';
-      let descText = '';
-
-      if (tool === 'describe') {
-        resultsHTML = `
-          <table class="detective-table">
-            <thead>
-              <tr><th>Stat</th><th>Physics</th><th>Chemistry</th><th>Math</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>count</td><td>4.0</td><td>4.0</td><td>4.0</td></tr>
-              <tr><td>mean</td><td>76.25</td><td>78.0</td><td>82.75</td></tr>
-              <tr><td>std</td><td>13.77</td><td>11.57</td><td>11.44</td></tr>
-              <tr><td>min</td><td>60.0</td><td>65.0</td><td>68.0</td></tr>
-              <tr><td>max</td><td>90.0</td><td>90.0</td><td>95.0</td></tr>
-            </tbody>
-          </table>
-        `;
-        codeStr = `import pandas as pd\ndf = pd.read_csv('grades.csv')\n\nsummary = df.describe()\nprint(summary)\n# Outputs statistical count, mean, min, max metrics`;
-        descText = 'describe() evaluates the numerical values mapping standard statistics.';
-      }
-
-      else if (tool === 'mean') {
-        resultsHTML = `
-          <div style="background:#FFF; padding:0.75rem; border-radius:8px; border:1.5px solid var(--light-red-border); width:100%; text-align:left; font-family:'JetBrains Mono'; font-size:0.8rem;">
-            Physics: 76.25<br>
-            Chemistry: 78.00<br>
-            Math: 82.75<br>
-            dtype: float64
-          </div>
-        `;
-        codeStr = `import pandas as pd\ndf = pd.read_csv('grades.csv')\n\naverages = df.mean(numeric_only=True)\nprint(averages)\n# Calculates mathematical mean for numeric columns`;
-        descText = 'mean() returns averages across all numerical columns.';
-      }
-
-      else if (tool === 'count') {
-        resultsHTML = `
-          <div style="background:#FFF; padding:0.75rem; border-radius:8px; border:1.5px solid var(--light-red-border); width:100%; text-align:left; font-family:'JetBrains Mono'; font-size:0.8rem;">
-            Roll: 4<br>
-            Name: 4<br>
-            Physics: 4<br>
-            Chemistry: 4<br>
-            Math: 4<br>
-            dtype: int64
-          </div>
-        `;
-        codeStr = `import pandas as pd\ndf = pd.read_csv('grades.csv')\n\ncounts = df.count()\nprint(counts)\n# Counts non-null records in each column`;
-        descText = 'count() counts non-null inputs across row variables.';
-      }
-
-      else if (tool === 'info') {
-        resultsHTML = `
-          <div style="background:#FFF; padding:0.5rem; border-radius:8px; border:1.5px solid var(--light-red-border); width:100%; text-align:left; font-family:'JetBrains Mono'; font-size:0.65rem; line-height:1.3;">
-            &lt;class 'pandas.core.frame.DataFrame'&gt;<br>
-            RangeIndex: 4 entries, 0 to 3<br>
-            Data columns (total 5 columns):<br>
-            # Column Non-Null Count Dtype<br>
-            0 Roll 4 non-null int64<br>
-            1 Name 4 non-null object<br>
-            2 Physics 4 non-null int64<br>
-            dtypes: int64(4), object(1)
-          </div>
-        `;
-        codeStr = `import pandas as pd\ndf = pd.read_csv('grades.csv')\n\ndf.info()\n# Prints memory footprint, columns, non-null counts, and datatypes`;
-        descText = 'info() inspects database metadata shapes, and memory weights.';
-      }
-
-      // Render outputs inside lens drop
-      const lens = document.getElementById('lens-drop');
-      lens.innerHTML = resultsHTML;
-      lens.style.borderRadius = 'var(--border-radius-sm)';
-      lens.style.width = '100%';
-      lens.style.height = 'auto';
-
-      formatPythonCode(codeStr, 3);
-      document.getElementById('code-explainer-text').innerText = descText;
-
-      if (!detectiveState.toolsTested.includes(tool)) {
-        detectiveState.toolsTested.push(tool);
-        document.getElementById('tools-tested').innerText = detectiveState.toolsTested.length;
-      }
-
-      if (detectiveState.toolsTested.length === 4) {
-        concludeActivity31();
-      }
-    }
-
-    function concludeActivity31() {
-      confetti.start();
-      setTimeout(() => confetti.stop(), 3000);
-
-      if (!state.completedActivities.includes('3-1')) {
-        state.completedActivities.push('3-1');
-        awardProgress(100, 3);
-      }
-
-      showStatusBanner("🎉 Data detective research completed! Click <strong>Next ▶</strong> at the top to proceed.");
-    }
-
-
-    /* =========================================================================
-       ACTIVITY 3.2: DASHBOARD BUILDER
-       ========================================================================= */
-    const dashboardState32 = {
-      slots: {
-        'head': null,
-        'shape': null,
-        'describe': null,
-        'info': null
-      }
-    };
-
-    function setupActivity32(container) {
-      document.getElementById('active-title').innerText = 'Activity 3.2 — Dashboard Builder';
-      document.getElementById('active-subtitle').innerText = 'Create a performance dashboard report for the School Principal.';
-
-      container.innerHTML = `
-        <div class="dashboard-workspace-grid">
-          
-          <!-- Widget layout template -->
-          <div class="dashboard-layout-template">
-            <div class="dashboard-drop-box" data-slot="head" id="slot-head">
-              <span class="dashboard-drop-title">First 3 Rows (Preview)</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">Drop head(3) here</span>
-            </div>
-
-            <div class="dashboard-drop-box" data-slot="shape" id="slot-shape">
-              <span class="dashboard-drop-title">Dataset Dimensions (Shape)</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">Drop shape here</span>
-            </div>
-
-            <div class="dashboard-drop-box" data-slot="describe" id="slot-describe">
-              <span class="dashboard-drop-title">Summary Statistics</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">Drop describe() here</span>
-            </div>
-
-            <div class="dashboard-drop-box" data-slot="info" id="slot-info">
-              <span class="dashboard-drop-title">System & Datatype Info</span>
-              <span style="font-size:0.6rem; color:var(--text-muted);">Drop info() here</span>
-            </div>
-
-            <button class="btn btn-primary" onclick="submitDashboard32()" style="justify-content:center; margin-top:0.5rem;">🎯 Submit Dashboard Report</button>
-          </div>
-
-          <!-- Draggable Widget cards -->
-          <div class="drag-chips-container" id="dashboard-widgets" style="flex-direction:column; gap:0.5rem; justify-content:flex-start;">
-            <div class="drag-chip" data-cmd="head" style="width:100%; text-align:center;">df.head(3)</div>
-            <div class="drag-chip" data-cmd="tail" style="width:100%; text-align:center;">df.tail(2)</div>
-            <div class="drag-chip" data-cmd="shape" style="width:100%; text-align:center;">df.shape</div>
-            <div class="drag-chip" data-cmd="columns" style="width:100%; text-align:center;">df.columns</div>
-            <div class="drag-chip" data-cmd="describe" style="width:100%; text-align:center;">df.describe()</div>
-            <div class="drag-chip" data-cmd="info" style="width:100%; text-align:center;">df.info()</div>
-          </div>
-
-        </div>
-      `;
-
-      dashboardState32.slots = { 'head': null, 'shape': null, 'describe': null, 'info': null };
-
-      const codeStr = `import pandas as pd\ndf = pd.read_csv('grades.csv')\n\n# Configure dashboard metrics output...\n# Drag widget cards into matching template drop slots.`;
-      formatPythonCode(codeStr, 4);
-      document.getElementById('code-explainer-text').innerText = 'Construct reports by linking widget outputs to Pandas attributes.';
-
-      // Enable draggables
-      document.querySelectorAll('#dashboard-widgets .drag-chip').forEach(widget => {
-        initDraggable(widget, (item, target) => {
-          const slotName = target.dataset.slot;
-          const cmdVal = item.dataset.cmd;
-
-          if (slotName) {
-            audio.success();
-            dashboardState32.slots[slotName] = cmdVal;
-            target.innerHTML = `
-              <span class="dashboard-drop-title" style="color:var(--primary-red); font-weight:800;">✔ Filled Slot</span>
-              <span style="font-family:'JetBrains Mono'; font-size:0.8rem; font-weight:700;">df.${cmdVal}${cmdVal === 'shape' || cmdVal === 'columns' ? '' : '()'}</span>
-            `;
-            target.classList.add('filled');
-            item.style.display = 'none'; // hide chip
-            syncDashboardCodeOutput32();
-          }
-        });
-      });
-    }
-
-    // Refresh layout lines
-    function syncDashboardCodeOutput32() {
-      let codeStr = `import pandas as pd\ndf = pd.read_csv('grades.csv')\n\n# Dashboard Layout Setup:\n`;
-      if (dashboardState32.slots.head) codeStr += `print(df.head(3))\n`;
-      if (dashboardState32.slots.shape) codeStr += `print(df.shape)\n`;
-      if (dashboardState32.slots.describe) codeStr += `print(df.describe())\n`;
-      if (dashboardState32.slots.info) codeStr += `print(df.info())\n`;
-
-      formatPythonCode(codeStr);
-    }
-
-    function submitDashboard32() {
-      const correct =
-        dashboardState32.slots.head === 'head' &&
-        dashboardState32.slots.shape === 'shape' &&
-        dashboardState32.slots.describe === 'describe' &&
-        dashboardState32.slots.info === 'info';
-
-      if (correct) {
-        audio.success();
-        confetti.start();
-        setTimeout(() => confetti.stop(), 3000);
-
-        if (!state.completedActivities.includes('3-2')) {
-          state.completedActivities.push('3-2');
-          awardProgress(150, 4);
-        }
-
-        // Show congrats dial
-        document.getElementById('badge-dialog-text').innerHTML = `
-          <p style="margin-bottom:0.5rem;">🎉 <strong>GRADUATED!</strong> You successfully completed all Pandas levels!</p>
-          <p>You unlocked the <strong>DataFrame Wizard</strong> badge! Keep up the amazing work.</p>
-        `;
-        document.getElementById('badge-dialog').showModal();
-
-        showStatusBanner("🎉 Dashboard report matches principal requirements! Academy completed successfully!");
-      } else {
-        audio.error();
-        showStatusBanner("❌ Dashboard report evaluation failed! Verify widget alignments and try again.", 'error');
-      }
-    }
-
-
-    /* --- Initialization on Load --- */
-    window.addEventListener('load', () => {
-      loadState();
-      // Default open first level activity 1.1
-      startActivity(1, 1);
     });
 
+    // Interactive DataFrame Lab Logic
+    const initialData = [
+      { time: "09:00", product: "Coffee", rev: 4.50 },
+      { time: "09:15", product: "Bagel", rev: 3.00 },
+      { time: "09:30", product: "Latte", rev: 5.50 },
+      { time: "09:45", product: "Water", rev: 2.00 }
+    ];
+
+    function renderDF(showCumSum = false) {
+      const tbody = document.getElementById('dfBody');
+      const colNewHeader = document.getElementById('col-new');
+      tbody.innerHTML = '';
+
+      let runningTotal = 0;
+
+      initialData.forEach((row, i) => {
+        runningTotal += row.rev;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+                    <td class="index-col">${i}</td>
+                    <td>"${row.time}"</td>
+                    <td>"${row.product}"</td>
+                    <td id="cell-rev-${i}">${row.rev.toFixed(2)}</td>
+                    ${showCumSum ? `<td class="text-blue-600 font-bold bg-blue-50">${runningTotal.toFixed(2)}</td>` : '<td class="hidden"></td>'}
+                `;
+        tbody.appendChild(tr);
+      });
+
+      if (showCumSum) colNewHeader.classList.remove('hidden');
+      else colNewHeader.classList.add('hidden');
+    }
+
+    function logOut(msg) {
+      const con = document.getElementById('consoleOut');
+      con.innerHTML = `> ${msg}<br>` + con.innerHTML;
+    }
+
+    function applyMethod(method) {
+      // Reset visuals
+      document.querySelectorAll('td').forEach(td => td.classList.remove('highlight-col'));
+      renderDF(false); // Reset to base state
+
+      const revs = initialData.map(d => d.rev);
+
+      if (method === 'mean') {
+        const mean = revs.reduce((a, b) => a + b, 0) / revs.length;
+        logOut(`Calculated Mean: <b>$${mean.toFixed(2)}</b>`);
+        highlightCol('rev');
+      } else if (method === 'sum') {
+        const sum = revs.reduce((a, b) => a + b, 0);
+        logOut(`Calculated Sum: <b>$${sum.toFixed(2)}</b>`);
+        highlightCol('rev');
+      } else if (method === 'cumsum') {
+        logOut(`Generated new Series via <b>.cumsum()</b>`);
+        renderDF(true);
+      }
+    }
+
+    function highlightCol(col) {
+      initialData.forEach((_, i) => {
+        document.getElementById(`cell-${col}-${i}`).classList.add('highlight-col');
+      });
+    }
+
+    function resetDF() {
+      renderDF(false);
+      document.getElementById('consoleOut').innerHTML = "> DataFrame reset.";
+    }
+
+    // Init
+    renderDF();
   </script>
 </body>
 
