@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Interactive Educational Simulation on Business Adoption of Digital Systems for Digital Business and Transformation - Module 4.3.">
+    <title>Digital Business & Transformation - Module 4.3: Business Adoption of Digital Systems</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --red-primary: #C62828;
+            --red-light: #EF5350;
+            --red-dark: #8E0000;
+            --red-bg: #FFF5F5;
+            --white: #FFFFFF;
+            --gray-light: #F8F9FA;
+            --gray-mid: #E0E0E0;
+            --gray-dark: #2C3E50;
+            --ink: #333333;
+            --ink-muted: #666666;
+            --border-color: #E0E0E0;
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --warning: #FF9800;
+            --warning-bg: #FFF3E0;
+            --danger: #C62828;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --card-shadow: 0 4px 20px rgba(198, 40, 40, 0.04), 0 1px 2px rgba(0, 0, 0, 0.05);
+            --card-shadow-hover: 0 10px 30px rgba(198, 40, 40, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--gray-light);
+            color: var(--ink);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--gray-dark);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #toast.warning-toast {
+            border-left: 4px solid var(--warning);
+        }
+
+        #toast.success-toast {
+            border-left: 4px solid var(--success);
+        }
+
+        /* ===== HEADER SECTION ===== */
+        header {
+            background: linear-gradient(135deg, var(--red-primary) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--red-light);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--white);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.95;
+            letter-spacing: 0.5px;
+            font-family: var(--font-display);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== PROGRESS & NAVIGATION BAR ===== */
+        .progress-card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .level-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .nav-pill {
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+            padding: 12px 10px;
+            border-radius: 8px;
+            background: var(--gray-light);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .nav-pill:hover {
+            border-color: var(--red-light);
+            color: var(--red-primary);
+            background: var(--red-bg);
+        }
+
+        .nav-pill.active {
+            background: var(--red-primary);
+            color: var(--white);
+            border-color: var(--red-primary);
+            box-shadow: 0 4px 12px rgba(198, 40, 40, 0.2);
+            cursor: default;
+        }
+
+        .nav-pill.active:hover {
+            background: var(--red-primary);
+            color: var(--white);
+        }
+
+        .nav-pill.completed {
+            background: var(--success-bg);
+            color: var(--success);
+            border-color: #C8E6C9;
+        }
+
+        .nav-pill.completed:hover {
+            background: #E8F5E9;
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .nav-pill.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #F1F1F1;
+            color: #999999;
+        }
+
+        .nav-pill.locked:hover {
+            background: #F1F1F1;
+            color: #999999;
+            border-color: var(--border-color);
+        }
+
+        .bar-container {
+            background: #E0E0E0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--red-light), var(--red-primary));
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* ===== SCREENS ===== */
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CARDS AND BUTTONS ===== */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--card-shadow-hover);
+            border-color: rgba(198, 40, 40, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.6rem;
+            color: var(--red-primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--red-bg);
+            padding-bottom: 10px;
+        }
+
+        .objective-box {
+            background: var(--red-bg);
+            border-left: 4px solid var(--red-primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .objective-box strong {
+            color: var(--red-dark);
+            display: block;
+            margin-bottom: 4px;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 28px;
+            background: var(--red-primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.15);
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--red-dark);
+            box-shadow: 0 6px 15px rgba(198, 40, 40, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: var(--gray-mid);
+            color: #888888;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--red-primary);
+            border: 2px solid var(--red-primary);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--red-bg);
+            color: var(--red-dark);
+            border-color: var(--red-dark);
+        }
+
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        /* ===== LEVEL 1: READINESS ASSESSMENT ===== */
+        .l1-dept-btn-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            box-shadow: var(--card-shadow);
+            position: relative;
+        }
+
+        .l1-dept-btn-card:hover {
+            border-color: var(--red-light);
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .l1-dept-btn-card.active {
+            border-color: var(--red-primary);
+            box-shadow: 0 0 0 2px var(--red-primary);
+            background: var(--red-bg);
+        }
+
+        .l1-dept-btn-card.diagnosed {
+            border-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        /* ===== LEVEL 2: BLUEPRINT DESIGNER ===== */
+        .blueprint-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .blueprint-board {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .blueprint-dept {
+            background: #FAF8F8;
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .blueprint-dept.dragover {
+            border-color: var(--red-light);
+            background: var(--red-bg);
+        }
+
+        .blueprint-dept h4 {
+            font-size: 0.95rem;
+            color: var(--red-dark);
+            margin-bottom: 6px;
+        }
+
+        .blueprint-dept-slot {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+            padding: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .blueprint-dept-slot:hover {
+            border-color: var(--red-light);
+        }
+
+        .blueprint-dept-slot.filled {
+            background: var(--red-primary);
+            color: var(--white);
+            border-color: var(--red-primary);
+            font-weight: 600;
+        }
+
+        .tech-pool-title {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            color: var(--red-primary);
+        }
+
+        .tech-pool {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .tech-pool {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tech-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: grab;
+            user-select: none;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .tech-card:hover {
+            border-color: var(--red-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(198, 40, 40, 0.08);
+        }
+
+        .tech-card:active {
+            cursor: grabbing;
+        }
+
+        .tech-card.selected {
+            border-color: var(--red-primary);
+            background: var(--red-bg);
+            box-shadow: 0 0 0 2px var(--red-primary);
+        }
+
+        .tech-card.used {
+            opacity: 0.5;
+            border-style: dashed;
+            cursor: not-allowed;
+        }
+
+        /* ===== LEVEL 3: RESISTANCE SCENARIOS ===== */
+        .l3-option-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+
+        .l3-option-card:hover {
+            border-color: var(--red-light);
+            transform: translateX(4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .l3-option-card.selected {
+            border-color: var(--red-primary);
+            background: var(--red-bg);
+            box-shadow: 0 0 0 2px var(--red-primary);
+        }
+
+        .l3-option-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .l3-option-card.selected .l3-option-radio {
+            border-color: var(--red-primary);
+            background: var(--red-primary);
+        }
+
+        .l3-option-card.selected .l3-option-radio::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--white);
+        }
+
+        /* ===== ANALYTICS DASHBOARD ===== */
+        .l2-dashboard {
+            background: var(--gray-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .l2-dashboard h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--gray-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .dash-metric {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .metric-info h5 {
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+            font-weight: 500;
+        }
+
+        .metric-target-indicator {
+            font-size: 0.72rem;
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .metric-target-indicator.met {
+            color: var(--success);
+        }
+
+        .metric-value {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--red-primary);
+        }
+
+        .dash-advisor {
+            font-size: 0.8rem;
+            background: var(--white);
+            border-left: 3px solid var(--red-primary);
+            padding: 10px;
+            border-radius: 4px;
+            line-height: 1.4;
+            color: var(--ink);
+        }
+
+        /* ===== GENERAL MODAL ===== */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: modalScale 0.3s ease;
+        }
+
+        @keyframes modalScale {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .summary-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .modal-learnings-list {
+            text-align: left;
+            background: var(--gray-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .modal-learnings-list li {
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+            line-height: 1.4;
+        }
+
+        /* ===== FEEDBACK AND BOXES ===== */
+        .feedback-box {
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: var(--success-bg);
+            border-left: 4px solid var(--success);
+            color: #1b5e20;
+        }
+
+        .feedback-box.wrong {
+            display: block;
+            background: var(--red-bg);
+            border-left: 4px solid var(--danger);
+            color: #b71c1c;
+        }
+
+        .completion-box {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .reinforcement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .welcome-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        @media (max-width: 800px) {
+            .welcome-hero {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Persistent Footer Navigation */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOAST ELEMENT -->
+    <div id="toast">🔔 Toast notification</div>
+
+    <!-- MAIN HEADER -->
+    <header>
+        <h1>Digital Business & Transformation – Module 4.3</h1>
+        <p>Simulation Challenge: Business Adoption of Digital Systems</p>
+    </header>
+
+    <!-- WRAPPER -->
+    <main class="container">
+
+        <!-- PERSISTENT CORE THEORY BOARD -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Business Adoption of Digital Systems (Module 4.3)
+                </h3>
+                <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--gray-dark);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. Business Drivers:</strong> Organizations adopt systems to increase Operational Efficiency, reduce costs, improve customer service levels, secure competitive advantages, and coordinate business intelligence logs.</p>
+                    <p style="margin-bottom: 10px;"><strong>2. Digital Systems:</strong> ERP coordinates cross-functional resource flows; CRM tracks customer pipelines and feedback notes; SCM automates logistics; HRMS handles employee logs.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Adoption Barriers:</strong> Typical roadblocks include high license/consulting costs, resistance to change by traditional staff, lack of digital skills, database silos, and poor management commitment.</p>
+                    <p><strong>4. Organizational Readiness:</strong> Change management projects succeed when executives authorize process redesign, staff training programs, technology alignments, and robust internal communication channels.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROGRESS CARD -->
+        <div class="progress-card">
+            <div class="level-nav">
+                <div class="nav-pill active" id="nav-l1" onclick="navigateToLevel(1)">Level 1</div>
+                <div class="nav-pill" id="nav-l2" onclick="navigateToLevel(2)">Level 2</div>
+                <div class="nav-pill" id="nav-l3" onclick="navigateToLevel(3)">Level 3</div>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="overall-progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- ==================== INTRO SCREEN ==================== -->
+        <section id="screen-intro" class="screen active">
+            <div class="card">
+                <div class="welcome-hero">
+                    <div class="welcome-content">
+                        <h2>Diagnose, Architect, and Lead ABC Retail</h2>
+                        <p>Welcome, Transformation Consultant! You have been hired by the board of <strong>ABC Retail Group</strong>, a legacy physical merchant group founded in 1995 that runs 15 legacy brick-and-mortar outlets.</p>
+                        <p>The business is struggling. Their departments operate in separate silos, inventory counts are hand-written on paper logs, customer reports are scattered, and operational efficiency is plummeting.</p>
+                        <div class="objective-box">
+                            <strong>Your Consulting Mission</strong>
+                            Guide the organization through three sequential levels: diagnose department readiness barriers, build an integrated corporate digital systems architecture, and simulate organizational change management scenarios to ensure successful employee adoption.
+                        </div>
+                        <button class="btn" onclick="startSimulation()">Begin Business Diagnosis</button>
+                    </div>
+                    <div class="welcome-art">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="15" y="15" width="170" height="170" rx="10" fill="#FFF5F5" stroke="#C62828"
+                                stroke-width="3" />
+                            <rect x="30" y="30" width="55" height="40" rx="4" fill="#C62828" />
+                            <text x="57" y="55" font-family="'Outfit', sans-serif" font-weight="bold" font-size="10"
+                                fill="white" text-anchor="middle">OFFLINE</text>
+
+                            <rect x="115" y="30" width="55" height="40" rx="4" fill="#E53935" />
+                            <text x="142" y="55" font-family="'Outfit', sans-serif" font-weight="bold" font-size="10"
+                                fill="white" text-anchor="middle">SILOS</text>
+
+                            <rect x="72" y="110" width="56" height="45" rx="4" fill="#8E0000" />
+                            <text x="100" y="130" font-family="'Outfit', sans-serif" font-weight="bold" font-size="8"
+                                fill="white" text-anchor="middle">TRANSFORM</text>
+                            <text x="100" y="142" font-family="'Outfit', sans-serif" font-size="7" fill="#FFCDD2"
+                                text-anchor="middle">ABC RETAIL</text>
+
+                            <line x1="85" y1="50" x2="115" y2="50" stroke="#EF5350" stroke-width="2"
+                                stroke-dasharray="2 2" />
+                            <line x1="57" y1="70" x2="72" y2="110" stroke="#EF5350" stroke-width="1.5" />
+                            <line x1="142" y1="70" x2="128" y2="110" stroke="#EF5350" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 1: BUSINESS READINESS ASSESSMENT ==================== -->
+        <section id="screen-l1" class="screen">
+            <div class="card" id="l1-main-card">
+                <h2>Level 1: Business Readiness Assessment</h2>
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Inspect the 6 operational departments of ABC Retail. For each department, read their operational symptom, then diagnose the core <strong>Business Problem</strong>, the primary <strong>Adoption Barrier</strong>, and recommend the most suitable <strong>Digital System</strong>.
+                </div>
+
+                <div class="l1-split" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; margin-top: 20px;">
+                    <!-- Left: Department Grid list of cards -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: fit-content;" id="l1-dept-cards-grid">
+                        <!-- Injected dynamically by JS -->
+                    </div>
+
+                    <!-- Right: Diagnostic Form Panel -->
+                    <div class="card" id="l1-diagnostic-panel" style="border: 1px solid var(--border-color); padding: 20px; background: var(--gray-light); display: none; margin-bottom: 0;">
+                        <h3 id="l1-selected-dept-title" style="color: var(--red-primary); margin-bottom: 8px;">Department</h3>
+                        <p style="font-style: italic; font-size: 0.95rem; background: var(--white); border-left: 3px solid var(--red-light); padding: 10px; border-radius: 4px; margin-bottom: 20px;" id="l1-selected-dept-quote">Symptom quote...</p>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; display: block; font-size: 0.88rem; margin-bottom: 6px; color: var(--gray-dark);">1. Core Business Problem</label>
+                            <select id="l1-select-problem" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-body); font-size: 0.88rem;">
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; display: block; font-size: 0.88rem; margin-bottom: 6px; color: var(--gray-dark);">2. Primary Adoption Barrier</label>
+                            <select id="l1-select-barrier" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-body); font-size: 0.88rem;">
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="font-weight: 600; display: block; font-size: 0.88rem; margin-bottom: 6px; color: var(--gray-dark);">3. Recommended Digital System</label>
+                            <select id="l1-select-system" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-body); font-size: 0.88rem;">
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+
+                        <button class="btn" onclick="submitL1Diagnosis()" id="btn-submit-l1-diag" style="width: 100%;">Confirm Diagnosis</button>
+
+                        <div class="feedback-box" id="l1-diag-feedback" style="display: none; margin-top: 15px; padding: 12px; border-radius: 6px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 1 Completion Summary -->
+            <div class="completion-box card" id="l1-completion-box" style="display: none; border-top: 4px solid var(--success); margin-top: 30px; padding: 20px;">
+                <h3 style="color: var(--success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    🎉 Level 1 Complete: Business Readiness Decoded
+                </h3>
+                <p style="margin-bottom: 20px;">Outstanding! You have successfully audited all 6 operational departments and diagnosed their adoption barriers and system matches. In Chaffey's textbook, successful business adoption of digital systems starts with understanding how technological innovations address specific operational drivers while overcoming internal organizational friction.</p>
+                
+                <div class="reinforcement-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Key Learning Points</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li><strong>Business Drivers</strong> like operational efficiency and cost reductions push firms to migrate away from manual legacy practices.</li>
+                            <li><strong>Adoption Barriers</strong> are multifaceted and include skill gaps, high license costs, cultural resistance, and lack of integration.</li>
+                            <li><strong>Strategic Alignment</strong> means choosing platforms (CRM, HRMS, ERP) based on business needs, not just for adopting technology itself.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Common Mistakes</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li>Deploying complex ERP software without checking if the staff has the technical skills or training backup to operate it.</li>
+                            <li>Monetizing customer lists or adding CRM tools without transparent security and privacy standards.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Real Business Application</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;">Traditional retailers successfully digitize by deploying modular SaaS platforms sequentially (e.g. launching CRM to stabilize client service before restructuring the back-end procurement using ERP integrations).</p>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Textbook Concept Link</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;"><strong>Chaffey (4th Ed):</strong> Internal readiness checks evaluate a company's technology infrastructure, employee skillset, and management commitment prior to initiating digital transitions.</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="navigateToLevel(2)">Proceed to Level 2</button>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 2: DIGITAL SYSTEMS ARCHITECT ==================== -->
+        <section id="screen-l2" class="screen">
+            <div class="card" id="l2-main-card">
+                <h2>Level 2: Digital Systems Architect</h2>
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Design ABC Retail's integrated digital systems blueprint. Map the available digital platforms to the correct business functions on the architecture board. Achieve performance targets: <strong>Process Integration &gt;= 70%</strong>, <strong>Operational Efficiency &gt;= 75%</strong>, and <strong>Information Sharing &gt;= 70%</strong>.
+                </div>
+
+                <div class="l2-grid" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 20px;">
+                    <!-- Left: Allocation Board -->
+                    <div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--gray-dark);">Corporate Architecture Map</h3>
+                        <div class="blueprint-board" id="l2-board-container">
+                            <!-- Injected dynamically by JS (7 departments) -->
+                        </div>
+
+                        <h4 class="tech-pool-title" style="margin-top: 25px;">Available Digital Systems Pool</h4>
+                        <div class="tech-pool" id="l2-tech-pool">
+                            <!-- Injected dynamically by JS (8 system cards) -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Dashboard metrics -->
+                    <div class="l2-dashboard" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; height: fit-content;">
+                        <h3>Systems Integration Analytics</h3>
+
+                        <div class="dash-metric" style="margin-bottom: 15px;">
+                            <div class="metric-info">
+                                <h5>Process Integration</h5>
+                                <div class="metric-target-indicator" id="ind-l2-integration">Target: &gt;= 70%</div>
+                            </div>
+                            <div class="metric-value" id="lbl-l2-integration">0%</div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 15px;">
+                            <div class="metric-info">
+                                <h5>Operational Efficiency</h5>
+                                <div class="metric-target-indicator" id="ind-l2-eff">Target: &gt;= 75%</div>
+                            </div>
+                            <div class="metric-value" id="lbl-l2-eff">0%</div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 15px;">
+                            <div class="metric-info">
+                                <h5>Information Sharing</h5>
+                                <div class="metric-target-indicator" id="ind-l2-sharing">Target: &gt;= 70%</div>
+                            </div>
+                            <div class="metric-value" id="lbl-l2-sharing">0%</div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 15px;">
+                            <div class="metric-info">
+                                <h5>Customer Service Quality</h5>
+                                <div class="metric-target-indicator">Customer Retention</div>
+                            </div>
+                            <div class="metric-value" id="lbl-l2-service">0%</div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 15px;">
+                            <div class="metric-info">
+                                <h5>Organizational Readiness</h5>
+                                <div class="metric-target-indicator">Technology Alignment</div>
+                            </div>
+                            <div class="metric-value" id="lbl-l2-readiness">0%</div>
+                        </div>
+
+                        <div class="dash-advisor" id="lbl-l2-advisor" style="background: var(--white); padding: 12px; border-radius: 6px; font-size: 0.85rem; border-left: 3px solid var(--red-primary); margin-top: 15px;">
+                            Click a system in the pool below to select it, then click a department above to assign it.
+                        </div>
+
+                        <button class="btn" id="btn-submit-l2" disabled onclick="submitLevel2Blueprint()" style="margin-top: 20px; width: 100%;">Confirm Blueprint Design</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 2 Completion Summary -->
+            <div class="completion-box card" id="l2-completion-box" style="display: none; border-top: 4px solid var(--success); margin-top: 30px; padding: 20px;">
+                <h3 style="color: var(--success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    🎉 Level 2 Complete: Architecture Blueprint Integrated
+                </h3>
+                <p style="margin-bottom: 20px;">Superb! You have mapped and integrated the digital platforms across all departments. In e-business, systems must coordinate processes (e.g. ERP sharing sales invoices directly with SCM inventory schedules) to realize the full benefits of digital transformation.</p>
+
+                <!-- Level 2 Configured Results Dashboard -->
+                <h4 style="margin-bottom: 15px; font-family: var(--font-display); text-align: center;">Configured Results Dashboard</h4>
+                <div id="l2-result-metric-grid" style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;">
+                    <!-- Injected dynamically by JS -->
+                </div>
+                
+                <div class="reinforcement-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Key Learning Points</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li><strong>Process Integration</strong> connects disparate software pipelines, automating data sharing and reducing duplicate manual tasks.</li>
+                            <li><strong>Information Sharing</strong> ensures that real-time transactional logs in SCM are visible to the Finance team immediately.</li>
+                            <li><strong>Enterprise Platforms</strong> like ERP function as the master data hub to coordinate warehouse, accounting, and personnel logs.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Common Mistakes</h4>
+                        <ul style="padding-left: 20px; font-size: 0.88rem; color: var(--ink-muted);">
+                            <li>Deploying standalone database silos (e.g. an isolated CRM that doesn't push customer billing logs to the ERP).</li>
+                            <li>Treating warehouse SCM software and online Sales e-commerce tools as independent, causing double inventory listings.</li>
+                        </ul>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Real Business Application</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;">Firms like Amazon integrate customer support logs directly with their logistics portals using CRM/SCM pipelines so agents can initiate automated refunds.</p>
+                    </div>
+                    <div class="reinforcement-section" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                        <h4 style="color: var(--red-primary); margin-bottom: 8px; font-size: 0.95rem;">Textbook Concept Link</h4>
+                        <p style="font-size: 0.88rem; color: var(--ink-muted); margin: 0;"><strong>Chaffey (4th Ed):</strong> Systems integration maps key value flows (ERP, CRM, SCM) to remove operational silos, reduce lead times, and optimize transaction pipelines.</p>
+                    </div>
+                </div>
+                <button class="btn" onclick="navigateToLevel(3)">Proceed to Level 3</button>
+            </div>
+        </section>
+
+        <!-- ==================== LEVEL 3: ORGANIZATIONAL ADOPTION SIMULATOR ==================== -->
+        <section id="screen-l3" class="screen">
+            <div class="card" id="l3-main-card">
+                <h2>Level 3: Organizational Adoption Simulator</h2>
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Manage the human side of digital transformation as the Change Management Director. Respond to 5 organizational resistance cases. Achieve target thresholds: <strong>Readiness &gt;= 50%</strong>, <strong>Employee Adoption &gt;= 50%</strong>, <strong>Process Integration &gt;= 50%</strong>, <strong>Business Value &gt;= 50%</strong>, and <strong>Success &gt;= 50%</strong>.
+                </div>
+
+                <div class="l3-layout" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 20px;">
+                    <!-- Left: Scenario and Choices -->
+                    <div>
+                        <div class="profile-card" style="border-left: 4px solid var(--red-primary); margin-bottom: 20px;">
+                            <span class="profile-nav-text" id="l3-scenario-number">Scenario 1 of 5</span>
+                            <h4 style="margin: 10px 0;" id="l3-scenario-title">Scenario Title</h4>
+                            <p style="font-size: 1rem; line-height: 1.5; color: var(--ink);" id="l3-scenario-text">Scenario description text...</p>
+                        </div>
+
+                        <div id="l3-options-list" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                            <!-- Shuffled options injected dynamically by JS -->
+                        </div>
+
+                        <div style="margin-top: 20px; display: flex; gap: 15px;">
+                            <button class="btn" id="btn-submit-decision" disabled onclick="submitL3Decision()">Confirm Strategy</button>
+                            <button class="btn" id="btn-next-scenario" style="display: none;" onclick="nextL3Scenario()">Next Scenario</button>
+                        </div>
+
+                        <div class="feedback-box" id="l3-decision-feedback" style="display: none; margin-top: 20px; padding: 15px; border-radius: 6px;">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Performance metrics dashboard -->
+                    <div class="l2-dashboard" style="background: var(--gray-light); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; height: fit-content;">
+                        <h3>Adoption Status Dashboard</h3>
+
+                        <div class="dash-metric" style="margin-bottom: 12px;">
+                            <div class="metric-info">
+                                <h5>Organizational Readiness</h5>
+                                <div class="metric-target-indicator" id="l3-target-readiness">Target: &gt;= 50%</div>
+                            </div>
+                            <div class="metric-value" id="l3-val-readiness">50%</div>
+                            <div class="bar-container" style="height: 6px; margin-top: 6px;">
+                                <div class="bar-fill" id="l3-bar-readiness" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 12px;">
+                            <div class="metric-info">
+                                <h5>Employee Adoption</h5>
+                                <div class="metric-target-indicator" id="l3-target-adoption">Target: &gt;= 50%</div>
+                            </div>
+                            <div class="metric-value" id="l3-val-adoption">50%</div>
+                            <div class="bar-container" style="height: 6px; margin-top: 6px;">
+                                <div class="bar-fill" id="l3-bar-adoption" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 12px;">
+                            <div class="metric-info">
+                                <h5>Process Integration</h5>
+                                <div class="metric-target-indicator" id="l3-target-integration">Target: &gt;= 50%</div>
+                            </div>
+                            <div class="metric-value" id="l3-val-integration">50%</div>
+                            <div class="bar-container" style="height: 6px; margin-top: 6px;">
+                                <div class="bar-fill" id="l3-bar-integration" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 12px;">
+                            <div class="metric-info">
+                                <h5>Business Value</h5>
+                                <div class="metric-target-indicator" id="l3-target-value">Target: &gt;= 50%</div>
+                            </div>
+                            <div class="metric-value" id="l3-val-value">50%</div>
+                            <div class="bar-container" style="height: 6px; margin-top: 6px;">
+                                <div class="bar-fill" id="l3-bar-value" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="dash-metric" style="margin-bottom: 12px;">
+                            <div class="metric-info">
+                                <h5>Implementation Success</h5>
+                                <div class="metric-target-indicator" id="l3-target-success">Target: &gt;= 50%</div>
+                            </div>
+                            <div class="metric-value" id="l3-val-success">50%</div>
+                            <div class="bar-container" style="height: 6px; margin-top: 6px;">
+                                <div class="bar-fill" id="l3-bar-success" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== GENERAL MODALS SYSTEM ==================== -->
+        <div class="overlay" id="learning-modal">
+            <div class="modal-box">
+                <span class="summary-icon" id="modal-icon">🏆</span>
+                <h3 id="modal-title">Stage Cleared</h3>
+                <p id="modal-desc">Learnings successfully locked in.</p>
+                <div class="modal-learnings-list" id="modal-learnings-body">
+                    <!-- Injected dynamically -->
+                </div>
+                <button class="btn" id="modal-next-btn" onclick="modalCloseAndAdvance()">Proceed to Next Level</button>
+            </div>
+        </div>
+
+        <!-- ==================== RESULTS SCREEN ==================== -->
+        <section id="screen-results" class="screen">
+            <div class="card results-box" style="text-align: center; padding: 30px;">
+                <div class="results-badge" id="results-icon" style="font-size: 3.5rem; margin-bottom: 15px;">🏆</div>
+                <h2 class="results-title" id="results-heading" style="color: var(--success); margin-bottom: 10px;">Transformation Successful!</h2>
+                <div class="results-summary-text" id="results-subheading" style="margin-bottom: 25px; font-size: 1.05rem; color: var(--ink-muted);">Your change management strategies and technical alignments successfully guided ABC Retail through its digital transformation.</div>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;">
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Readiness</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="res-val-readiness">0%</strong>
+                    </div>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Employee Adoption</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="res-val-adoption">0%</strong>
+                    </div>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Integration</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="res-val-integration">0%</strong>
+                    </div>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Business Value</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="res-val-value">0%</strong>
+                    </div>
+                    <div style="background: var(--gray-light); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--ink-muted); display: block;">Success Index</span>
+                        <strong style="font-family: var(--font-display); font-size: 1.5rem; color: var(--red-primary);" id="res-val-success">0%</strong>
+                    </div>
+                </div>
+
+                <div class="analysis-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; margin-bottom: 25px;">
+                    <div class="analysis-card strengths" style="background: var(--success-bg); border-left: 4px solid var(--success); padding: 20px; border-radius: 8px;">
+                        <h4 style="color: var(--success); margin-bottom: 10px;">🟢 Strengths</h4>
+                        <ul id="res-strengths" style="padding-left: 20px; font-size: 0.88rem; color: var(--ink);">
+                            <!-- Bullets -->
+                        </ul>
+                    </div>
+                    <div class="analysis-card improvements" style="background: #FFF8E1; border-left: 4px solid var(--warning); padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #F57F17; margin-bottom: 10px;">🟠 Areas for Improvement</h4>
+                        <ul id="res-improvements" style="padding-left: 20px; font-size: 0.88rem; color: var(--ink);">
+                            <!-- Bullets -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Academic Reinforcement Summary -->
+                <div class="reinforcement-section card" style="text-align: left; background: var(--gray-light); padding: 20px; margin-bottom: 25px; border: 1px solid var(--border-color);">
+                    <h4 style="color: var(--red-primary); margin-bottom: 8px;">Academic Reinforcement: Business Adoption & Strategic Alignment</h4>
+                    <p style="font-size: 0.88rem; color: var(--ink-muted); line-height: 1.6;">
+                        According to <strong>Dave Chaffey's E-Business and E-Commerce Management (4th Edition)</strong>, the success of corporate digital adoption relies on <strong>Change Management</strong>: aligning workers, organizational structures, and systems processes. Leadership must address employee anxieties through skills training, maintain cross-functional process integration, and prioritize strategic alignment—delivering actual business value rather than implementing technologies for their own sake.
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="restartLevel3Only()">Restart Level 3 Only</button>
+                    <button class="btn" onclick="restartEntireSimulation()">Restart Full Simulation</button>
+                </div>
+    <!-- Persistent Bottom Nav Bar (No Lock Level Navigation) -->
+    <div class="nav-footer" id="navigationFooter" style="display: none;">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Level</button>
+            <div style="font-family: var(--font-display); font-weight: 700; color: var(--red-primary); font-size: 0.95rem;"
+                id="footerLevelText">
+                Level 1 of 3
+            </div>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    </main>
+
+    <script>
+        /* ==================== GLOBAL STATES ==================== */
+        let currentScreen = 'intro';
+        let levelsUnlocked = [true, true, true];
+        let levelsCompleted = [false, false, false];
+        let currentActiveLevel = 1;
+
+        // Custom Toast Notification
+        function showToast(message, type = 'warning') {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.className = '';
+            toast.classList.add('show');
+            if (type === 'warning') toast.classList.add('warning-toast');
+            if (type === 'success') toast.classList.add('success-toast');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Screen toggles
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
+            const targetScreen = document.getElementById(`screen-${screenId}`);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                currentScreen = screenId;
+                window.scrollTo(0, 0);
+            }
+
+            const footer = document.getElementById('navigationFooter');
+            if (footer) {
+                if (screenId === 'intro') {
+                    footer.style.display = 'none';
+                } else {
+                    footer.style.display = 'flex';
+                    // Derive level number from screenId e.g. 'l1', 'l2', 'l3'
+                    let levelNum = screenId.replace('l', '');
+                    document.getElementById('footerLevelText').innerText = `Level ${levelNum} of 3`;
+                }
+            }
+        }
+
+        window.prevLevel = function() {
+            if (currentActiveLevel > 1) {
+                navigateToLevel(currentActiveLevel - 1);
+            }
+        };
+
+        window.nextLevel = function() {
+            if (currentActiveLevel < 3) {
+                navigateToLevel(currentActiveLevel + 1);
+            }
+        };
+
+        // Navigate to level directly (locking removed)
+        function navigateToLevel(levelNum) {
+            currentActiveLevel = levelNum;
+            updatePills();
+            showScreen(`l${levelNum}`);
+            initLevel(levelNum);
+        }
+
+        function updatePills() {
+            for (let i = 1; i <= 3; i++) {
+                const pill = document.getElementById(`nav-l${i}`);
+                if (pill) {
+                    pill.className = 'nav-pill';
+                    if (levelsCompleted[i - 1]) {
+                        pill.classList.add('completed');
+                        pill.innerHTML = `✓ Level ${i}`;
+                    } else {
+                        pill.innerHTML = `Level ${i}`;
+                    }
+                    if (i === currentActiveLevel) {
+                        pill.classList.add('active');
+                    }
+                }
+            }
+
+            // Overall Progress bar
+            let totalProgress = 0;
+            if (currentScreen === 'intro') {
+                totalProgress = 0;
+            } else if (currentScreen === 'results') {
+                totalProgress = 100;
+            } else {
+                totalProgress = (currentActiveLevel - 1) * 35 + 15;
+            }
+            document.getElementById('overall-progress-bar').style.width = `${totalProgress}%`;
+        }
+
+        function startSimulation() {
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            navigateToLevel(1);
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        function initLevel(levelNum) {
+            if (levelNum === 1) initLevel1();
+            if (levelNum === 2) initLevel2();
+            if (levelNum === 3) initLevel3();
+        }
+
+        function shuffleArray(array) {
+            let cur = [...array];
+            for (let i = cur.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cur[i], cur[j]] = [cur[j], cur[i]];
+            }
+            return cur;
+        }
+
+        /* ==================== LEVEL 1: BUSINESS READINESS ASSESSMENT ==================== */
+        const L1_PROBLEMS = {
+            'p_sales': "Catalog and telephone sales limit customer reach",
+            'p_finance': "Spreadsheet-based ledger entries cause calculation errors",
+            'p_hr': "Duplicate employee records across local files",
+            'p_inventory': "Clipboard stock counting causes frequent stockouts",
+            'p_procurement': "Manual emails and fax coordinate supply orders too slowly",
+            'p_service': "Misplaced handwritten customer complaint slips"
+        };
+
+        const L1_BARRIERS = {
+            'b_cost': "High implementation cost",
+            'b_skills': "Lack of technical skills",
+            'b_culture': "Organizational culture",
+            'b_integration': "Integration challenges",
+            'b_commitment': "Management commitment"
+        };
+
+        const L1_SYSTEMS = {
+            'sys_crm': "CRM (Customer Relationship Management)",
+            'sys_erp': "ERP (Enterprise Resource Planning)",
+            'sys_scm': "SCM (Supply Chain Management)",
+            'sys_hrms': "HRMS (Human Resources Management System)",
+            'sys_ims': "Inventory Management System",
+            'sys_ecom': "E-Commerce Platform",
+            'sys_acct': "Accounting System"
+        };
+
+        const L1_DEPTS_DATA = [
+            {
+                id: 'sales',
+                name: "Sales Department",
+                quote: "We only sell through catalog mailings and phone agents, leaving us unable to reach international markets or process instant payments.",
+                correctProblem: 'p_sales',
+                correctBarrier: 'b_cost',
+                correctSystem: 'sys_ecom',
+                feedback: "Excellent. Implementing an E-Commerce Platform expands ABC Retail's target reach to international markets and enables instant digital payments 24/7, reducing order processing costs."
+            },
+            {
+                id: 'finance',
+                name: "Finance Department",
+                quote: "Our ledger is manually updated weekly on paper logs and separate spreadsheets, resulting in frequent calculation errors and delayed monthly reporting.",
+                correctProblem: 'p_finance',
+                correctBarrier: 'b_skills',
+                correctSystem: 'sys_acct',
+                feedback: "Perfect. An Accounting System automates book entries, coordinates invoice processing, and speeds up monthly closes with minimal manual errors."
+            },
+            {
+                id: 'hr',
+                name: "Human Resources",
+                quote: "Employee details, training histories, and leave logs are scattered across separate files, causing double filings and slow contract processing.",
+                correctProblem: 'p_hr',
+                correctBarrier: 'b_culture',
+                correctSystem: 'sys_hrms',
+                feedback: "Correct. HRMS centralizes records, automates onboarding steps, and manages employee leave balances in a single compliant interface."
+            },
+            {
+                id: 'inventory',
+                name: "Inventory Warehouse",
+                quote: "Staff count warehouse stock manually using clipboards once a week, leading to frequent warehouse inventory mismatch, order delays, and stockouts.",
+                correctProblem: 'p_inventory',
+                correctBarrier: 'b_skills',
+                correctSystem: 'sys_ims',
+                feedback: "Superb. An Inventory Management System tracks stock movements in real time using barcode scanning, automating reorder notifications and reducing warehousing costs."
+            },
+            {
+                id: 'procurement',
+                name: "Procurement Desk",
+                quote: "We negotiate material deliveries with suppliers manually via emails and fax, resulting in supply bottlenecks, late shipments, and poor supplier audits.",
+                correctProblem: 'p_procurement',
+                correctBarrier: 'b_integration',
+                correctSystem: 'sys_scm',
+                feedback: "Great. SCM (Supply Chain Management) coordinates supplier portal access, optimizes inventory replenishment, and gives real-time visibility from logistics to assembly."
+            },
+            {
+                id: 'service',
+                name: "Customer Service",
+                quote: "We log support complaints on handwritten slips which frequently get misplaced, causing customer response delays and high churn.",
+                correctProblem: 'p_service',
+                correctBarrier: 'b_commitment',
+                correctSystem: 'sys_crm',
+                feedback: "Spot on. CRM registers and routes help tickets, logs customer interactions, and tracks service levels to keep customer retention high."
+            }
+        ];
+
+        let l1SelectedDeptId = null;
+        let l1DiagnosedDepts = {};
+        let l1ScrambledDepts = [];
+
+        function initLevel1() {
+            l1DiagnosedDepts = {};
+            l1SelectedDeptId = null;
+            l1ScrambledDepts = shuffleArray(L1_DEPTS_DATA);
+            
+            document.getElementById('l1-main-card').style.display = 'block';
+            document.getElementById('l1-completion-box').style.display = 'none';
+            document.getElementById('l1-diagnostic-panel').style.display = 'none';
+
+            renderL1DeptCards();
+        }
+
+        function renderL1DeptCards() {
+            const grid = document.getElementById('l1-dept-cards-grid');
+            grid.innerHTML = l1ScrambledDepts.map(dept => {
+                const isDiagnosed = l1DiagnosedDepts[dept.id];
+                const isActive = l1SelectedDeptId === dept.id;
+                const statusIcon = isDiagnosed ? '🟢 Diagnosed' : '🔴 Awaiting Audit';
+                const activeClass = isActive ? 'active' : '';
+                const diagClass = isDiagnosed ? 'diagnosed' : '';
+
+                return `
+                    <div class="l1-dept-btn-card ${activeClass} ${diagClass}" onclick="selectL1Dept('${dept.id}')">
+                        <h4 style="font-size:1rem; margin-bottom:4px;">🏢 ${dept.name}</h4>
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--ink-muted);">${statusIcon}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectL1Dept(deptId) {
+            l1SelectedDeptId = deptId;
+            renderL1DeptCards();
+
+            const dept = L1_DEPTS_DATA.find(d => d.id === deptId);
+            document.getElementById('l1-selected-dept-title').textContent = `Audit: ${dept.name}`;
+            document.getElementById('l1-selected-dept-quote').textContent = `"${dept.quote}"`;
+
+            const problemSelect = document.getElementById('l1-select-problem');
+            const barrierSelect = document.getElementById('l1-select-barrier');
+            const systemSelect = document.getElementById('l1-select-system');
+
+            const scrambledProblems = shuffleArray(Object.entries(L1_PROBLEMS));
+            const scrambledBarriers = shuffleArray(Object.entries(L1_BARRIERS));
+            const scrambledSystems = shuffleArray(Object.entries(L1_SYSTEMS));
+
+            problemSelect.innerHTML = `<option value="">Choose core business problem...</option>` + scrambledProblems.map(([k, v]) => `
+                <option value="${k}">${v}</option>
+            `).join('');
+
+            barrierSelect.innerHTML = `<option value="">Choose primary adoption barrier...</option>` + scrambledBarriers.map(([k, v]) => `
+                <option value="${k}">${v}</option>
+            `).join('');
+
+            systemSelect.innerHTML = `<option value="">Choose digital system match...</option>` + scrambledSystems.map(([k, v]) => `
+                <option value="${k}">${v}</option>
+            `).join('');
+
+            document.getElementById('l1-diagnostic-panel').style.display = 'block';
+            document.getElementById('l1-diag-feedback').style.display = 'none';
+            document.getElementById('btn-submit-l1-diag').style.display = 'block';
+        }
+
+        function submitL1Diagnosis() {
+            if (!l1SelectedDeptId) return;
+
+            const dept = L1_DEPTS_DATA.find(d => d.id === l1SelectedDeptId);
+            const probVal = document.getElementById('l1-select-problem').value;
+            const barrierVal = document.getElementById('l1-select-barrier').value;
+            const sysVal = document.getElementById('l1-select-system').value;
+
+            if (!probVal || !barrierVal || !sysVal) {
+                showToast("Please make selections for all three questions.", "warning");
+                return;
+            }
+
+            const pCorrect = probVal === dept.correctProblem;
+            const bCorrect = barrierVal === dept.correctBarrier;
+            const sCorrect = sysVal === dept.correctSystem;
+
+            const feedback = document.getElementById('l1-diag-feedback');
+            feedback.style.display = 'block';
+
+            if (pCorrect && bCorrect && sCorrect) {
+                l1DiagnosedDepts[l1SelectedDeptId] = true;
+                feedback.className = "feedback-box correct";
+                feedback.innerHTML = `
+                    <h4 style="margin-bottom:6px;">🎉 Correct Diagnosis!</h4>
+                    <p>${dept.feedback}</p>
+                `;
+                document.getElementById('btn-submit-l1-diag').style.display = 'none';
+                renderL1DeptCards();
+                showToast("Diagnosis verified!", "success");
+
+                // Check level completion
+                const diagnosedCount = Object.keys(l1DiagnosedDepts).length;
+                if (diagnosedCount === L1_DEPTS_DATA.length) {
+                    levelsCompleted[0] = true;
+                    updatePills();
+                    setTimeout(() => {
+                        document.getElementById('l1-main-card').style.display = 'none';
+                        document.getElementById('l1-completion-box').style.display = 'block';
+                    }, 1500);
+                }
+            } else {
+                feedback.className = "feedback-box wrong";
+                let errText = "Incorrect selections:<br>";
+                if (!pCorrect) errText += "• Core Business Problem is incorrect.<br>";
+                if (!bCorrect) errText += "• Primary Adoption Barrier is incorrect.<br>";
+                if (!sCorrect) errText += "• Recommended Digital System is incorrect.";
+                
+                feedback.innerHTML = `
+                    <h4 style="margin-bottom:6px;">⚠️ Mismatched Audit</h4>
+                    <p>${errText}</p>
+                    <p style="margin-top:8px; font-weight:600; font-size:0.82rem; color:#b71c1c;">Review the department quote and adjust your answers to try again.</p>
+                `;
+                showToast("Mismatch detected.", "warning");
+            }
+        }
+
+
+        /* ==================== LEVEL 2: DIGITAL SYSTEMS ARCHITECT ==================== */
+        const L2_DEPTS = [
+            { id: 'sales', name: "Sales Desk", placeholder: "Empty slot..." },
+            { id: 'marketing', name: "Marketing", placeholder: "Empty slot..." },
+            { id: 'finance', name: "Finance Segment", placeholder: "Empty slot..." },
+            { id: 'hr', name: "Human Resources", placeholder: "Empty slot..." },
+            { id: 'warehouse', name: "Warehouse", placeholder: "Empty slot..." },
+            { id: 'procurement', name: "Procurement", placeholder: "Empty slot..." },
+            { id: 'support', name: "Customer Support", placeholder: "Empty slot..." }
+        ];
+
+        const L2_TECH = [
+            { id: 'erp', label: "ERP", icon: "⚙️", desc: "Integrates warehouse operations, HR details, and accounting ledger database." },
+            { id: 'crm', label: "CRM", icon: "🔒", desc: "Coordinates client records, sales pipeline targets, and customer complaints." },
+            { id: 'scm', label: "SCM", icon: "🚛", desc: "Coordinates supplier deliveries, transit updates, and warehouse replenishments." },
+            { id: 'hrms', label: "HRMS", icon: "👥", desc: "Coordinates training databases, leave logs, and employee contract payrolls." },
+            { id: 'bi', label: "Business Intel", icon: "📊", desc: "Aggregates databases to display sales trends and financial metrics charts." },
+            { id: 'ecom', label: "E-Commerce", icon: "🛒", desc: "Enables customers to purchase catalogs online and processes payments." },
+            { id: 'support_sys', label: "Support System", icon: "🎧", desc: "Registers customer support help tickets and manages response logs." },
+            { id: 'gateway', label: "Payment Gateway", icon: "💳", desc: "Authorizes and processes direct client credit card transactions." }
+        ];
+
+        let l2Placements = {};
+        let l2SelectedTechId = null;
+
+        function initLevel2() {
+            l2Placements = {
+                sales: null,
+                marketing: null,
+                finance: null,
+                hr: null,
+                warehouse: null,
+                procurement: null,
+                support: null
+            };
+            l2SelectedTechId = null;
+            document.getElementById('l2-main-card').style.display = 'block';
+            document.getElementById('l2-completion-box').style.display = 'none';
+
+            renderL2Board();
+            renderL2Pool();
+            updateL2Metrics();
+        }
+
+        function renderL2Board() {
+            const container = document.getElementById('l2-board-container');
+            container.innerHTML = L2_DEPTS.map(dept => {
+                const assignedTechId = l2Placements[dept.id];
+                const tech = L2_TECH.find(t => t.id === assignedTechId);
+
+                return `
+                    <div class="blueprint-dept" id="dept-${dept.id}" onclick="clickL2Dept('${dept.id}')">
+                        <h4>${dept.name}</h4>
+                        <div class="blueprint-dept-slot ${tech ? 'filled' : ''}" id="slot-${dept.id}">
+                            ${tech ? `
+                                <div>
+                                    <span>${tech.icon}</span> <strong>${tech.label}</strong>
+                                    <div style="font-size: 0.6rem; opacity: 0.8;">(Click to remove)</div>
+                                </div>
+                            ` : `<span>${dept.placeholder}</span>`}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderL2Pool() {
+            const container = document.getElementById('l2-tech-pool');
+            container.innerHTML = L2_TECH.map(tech => {
+                const isSelected = l2SelectedTechId === tech.id;
+                const useCount = Object.values(l2Placements).filter(id => id === tech.id).length;
+
+                return `
+                    <div class="tech-card ${isSelected ? 'selected' : ''}" 
+                         id="tech-${tech.id}" 
+                         onclick="clickL2TechCard('${tech.id}')">
+                        <h5>${tech.icon} ${tech.label}</h5>
+                        <p style="font-size: 0.72rem; color: var(--ink-muted); line-height: 1.2; margin: 4px 0;">${tech.desc}</p>
+                        ${useCount > 0 ? `<span class="zone-badge" style="font-size:0.6rem; background:var(--success); color:#fff; position:absolute; top:-5px; right:-5px; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; padding:0;">${useCount}</span>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clickL2TechCard(techId) {
+            if (l2SelectedTechId === techId) {
+                l2SelectedTechId = null;
+                showToast("Deselected platform.", "warning");
+            } else {
+                l2SelectedTechId = techId;
+                const tech = L2_TECH.find(t => t.id === techId);
+                showToast(`Selected "${tech.label}". Click a department above to assign.`, "success");
+            }
+            renderL2Pool();
+        }
+
+        function clickL2Dept(deptId) {
+            const currentlyAssigned = l2Placements[deptId];
+
+            if (l2SelectedTechId) {
+                l2Placements[deptId] = l2SelectedTechId;
+                l2SelectedTechId = null;
+                renderL2Board();
+                renderL2Pool();
+                updateL2Metrics();
+                showToast("System deployed to department.", "success");
+            } else if (currentlyAssigned) {
+                l2Placements[deptId] = null;
+                renderL2Board();
+                renderL2Pool();
+                updateL2Metrics();
+                showToast("System cleared from department.", "warning");
+            } else {
+                showToast("Click a digital system card below first, then click here to deploy.", "warning");
+            }
+        }
+
+        function updateL2Metrics() {
+            let integration = 10; // base 10 (was 0)
+            let efficiency = 25; // base 25 (was 20)
+            let sharing = 20; // base 20 (was 10)
+            let service = 20; // base 20 (was 10)
+            let readiness = 30; // base 30
+
+            // Sales -> E-Commerce is correct (+20 Int, +30 Eff, +20 Share)
+            if (l2Placements.sales === 'crm') { integration += 10; service += 25; }
+            if (l2Placements.sales === 'ecom') { integration += 20; efficiency += 30; sharing += 20; }
+
+            // Marketing -> CRM or BI
+            if (l2Placements.marketing === 'crm') { integration += 15; service += 15; }
+            if (l2Placements.marketing === 'bi') { sharing += 25; readiness += 15; }
+
+            // Finance -> ERP (ideal) or Gateway (ideal)
+            if (l2Placements.finance === 'erp') { integration += 25; efficiency += 25; sharing += 20; }
+            if (l2Placements.finance === 'gateway') { integration += 20; efficiency += 30; sharing += 15; }
+
+            // HR -> HRMS (ideal) or ERP
+            if (l2Placements.hr === 'hrms') { integration += 25; readiness += 25; sharing += 15; }
+            if (l2Placements.hr === 'erp') { integration += 15; sharing += 20; }
+
+            // Warehouse -> SCM (ideal) or ERP
+            if (l2Placements.warehouse === 'scm') { integration += 25; efficiency += 25; sharing += 15; }
+            if (l2Placements.warehouse === 'erp') { integration += 15; efficiency += 15; sharing += 20; }
+
+            // Procurement -> SCM (ideal) or ERP
+            if (l2Placements.procurement === 'scm') { integration += 25; efficiency += 25; sharing += 15; }
+            if (l2Placements.procurement === 'erp') { integration += 15; efficiency += 15; sharing += 20; }
+
+            // Customer Support -> Support System or CRM
+            if (l2Placements.support === 'support_sys') { service += 30; efficiency += 15; }
+            if (l2Placements.support === 'crm') { service += 25; integration += 15; sharing += 15; }
+
+            integration = Math.max(0, Math.min(100, integration));
+            efficiency = Math.max(0, Math.min(100, efficiency));
+            sharing = Math.max(0, Math.min(100, sharing));
+            service = Math.max(0, Math.min(100, service));
+            readiness = Math.max(0, Math.min(100, readiness));
+
+            document.getElementById('lbl-l2-integration').textContent = `${integration}%`;
+            document.getElementById('lbl-l2-eff').textContent = `${efficiency}%`;
+            document.getElementById('lbl-l2-sharing').textContent = `${sharing}%`;
+            document.getElementById('lbl-l2-service').textContent = `${service}%`;
+            document.getElementById('lbl-l2-readiness').textContent = `${readiness}%`;
+
+            const intMet = integration >= 70;
+            const effMet = efficiency >= 75;
+            const shareMet = sharing >= 70;
+
+            const indInt = document.getElementById('ind-l2-integration');
+            const indEff = document.getElementById('ind-l2-eff');
+            const indShare = document.getElementById('ind-l2-sharing');
+
+            if (intMet) { indInt.classList.add('met'); indInt.textContent = "Target met! (>=70%)"; }
+            else { indInt.classList.remove('met'); indInt.textContent = "Target: >=70%"; }
+
+            if (effMet) { indEff.classList.add('met'); indEff.textContent = "Target met! (>=75%)"; }
+            else { indEff.classList.remove('met'); indEff.textContent = "Target: >=75%"; }
+
+            if (shareMet) { indShare.classList.add('met'); indShare.textContent = "Target met! (>=70%)"; }
+            else { indShare.classList.remove('met'); indShare.textContent = "Target: >=70%"; }
+
+            const submitBtn = document.getElementById('btn-submit-l2');
+            submitBtn.disabled = !(intMet && effMet && shareMet);
+
+            const advisor = document.getElementById('lbl-l2-advisor');
+            if (!intMet) {
+                advisor.innerHTML = "⚠️ <strong>Advisor Warning:</strong> System processes are siloed. Map ERP to Finance/Warehouse and CRM to Sales to coordinate database pipelines.";
+            } else if (!effMet) {
+                advisor.innerHTML = "⚠️ <strong>Advisor Warning:</strong> Transaction efficiency is lagging. Integrate an E-Commerce Platform at the Sales desk and Payment Gateway to process transactions faster.";
+            } else if (!shareMet) {
+                advisor.innerHTML = "⚠️ <strong>Advisor Warning:</strong> Information flow is blocked. Deploy Business Intelligence at Marketing/Finance and ERP across back-end teams to unlock database logs.";
+            } else {
+                advisor.innerHTML = "🟢 <strong>Blueprint Configured:</strong> Excellent alignment of systems architectures. Operational pipelines are integrated. Click 'Confirm Blueprint Design' below.";
+            }
+        }
+
+        function submitLevel2Blueprint() {
+            levelsCompleted[1] = true;
+            levelsUnlocked[2] = true;
+            updatePills();
+
+            const integrationVal = document.getElementById('lbl-l2-integration').textContent;
+            const efficiencyVal = document.getElementById('lbl-l2-eff').textContent;
+            const sharingVal = document.getElementById('lbl-l2-sharing').textContent;
+            const serviceVal = document.getElementById('lbl-l2-service').textContent;
+
+            document.getElementById('l2-result-metric-grid').innerHTML = `
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Integration</span>
+                    <strong style="font-size:1.3rem; color:var(--success);">${integrationVal}</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Efficiency</span>
+                    <strong style="font-size:1.3rem; color:var(--success);">${efficiencyVal}</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Sharing</span>
+                    <strong style="font-size:1.3rem; color:var(--success);">${sharingVal}</strong>
+                </div>
+                <div style="background: var(--gray-light); border:1px solid var(--border-color); padding: 12px; border-radius: 8px; flex:1; min-width:120px; text-align:center;">
+                    <span style="font-size:0.75rem; text-transform:uppercase; color:var(--ink-muted); display:block;">Service Quality</span>
+                    <strong style="font-size:1.3rem; color:var(--success);">${serviceVal}</strong>
+                </div>
+            `;
+
+            document.getElementById('l2-main-card').style.display = 'none';
+            document.getElementById('l2-completion-box').style.display = 'block';
+        }
+
+
+        /* ==================== LEVEL 3: ORGANIZATIONAL ADOPTION SIMULATOR ==================== */
+        const L3_SCENARIOS = [
+            {
+                id: 's1',
+                title: "Employee ERP confusion and friction",
+                desc: "Employees are resisting the new ERP system because they find the user interface overly complicated, claims onboarding takes too long, and threaten to use paper ledgers.",
+                choices: [
+                    {
+                        text: "Host tailored hands-on training sessions and streamline initial workflows to build capability.",
+                        effect: { read: 25, adopt: 25, integration: 15, value: 10, success: 20 },
+                        feedback: "Excellent! Hands-on training lowers complexity barriers, builds employee skills, and reduces transition friction."
+                    },
+                    {
+                        text: "Issue an executive mandate requiring full compliance on penalty of formal review.",
+                        effect: { read: 5, adopt: -20, integration: 10, value: -5, success: -15 },
+                        feedback: "Negative impact. Forcing compliance without solving skill gaps raises worker anxiety and damages corporate adoption."
+                    },
+                    {
+                        text: "Postpone the system launch by six months to allow gradual self-learning.",
+                        effect: { read: 10, adopt: 5, integration: -10, value: -15, success: -10 },
+                        feedback: "Poor. Delaying the rollout without structured training leads to transformation drift and delays business value."
+                    },
+                    {
+                        text: "Provide cash incentives for every profile created on the platform.",
+                        effect: { read: 5, adopt: 10, integration: 5, value: -15, success: -5 },
+                        feedback: "Ineffective. Cash rewards fail to solve the underlying complexity problem and raise budgets without building capability."
+                    }
+                ]
+            },
+            {
+                id: 's2',
+                title: "Board hesitates to approve transition budget",
+                desc: "Executive directors express skepticism about the rising implementation costs and consult on suspending integration funding due to lack of immediate ROI.",
+                choices: [
+                    {
+                        text: "Deploy a pilot implementation in one department and present verified operational cost reductions.",
+                        effect: { read: 20, adopt: 15, integration: 15, value: 25, success: 25 },
+                        feedback: "Superb. Proving value in a small pilot secures management commitment and highlights relative advantages."
+                    },
+                    {
+                        text: "Demand budget approval under threat of consultant resignation.",
+                        effect: { read: -15, adopt: -5, integration: 0, value: -10, success: -25 },
+                        feedback: "Highly negative. Emotional ultimatums destroy board trust and derail strategic alignment."
+                    },
+                    {
+                        text: "Minimize costs by disabling security filters and database backup modules.",
+                        effect: { read: -25, adopt: 10, integration: 5, value: -30, success: -25 },
+                        feedback: "Critical failure. Compromising database safety to cut costs triggers catastrophic compliance risks."
+                    },
+                    {
+                        text: "Request vendor discounts by eliminating process integration features.",
+                        effect: { read: 10, adopt: 5, integration: -20, value: -15, success: -10 },
+                        feedback: "Counterproductive. Restricting integrations limits information sharing, keeping database silos in place."
+                    }
+                ]
+            },
+            {
+                id: 's3',
+                title: "Siloed department data bottlenecks",
+                desc: "The Procurement and Warehouse managers refuse to share real-time inventories, maintaining independent database records instead.",
+                choices: [
+                    {
+                        text: "Establish integrated KPI targets and host cross-functional alignment sessions.",
+                        effect: { read: 20, adopt: 20, integration: 25, value: 15, success: 20 },
+                        feedback: "Perfect. Aligning incentive metrics and team objectives breaks down political silos and drives process integration."
+                    },
+                    {
+                        text: "Request manual spreadsheet extracts to bridge team databases weekly.",
+                        effect: { read: -10, adopt: 5, integration: -15, value: -10, success: -10 },
+                        feedback: "Poor. Reinforces database silos, introducing double entries and delay costs."
+                    },
+                    {
+                        text: "Hold mandatory daily status meetings to read warehouse inventories aloud.",
+                        effect: { read: 5, adopt: -5, integration: -10, value: -15, success: -5 },
+                        feedback: "Ineffective. Meetings increase administrative overhead without deploying automated system integration."
+                    },
+                    {
+                        text: "Enforce admin passwords to access departmental databases without consent.",
+                        effect: { read: -20, adopt: -15, integration: 10, value: 5, success: -15 },
+                        feedback: "Negative. Violating departmental trust damages team alignment and organizational readiness."
+                    }
+                ]
+            },
+            {
+                id: 's4',
+                title: "CRM utilization levels remain low",
+                desc: "Sales and Support reps lack confidence using the CRM portal, logging data back into legacy handwritten booklets.",
+                choices: [
+                    {
+                        text: "Appoint CRM change champions in each team to offer peer support and highlight daily benefits.",
+                        effect: { read: 25, adopt: 25, integration: 15, value: 15, success: 20 },
+                        feedback: "Excellent! Appointing peer champions builds adoption trust and models correct software behaviors."
+                    },
+                    {
+                        text: "Distribute the vendor's 200-page database schema manual for self-study.",
+                        effect: { read: -10, adopt: -15, integration: 5, value: -5, success: -10 },
+                        feedback: "Ineffective. Overloading employees with manuals increases digital anxiety and lowers adoption rates."
+                    },
+                    {
+                        text: "Authorize the rollback to paper templates for struggling employees.",
+                        effect: { read: -15, adopt: 10, integration: -25, value: -20, success: -15 },
+                        feedback: "Negative. Allowing legacy fallbacks halts the digital transition and leaves database logs incomplete."
+                    },
+                    {
+                        text: "Extend testing timelines by three months without training backups.",
+                        effect: { read: 5, adopt: 5, integration: -5, value: -10, success: -10 },
+                        feedback: "Neutral. Stretching out schedules without training backup delays benefits and raises budget costs."
+                    }
+                ]
+            },
+            {
+                id: 's5',
+                title: "Customer friction during checkout transition",
+                desc: "During the checkout transition to online systems, customers complain about payment errors and processing delays.",
+                choices: [
+                    {
+                        text: "Keep a standby help desk active and offer proactive transaction credits.",
+                        effect: { read: 20, adopt: 15, integration: 15, value: 25, success: 25 },
+                        feedback: "Superb. Combining standby support with proactive service recovery minimizes churn and preserves customer service quality."
+                    },
+                    {
+                        text: "Send automated alerts stating that errors are normal transition parameters.",
+                        effect: { read: 10, adopt: 5, integration: 5, value: -15, success: -10 },
+                        feedback: "Weak. Dismissive alerts trigger customer complaints and damage brand trust."
+                    },
+                    {
+                        text: "Suspend transactions until integration completes.",
+                        effect: { read: -30, adopt: -10, integration: 10, value: -40, success: -30 },
+                        feedback: "Catastrophic. Halting business sales ruins revenue and compromises transformation success."
+                    },
+                    {
+                        text: "Outsource support to a third-party agency with no system training.",
+                        effect: { read: -15, adopt: 5, integration: 5, value: -10, success: -10 },
+                        feedback: "Ineffective. Untrained agents cannot resolve support queries, raising operational friction."
+                    }
+                ]
+            }
+        ];
+
+        let l3CurrentIndex = 0;
+        let l3Readiness = 50;
+        let l3Adoption = 50;
+        let l3Integration = 50;
+        let l3Value = 50;
+        let l3Success = 50;
+
+        let l3SelectedOptionIndex = null;
+        let l3ConfirmedOptionIndex = null;
+        let l3Scenarios = [];
+
+        function initLevel3() {
+            l3CurrentIndex = 0;
+            l3Readiness = 50;
+            l3Adoption = 50;
+            l3Integration = 50;
+            l3Value = 50;
+            l3Success = 50;
+
+            l3Scenarios = L3_SCENARIOS.map(sc => {
+                return {
+                    ...sc,
+                    shuffledChoices: shuffleArray(sc.choices)
+                };
+            });
+
+            document.getElementById('l3-main-card').style.display = 'block';
+            document.getElementById('l3-decision-feedback').style.display = 'none';
+            document.getElementById('btn-submit-decision').style.display = 'inline-block';
+            document.getElementById('btn-submit-decision').disabled = true;
+            document.getElementById('btn-next-scenario').style.display = 'none';
+
+            updateL3Dashboard();
+            renderL3Scenario();
+        }
+
+        function updateL3Dashboard() {
+            l3Readiness = Math.max(0, Math.min(100, l3Readiness));
+            l3Adoption = Math.max(0, Math.min(100, l3Adoption));
+            l3Integration = Math.max(0, Math.min(100, l3Integration));
+            l3Value = Math.max(0, Math.min(100, l3Value));
+            l3Success = Math.max(0, Math.min(100, l3Success));
+
+            document.getElementById('l3-val-readiness').textContent = `${l3Readiness}%`;
+            document.getElementById('l3-bar-readiness').style.width = `${l3Readiness}%`;
+
+            document.getElementById('l3-val-adoption').textContent = `${l3Adoption}%`;
+            document.getElementById('l3-bar-adoption').style.width = `${l3Adoption}%`;
+
+            document.getElementById('l3-val-integration').textContent = `${l3Integration}%`;
+            document.getElementById('l3-bar-integration').style.width = `${l3Integration}%`;
+
+            document.getElementById('l3-val-value').textContent = `${l3Value}%`;
+            document.getElementById('l3-bar-value').style.width = `${l3Value}%`;
+
+            document.getElementById('l3-val-success').textContent = `${l3Success}%`;
+            document.getElementById('l3-bar-success').style.width = `${l3Success}%`;
+        }
+
+        function renderL3Scenario() {
+            const scenario = l3Scenarios[l3CurrentIndex];
+            document.getElementById('l3-scenario-number').textContent = `Scenario ${l3CurrentIndex + 1} of 5`;
+            document.getElementById('l3-scenario-title').textContent = scenario.title;
+            document.getElementById('l3-scenario-text').textContent = scenario.desc;
+
+            const list = document.getElementById('l3-options-list');
+            list.innerHTML = '';
+            l3SelectedOptionIndex = null;
+            l3ConfirmedOptionIndex = null;
+
+            scenario.shuffledChoices.forEach((choice, idx) => {
+                const card = document.createElement('div');
+                card.className = 'l3-option-card';
+                const letter = String.fromCharCode(65 + idx);
+                card.innerHTML = `
+                    <div class="l3-option-radio"></div>
+                    <span style="font-size: 0.92rem; text-align: left;"><strong>Option ${letter}:</strong> ${choice.text}</span>
+                `;
+
+                card.addEventListener('click', () => {
+                    if (l3SelectedOptionIndex === idx) return;
+
+                    if (l3ConfirmedOptionIndex !== null) {
+                        const prevChoice = scenario.shuffledChoices[l3ConfirmedOptionIndex];
+                        l3Readiness -= prevChoice.effect.read;
+                        l3Adoption -= prevChoice.effect.adopt;
+                        l3Integration -= prevChoice.effect.integration;
+                        l3Value -= prevChoice.effect.value;
+                        l3Success -= prevChoice.effect.success;
+                        
+                        l3ConfirmedOptionIndex = null;
+                        
+                        document.getElementById('btn-submit-decision').style.display = 'inline-block';
+                        document.getElementById('btn-submit-decision').disabled = false;
+                        document.getElementById('btn-next-scenario').style.display = 'none';
+                        document.getElementById('l3-decision-feedback').style.display = 'none';
+                        
+                        updateL3Dashboard();
+                    }
+
+                    document.querySelectorAll('.l3-option-card').forEach(el => el.classList.remove('selected'));
+                    card.classList.add('selected');
+                    l3SelectedOptionIndex = idx;
+                    document.getElementById('btn-submit-decision').disabled = false;
+                });
+
+                list.appendChild(card);
+            });
+        }
+
+        function submitL3Decision() {
+            if (l3SelectedOptionIndex === null) return;
+
+            const scenario = l3Scenarios[l3CurrentIndex];
+            const choice = scenario.shuffledChoices[l3SelectedOptionIndex];
+
+            l3Readiness += choice.effect.read;
+            l3Adoption += choice.effect.adopt;
+            l3Integration += choice.effect.integration;
+            l3Value += choice.effect.value;
+            l3Success += choice.effect.success;
+
+            l3ConfirmedOptionIndex = l3SelectedOptionIndex;
+            updateL3Dashboard();
+
+            const feedback = document.getElementById('l3-decision-feedback');
+            feedback.style.display = 'block';
+
+            const positiveSum = choice.effect.read + choice.effect.adopt + choice.effect.integration + choice.effect.value + choice.effect.success;
+            if (positiveSum >= 30) {
+                feedback.className = "feedback-box correct";
+            } else if (positiveSum < 0) {
+                feedback.className = "feedback-box wrong";
+            } else {
+                feedback.className = "feedback-box";
+                feedback.style.backgroundColor = "var(--white)";
+                feedback.style.border = "1px solid var(--border-color)";
+                feedback.style.color = "var(--ink)";
+            }
+
+            const rdStr = choice.effect.read >= 0 ? `+${choice.effect.read}%` : `${choice.effect.read}%`;
+            const adStr = choice.effect.adopt >= 0 ? `+${choice.effect.adopt}%` : `${choice.effect.adopt}%`;
+            const inStr = choice.effect.integration >= 0 ? `+${choice.effect.integration}%` : `${choice.effect.integration}%`;
+            const vlStr = choice.effect.value >= 0 ? `+${choice.effect.value}%` : `${choice.effect.value}%`;
+            const scStr = choice.effect.success >= 0 ? `+${choice.effect.success}%` : `${choice.effect.success}%`;
+
+            feedback.innerHTML = `
+                <h4 style="margin-bottom: 6px; font-family: var(--font-display);">Strategy Applied Summary</h4>
+                <p style="margin-bottom: 8px;">${choice.feedback}</p>
+                <div style="font-size:0.8rem; background: rgba(0,0,0,0.03); padding:8px; border-radius:4px; font-weight:600; color:var(--ink-muted);">
+                    Impacts: Readiness ${rdStr} | Adoption ${adStr} | Integration ${inStr} | Value ${vlStr} | Success ${scStr}
+                </div>
+                <p style="font-size:0.75rem; color:var(--ink-muted); margin-top:8px; font-style:italic;">Note: You can click a different option card above to adjust your change strategy for this scenario.</p>
+            `;
+
+            document.getElementById('btn-submit-decision').style.display = 'none';
+            document.getElementById('btn-next-scenario').style.display = 'inline-block';
+            
+            if (l3CurrentIndex === 4) {
+                document.getElementById('btn-next-scenario').textContent = "Calculate Final Results";
+            } else {
+                document.getElementById('btn-next-scenario').textContent = "Next Scenario";
+            }
+        }
+
+        function nextL3Scenario() {
+            l3CurrentIndex++;
+            document.getElementById('l3-decision-feedback').style.display = 'none';
+            document.getElementById('btn-next-scenario').style.display = 'none';
+            document.getElementById('btn-submit-decision').style.display = 'inline-block';
+            document.getElementById('btn-submit-decision').disabled = true;
+
+            if (l3CurrentIndex < 5) {
+                renderL3Scenario();
+            } else {
+                evaluateSimulationResults();
+            }
+        }
+
+        function evaluateSimulationResults() {
+            levelsCompleted[2] = true;
+            updatePills();
+
+            document.getElementById('l3-main-card').style.display = 'none';
+            const won = (l3Readiness >= 50 && l3Adoption >= 50 && l3Integration >= 50 && l3Value >= 50 && l3Success >= 50);
+
+            document.getElementById('res-val-readiness').textContent = `${l3Readiness}%`;
+            document.getElementById('res-val-adoption').textContent = `${l3Adoption}%`;
+            document.getElementById('res-val-integration').textContent = `${l3Integration}%`;
+            document.getElementById('res-val-value').textContent = `${l3Value}%`;
+            document.getElementById('res-val-success').textContent = `${l3Success}%`;
+
+            const icon = document.getElementById('results-icon');
+            const heading = document.getElementById('results-heading');
+            const sub = document.getElementById('results-subheading');
+            const strengths = document.getElementById('res-strengths');
+            const improvements = document.getElementById('res-improvements');
+
+            strengths.innerHTML = '';
+            improvements.innerHTML = '';
+
+            if (won) {
+                icon.textContent = "🏆";
+                heading.textContent = "Transformation Successful!";
+                heading.style.color = "var(--success)";
+                sub.textContent = "Outstanding! Your strategic decisions guided ABC Retail through a successful adoption of digital systems, minimizing friction and achieving strategic alignment.";
+
+                addL3Strength("Successfully mitigated employee resistance through peer change champions and structured training.");
+                addL3Strength("Addressed the board's budget hesitation by using department pilots to prove early ROI.");
+                addL3Strength("Broke down information silos by establishing integrated KPI metrics between Procurement and Warehouse.");
+            } else {
+                icon.textContent = "⚠️";
+                heading.textContent = "Transformation Needs Improvement";
+                heading.style.color = "var(--danger)";
+                sub.textContent = "The transformation struggled. High worker resistance, operational silos, or budget cuts compromised system adoption.";
+
+                if (l3Readiness < 50) {
+                    addL3Improvement("Organizational readiness was low. Deploy pilots and establish cross-functional incentives early.");
+                }
+                if (l3Adoption < 50) {
+                    addL3Improvement("Employee adoption failed. Host hands-on training instead of distributing self-study manuals.");
+                }
+                if (l3Integration < 50) {
+                    addL3Improvement("Process integration was siloed. Avoid letting departments rollback to manual/paper fallbacks.");
+                }
+                if (l3Value < 50) {
+                    addL3Improvement("Business value creation was low. Avoid cutting critical security and integration modules to save costs.");
+                }
+                if (l3Success < 50) {
+                    addL3Improvement("Implementation success index was low. Secure management commitment and keep standby helpdesks active during transition.");
+                }
+            }
+
+            if (l3Readiness >= 50) addL3Strength("Maintained solid technology infrastructure and leadership support metrics.");
+            if (l3Success >= 50) addL3Strength("Maintained customer satisfaction levels through standby helpdesks during checkout migrations.");
+
+            showScreen('results');
+        }
+
+        function addL3Strength(txt) {
+            const li = document.createElement('li');
+            li.textContent = txt;
+            document.getElementById('res-strengths').appendChild(li);
+        }
+
+        function addL3Improvement(txt) {
+            const li = document.createElement('li');
+            li.textContent = txt;
+            document.getElementById('res-improvements').appendChild(li);
+        }
+
+        function restartLevel3Only() {
+            initLevel3();
+            showScreen('l3');
+        }
+
+        function restartEntireSimulation() {
+            levelsCompleted = [false, false, false];
+            currentActiveLevel = 1;
+            
+            updatePills();
+            showScreen('intro');
+        }
+
+        function modalCloseAndAdvance() {
+            document.getElementById('learning-modal').classList.remove('active');
+            if (activeModalCallback) {
+                activeModalCallback();
+                activeModalCallback = null;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.2 Impact (Cityscape) - E-Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fef2f2;
+      --bg-panel: #ffffff;
+      --border-color: #fca5a5;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --accent: #ef4444;
+
+      --color-sky-day: #bae6fd;
+      --color-sky-sunset: #fca5a5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 400px;
+      background-color: var(--bg-panel);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--accent);
+      color: white;
+    }
+
+    .back-link {
+      color: #fee2e2;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: white;
+    }
+
+    .header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .levels {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .level-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      text-align: left;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .level-btn:hover {
+      background: var(--bg-main);
+      color: var(--text-main);
+    }
+
+    .level-btn.active {
+      background: #fee2e2;
+      border-color: var(--accent);
+      color: #dc2626;
+    }
+
+    .level-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-color: #cbd5e1;
+      color: #94a3b8;
+      background: transparent !important;
+    }
+
+    .explanation-box {
+      padding: 1.5rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .explanation-box h3 {
+      margin-bottom: 1rem;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    .explanation-box p {
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .explanation-box strong {
+      color: var(--text-main);
+    }
+
+    /* Main Area */
+    .main-area {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    /* Simulation Containers */
+    .sim-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sim-container.active {
+      display: flex;
+    }
+
+    .sim-instruction {
+      position: absolute;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 0.8rem 2rem;
+      border-radius: 30px;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 1rem;
+      border: 2px solid var(--border-color);
+      z-index: 10;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* SIM 1: Cityscape */
+    #sim-1 {
+      background: linear-gradient(180deg, var(--color-sky-day) 0%, #ffffff 100%);
+      transition: background 1s ease;
+    }
+
+    .sun {
+      position: absolute;
+      top: 10%;
+      right: 10%;
+      width: 80px;
+      height: 80px;
+      background: #fde047;
+      border-radius: 50%;
+      box-shadow: 0 0 40px #fde047;
+      transition: all 1s ease;
+      z-index: 1;
+    }
+
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 15vh;
+      background: #ef4444;
+      border-top: 8px solid #dc2626;
+      z-index: 2;
+    }
+
+    .city {
+      position: absolute;
+      bottom: 15vh;
+      width: 100%;
+      height: 60vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 4rem;
+      z-index: 3;
+      padding: 0 2rem;
+    }
+
+    .building-wrapper {
+      position: relative;
+      cursor: not-allowed;
+      transition: transform 0.3s;
+      filter: grayscale(100%) opacity(0.5);
+    }
+
+    .building-wrapper.interactive {
+      cursor: pointer;
+      filter: grayscale(0%) opacity(1);
+    }
+
+    .building-wrapper.interactive:hover {
+      transform: scale(1.05) translateY(-10px);
+    }
+
+    .building-wrapper.upgraded {
+      cursor: default;
+      filter: grayscale(0%) opacity(1);
+    }
+
+    .building-label {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border: 2px solid var(--border-color);
+    }
+
+    .building-wrapper:hover .building-label {
+      opacity: 1;
+    }
+
+    .building-wrapper.upgraded .building-label {
+      opacity: 1;
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .svg-icon {
+      width: 160px;
+      height: auto;
+      transition: all 0.5s;
+    }
+
+    .particle {
+      position: absolute;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: explode 0.8s ease-out forwards;
+      z-index: 10;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0) translate(var(--tx), var(--ty));
+        opacity: 0;
+      }
+    }
+
+    /* SIM 2: Assembly Line */
+    .factory-area {
+      width: 80%;
+      height: 400px;
+      background: #f8fafc;
+      border: 4px solid var(--border-color);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    }
+
+    .conveyor {
+      position: absolute;
+      bottom: 80px;
+      width: 100%;
+      height: 20px;
+      background: #475569;
+      border-top: 4px solid #334155;
+    }
+
+    .box {
+      position: absolute;
+      bottom: 100px;
+      left: -100px;
+      width: 60px;
+      height: 60px;
+      background: #d97706;
+      border: 3px solid #b45309;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      transition: transform 0.2s;
+    }
+
+    .box:hover {
+      transform: scale(1.1);
+    }
+
+    .box.processed {
+      background: #10b981;
+      border-color: #059669;
+      cursor: default;
+    }
+
+    .box.processed:hover {
+      transform: none;
+    }
+
+    .scanner {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 120px;
+      border: 4px dashed #94a3b8;
+      border-bottom: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .scanner.active {
+      opacity: 1;
+      border-color: var(--accent);
+    }
+
+    .laser {
+      width: 4px;
+      height: 100%;
+      background: var(--accent);
+      animation: scan 0.2s infinite;
+      opacity: 0;
+    }
+
+    .scanner.active .laser {
+      opacity: 1;
+    }
+
+    @keyframes scan {
+      0% {
+        transform: translateX(-40px);
+      }
+
+      100% {
+        transform: translateX(40px);
+      }
+    }
+
+    .factory-controls {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-action {
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      border: none;
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-trad {
+      background: white;
+      color: var(--text-main);
+      border: 2px solid var(--border-color);
+    }
+
+    .btn-trad:hover {
+      background: #fef2f2;
+    }
+
+    .btn-digi {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-digi:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4);
+    }
+
+    .score-display {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+    }
+
+    /* SIM 3: Market Disruption */
+    .market-arena {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pie-chart {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: conic-gradient(#8b5cf6 0% 100%, var(--accent) 100% 100%);
+      transition: background 0.5s ease;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      border: 8px solid white;
+      position: relative;
+    }
+
+    .pie-label {
+      position: absolute;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      width: 80%;
+      left: 10%;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .label-trad {
+      top: 25%;
+    }
+
+    .label-digi {
+      bottom: 25%;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .disrupt-controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    /* Modal / Overlay styling for Simulation 1 */
+    .sim1-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .sim1-modal {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 16px;
+      border: 3px solid var(--border-color);
+      width: 440px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      text-align: center;
+      animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .sim1-modal h3 {
+      font-size: 1.2rem;
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+    }
+    .sim1-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    .sim1-opt-btn {
+      background: #f8fafc;
+      border: 2px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .sim1-opt-btn:hover {
+      background: #fee2e2;
+      border-color: var(--accent);
+      color: #dc2626;
+    }
+    .sim1-feedback {
+      min-height: 2.5rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-top: 1rem;
+    }
+
+    /* Simulation 2 manual department buttons */
+    .sim2-departments {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      width: 80%;
+      justify-content: space-between;
+    }
+    .sim2-dept-btn {
+      flex: 1;
+      padding: 1rem;
+      background: white;
+      border: 3px solid var(--border-color);
+      border-radius: 12px;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .sim2-dept-btn:hover {
+      background: #fee2e2;
+      border-color: var(--accent);
+      color: #dc2626;
+      transform: translateY(-2px);
+    }
+    .sim2-dept-btn.active-target {
+      border-color: #3b82f6;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+    .sim2-hint {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+      min-height: 1.5rem;
+    }
+
+    /* Simulation 3 strategy layout */
+    .sim3-scenario-card {
+      background: #f8fafc;
+      border: 3px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 500px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .sim3-scenario-title {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+    .sim3-scenario-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .sim3-feedback {
+      margin-top: 1.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-height: 2.5rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+          </svg>
+          Back to Hub
+        </a>
+        <h2>1.2 Impact of E-Business</h2>
+      </div>
+
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: Business Transformation through
+          E-Business</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: Business Process Transformation</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: Business Adoption of E-Business</button>
+        
+        <div class="nav-buttons" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button class="level-btn" id="btn-prev-sim" onclick="changeSim(-1)" style="flex: 1; text-align: center; justify-content: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">← Prev</button>
+          <button class="level-btn" id="btn-next-sim" onclick="changeSim(1)" style="flex: 1; text-align: center; justify-content: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">Next →</button>
+        </div>
+      </div>
+
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area" id="main-area">
+      <!-- SIMULATION 1: Business Transformation through E-Business -->
+      <div class="sim-container active" id="sim-1">
+        <div class="sun" id="sun"></div>
+        <div class="sim-instruction" id="instruction-1">Observe how traditional businesses adopt electronic
+          communications and evolve into e-businesses.</div>
+
+        <div class="city">
+          <div class="building-wrapper interactive" id="b-retail" onclick="upgradeBuilding('retail')">
+            <div class="building-label" id="lbl-retail">Physical Retail Store</div>
+            <svg class="svg-icon" id="svg-retail" viewBox="0 0 100 100" fill="none" stroke="#94a3b8" stroke-width="4">
+              <rect x="20" y="40" width="60" height="60" fill="#f1f5f9" />
+              <polygon points="10,40 50,10 90,40" fill="#cbd5e1" />
+              <rect x="40" y="60" width="20" height="40" fill="#cbd5e1" />
+            </svg>
+          </div>
+          <div class="building-wrapper" id="b-finance" onclick="upgradeBuilding('finance')">
+            <div class="building-label" id="lbl-finance">Traditional Bank</div>
+            <svg class="svg-icon" id="svg-finance" viewBox="0 0 100 120" fill="none" stroke="#94a3b8" stroke-width="4">
+              <rect x="15" y="30" width="70" height="90" fill="#f1f5f9" />
+              <polygon points="5,30 50,5 95,30" fill="#cbd5e1" />
+              <rect x="25" y="40" width="10" height="80" fill="#cbd5e1" />
+              <rect x="45" y="40" width="10" height="80" fill="#cbd5e1" />
+              <rect x="65" y="40" width="10" height="80" fill="#cbd5e1" />
+            </svg>
+          </div>
+          <div class="building-wrapper" id="b-comms" onclick="upgradeBuilding('comms')">
+            <div class="building-label" id="lbl-comms">Post Office</div>
+            <svg class="svg-icon" id="svg-comms" viewBox="0 0 100 80" fill="none" stroke="#94a3b8" stroke-width="4">
+              <rect x="20" y="30" width="60" height="50" fill="#f1f5f9" />
+              <rect x="10" y="20" width="80" height="10" fill="#cbd5e1" />
+              <circle cx="50" cy="55" r="12" fill="#cbd5e1" />
+            </svg>
+          </div>
+        </div>
+        <div class="ground"></div>
+
+        <!-- Choice Modal Overlay -->
+        <div class="sim1-overlay" id="sim1-overlay">
+          <div class="sim1-modal">
+            <h3 id="sim1-modal-title">E-Business Evolution</h3>
+            <div class="sim1-options" id="sim1-modal-options"></div>
+            <div class="sim1-feedback" id="sim1-modal-feedback"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMULATION 2: Business Process Transformation -->
+      <div class="sim-container" id="sim-2">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Business Process Integration</h2>
+        <div class="factory-area" id="factory">
+          <div class="score-display">Orders Processed: <span id="box-score" style="color: var(--accent);">0</span></div>
+          <div class="conveyor"></div>
+          <div class="scanner" id="scanner">
+            <div class="laser"></div>
+            <div style="margin-top:10px;font-weight:700;color:var(--accent);text-align:center;">ELECTRONIC PROCESSING
+            </div>
+          </div>
+        </div>
+
+        <!-- Department Routing Bays (Visible in Manual Mode) -->
+        <div class="sim2-departments" id="sim2-dept-bays" style="display: none; margin-bottom: 1rem;">
+          <button class="sim2-dept-btn" onclick="routeOrder('external')">Sales (E-Commerce)</button>
+          <button class="sim2-dept-btn" onclick="routeOrder('supplier')">Purchasing (Suppliers)</button>
+          <button class="sim2-dept-btn" onclick="routeOrder('internal')">Operations (Internal)</button>
+        </div>
+        <div class="sim2-hint" id="sim2-feedback-msg" style="color: var(--text-muted);"></div>
+
+        <div class="factory-controls">
+          <button class="btn-action btn-trad" id="btn-trad-mode" onclick="setMode('manual')">Manual Order Processing</button>
+          <button class="btn-action btn-digi" id="btn-digi-mode" onclick="setMode('auto')">Deploy Electronic Order Processing</button>
+        </div>
+      </div>
+
+      <!-- SIMULATION 3: Business Adoption of E-Business -->
+      <div class="sim-container" id="sim-3">
+        <h2 style="margin-bottom: 1.5rem; color: var(--text-main);">Business Adoption of E-Business</h2>
+
+        <!-- Scenario Card Area -->
+        <div class="sim3-scenario-card" id="sim3-card" style="margin: auto; margin-bottom: 1rem;">
+          <div class="sim3-scenario-title" id="sim3-card-step">Scenario 1 of 4</div>
+          <div class="sim3-scenario-text" id="sim3-card-text">Loading adoption scenario...</div>
+          <div class="sim1-options" id="sim3-card-options">
+            <!-- Action buttons will be rendered here dynamically -->
+          </div>
+          <div class="sim3-feedback" id="sim3-feedback"></div>
+        </div>
+
+        <div class="market-arena" style="margin: auto;">
+          <div class="pie-chart" id="pie">
+            <div class="pie-label label-trad" id="l-trad">Traditional Operations 100%</div>
+            <div class="pie-label label-digi" id="l-digi">E-Business Adoption 0%</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const levelsData = {
+      1: {
+        title: "Business Transformation through E-Business",
+        desc: "<p>Traditional organizations increasingly use electronic communications to improve customer service, supplier relationships, and internal business processes.</p><p>This transformation creates e-businesses capable of operating more efficiently while extending their market reach.</p><p><em>Click the interactive buildings to observe how traditional businesses adopt electronic communications and evolve into e-businesses.</em></p>"
+      },
+      2: {
+        title: "Business Process Transformation",
+        desc: "<p>In traditional business models, customer orders are processed individually using manual paper records.</p><p><strong>Try clicking the orders</strong> as they pass by to process them manually.</p><p>Then, click <strong>Deploy Electronic Order Processing</strong>. Electronic business systems improve information flow, reduce manual work, and integrate organizational processes.</p>"
+      },
+      3: {
+        title: "Business Adoption of E-Business",
+        desc: "<p>Organizations adopt e-business because it improves efficiency, customer service, supplier collaboration, communication, and competitiveness.</p><p>This reflects the business drivers discussed in Chapter 1.</p><p><em>Click the adoption buttons to transition traditional operations to electronic processes.</em></p>"
+      }
+    };
+
+    let currentLevel = 1;
+    function loadLevel(level) {
+      currentLevel = level;
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-lvl-' + level).classList.add('active');
+
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+
+      // Update sidebar prev/next buttons
+      document.getElementById('btn-prev-sim').disabled = (level === 1);
+      document.getElementById('btn-next-sim').disabled = (level === 3);
+
+      if (level === 2) initSim2();
+      if (level === 3) initSim3();
+    }
+
+    window.changeSim = function(dir) {
+      let target = currentLevel + dir;
+      if (target >= 1 && target <= 3) {
+        loadLevel(target);
+      }
+    };
+
+    // --- SIMULATION 1: Cityscape ---
+    let bState = { retail: false, finance: false, comms: false };
+
+    const sim1Questions = {
+      'retail': {
+        title: "Select the correct E-Business transformation for a Physical Retail Store:",
+        options: [
+          { text: "E-Commerce Store", correct: true, feedback: "Correct! Selling goods via a web portal is the primary consumer-facing e-commerce transformation." },
+          { text: "Internal Intranet Portal", correct: false, feedback: "Incorrect. Intranets are internal employee communications platforms, not retail transaction hubs." },
+          { text: "Supplier PO Database", correct: false, feedback: "Incorrect. PO databases automate external purchasing, not retail customer sales." }
+        ]
+      },
+      'finance': {
+        title: "Select the correct E-Business transformation for a Traditional Bank:",
+        options: [
+          { text: "E-Banking Services", correct: true, feedback: "Correct! Offering client accounts and fund transfers online is the core retail e-banking evolution." },
+          { text: "Electronic Data Interchange (EDI)", correct: false, feedback: "Incorrect. EDI coordinates standardized document exchange between trading partners, not banking customers." },
+          { text: "Enterprise Resource Planning (ERP)", correct: false, feedback: "Incorrect. ERP links internal departmental databases, not customer accounts." }
+        ]
+      },
+      'comms': {
+        title: "Select the correct E-Business transformation for a Post Office:",
+        options: [
+          { text: "Electronic Communication", correct: true, feedback: "Correct! Email and messaging systems digitize post office communications." },
+          { text: "Point of Sale (POS) Terminals", correct: false, feedback: "Incorrect. POS systems automate physical checkout desks, not postage and communication channels." },
+          { text: "Client Database Registry", correct: false, feedback: "Incorrect. Customer databases manage client records, not communication channels." }
+        ]
+      }
+    };
+
+    function upgradeBuilding(id) {
+      if (bState[id]) return;
+
+      const order = ['retail', 'finance', 'comms'];
+      const currentIndex = order.indexOf(id);
+      if (currentIndex > 0 && !bState[order[currentIndex - 1]]) return;
+
+      const overlay = document.getElementById('sim1-overlay');
+      const titleEl = document.getElementById('sim1-modal-title');
+      const optionsEl = document.getElementById('sim1-modal-options');
+      const feedbackEl = document.getElementById('sim1-modal-feedback');
+
+      titleEl.innerText = sim1Questions[id].title;
+      optionsEl.innerHTML = '';
+      feedbackEl.innerHTML = '';
+      feedbackEl.style.color = 'inherit';
+
+      const optionsCopy = [...sim1Questions[id].options];
+      for (let i = optionsCopy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [optionsCopy[i], optionsCopy[j]] = [optionsCopy[j], optionsCopy[i]];
+      }
+
+      optionsCopy.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'sim1-opt-btn';
+        btn.innerText = opt.text;
+        btn.onclick = () => {
+          if (opt.correct) {
+            feedbackEl.style.color = '#047857';
+            feedbackEl.innerHTML = `<strong>Correct!</strong> ${opt.feedback}`;
+            setTimeout(() => {
+              overlay.style.display = 'none';
+              applyUpgrade(id);
+            }, 2000);
+          } else {
+            feedbackEl.style.color = '#ef4444';
+            feedbackEl.innerHTML = `<strong>Incorrect.</strong> ${opt.feedback}`;
+          }
+        };
+        optionsEl.appendChild(btn);
+      });
+
+      overlay.style.display = 'flex';
+    }
+
+    function applyUpgrade(id) {
+      const wrapper = document.getElementById('b-' + id);
+      const rect = wrapper.getBoundingClientRect();
+      createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+      wrapper.classList.remove('interactive');
+      wrapper.classList.add('upgraded');
+      bState[id] = true;
+
+      const svg = document.getElementById('svg-' + id);
+      const label = document.getElementById('lbl-' + id);
+
+      if (id === 'retail') {
+        label.innerText = 'E-Commerce Store';
+        svg.innerHTML = '<rect x="10" y="20" width="80" height="60" rx="10" fill="#fecaca" stroke="#ef4444"/><path d="M30 40 L50 60 L70 30" stroke="#ef4444" fill="none" stroke-width="6" stroke-linecap="round"/>';
+        document.getElementById('b-finance').classList.add('interactive');
+        document.getElementById('sim-1').style.background = "linear-gradient(180deg, #fca5a5 0%, #ffffff 100%)";
+        document.getElementById('sun').style.top = "30%";
+        document.getElementById('sun').style.background = "#f87171";
+      } else if (id === 'finance') {
+        label.innerText = 'E-Banking';
+        svg.innerHTML = '<circle cx="50" cy="60" r="40" fill="#fecaca" stroke="#ef4444"/><text x="50" y="75" font-size="40" fill="#ef4444" text-anchor="middle" font-family="Inter" font-weight="900">$</text>';
+        document.getElementById('b-comms').classList.add('interactive');
+        document.getElementById('sim-1').style.background = "linear-gradient(180deg, #f87171 0%, #fee2e2 100%)";
+        document.getElementById('sun').style.top = "50%";
+        document.getElementById('sun').style.background = "#ef4444";
+      } else if (id === 'comms') {
+        label.innerText = 'Electronic Communication';
+        svg.innerHTML = '<path d="M20 60 Q50 10 80 60" stroke="#ef4444" fill="none" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="35" r="12" fill="#ef4444"/>';
+        document.getElementById('sim-1').style.background = "linear-gradient(180deg, #dc2626 0%, #fef2f2 100%)";
+        document.getElementById('sun').style.top = "70%";
+        document.getElementById('instruction-1').innerText = "Traditional Businesses Successfully Adopted E-Business!";
+        document.getElementById('instruction-1').style.color = "#ef4444";
+      }
+    }
+
+    function createParticles(x, y) {
+      const container = document.getElementById('sim-1');
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 8 + 4;
+        p.style.width = size + 'px'; p.style.height = size + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 100 + 50;
+        p.style.left = x + 'px'; p.style.top = y + 'px';
+        p.style.setProperty('--tx', (Math.cos(angle) * velocity) + 'px');
+        p.style.setProperty('--ty', (Math.sin(angle) * velocity) + 'px');
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 800);
+      }
+    }
+
+    // --- SIMULATION 2: Business Process Transformation ---
+    let factoryInterval;
+    let boxes = [];
+    let processedCount = 0;
+    let factoryMode = 'manual'; // manual or auto
+    let selectedBox = null;
+
+    const boxCategories = [
+      { label: "Customer Order", type: "external" },
+      { label: "Supplier PO", type: "supplier" },
+      { label: "Internal Memo", type: "internal" }
+    ];
+
+    function initSim2() {
+      clearInterval(factoryInterval);
+      document.querySelectorAll('.box').forEach(b => b.remove());
+      boxes = [];
+      processedCount = 0;
+      selectedBox = null;
+      document.getElementById('box-score').innerText = processedCount;
+      const feedbackMsg = document.getElementById('sim2-feedback-msg');
+      if (feedbackMsg) feedbackMsg.innerHTML = '';
+      setMode('manual');
+      spawnBox();
+    }
+
+    function spawnBox() {
+      if (document.getElementById('sim-2').classList.contains('active')) {
+        const f = document.getElementById('factory');
+        const b = document.createElement('div');
+        b.className = 'box';
+        
+        const cat = boxCategories[Math.floor(Math.random() * boxCategories.length)];
+        b.innerHTML = `<span style="font-size: 0.65rem; text-align: center; font-weight: 800; word-break: break-all; padding: 2px;">${cat.label}</span>`;
+        b.style.left = '-100px';
+        b.dataset.processed = "false";
+        b.dataset.type = cat.type;
+
+        b.onclick = (e) => {
+          if (factoryMode === 'manual' && b.dataset.processed === "false") {
+            if (selectedBox) {
+              selectedBox.style.borderColor = '#b45309';
+              selectedBox.style.boxShadow = 'none';
+            }
+            selectedBox = b;
+            b.style.borderColor = '#3b82f6';
+            b.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.6)';
+            document.getElementById('sim2-feedback-msg').innerHTML = `<span style="color: #3b82f6;">Selected: ${cat.label}. Route it to the correct department bay below!</span>`;
+            e.stopPropagation();
+          }
+        };
+
+        f.appendChild(b);
+        boxes.push(b);
+      }
+
+      const speed = factoryMode === 'auto' ? 500 : 2000;
+      factoryInterval = setTimeout(spawnBox, speed);
+    }
+
+    function processBox(b) {
+      b.dataset.processed = "true";
+      b.classList.add('processed');
+      b.innerHTML = '✔';
+      b.style.borderColor = '#059669';
+      b.style.boxShadow = 'none';
+      processedCount++;
+      document.getElementById('box-score').innerText = processedCount;
+    }
+
+    function routeOrder(deptType) {
+      if (!selectedBox) {
+        document.getElementById('sim2-feedback-msg').innerHTML = "<span style='color: #ef4444;'>Select an order on the conveyor belt first!</span>";
+        return;
+      }
+      
+      const correctType = selectedBox.dataset.type;
+      if (correctType === deptType) {
+        document.getElementById('sim2-feedback-msg').innerHTML = "<span style='color: #10b981;'>Correct! Order routed successfully.</span>";
+        processBox(selectedBox);
+        selectedBox = null;
+      } else {
+        document.getElementById('sim2-feedback-msg').innerHTML = "<span style='color: #ef4444;'>Incorrect department! Misrouting causes administrative delays. Try again.</span>";
+        selectedBox.style.borderColor = '#ef4444';
+        selectedBox.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.6)';
+      }
+    }
+
+    function setMode(mode) {
+      factoryMode = mode;
+      const bays = document.getElementById('sim2-dept-bays');
+      const hint = document.getElementById('sim2-feedback-msg');
+
+      if (mode === 'auto') {
+        selectedBox = null;
+        if (bays) bays.style.display = 'none';
+        hint.innerHTML = "<span style='color: #10b981; font-weight: 700;'>Integrated electronic processing active: orders are auto-routed and synchronized!</span>";
+        document.getElementById('scanner').classList.add('active');
+        document.getElementById('btn-digi-mode').style.transform = 'scale(1.05)';
+        document.getElementById('btn-trad-mode').style.transform = 'none';
+      } else {
+        if (bays) bays.style.display = 'flex';
+        hint.innerHTML = "<span style='color: var(--text-muted);'>Click a moving order to select it, then click the correct department bay.</span>";
+        document.getElementById('scanner').classList.remove('active');
+        document.getElementById('btn-trad-mode').style.transform = 'scale(1.05)';
+        document.getElementById('btn-digi-mode').style.transform = 'none';
+      }
+    }
+
+    // Game loop for boxes
+    setInterval(() => {
+      if (!document.getElementById('sim-2').classList.contains('active')) return;
+
+      const speed = factoryMode === 'auto' ? 8 : 2;
+      boxes.forEach((b, idx) => {
+        let left = parseFloat(b.style.left);
+        left += speed;
+        b.style.left = left + 'px';
+
+        // Auto process if under scanner
+        if (factoryMode === 'auto' && left > 300 && left < 400 && b.dataset.processed === "false") {
+          processBox(b);
+        }
+
+        if (left > 1000) {
+          if (b === selectedBox) selectedBox = null;
+          b.remove();
+          boxes.splice(idx, 1);
+        }
+      });
+    }, 30);
+
+    // --- SIMULATION 3: Business Adoption of E-Business ---
+    let digitalShare = 0;
+    let currentSim3Scenario = 0;
+
+    const sim3Scenarios = [
+      {
+        text: "Customers are dissatisfied with physical queuing and lack of online product catalogs. How can the organization solve this?",
+        driver: "customer",
+        options: [
+          { text: "Improve Customer Service", correct: true, feedback: "Correct! Deploying an online catalog and client order tracking portal addresses customer access demands." },
+          { text: "Improve Supplier Integration", correct: false, feedback: "Incorrect. Supplier portals coordinate raw materials logistics, but do not solve client-facing catalog issues." },
+          { text: "Enhance Internal Communication", correct: false, feedback: "Incorrect. Internal communications improve staff workflows, but do not open external customer channels." }
+        ]
+      },
+      {
+        text: "Warehouse inventory counts lag because raw materials orders are manually typed and sent to suppliers via post mail.",
+        driver: "supplier",
+        options: [
+          { text: "Improve Supplier Integration", correct: true, feedback: "Correct! Linking inventory databases electronically with suppliers synchronizes procurement schedules." },
+          { text: "Expand Market Reach", correct: false, feedback: "Incorrect. Market reach targets new consumer locations, not warehouse replenishment." },
+          { text: "Enhance Internal Communication", correct: false, feedback: "Incorrect. Siloed staff files are internal, while supplier POs require external inter-organizational linkage." }
+        ]
+      },
+      {
+        text: "Staff members complain about delayed internal memos, siloed records, and a total lack of cross-department database sharing.",
+        driver: "internal",
+        options: [
+          { text: "Enhance Internal Communication", correct: true, feedback: "Correct! Deploying an intranet and shared database (ERP) unites departmental workflows." },
+          { text: "Expand Market Reach", correct: false, feedback: "Incorrect. Market reach targets external retail expansion, not internal document silos." },
+          { text: "Improve Customer Service", correct: false, feedback: "Incorrect. Customer support deals with external clients, not internal staff coordination." }
+        ]
+      },
+      {
+        text: "Sales volumes are stagnant because the company only sells physical goods from local brick-and-mortar storefronts.",
+        driver: "market",
+        options: [
+          { text: "Expand Market Reach", correct: true, feedback: "Correct! Establishing an online store lets the business cross physical borders to reach remote markets." },
+          { text: "Improve Supplier Integration", correct: false, feedback: "Incorrect. Procurement integration coordinates logistics, but does not add sales channels." },
+          { text: "Enhance Internal Communication", correct: false, feedback: "Incorrect. Employee portals optimize workflows, but do not increase market size." }
+        ]
+      }
+    ];
+
+    function initSim3() {
+      digitalShare = 0;
+      currentSim3Scenario = 0;
+      document.getElementById('sim3-card').style.display = 'block';
+      updatePie();
+      renderSim3Scenario();
+    }
+
+    function renderSim3Scenario() {
+      const feedback = document.getElementById('sim3-feedback');
+      feedback.innerHTML = '';
+      
+      if (currentSim3Scenario >= sim3Scenarios.length) {
+        document.getElementById('sim3-card-options').innerHTML = '';
+        document.getElementById('sim3-card-text').innerText = "Adoption complete! The organization is now a fully integrated e-business.";
+        document.getElementById('sim3-card-step').innerText = "COMPLETED";
+        return;
+      }
+      
+      const sc = sim3Scenarios[currentSim3Scenario];
+      document.getElementById('sim3-card-step').innerText = `Challenge ${currentSim3Scenario + 1} of 4`;
+      document.getElementById('sim3-card-text').innerText = sc.text;
+      
+      const optionsEl = document.getElementById('sim3-card-options');
+      optionsEl.innerHTML = '';
+      
+      const optionsCopy = [...sc.options];
+      for (let i = optionsCopy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [optionsCopy[i], optionsCopy[j]] = [optionsCopy[j], optionsCopy[i]];
+      }
+
+      optionsCopy.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'sim1-opt-btn';
+        btn.innerText = opt.text;
+        btn.onclick = () => {
+          if (opt.correct) {
+            feedback.style.color = '#047857';
+            feedback.innerHTML = `<strong>Correct!</strong> ${opt.feedback}`;
+            disrupt(25);
+            setTimeout(() => {
+              currentSim3Scenario++;
+              if (currentSim3Scenario >= sim3Scenarios.length) {
+                feedback.innerHTML = "<strong style='font-size: 1.1rem;'>All scenarios resolved! Complete E-Business Adoption achieved.</strong>";
+                document.getElementById('sim3-card-options').innerHTML = '';
+                document.getElementById('sim3-card-text').innerText = "Adoption complete! The organization is now a fully integrated e-business.";
+                document.getElementById('sim3-card-step').innerText = "COMPLETED";
+              } else {
+                renderSim3Scenario();
+              }
+            }, 2500);
+          } else {
+            feedback.style.color = '#ef4444';
+            feedback.innerHTML = `<strong>Incorrect.</strong> ${opt.feedback}`;
+          }
+        };
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function disrupt(amount) {
+      digitalShare += amount;
+      if (digitalShare > 100) digitalShare = 100;
+      updatePie();
+    }
+
+    function updatePie() {
+      const pie = document.getElementById('pie');
+      const trad = 100 - digitalShare;
+      pie.style.background = `conic-gradient(#8b5cf6 0% ${trad}%, var(--accent) ${trad}% 100%)`;
+
+      document.getElementById('l-trad').innerText = `Traditional Operations ${trad}%`;
+      const lDigi = document.getElementById('l-digi');
+      lDigi.innerText = `E-Business Adoption ${digitalShare}%`;
+
+      if (digitalShare > 0) lDigi.style.opacity = 1;
+    }
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+
+</html>

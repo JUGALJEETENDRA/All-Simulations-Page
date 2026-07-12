@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.4 Mobile Commerce, Social Media, Web 2.0 - Digital Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fff5f5;
+      --bg-panel: #ffffff;
+      --border-color: #fee2e2; /* soft rose/red border */
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent: #dc2626; /* red/crimson */
+      --accent-hover: #b91c1c;
+      --accent-secondary: #f43f5e; /* secondary rose */
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+    .layout { display: flex; width: 100%; height: 100%; }
+
+    /* Sidebar Styles */
+    .sidebar { width: 400px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+    .header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--accent); color: white; }
+    .back-link { color: #fecaca; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; transition: color 0.2s; }
+    .back-link:hover { color: white; }
+    .header h2 { font-size: 1.15rem; font-weight: 800; line-height: 1.3; }
+
+    .levels { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border-color); }
+    .level-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.75rem 1rem; border-radius: 10px; text-align: left; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
+    .level-btn:hover { background: var(--bg-main); color: var(--text-main); }
+    .level-btn.active { background: #fee2e2; border-color: var(--accent); color: var(--accent-hover); }
+    .level-btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: #cbd5e1; color: #94a3b8; background: transparent !important; }
+
+    .nav-buttons { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+
+    .explanation-box { padding: 1.5rem; flex: 1; overflow-y: auto; }
+    .explanation-box h3 { margin-bottom: 0.8rem; color: var(--accent); font-size: 1.15rem; font-weight: 800; text-transform: uppercase; }
+    .explanation-box p { color: var(--text-muted); line-height: 1.55; margin-bottom: 1rem; font-size: 0.88rem; }
+    .explanation-box strong { color: var(--text-main); }
+
+    .side-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.8rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+    .side-card strong { color: var(--accent); display: block; margin-bottom: 0.25rem; font-size: 0.88rem; }
+
+    /* Main Area Styles */
+    .main-area { flex: 1; position: relative; display: flex; flex-direction: column; background: radial-gradient(circle at center, #ffffff 0%, #fff5f5 100%); overflow: hidden; padding: 2rem; }
+
+    .sim-container { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; }
+    .sim-container.active { display: flex; }
+
+    .sim-title { font-weight: 800; font-size: 1.5rem; color: var(--text-main); margin-bottom: 1.5rem; text-align: center; }
+
+    /* Level 1 specific layout */
+    .lab-layout { display: flex; gap: 2rem; width: 100%; max-width: 1000px; align-items: flex-start; justify-content: center; }
+    
+    /* Netscape Retro Browser */
+    .browser-window { width: 550px; background: #c0c0c0; border: 3px solid #dfdfdf; border-top-color: #fff; border-left-color: #fff; border-right-color: #808080; border-bottom-color: #808080; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; }
+    .browser-titlebar { background: #000080; padding: 4px 8px; display: flex; justify-content: space-between; align-items: center; color: white; font-family: "MS Sans Serif", sans-serif; font-size: 0.75rem; font-weight: bold; }
+    .browser-dots { display: flex; gap: 4px; }
+    .browser-dots button { width: 14px; height: 14px; background: #c0c0c0; border: 1px solid #fff; border-right-color: #808080; border-bottom-color: #808080; font-size: 0.6rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    
+    .browser-top { background: #c0c0c0; padding: 8px; border-bottom: 2px solid #808080; display: flex; flex-direction: column; gap: 6px; }
+    .browser-toolbar { display: flex; gap: 4px; border-bottom: 1px solid #808080; padding-bottom: 6px; }
+    .browser-btn { background: #c0c0c0; border: 2px solid #fff; border-right-color: #808080; border-bottom-color: #808080; padding: 2px 8px; font-size: 0.75rem; font-weight: bold; font-family: "MS Sans Serif", Arial; cursor: pointer; }
+    .browser-btn:active { border-color: #808080; border-right-color: #fff; border-bottom-color: #fff; }
+    .browser-url-bar { display: flex; align-items: center; gap: 6px; font-family: Arial; font-size: 0.75rem; font-weight: bold; }
+    .browser-url { background: white; padding: 4px 6px; border: 2px inset #fff; flex: 1; font-weight: normal; color: black; font-family: monospace; }
+    
+    /* Browser internal content - can upgrade to dynamic modern design */
+    .browser-content { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; background: #ffffff; color: black; font-family: "Times New Roman", Times, serif; min-height: 320px; transition: all 0.5s ease; }
+    .browser-content.web20-upgraded { font-family: 'Inter', sans-serif; background: #f8fafc; color: var(--text-main); }
+    .browser-content h1 { color: #000080; font-size: 1.8rem; border-bottom: 2px solid #000080; padding-bottom: 0.5rem; margin-bottom: 1rem; width: 100%; transition: all 0.3s; }
+    .browser-content.web20-upgraded h1 { color: var(--accent); border-bottom-color: var(--border-color); }
+    .browser-content p { font-size: 1rem; line-height: 1.4; margin-bottom: 1.2rem; }
+    .browser-dropzone { border: 2px dashed #808080; min-height: 180px; padding: 1rem; background: #f0f0f0; border-radius: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #808080; transition: all 0.2s; position: relative; }
+    .browser-dropzone.drag-over { background: #fee2e2; border-color: var(--accent); color: var(--accent); }
+    
+    /* Draggable feature tags */
+    .toolbox { width: 380px; background: white; border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+    .toolbox-header { font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 1rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem; text-transform: uppercase; }
+    .toolbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .tool-tag { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.6rem; text-align: center; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); cursor: grab; transition: all 0.2s; user-select: none; }
+    .tool-tag:hover { background: #fee2e2; border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+    .tool-tag:active { cursor: grabbing; }
+    .tool-tag.used { opacity: 0.3; cursor: not-allowed; pointer-events: none; background: #e5e7eb !important; border-color: #cbd5e1 !important; color: #94a3b8 !important; }
+
+    /* Web 2.0 injected layout upgrades styles */
+    .w20-widget { border: 1px solid var(--border-color); background: white; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 0.8rem; font-size: 0.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); animation: slide-down 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .w20-widget-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.3rem; margin-bottom: 0.4rem; font-weight: 800; color: var(--accent); }
+    @keyframes slide-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Level 2: Social Media Strategy */
+    .challenge-panel { width: 100%; max-width: 900px; background: white; border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .objective-banner { background: #fff5f5; border-left: 4px solid var(--accent); padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; }
+    .objective-banner h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 0.25rem; }
+    .objective-banner p { font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
+    
+    .channels-selection-title { font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.8rem; text-transform: uppercase; text-align: left; }
+    .channels-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    .channel-checkbox { display: none; }
+    .channel-label { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.3s; height: 100px; }
+    .channel-label .channel-icon { font-size: 2.2rem; margin-bottom: 0.3rem; transition: transform 0.2s; }
+    .channel-label span { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+    .channel-checkbox:checked + .channel-label { border-color: var(--accent); background: #fee2e2; }
+    .channel-checkbox:checked + .channel-label span { color: var(--accent); }
+    .channel-checkbox:checked + .channel-label .channel-icon { transform: scale(1.15) rotate(4deg); }
+    
+    .evaluation-dashboard { display: grid; grid-template-columns: 2fr 1.5fr; gap: 2rem; border-top: 1px solid #f1f5f9; padding-top: 1.5rem; display: none; text-align: left; }
+    .metrics-panel { display: flex; flex-direction: column; gap: 0.8rem; }
+    .metric-row { display: flex; flex-direction: column; gap: 0.25rem; }
+    .metric-header { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 800; color: var(--text-muted); }
+    .metric-bar-outer { width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; }
+    .metric-bar-inner { height: 100%; width: 0%; background: var(--accent); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    .metric-bar-inner.success-bar { background: var(--success); }
+    
+    .explanation-panel { background: #fff5f5; border: 1px dashed var(--border-color); border-radius: 12px; padding: 1.2rem; }
+    .explanation-panel h4 { font-weight: 800; font-size: 0.9rem; color: var(--accent); margin-bottom: 0.4rem; text-transform: uppercase; }
+    .explanation-panel p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; }
+
+    /* Level 3: Mobile Commerce */
+    .mcommerce-layout { display: flex; gap: 2rem; width: 100%; max-width: 950px; justify-content: center; align-items: flex-start; }
+    .phone-mockup { width: 320px; height: 600px; background: #0f172a; border-radius: 44px; padding: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 4px solid #475569; position: relative; }
+    .phone-screen { width: 100%; height: 100%; background: #fff; border-radius: 34px; overflow: hidden; position: relative; display: flex; flex-direction: column; border: 1px solid #1e293b; }
+    .phone-notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 110px; height: 26px; background: #000; border-radius: 13px; z-index: 50; transition: all 0.3s; }
+    .phone-notch.active-notch { width: 130px; height: 32px; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
+    
+    .phone-app-header { background: var(--accent); color: white; padding: 2rem 1rem 1rem; text-align: center; font-weight: 800; font-size: 1.15rem; }
+    .phone-app-display { flex: 1; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 1rem; overflow: hidden; text-align: center; }
+    
+    .phone-app-status { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
+    .phone-app-icon { font-size: 3rem; margin-bottom: 0.8rem; transition: transform 0.3s; }
+    .phone-app-details { font-size: 0.85rem; line-height: 1.4; color: var(--text-main); font-weight: 500; }
+    
+    .phone-map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #cbd5e1; display: none; align-items: center; justify-content: center; }
+    .phone-map-grid { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3; }
+    .phone-map-dot { width: 14px; height: 14px; background: var(--accent); border-radius: 50%; border: 3px solid white; box-shadow: 0 0 12px var(--accent); position: absolute; z-index: 5; }
+    .phone-map-radar { position: absolute; width: 44px; height: 44px; border: 2px solid var(--accent); border-radius: 50%; background: rgba(220, 38, 38, 0.15); animation: radar-ripple 1.5s infinite linear; }
+    
+    .phone-camera { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 0.8rem; z-index: 10; }
+    .phone-camera-laser { position: absolute; left: 0; width: 100%; height: 3px; background: #ec4899; box-shadow: 0 0 8px #ec4899; animation: laser-scan 3s infinite linear; }
+    
+    .phone-notif { position: absolute; top: -100px; left: 10px; right: 10px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); padding: 0.75rem; border-radius: 14px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 100; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: left; }
+    .phone-notif.show { top: 44px; }
+    .phone-notif strong { display: block; color: var(--text-main); font-size: 0.8rem; }
+    .phone-notif p { margin: 0; font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .phone-nfc { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff5f5; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; z-index: 8; }
+
+    /* Part A controls */
+    .controls-panel { width: 500px; background: white; border: 1px solid var(--border-color); border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.02); text-align: left; }
+    .sensor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1.2rem 0; }
+    .sensor-item { border: 2px solid #cbd5e1; border-radius: 12px; background: transparent; padding: 0.6rem; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; color: var(--text-muted); cursor: pointer; transition: all 0.2s; height: 75px; }
+    .sensor-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 4px; }
+    .sensor-item:hover { border-color: var(--accent); color: var(--accent); }
+    .sensor-item.active { background: #fee2e2; border-color: var(--accent); color: var(--accent); }
+
+    /* Part B capstone layout */
+    .capstone-container { width: 100%; max-width: 900px; background: white; border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: left; }
+    .capstone-grid { display: grid; grid-template-columns: 1.2fr 2fr; gap: 2rem; }
+
+    /* Common elements */
+    .btn-action { width: 100%; background: var(--accent); border: none; color: white; padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; text-align: center; text-transform: uppercase; margin-top: 1rem; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.15); }
+    .btn-action:hover { background: var(--accent-hover); }
+    
+    .feedback-box { border-radius: 10px; padding: 1rem; margin-top: 1rem; font-size: 0.85rem; line-height: 1.45; font-weight: 600; display: none; }
+    .feedback-box.correct { background: #ecfdf5; border-left: 4px solid var(--success); color: #065f46; }
+    .feedback-box.incorrect { background: #fef2f2; border-left: 4px solid var(--error); color: #991b1b; }
+
+    .sim-feedback-card { background: #fff; border: 2px solid var(--border-color); border-radius: 12px; padding: 1.2rem; margin-top: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-family: 'Inter', sans-serif; text-align: left; }
+    .sim-feedback-title { font-weight: 800; font-size: 1rem; color: var(--accent); margin-bottom: 0.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.4rem; text-transform: uppercase; }
+    .sim-feedback-body { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+
+    @keyframes radar-ripple {
+      0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+    }
+    @keyframes laser-scan {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Hub
+        </a>
+        <h2>1.4 Mobile Commerce, Social Media, Web 2.0</h2>
+      </div>
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: Web 2.0 Evolution Lab</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: Social Media Strategy</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: Mobile Commerce Builder</button>
+        
+        <div class="nav-buttons">
+          <button class="level-btn" id="btn-prev-sim" onclick="changeSim(-1)" style="flex: 1; text-align: center; justify-content: center; font-size: 0.82rem; padding: 0.5rem 1rem;">← Prev</button>
+          <button class="level-btn" id="btn-next-sim" onclick="changeSim(1)" style="flex: 1; text-align: center; justify-content: center; font-size: 0.82rem; padding: 0.5rem 1rem;">Next →</button>
+        </div>
+      </div>
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area" id="main-area">
+      
+      <!-- LEVEL 1: WEB 2.0 LAB -->
+      <div class="sim-container active" id="sim-1">
+        <h2 class="sim-title">Web 2.0 Evolution Lab</h2>
+        <div class="lab-layout">
+          <!-- Retro Browser Dropzone -->
+          <div class="browser-window">
+            <div class="browser-titlebar">
+              <span>Netscape Navigator 3.0</span>
+              <div class="browser-dots">
+                <button>_</button><button>口</button><button>X</button>
+              </div>
+            </div>
+            <div class="browser-top">
+              <div class="browser-toolbar">
+                <button class="browser-btn">Back</button>
+                <button class="browser-btn">Forward</button>
+                <button class="browser-btn">Home</button>
+                <button class="browser-btn">Reload</button>
+                <button class="browser-btn">Print</button>
+              </div>
+              <div class="browser-url-bar">
+                <span>Location:</span>
+                <div class="browser-url" id="browser-address">http://www.retro-acme-parts.com/catalog.html</div>
+              </div>
+            </div>
+            <div class="browser-content" id="browser-body">
+              <h1 id="retro-h1">Acme Supplies Catalog</h1>
+              <p id="retro-p">Welcome to our homepage. We publish our printed brochure electronically here. Click below to download our catalog PDF, or email our support staff using the contact forms below.</p>
+              
+              <!-- Features get visually injected here -->
+              <div id="w20-header-zone" style="margin-bottom: 0.5rem;"></div>
+              
+              <div class="browser-dropzone" id="dropzone" ondragover="allowDrop(event)" ondrop="dropWeb2Feature(event)">
+                <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📥</div>
+                <div style="font-weight: bold; text-align: center;">Drag features here to enable Web 2.0 participation</div>
+                <div style="font-size: 0.75rem; margin-top: 0.25rem;">(Added: <span id="w20-count">0/8</span>)</div>
+              </div>
+              
+              <div id="w20-bottom-zone" style="margin-top: 1rem;"></div>
+            </div>
+          </div>
+
+          <!-- Toolbox Feature Stack -->
+          <div class="toolbox">
+            <div class="toolbox-header">Web 2.0 Toolbox</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4;">Drag these technological features into the browser mock-up to upgrade our website to a collaborative platform.</p>
+            <div class="toolbox-grid">
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-comments" data-w20="true">Comments</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-reviews" data-w20="true">User Reviews</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-cart" data-w20="false">Shopping Cart</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-forum" data-w20="true">Discussion Forum</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-blog" data-w20="true">Blog Feed</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-rss" data-w20="true">RSS Feed</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-search" data-w20="true">AJAX Search</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-profiles" data-w20="true">User Profiles</div>
+              <div class="tool-tag" draggable="true" ondragstart="dragTool(event)" id="tool-sharing" data-w20="true">Social Sharing</div>
+            </div>
+            
+            <div class="feedback-box" id="sim1-feedback-box"></div>
+            
+            <button class="btn-action" id="btn-lvl1-proceed" onclick="loadLevel(2)" style="display: none; background: var(--success);">Proceed to Level 2</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEVEL 2: SOCIAL MEDIA CHALLENGE -->
+      <div class="sim-container" id="sim-2">
+        <h2 class="sim-title">Social Media Strategy Challenge</h2>
+        <div class="challenge-panel">
+          
+          <div class="objective-banner">
+            <h3>Active Objective (Round <span id="sm-round">1</span>/5)</h3>
+            <p id="sm-objective-desc">Increase Brand Awareness</p>
+          </div>
+          
+          <div class="channels-selection-title">Select Optimal Marketing Channels (Select 2 or 3)</div>
+          <div class="channels-grid">
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-instagram" value="Instagram">
+            <label class="channel-label" for="sm-instagram">
+              <div class="channel-icon">📸</div>
+              <span>Instagram</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-facebook" value="Facebook">
+            <label class="channel-label" for="sm-facebook">
+              <div class="channel-icon">👥</div>
+              <span>Facebook</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-linkedin" value="LinkedIn">
+            <label class="channel-label" for="sm-linkedin">
+              <div class="channel-icon">💼</div>
+              <span>LinkedIn</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-youtube" value="YouTube">
+            <label class="channel-label" for="sm-youtube">
+              <div class="channel-icon">📺</div>
+              <span>YouTube</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-twitter" value="X">
+            <label class="channel-label" for="sm-twitter">
+              <div class="channel-icon">🐦</div>
+              <span>X (Twitter)</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-web" value="Website">
+            <label class="channel-label" for="sm-web">
+              <div class="channel-icon">🌐</div>
+              <span>Corporate Web</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-email" value="Email">
+            <label class="channel-label" for="sm-email">
+              <div class="channel-icon">📧</div>
+              <span>Email List</span>
+            </label>
+            
+            <input type="checkbox" class="channel-checkbox" id="sm-blog" value="Blog">
+            <label class="channel-label" for="sm-blog">
+              <div class="channel-icon">✍️</div>
+              <span>Corporate Blog</span>
+            </label>
+            
+          </div>
+          
+          <button class="btn-action" id="btn-eval-sm" onclick="evaluateSocialMedia()">Evaluate Strategy</button>
+          
+          <div class="evaluation-dashboard" id="sm-eval-dashboard">
+            <div class="metrics-panel">
+              <h4 style="font-weight: 800; font-size: 0.9rem; text-transform: uppercase; color: var(--text-main); margin-bottom: 0.4rem;">Performance Metrics</h4>
+              
+              <div class="metric-row">
+                <div class="metric-header"><span>Reach</span><span id="val-m-reach">0%</span></div>
+                <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-m-reach"></div></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-header"><span>Engagement</span><span id="val-m-engage">0%</span></div>
+                <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-m-engage"></div></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-header"><span>Trust</span><span id="val-m-trust">0%</span></div>
+                <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-m-trust"></div></div>
+              </div>
+              <div class="metric-row">
+                <div class="metric-header"><span>Cost Efficiency</span><span id="val-m-cost">0%</span></div>
+                <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-m-cost"></div></div>
+              </div>
+            </div>
+            
+            <div class="explanation-panel">
+              <h4 id="sm-eval-status">Evaluation</h4>
+              <p id="sm-eval-text">Textbook explanation details appear here.</p>
+              <button class="btn-action" id="btn-sm-next-round" onclick="nextSMRound()" style="display: none; margin-top: 1rem; padding: 0.5rem 1rem;">Next Scenario</button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- LEVEL 3: MOBILE COMMERCE -->
+      <div class="sim-container" id="sim-3">
+        <h2 class="sim-title">Mobile Commerce Ecosystem Builder</h2>
+        
+        <!-- Part A: Sensor Matcher -->
+        <div class="mcommerce-layout" id="mcom-part-a">
+          <!-- Smartphone Mockup -->
+          <div class="phone-mockup">
+            <div class="phone-notch" id="phone-notch"></div>
+            <div class="phone-screen">
+              
+              <!-- Glassmorphic Push Toast -->
+              <div class="phone-notif" id="p-notif">
+                <strong id="p-notif-title">Alert</strong>
+                <p id="p-notif-body">Delivery courier has arrived at your gate.</p>
+              </div>
+              
+              <div class="phone-app-header" id="p-header">Mobile Device</div>
+              <div class="phone-app-display">
+                <!-- GPS Map Panel Overlay -->
+                <div class="phone-map" id="p-map">
+                  <div class="phone-map-grid"></div>
+                  <div class="phone-map-dot" id="p-dot" style="top: 50%; left: 50%;"></div>
+                  <div class="phone-map-radar" id="p-radar" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                </div>
+                
+                <!-- Camera view laser scan overlay -->
+                <div class="phone-camera" id="p-cam">
+                  <div class="phone-camera-laser"></div>
+                  <span>VISUAL VIEWFINDER<br>Aligning lens on code...</span>
+                </div>
+
+                <!-- NFC checkout display -->
+                <div class="phone-nfc" id="p-nfc">
+                  <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">💳</div>
+                  <div style="font-weight: 800; font-size: 0.95rem; color: var(--accent);">NFC Pay Active</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">Tap phone against register terminal to complete transaction.</div>
+                </div>
+                
+                <!-- Default screen -->
+                <div id="p-default-screen">
+                  <div class="phone-app-status">Ecosystem Online</div>
+                  <div class="phone-app-icon" id="p-icon">📶</div>
+                  <div class="phone-app-details" id="p-details">Select coordinates and apply device stack to satisfy customer requests.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sensor Panel and Customer Scenarios -->
+          <div class="controls-panel">
+            <div class="objective-banner" style="margin-bottom: 1rem;">
+              <h3>Customer Scenario (<span id="mc-step">1</span>/8)</h3>
+              <p id="mc-scenario-desc">Scenario description...</p>
+            </div>
+            
+            <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-main); text-transform: uppercase;">Toggle Required Device Sensors</div>
+            <div class="sensor-grid">
+              <button class="sensor-item" id="sen-gps" onclick="toggleSensor('gps')">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                GPS
+              </button>
+              <button class="sensor-item" id="sen-cam" onclick="toggleSensor('cam')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                Camera
+              </button>
+              <button class="sensor-item" id="sen-push" onclick="toggleSensor('push')">
+                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                Push Alerts
+              </button>
+              <button class="sensor-item" id="sen-nfc" onclick="toggleSensor('nfc')">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                NFC chip
+              </button>
+              <button class="sensor-item" id="sen-qr" onclick="toggleSensor('qr')">
+                <svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v2h2v-2zm-3-3h2v2h-2v-2zm3 5h-2v2h2v-2zm-3 3h2v2h-2v-2zm-3-3h2v2h-2v-2zm0 3h-2v-2h-2v4h4v-2zm3-9H13v2h2V8z"/></svg>
+                QR Scanner
+              </button>
+              <button class="sensor-item" id="sen-wallet" onclick="toggleSensor('wallet')">
+                <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                Wallet App
+              </button>
+              <button class="sensor-item" id="sen-loc" onclick="toggleSensor('loc')">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                Location Svc
+              </button>
+              <button class="sensor-item" id="sen-acc" onclick="toggleSensor('acc')">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-2v2h2v-2zm-4 4H9v2h2v-2zm4 0h-2v2h2v-2zm-8-4h2v2H7V9zm10 8H7v2h10v-2z"/></svg>
+                Accelerometer
+              </button>
+              <button class="sensor-item" id="sen-net" onclick="toggleSensor('net')">
+                <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-1.47-1.89-2.35-4.29-2.35-6.9 0-6.08 4.93-11 11-11s11 4.92 11 11c0 2.61-.88 5.01-2.35 6.9l-1.62-1.79C21.26 16.07 22 14.12 22 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.15.39 2.21 1.04 3.06L6.5 16.9c-1-1.37-1.5-3.08-1.5-4.9 0-4.41 3.59-8 8-8s8 3.59 8 8c0 1.82-.5 3.53-1.5 4.9l-1.54-1.69c.65-.85 1.04-1.91 1.04-3.06 0-2.76-2.24-5-5-5z"/></svg>
+                Internet
+              </button>
+            </div>
+            
+            <button class="btn-action" id="btn-deploy-sensors" onclick="deploySensorChallenge()">Deploy Device Stack</button>
+            
+            <div class="feedback-box" id="mc-feedback-box"></div>
+          </div>
+        </div>
+
+        <!-- Part B: App Architecture Designer -->
+        <div class="capstone-container" id="mcom-part-b" style="display: none;">
+          <h3 style="font-weight: 800; font-size: 1.1rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase;">Mobile App Architecture Capstone</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;">Select your e-business business model and configure its hardware/software sensor ecosystem dependencies to achieve successful readiness deployment scores.</p>
+          
+          <div class="capstone-grid">
+            <!-- Selector Panel -->
+            <div>
+              <div style="margin-bottom: 1.2rem;">
+                <label style="font-weight: bold; font-size: 0.85rem; display: block; margin-bottom: 0.4rem;">Select Business Application</label>
+                <select id="caps-business" class="level-btn" style="width: 100%; border-color: var(--border-color); background: white; padding: 0.6rem;" onchange="updateCapstoneDetails()">
+                  <option value="delivery">Food Delivery App</option>
+                  <option value="ride">Ride Sharing App</option>
+                  <option value="banking">Mobile Banking App</option>
+                  <option value="shopping">E-Commerce Shopping App</option>
+                </select>
+              </div>
+
+              <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 0.6rem;">Select Core Technologies Needed</div>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" id="caps-gps"> GPS Navigation
+                </label>
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" id="caps-cam"> Camera Visual Scan
+                </label>
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" id="caps-push"> Push Notification Alerts
+                </label>
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" id="caps-nfc"> NFC Chip Payments
+                </label>
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" id="caps-wallet"> Mobile Wallet Integrator
+                </label>
+                <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" id="caps-loc"> Location-Aware Services
+                </label>
+              </div>
+
+              <button class="btn-action" onclick="evaluateCapstone()">Deploy Capstone Architecture</button>
+            </div>
+
+            <!-- Diagnostics display -->
+            <div style="border-left: 1px solid #f1f5f9; padding-left: 2rem;">
+              <h4 style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); margin-bottom: 1rem; text-transform: uppercase;">Architecture Diagnosis</h4>
+              
+              <div class="metrics-panel" style="gap: 0.6rem;">
+                <div class="metric-row">
+                  <div class="metric-header"><span>Customer Experience</span><span id="c-cx">0%</span></div>
+                  <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-c-cx"></div></div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-header"><span>Convenience</span><span id="c-conv">0%</span></div>
+                  <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-c-conv"></div></div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-header"><span>Functionality</span><span id="c-func">0%</span></div>
+                  <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-c-func"></div></div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-header"><span>Tech Readiness</span><span id="c-read">0%</span></div>
+                  <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-c-read"></div></div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-header"><span>Business Success</span><span id="c-bus">0%</span></div>
+                  <div class="metric-bar-outer"><div class="metric-bar-inner" id="bar-c-bus"></div></div>
+                </div>
+              </div>
+
+              <div class="feedback-box" id="caps-feedback-box" style="margin-top: 1rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capstone Success Summary Card -->
+        <div class="sim-feedback-card" id="sim3-feedback" style="display: none; width: 900px; margin-top: 1.5rem;">
+          <div class="sim-feedback-title">Key Learning: Mobile Commerce Ecosystem</div>
+          <div class="sim-feedback-body" id="sim3-feedback-body">
+            <strong>What you designed:</strong> A location-aware, integrated device sensor stack optimized for specific customer business transactions.<br><br>
+            <strong>Why it matters:</strong> Dave Chaffey defines mobile commerce as extending traditional e-commerce by utilizing real-time, context-specific capabilities. Mobile systems are ecosystems combining physical sensors (GPS, NFC, Accelerometers) together with software stacks (Wallets, Push Notifications) to construct seamless customer utility.
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const levelsData = {
+      1: {
+        title: "Web 2.0 Evolution Lab",
+        desc: `<p><strong>Dave Chaffey's Concept:</strong> Web 2.0 represents the transition from static, read-only content to collaborative, participation-driven networks.</p>
+        <div class="side-card"><strong>Key Characteristics:</strong>User Generated Content (UGC), collective intelligence, interactive rich experiences (AJAX), syndication (RSS), and social sharing.</div>
+        <div class="side-card"><strong>Real Business Examples:</strong>Wikipedia, YouTube, TripAdvisor user reviews, customer blogs.</div>
+        <div class="side-card"><strong>Common Misconceptions:</strong>Standard online transactional checkouts (shopping carts) belong to Web 1.0 systems, not Web 2.0 collaborative structures.</div>`
+      },
+      2: {
+        title: "Social Media Strategy",
+        desc: `<p><strong>Dave Chaffey's Concept:</strong> Social media marketing utilizes collaborative networks to build relationships, customer loyalty, and reach.</p>
+        <div class="side-card"><strong>Key Characteristics:</strong>Highly interactive dialog, customer-driven communities, multi-channel alignment, and cost efficiency.</div>
+        <div class="side-card"><strong>Strategy Target:</strong>Align specific business goals (e.g. support, awareness, leads) to correct platform features.</div>
+        <div class="side-card"><strong>Key Learning Point:</strong>Integrated strategy utilizing multiple platforms performs significantly better than single channel posts.</div>`
+      },
+      3: {
+        title: "Mobile Commerce Builder",
+        desc: `<p><strong>Dave Chaffey's Concept:</strong> Mobile commerce relies on hardware-software sensor integrations to execute transactions over wireless networks.</p>
+        <div class="side-card"><strong>Key Characteristics:</strong>Location-awareness, push notification loops, visual barcode scanning, and instant NFC checkouts.</div>
+        <div class="side-card"><strong>Core Learning:</strong>Mobile commerce is not just responsive web pages; it is a context-dependent ecosystem utilizing active sensors.</div>`
+      }
+    };
+
+    let activeLevel = 1;
+
+    function loadLevel(level) {
+      activeLevel = level;
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      
+      const targetBtn = document.getElementById('btn-lvl-' + level);
+      if (targetBtn) targetBtn.classList.add('active');
+      
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+      
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+      
+      // Update sidebar prev/next buttons
+      document.getElementById('btn-prev-sim').disabled = (level === 1);
+      document.getElementById('btn-next-sim').disabled = (level === 3);
+
+      if (level === 1) initSim1();
+      if (level === 2) initSim2();
+      if (level === 3) initSim3();
+    }
+
+    window.changeSim = function(dir) {
+      let target = activeLevel + dir;
+      if (target >= 1 && target <= 3) {
+        loadLevel(target);
+      }
+    };
+
+    // --- LEVEL 1: WEB 2.0 EVOLUTION LAB ---
+    let completedW20Features = [];
+    const correctW20Features = {
+      'tool-comments': {
+        name: "Comments Section",
+        html: `<div class="w20-widget">
+                 <div class="w20-widget-header"><span>Customer Comments Feed</span><span>UGC</span></div>
+                 <div style="font-weight:bold;margin-bottom:0.2rem;">John D. says:</div>
+                 <div>"Excellent shipping speed. High quality industrial supplies!"</div>
+               </div>`
+      },
+      'tool-reviews': {
+        name: "User Reviews & Ratings",
+        html: `<div class="w20-widget">
+                 <div class="w20-widget-header"><span>Collective Intelligence</span><span>★★★★★</span></div>
+                 <div style="display:flex;gap:4px;color:#f59e0b;font-weight:bold;margin-bottom:0.2rem;">5.0 average based on 234 reviews</div>
+                 <div style="color:var(--text-muted);">Reviews empower peer decisions.</div>
+               </div>`
+      },
+      'tool-forum': {
+        name: "Discussion Forum",
+        html: `<div class="w20-widget">
+                 <div class="w20-widget-header"><span>Community Board</span><span>Participation</span></div>
+                 <div>Active Threads: <strong>How to set up Acme Drill bits?</strong> (12 replies)</div>
+               </div>`
+      },
+      'tool-blog': {
+        name: "Dynamic Blog Feed",
+        html: `<div class="w20-widget">
+                 <div class="w20-widget-header"><span>Latest Blog Updates</span><span>Dynamic</span></div>
+                 <div style="font-weight:bold;">Top 10 E-Business Logistics Tips</div>
+                 <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Published 2 hours ago by Acme Staff</div>
+               </div>`
+      },
+      'tool-rss': {
+        name: "RSS Feed Ticker",
+        html: `<div class="w20-widget" style="background:#fff7ed;border-color:#ffedd5;">
+                 <div style="display:flex;align-items:center;gap:6px;font-weight:bold;color:#ea580c;">
+                   <span style="background:#ea580c;color:white;padding:2px 4px;border-radius:4px;font-size:0.7rem;">RSS</span>
+                   <span>Syndicated Articles Feed Active</span>
+                 </div>
+               </div>`
+      },
+      'tool-search': {
+        name: "AJAX Search Input",
+        html: `<div class="w20-widget" style="padding:0.5rem 0.8rem;">
+                 <div style="display:flex;gap:6px;align-items:center;">
+                   <input type="text" placeholder="Type to search catalog (AJAX)..." style="flex:1;padding:4px;border:1px solid #cbd5e1;border-radius:4px;font-size:0.75rem;" value="dril" disabled>
+                   <span style="font-size:0.7rem;color:var(--success);">Suggestions Loaded</span>
+                 </div>
+               </div>`
+      },
+      'tool-profiles': {
+        name: "User Profile Badge",
+        html: `<div class="w20-widget" style="display:flex;align-items:center;gap:10px;padding:0.5rem 0.8rem;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--accent);">JD</div>
+                 <div>Welcome back, <strong>Jane Doe</strong> (Gold Buyer Member)</div>
+               </div>`
+      },
+      'tool-sharing': {
+        name: "Social Sharing Panel",
+        html: `<div class="w20-widget" style="display:flex;gap:8px;align-items:center;padding:0.5rem 0.8rem;background:#f0fdf4;border-color:#dcfce7;">
+                 <span style="font-weight:bold;color:#15803d;font-size:0.75rem;">Share Catalog:</span>
+                 <button style="background:#1877f2;color:white;border:none;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:bold;">Facebook</button>
+                 <button style="background:#1da1f2;color:white;border:none;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:bold;">Twitter</button>
+               </div>`
+      }
+    };
+
+    function initSim1() {
+      completedW20Features = [];
+      document.getElementById('w20-count').innerText = "0/8";
+      document.getElementById('sim1-feedback-box').style.display = 'none';
+      document.getElementById('btn-lvl1-proceed').style.display = 'none';
+      
+      // Reset retro browser window visuals
+      const body = document.getElementById('browser-body');
+      body.className = 'browser-content';
+      body.style.fontFamily = '"Times New Roman", Times, serif';
+      
+      document.getElementById('retro-h1').style.fontFamily = '"Times New Roman", Times, serif';
+      document.getElementById('retro-p').style.fontFamily = '"Times New Roman", Times, serif';
+      
+      document.getElementById('w20-header-zone').innerHTML = '';
+      document.getElementById('w20-bottom-zone').innerHTML = '';
+      
+      document.getElementById('dropzone').style.display = 'flex';
+      
+      // Re-enable tags
+      document.querySelectorAll('.tool-tag').forEach(tag => {
+        tag.classList.remove('used');
+      });
+    }
+
+    window.allowDrop = function(ev) {
+      ev.preventDefault();
+      ev.target.classList.add('drag-over');
+    };
+    
+    // Manage drag leave triggers
+    document.addEventListener('dragleave', (ev) => {
+      if (ev.target.classList.contains('browser-dropzone')) {
+        ev.target.classList.remove('drag-over');
+      }
+    });
+
+    window.dragTool = function(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    };
+
+    window.dropWeb2Feature = function(ev) {
+      ev.preventDefault();
+      const dropzone = document.getElementById('dropzone');
+      dropzone.classList.remove('drag-over');
+      
+      const id = ev.dataTransfer.getData("text");
+      const tag = document.getElementById(id);
+      if (!tag) return;
+      
+      const isW20 = tag.dataset.w20 === "true";
+      const fb = document.getElementById('sim1-feedback-box');
+      fb.style.display = 'block';
+
+      if (!isW20) {
+        fb.className = 'feedback-box incorrect';
+        fb.innerHTML = `<strong>Web 1.0 Element:</strong> A shopping cart enables basic transactional e-commerce (Web 1.0), but does not promote the user-generated content, collaboration, or social participation that defines Web 2.0.`;
+        return;
+      }
+
+      if (completedW20Features.includes(id)) return;
+      
+      completedW20Features.push(id);
+      tag.classList.add('used');
+      
+      fb.className = 'feedback-box correct';
+      fb.innerHTML = `<strong>Success:</strong> Added ${correctW20Features[id].name}! This supports Web 2.0 collaborative interactions.`;
+      
+      // Visually inject widget
+      const headerZone = document.getElementById('w20-header-zone');
+      const bottomZone = document.getElementById('w20-bottom-zone');
+      
+      if (id === 'tool-search' || id === 'tool-profiles') {
+        headerZone.innerHTML += correctW20Features[id].html;
+      } else {
+        bottomZone.innerHTML += correctW20Features[id].html;
+      }
+      
+      // Gradually change browser typography & container styles to look modern
+      const body = document.getElementById('browser-body');
+      const count = completedW20Features.length;
+      document.getElementById('w20-count').innerText = `${count}/8`;
+
+      if (count >= 3) {
+        body.classList.add('web20-upgraded');
+        body.style.fontFamily = "'Inter', sans-serif";
+        document.getElementById('retro-h1').style.fontFamily = "'Inter', sans-serif";
+        document.getElementById('retro-p').style.fontFamily = "'Inter', sans-serif";
+      }
+      
+      if (count === 8) {
+        dropzone.style.display = 'none';
+        fb.className = 'feedback-box correct';
+        fb.innerHTML = `<strong>Congratulations!</strong> You successfully transformed a static website into a Web 2.0 platform by enabling user participation and interactive communication.`;
+        document.getElementById('btn-lvl1-proceed').style.display = 'block';
+      }
+    };
+
+    // --- LEVEL 2: SOCIAL MEDIA STRATEGY ---
+    let smRound = 1;
+    const smScenarios = {
+      1: {
+        obj: "Increase Brand Awareness",
+        optimal: ["Instagram", "YouTube"],
+        desc: "Build initial interest and visible reach for a newly launched consumer lifestyle product.",
+        explain: "Instagram and YouTube are highly visual platforms optimized for viral discovery and media reach. While text channels like email are good for relationships, visual video triggers are the most cost-efficient way to build awareness for new consumers."
+      },
+      2: {
+        obj: "Generate Sales Leads",
+        optimal: ["Email", "LinkedIn"],
+        desc: "Collect qualified prospects and purchase inquiries for a professional software service.",
+        explain: "Email marketing and LinkedIn are highly targeted platforms. LinkedIn isolates decision-makers, and email allows direct outreach with detailed lead magnets, providing high trust and conversion."
+      },
+      3: {
+        obj: "Provide Customer Support",
+        optimal: ["X", "Website"],
+        desc: "Offer real-time service updates and customer support ticketing pathways.",
+        explain: "X (Twitter) is recognized for real-time customer support dialogue, and the Corporate Website serves as a central hub for databases/helpdesks. Social media channels like YouTube or Facebook are too slow or unsuited for one-to-one tickets."
+      },
+      4: {
+        obj: "Build Community",
+        optimal: ["Facebook", "Blog"],
+        desc: "Promote peer-to-peer discussions, updates, and community advocacy.",
+        explain: "Facebook Groups promote peer-to-peer discussion, and a Corporate Blog provides long-term authority and content to discuss. Advertising channels or simple brochures do not facilitate collaborative community building."
+      },
+      5: {
+        obj: "Promote Educational Content",
+        optimal: ["YouTube", "Blog"],
+        desc: "Distribute technical step-by-step guides and tutorials to increase authority.",
+        explain: "YouTube is the premier repository for video tutorials, and a Blog allows structured step-by-step documentation. Visual feeds like Instagram are too brief for complex technical guidance."
+      }
+    };
+
+    function initSim2() {
+      smRound = 1;
+      document.getElementById('sm-eval-dashboard').style.display = 'none';
+      document.getElementById('btn-sm-next-round').style.display = 'none';
+      document.getElementById('btn-eval-sm').disabled = false;
+      loadSMScenario();
+    }
+
+    function loadSMScenario() {
+      const scenario = smScenarios[smRound];
+      document.getElementById('sm-round').innerText = smRound;
+      document.getElementById('sm-objective-desc').innerText = scenario.obj;
+      document.getElementById('sm-eval-dashboard').style.display = 'none';
+      document.getElementById('btn-sm-next-round').style.display = 'none';
+      document.getElementById('btn-eval-sm').disabled = false;
+      
+      // Reset checkboxes
+      document.querySelectorAll('.channel-checkbox').forEach(cb => {
+        cb.checked = false;
+      });
+    }
+
+    function evaluateSocialMedia() {
+      const selected = [];
+      document.querySelectorAll('.channel-checkbox:checked').forEach(cb => {
+        selected.push(cb.value);
+      });
+
+      if (selected.length < 2 || selected.length > 3) {
+        alert("Please select exactly 2 or 3 channels to form your marketing mix strategy.");
+        return;
+      }
+
+      const scenario = smScenarios[smRound];
+      const optimal = scenario.optimal;
+      
+      // Calculate matching metrics
+      let matchCount = 0;
+      selected.forEach(ch => {
+        if (optimal.includes(ch) || (ch === "X" && optimal.includes("X")) || (ch === "Website" && optimal.includes("Website")) || (ch === "Email" && optimal.includes("Email"))) {
+          matchCount++;
+        }
+      });
+
+      let reach = 30, engage = 35, trust = 40, cost = 45;
+      const isOptimal = matchCount >= 2;
+
+      if (isOptimal) {
+        reach = 85 + Math.floor(Math.random() * 10);
+        engage = 80 + Math.floor(Math.random() * 12);
+        trust = 75 + Math.floor(Math.random() * 10);
+        cost = 80 + Math.floor(Math.random() * 8);
+      } else {
+        reach = 40 + Math.floor(Math.random() * 15);
+        engage = 45 + Math.floor(Math.random() * 15);
+        trust = 50 + Math.floor(Math.random() * 10);
+        cost = 35 + Math.floor(Math.random() * 20);
+      }
+
+      // Update progress bar scores
+      updateScoreMeter("reach", reach, isOptimal);
+      updateScoreMeter("engage", engage, isOptimal);
+      updateScoreMeter("trust", trust, isOptimal);
+      updateScoreMeter("cost", cost, isOptimal);
+
+      document.getElementById('sm-eval-dashboard').style.display = 'grid';
+      document.getElementById('btn-eval-sm').disabled = true;
+
+      const status = document.getElementById('sm-eval-status');
+      const desc = document.getElementById('sm-eval-text');
+      
+      if (isOptimal) {
+        status.innerText = "Optimal Strategy Approved";
+        status.style.color = "var(--success)";
+        desc.innerHTML = `<strong>Selected channels:</strong> ${selected.join(', ')}.<br><br><strong>Textbook Reason:</strong> ${scenario.explain}`;
+        document.getElementById('btn-sm-next-round').style.display = 'block';
+      } else {
+        status.innerText = "Sub-Optimal Performance";
+        status.style.color = "var(--error)";
+        desc.innerHTML = `<strong>Selected channels:</strong> ${selected.join(', ')}.<br><br><strong>Textbook Feedback:</strong> Your selected channel mix failed to maximize customer engagement or reach for the objective: <em>"${scenario.obj}"</em>. Ensure you choose platforms specifically designed for this type of client interaction (e.g. visual grids for awareness, support pipelines for inquiries).`;
+        document.getElementById('btn-eval-sm').disabled = false;
+      }
+    }
+
+    function updateScoreMeter(id, val, isSuccess) {
+      document.getElementById('val-m-' + id).innerText = val + '%';
+      const bar = document.getElementById('bar-m-' + id);
+      bar.style.width = val + '%';
+      if (isSuccess) {
+        bar.className = "metric-bar-inner success-bar";
+      } else {
+        bar.className = "metric-bar-inner";
+      }
+    }
+
+    function nextSMRound() {
+      if (smRound < 5) {
+        smRound++;
+        loadSMScenario();
+      } else {
+        const dashboard = document.getElementById('sm-eval-dashboard');
+        dashboard.style.display = 'grid';
+        document.getElementById('sm-eval-status').innerText = "Strategy Challenge Complete!";
+        document.getElementById('sm-eval-status').style.color = "var(--success)";
+        document.getElementById('sm-eval-text').innerHTML = `
+          <strong>Integrated Strategy Achieved:</strong> Dave Chaffey explains that successful digital marketing requires integrating multiple communication channels in synergy rather than relying on a single platform.<br><br>
+          <button onclick="loadLevel(3)" class="btn-action" style="margin-top: 1rem;">Proceed to Level 3</button>
+        `;
+        document.getElementById('btn-sm-next-round').style.display = 'none';
+      }
+    }
+
+    // --- LEVEL 3: MOBILE COMMERCE BUILDER ---
+    let activeSensors = {
+      gps: false,
+      cam: false,
+      push: false,
+      nfc: false,
+      qr: false,
+      wallet: false,
+      loc: false,
+      acc: false,
+      net: false
+    };
+
+    let mcStep = 0;
+    const mcScenarios = [
+      {
+        desc: "A customer wants to locate their nearest physical branch and navigate to it in real-time.",
+        optimal: ["gps", "loc", "net"],
+        explain: "Activated GPS location maps to route client coordinates.",
+        hint: "Requires GPS, Location Services, and Internet active."
+      },
+      {
+        desc: "A retail shopper wants to tap their phone against a register to complete a secure purchase.",
+        optimal: ["nfc", "wallet", "net"],
+        explain: "Secure NFC payment verified and processed through digital wallet credentials.",
+        hint: "Requires NFC, Wallet App, and Internet."
+      },
+      {
+        desc: "A customer wants to scan a barcode inside the branch to compare product reviews.",
+        optimal: ["cam", "qr", "net"],
+        explain: "Camera scanner decoded product identifier and retrieved review database records.",
+        hint: "Requires Camera, QR Scanner, and Internet."
+      },
+      {
+        desc: "A customer wants to locate a nearby ATM and receive a home-screen confirmation alert once they arrive.",
+        optimal: ["gps", "loc", "push", "net"],
+        explain: "GPS detected coordinates, location services confirmed proximity, and push alert fired.",
+        hint: "Requires GPS, Location Services, Push alerts, and Internet."
+      }
+    ];
+
+    function initSim3() {
+      mcStep = 0;
+      document.getElementById('mcom-part-a').style.display = 'flex';
+      document.getElementById('mcom-part-b').style.display = 'none';
+      document.getElementById('sim3-feedback').style.display = 'none';
+      
+      resetSensors();
+      loadMCScenario();
+    }
+
+    function resetSensors() {
+      activeSensors = { gps: false, cam: false, push: false, nfc: false, qr: false, wallet: false, loc: false, acc: false, net: false };
+      document.querySelectorAll('.sensor-item').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Hide phone overlays
+      document.getElementById('phone-notch').classList.remove('active-notch');
+      document.getElementById('p-notif').classList.remove('show');
+      document.getElementById('p-map').style.display = 'none';
+      document.getElementById('p-cam').style.display = 'none';
+      document.getElementById('p-nfc').style.display = 'none';
+      document.getElementById('p-default-screen').style.display = 'block';
+    }
+
+    function toggleSensor(id) {
+      activeSensors[id] = !activeSensors[id];
+      const btn = document.getElementById('sen-' + id);
+      if (activeSensors[id]) btn.classList.add('active');
+      else btn.classList.remove('active');
+    }
+
+    function loadMCScenario() {
+      if (mcStep >= mcScenarios.length) {
+        // Load Capstone Part B
+        document.getElementById('mcom-part-a').style.display = 'none';
+        document.getElementById('mcom-part-b').style.display = 'block';
+        updateCapstoneDetails();
+        return;
+      }
+      document.getElementById('mc-step').innerText = mcStep + 1;
+      document.getElementById('mc-scenario-desc').innerText = mcScenarios[mcStep].desc;
+      document.getElementById('mc-feedback-box').style.display = 'none';
+    }
+
+    function deploySensorChallenge() {
+      const current = mcScenarios[mcStep];
+      const optimal = current.optimal;
+      
+      // Verify matches
+      let match = true;
+      Object.keys(activeSensors).forEach(k => {
+        if (optimal.includes(k) && !activeSensors[k]) match = false;
+        if (!optimal.includes(k) && activeSensors[k]) match = false;
+      });
+
+      const fb = document.getElementById('mc-feedback-box');
+      fb.style.display = 'block';
+
+      if (match) {
+        fb.className = "feedback-box correct";
+        fb.innerHTML = `<strong>Correct:</strong> ${current.explain}`;
+        
+        // Trigger visual phone displays
+        if (activeSensors.gps) {
+          document.getElementById('p-default-screen').style.display = 'none';
+          document.getElementById('p-map').style.display = 'block';
+        }
+        if (activeSensors.cam) {
+          document.getElementById('p-default-screen').style.display = 'none';
+          document.getElementById('p-cam').style.display = 'block';
+        }
+        if (activeSensors.nfc) {
+          document.getElementById('p-default-screen').style.display = 'none';
+          document.getElementById('p-nfc').style.display = 'flex';
+        }
+        if (activeSensors.push) {
+          document.getElementById('phone-notch').classList.add('active-notch');
+          document.getElementById('p-notif').classList.add('show');
+          setTimeout(() => { document.getElementById('p-notif').classList.remove('show'); }, 3000);
+        }
+
+        mcStep++;
+        setTimeout(() => {
+          resetSensors();
+          loadMCScenario();
+        }, 3000);
+      } else {
+        fb.className = "feedback-box incorrect";
+        fb.innerHTML = `<strong>Configuration Fault:</strong> Selected sensor stack cannot satisfy coordinates.<br><br><em>Hint:</em> ${current.hint}`;
+      }
+    }
+
+    // --- PART B CAPSTONE ---
+    const capstoneData = {
+      delivery: {
+        optimal: ["gps", "push", "loc"],
+        desc: "Food Delivery App: Demands real-time courier tracking and dispatch notification updates."
+      },
+      ride: {
+        optimal: ["gps", "wallet", "loc"],
+        desc: "Ride Sharing App: Demands real-time route plotting, location services, and instant card wallets."
+      },
+      banking: {
+        optimal: ["cam", "push", "nfc"],
+        desc: "Mobile Banking App: Demands cameras for visual checks deposit scanning, and secure notification alerts."
+      },
+      shopping: {
+        optimal: ["push", "nfc", "wallet"],
+        desc: "E-Commerce Shopping App: Demands home screen promotion pushes, NFC in-store triggers, and credit wallets."
+      }
+    };
+
+    function updateCapstoneDetails() {
+      const type = document.getElementById('caps-business').value;
+      document.getElementById('caps-feedback-box').style.display = 'none';
+      document.getElementById('sim3-feedback').style.display = 'none';
+      
+      // Reset checkboxes
+      document.getElementById('caps-gps').checked = false;
+      document.getElementById('caps-cam').checked = false;
+      document.getElementById('caps-push').checked = false;
+      document.getElementById('caps-nfc').checked = false;
+      document.getElementById('caps-wallet').checked = false;
+      document.getElementById('caps-loc').checked = false;
+      
+      // Reset diagnostic bars
+      updateCapsMeter("cx", 0);
+      updateCapsMeter("conv", 0);
+      updateCapsMeter("func", 0);
+      updateCapsMeter("read", 0);
+      updateCapsMeter("bus", 0);
+    }
+
+    function evaluateCapstone() {
+      const type = document.getElementById('caps-business').value;
+      const cap = capstoneData[type];
+      const selected = [];
+      
+      if (document.getElementById('caps-gps').checked) selected.push("gps");
+      if (document.getElementById('caps-cam').checked) selected.push("cam");
+      if (document.getElementById('caps-push').checked) selected.push("push");
+      if (document.getElementById('caps-nfc').checked) selected.push("nfc");
+      if (document.getElementById('caps-wallet').checked) selected.push("wallet");
+      if (document.getElementById('caps-loc').checked) selected.push("loc");
+
+      let matchCount = 0;
+      selected.forEach(k => {
+        if (cap.optimal.includes(k)) matchCount++;
+      });
+
+      const isOptimal = matchCount === 3 && selected.length === 3;
+      
+      let cx = 35, conv = 40, func = 30, read = 50, bus = 25;
+      
+      if (isOptimal) {
+        cx = 95; conv = 90; func = 95; read = 85; bus = 90;
+      } else {
+        cx = 40 + (matchCount * 15);
+        conv = 35 + (matchCount * 15);
+        func = 30 + (matchCount * 15);
+        read = 60;
+        bus = 30 + (matchCount * 10);
+      }
+
+      updateCapsMeter("cx", cx);
+      updateCapsMeter("conv", conv);
+      updateCapsMeter("func", func);
+      updateCapsMeter("read", read);
+      updateCapsMeter("bus", bus);
+
+      const fb = document.getElementById('caps-feedback-box');
+      fb.style.display = 'block';
+
+      if (isOptimal) {
+        fb.className = "feedback-box correct";
+        fb.innerHTML = `<strong>Structure Approved! Rating: Class A.</strong> Successfully configured hardware-software sensor ecosystem dependencies! Modern mobile commerce combines multiple sensors to deliver convenient customer services.`;
+        document.getElementById('sim3-feedback').style.display = 'block';
+      } else {
+        fb.className = "feedback-box incorrect";
+        fb.innerHTML = `<strong>Warning: Sub-Optimal System.</strong> Architecture suffers from gaps. For example, check that you have selected location-aware capabilities and push notification setups appropriate to tracking and mobile convenience.`;
+      }
+    }
+
+    function updateCapsMeter(id, val) {
+      document.getElementById('c-' + id).innerText = val + '%';
+      document.getElementById('bar-c-' + id).style.width = val + '%';
+    }
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+</html>

@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 5.4 - Digital Channel Strategies & Implementation</title>
+    <meta name="description"
+        content="An interactive strategic marketing channel simulation for DBT Module 5.4. Act as the Digital Marketing Director, align customer personas with channels, design RACE customer journeys, and formulate omnichannel strategies.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #F57C00;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .logo-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stepper Progress Bar (Unlocked Globally) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .step-item.unlocked {
+            color: var(--text-dark);
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            opacity: 1;
+        }
+
+        .step-item.completed {
+            color: var(--success);
+            opacity: 1;
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.unlocked .step-badge {
+            background-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+            max-width: 120px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        .step-divider.completed {
+            background-color: var(--success);
+        }
+
+        /* Main Workspace Container */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Panels */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons & Interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Native Dialog (Modal) Styles */
+        dialog {
+            margin: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            font-family: var(--font-body);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .dialog-body {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Onboarding Memo */
+        .welcome-memo {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #FFCDD2;
+            padding-bottom: 16px;
+        }
+
+        .memo-logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .memo-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .memo-body {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memo-highlight {
+            background-color: var(--primary-red-light);
+            border-left: 4px solid var(--primary-red);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Objective Box */
+        .objective-box {
+            background-color: #ECEFF1;
+            border-left: 4px solid #455A64;
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .objective-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #37474F;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Persistent Navigation Footer */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Toast notifications styling */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background-color: #333333;
+            color: var(--white);
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .toast.success { border-left: 5px solid var(--success); }
+        .toast.warning { border-left: 5px solid var(--warning); }
+        .toast.danger { border-left: 5px solid var(--danger); }
+        .toast.info { border-left: 5px solid var(--accent-blue); }
+
+        /* LEVEL 1: Channel Selection Studio */
+        .l1-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .goals-list {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .goal-item-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .goal-item-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .goal-item-btn.active {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+            border-left: 5px solid var(--primary-red);
+        }
+
+        .goal-item-btn.completed {
+            border-left: 5px solid var(--success);
+            background-color: var(--success-light);
+            color: var(--success);
+            cursor: default;
+        }
+
+        .builder-workspace {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .builder-component-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .builder-component-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+
+        .component-label {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .builder-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        .repaired-objectives-card {
+            border: 2px solid var(--success);
+            border-radius: var(--radius-lg);
+            background-color: var(--success-light);
+            padding: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            animation: cardSlideUp 0.4s ease-out forwards;
+        }
+
+        .repaired-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--success);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .repaired-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        /* LEVEL 2: RACE Journey Designer */
+        .race-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1000px) {
+            .race-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .race-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .race-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .race-card.active-stage {
+            border-color: var(--success);
+            background-color: var(--success-light);
+            box-shadow: 0 0 10px rgba(46, 125, 80, 0.15);
+        }
+
+        .race-header {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--primary-red);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        /* LEVEL 3: Scenario Selector */
+        .l3-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l3-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* KPI dashboard widgets */
+        .kpi-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 1000px) {
+            .kpi-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kpi-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kpi-title {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .kpi-value-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .kpi-gauge-bar {
+            height: 5px;
+            background-color: #ECEFF1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .kpi-gauge-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-red);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Dialog reviews */
+        .scorecard-result {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .scorecard-banner {
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .scorecard-banner.success {
+            background-color: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .scorecard-banner.failed {
+            background-color: var(--danger-light);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+        }
+
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .scorecard-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .scorecard-box-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header UI Area -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>DBT Module 5.4: Digital Channel Strategy Laboratory</h1>
+                    <p>Dave Chaffey E-Business Integrated Marketing Communications Alignment</p>
+                </div>
+                <div class="logo-badge">CONNECTHUB</div>
+            </div>
+
+            <!-- Stepper Progress Tracker (Unlocked Globally) -->
+            <div class="stepper">
+                <div class="step-item active unlocked" id="step-btn-1" onclick="navigateToLevel(1)">
+                    <span class="step-badge">1</span>
+                    <span>Digital Channel Selection</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-2"></div>
+                <div class="step-item unlocked" id="step-btn-2" onclick="navigateToLevel(2)">
+                    <span class="step-badge">2</span>
+                    <span>Customer Journey Design</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-3"></div>
+                <div class="step-item unlocked" id="step-btn-3" onclick="navigateToLevel(3)">
+                    <span class="step-badge">3</span>
+                    <span>Omnichannel Strategy</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Channel Strategy & Media Integration (Module 5.4)
+                </h3>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" id="btn-theory-tab-strategy" onclick="switchTheoryTab('strategy')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Channel Strategy</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-channels" onclick="switchTheoryTab('channels')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Channels</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-media" onclick="switchTheoryTab('media')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Media Types</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-journey" onclick="switchTheoryTab('journey')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Customer Journey</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-omni" onclick="switchTheoryTab('omni')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Omnichannel</button>
+                    <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                        style="font-size: 0.72rem; padding: 4px 8px; height: auto; background: #666; color: white;">Hide</button>
+                </div>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; color: var(--text-dark);">
+                <!-- Dynamic theory content -->
+            </div>
+        </section>
+
+        <!-- PERSISTENT STRATEGIC ANALYSIS PERFORMANCE DASHBOARD -->
+        <section id="kpi-dashboard-card" class="card"
+            style="border-left: 4px solid var(--primary-red); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <h3
+                style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--primary-red); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                📊 Strategic Channel Performance Dashboard (Module 5.4)
+            </h3>
+            <div class="kpi-board">
+                <div class="kpi-card">
+                    <span class="kpi-title">Channel Selection Accuracy</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-selection">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-selection" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Customer Journey Quality</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-journey">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-journey" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Omnichannel Integration</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-integration">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-integration" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Customer Experience</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-experience">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-experience" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Strategic Alignment</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-alignment">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-alignment" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Digital Engagement</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-engagement">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-engagement" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BRIEFING SCREEN (ONBOARDING) -->
+        <section id="screen-intro" class="screen active">
+            <div class="welcome-memo">
+                <div class="memo-header">
+                    <div class="memo-logo">
+                        <span>🏛️</span>
+                        <span>ConnectHub Director Panel</span>
+                    </div>
+                    <div class="memo-meta">
+                        <div>PROJECT: CHANNEL STRATEGY</div>
+                        <div>ROLE: DIGITAL MARKETING DIRECTOR</div>
+                        <div>DATE: JUL 2026</div>
+                    </div>
+                </div>
+
+                <div class="memo-body">
+                    <p><strong>To: Digital Marketing Director</strong></p>
+                    <p>Welcome to <strong>ConnectHub</strong>. Our firm currently lacks a structured digital channel blueprint, causing massive campaign bounce rates and poor customer acquisition efficiency.</p>
+
+                    <div class="memo-highlight">
+                        Your mission is to map target audience personas to optimal digital channels, design unified customer journeys using the RACE Framework, and design cross-channel omnichannel strategies based on Dave Chaffey's frameworks.
+                    </div>
+
+                    <p>Your strategic lab contains three core levels:</p>
+
+                    <ul style="padding-left: 24px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem;">
+                        <li><strong>Level 1: Digital Channel Selection Studio</strong> – Align customer personas (Gen Z, professionals, seniors) with primary channels, media classes, and strategic communication objectives.</li>
+                        <li><strong>Level 2: Integrated Customer Journey Designer</strong> – Map appropriate digital channels, content, customer objectives, and behaviours across the RACE Framework (Reach, Act, Convert, Engage).</li>
+                        <li><strong>Level 3: Omnichannel Strategy Designer</strong> – Formulate integrated strategies for 3 distinct corporate scenarios (Fashion retail loyalty, EdTech awareness, Healthcare app engagement) by setting channel mixes, RACEs, and POE distributions.</li>
+                    </ul>
+
+                    <p>In accordance with organizational parameters, all simulation stages are unlocked globally. You can navigate freely using the stepper buttons above or the footer navigators below at any time.</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" onclick="startSimulation()">Open Strategy Console</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 1: Digital Channel Selection Studio -->
+        <section id="screen-l1" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 1: Digital Channel Selection Studio</div>
+                    <span style="background-color: var(--primary-red-light); color: var(--primary-red); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Audience Matchmaker</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Analyze demographic profiles on the left. Select the primary channel, classify the media type (Paid/Owned/Earned), and assign the business objective on the right.
+                </div>
+
+                <div class="l1-layout">
+                    <!-- Left: Personas List -->
+                    <div class="goals-list">
+                        <div style="font-weight:700; margin-bottom:8px;">Customer Personas</div>
+                        <div id="personas-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Selection & Builder -->
+                    <div class="builder-workspace">
+                        <div class="card-title" id="persona-target-title" style="font-size:1.1rem; margin-bottom:12px;">Select a Persona to Begin</div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Primary Channel</span>
+                            <select class="builder-select" id="l1-primary-channel">
+                                <option value="none">-- Select Channel --</option>
+                                <option value="instagram">Instagram Organic</option>
+                                <option value="linkedin">LinkedIn B2B Feed</option>
+                                <option value="email">Email Newsletter</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Media Type</span>
+                            <select class="builder-select" id="l1-primary-media">
+                                <option value="none">-- Select Media Type --</option>
+                                <option value="paid">Paid Media</option>
+                                <option value="owned">Owned Media</option>
+                                <option value="earned">Earned Media</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Business Objective</span>
+                            <select class="builder-select" id="l1-objective">
+                                <option value="none">-- Select Objective --</option>
+                                <option value="drive-brand-awareness">Drive Brand Awareness</option>
+                                <option value="generate-b2b-leads">Generate B2B Leads</option>
+                                <option value="nurture-customer-loyalty">Nurture Customer Loyalty</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="resetLevel1()">Reset Fields</button>
+                            <button class="btn" id="l1-verify-btn" onclick="verifyLevel1()" disabled>Verify Persona Match</button>
+                        </div>
+
+                        <div id="l1-feedback-box" style="margin-top:16px; padding:16px; border-radius:var(--radius-md); font-size:0.88rem; display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Repaired inventory log -->
+                <div class="repaired-objectives-card" id="l1-repaired-box">
+                    <div class="repaired-title">Aligned Personas Strategy Log</div>
+                    <div class="repaired-list" id="l1-repaired-list">
+                        <!-- Injected -->
+                    </div>
+                    <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                        <button class="btn" onclick="showSummaryDialog(1)">Lock Channel Selection Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Integrated Customer Journey Designer -->
+        <section id="screen-l2" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 2: Integrated Customer Journey Designer</div>
+                    <span style="background-color: var(--warning-light); color: var(--warning); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">RACE Framework</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Construct an integrated customer journey matching Dave Chaffey's RACE Framework. For each stage (Reach, Act, Convert, Engage), align the digital channels, content, customer objectives, and behaviours.
+                </div>
+
+                <div class="race-grid">
+                    <!-- Reach Card -->
+                    <div class="race-card" id="race-reach-card">
+                        <div class="race-header">1. Reach Stage</div>
+                        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem;">
+                            <label><strong>Digital Channel:</strong></label>
+                            <select class="builder-select" id="race-reach-channel">
+                                <option value="none">Select...</option>
+                                <option value="seo">Search Engines (SEO/PPC)</option>
+                                <option value="website">Company Website</option>
+                                <option value="checkout">Online Checkout Portal</option>
+                                <option value="crm">CRM & Loyalty Systems</option>
+                            </select>
+
+                            <label><strong>Content Assets:</strong></label>
+                            <select class="builder-select" id="race-reach-content">
+                                <option value="none">Select...</option>
+                                <option value="search-ads">Targeted PPC Search Ads</option>
+                                <option value="whitepaper">Feature Guides & Whitepapers</option>
+                                <option value="coupons">Discount Checkout Coupons</option>
+                                <option value="newsletter">Loyalty Email Newsletters</option>
+                            </select>
+
+                            <label><strong>Customer Objective:</strong></label>
+                            <select class="builder-select" id="race-reach-obj">
+                                <option value="none">Select...</option>
+                                <option value="find-solution">Finding solutions for a problem</option>
+                                <option value="compare-features">Comparing product specifications</option>
+                                <option value="complete-buy">Completing transaction quickly</option>
+                                <option value="gain-perks">Gaining post-purchase loyalty rewards</option>
+                            </select>
+
+                            <label><strong>Customer Behaviour:</strong></label>
+                            <select class="builder-select" id="race-reach-behave">
+                                <option value="none">Select...</option>
+                                <option value="googling">Googling keywords and topics</option>
+                                <option value="viewing-pages">Clicking landing pages & product tabs</option>
+                                <option value="entering-info">Entering payment credentials</option>
+                                <option value="reviews">Writing product reviews & repeat orders</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Act Card -->
+                    <div class="race-card" id="race-act-card">
+                        <div class="race-header">2. Act Stage</div>
+                        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem;">
+                            <label><strong>Digital Channel:</strong></label>
+                            <select class="builder-select" id="race-act-channel">
+                                <option value="none">Select...</option>
+                                <option value="seo">Search Engines (SEO/PPC)</option>
+                                <option value="website">Company Website</option>
+                                <option value="checkout">Online Checkout Portal</option>
+                                <option value="crm">CRM & Loyalty Systems</option>
+                            </select>
+
+                            <label><strong>Content Assets:</strong></label>
+                            <select class="builder-select" id="race-act-content">
+                                <option value="none">Select...</option>
+                                <option value="search-ads">Targeted PPC Search Ads</option>
+                                <option value="whitepaper">Feature Guides & Whitepapers</option>
+                                <option value="coupons">Discount Checkout Coupons</option>
+                                <option value="newsletter">Loyalty Email Newsletters</option>
+                            </select>
+
+                            <label><strong>Customer Objective:</strong></label>
+                            <select class="builder-select" id="race-act-obj">
+                                <option value="none">Select...</option>
+                                <option value="find-solution">Finding solutions for a problem</option>
+                                <option value="compare-features">Comparing product specifications</option>
+                                <option value="complete-buy">Completing transaction quickly</option>
+                                <option value="gain-perks">Gaining post-purchase loyalty rewards</option>
+                            </select>
+
+                            <label><strong>Customer Behaviour:</strong></label>
+                            <select class="builder-select" id="race-act-behave">
+                                <option value="none">Select...</option>
+                                <option value="googling">Googling keywords and topics</option>
+                                <option value="viewing-pages">Clicking landing pages & product tabs</option>
+                                <option value="entering-info">Entering payment credentials</option>
+                                <option value="reviews">Writing product reviews & repeat orders</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Convert Card -->
+                    <div class="race-card" id="race-convert-card">
+                        <div class="race-header">3. Convert Stage</div>
+                        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem;">
+                            <label><strong>Digital Channel:</strong></label>
+                            <select class="builder-select" id="race-convert-channel">
+                                <option value="none">Select...</option>
+                                <option value="seo">Search Engines (SEO/PPC)</option>
+                                <option value="website">Company Website</option>
+                                <option value="checkout">Online Checkout Portal</option>
+                                <option value="crm">CRM & Loyalty Systems</option>
+                            </select>
+
+                            <label><strong>Content Assets:</strong></label>
+                            <select class="builder-select" id="race-convert-content">
+                                <option value="none">Select...</option>
+                                <option value="search-ads">Targeted PPC Search Ads</option>
+                                <option value="whitepaper">Feature Guides & Whitepapers</option>
+                                <option value="coupons">Discount Checkout Coupons</option>
+                                <option value="newsletter">Loyalty Email Newsletters</option>
+                            </select>
+
+                            <label><strong>Customer Objective:</strong></label>
+                            <select class="builder-select" id="race-convert-obj">
+                                <option value="none">Select...</option>
+                                <option value="find-solution">Finding solutions for a problem</option>
+                                <option value="compare-features">Comparing product specifications</option>
+                                <option value="complete-buy">Completing transaction quickly</option>
+                                <option value="gain-perks">Gaining post-purchase loyalty rewards</option>
+                            </select>
+
+                            <label><strong>Customer Behaviour:</strong></label>
+                            <select class="builder-select" id="race-convert-behave">
+                                <option value="none">Select...</option>
+                                <option value="googling">Googling keywords and topics</option>
+                                <option value="viewing-pages">Clicking landing pages & product tabs</option>
+                                <option value="entering-info">Entering payment credentials</option>
+                                <option value="reviews">Writing product reviews & repeat orders</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Engage Card -->
+                    <div class="race-card" id="race-engage-card">
+                        <div class="race-header">4. Engage Stage</div>
+                        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem;">
+                            <label><strong>Digital Channel:</strong></label>
+                            <select class="builder-select" id="race-engage-channel">
+                                <option value="none">Select...</option>
+                                <option value="seo">Search Engines (SEO/PPC)</option>
+                                <option value="website">Company Website</option>
+                                <option value="checkout">Online Checkout Portal</option>
+                                <option value="crm">CRM & Loyalty Systems</option>
+                            </select>
+
+                            <label><strong>Content Assets:</strong></label>
+                            <select class="builder-select" id="race-engage-content">
+                                <option value="none">Select...</option>
+                                <option value="search-ads">Targeted PPC Search Ads</option>
+                                <option value="whitepaper">Feature Guides & Whitepapers</option>
+                                <option value="coupons">Discount Checkout Coupons</option>
+                                <option value="newsletter">Loyalty Email Newsletters</option>
+                            </select>
+
+                            <label><strong>Customer Objective:</strong></label>
+                            <select class="builder-select" id="race-engage-obj">
+                                <option value="none">Select...</option>
+                                <option value="find-solution">Finding solutions for a problem</option>
+                                <option value="compare-features">Comparing product specifications</option>
+                                <option value="complete-buy">Completing transaction quickly</option>
+                                <option value="gain-perks">Gaining post-purchase loyalty rewards</option>
+                            </select>
+
+                            <label><strong>Customer Behaviour:</strong></label>
+                            <select class="builder-select" id="race-engage-behave">
+                                <option value="none">Select...</option>
+                                <option value="googling">Googling keywords and topics</option>
+                                <option value="viewing-pages">Clicking landing pages & product tabs</option>
+                                <option value="entering-info">Entering payment credentials</option>
+                                <option value="reviews">Writing product reviews & repeat orders</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                    <button class="btn btn-secondary" onclick="resetLevel2()">Reset Journey</button>
+                    <button class="btn" id="l2-verify-btn" onclick="verifyLevel2()">Verify RACE Journey</button>
+                </div>
+
+                <div id="l2-feedback-box" style="margin-top: 16px; padding: 16px; border-radius: var(--radius-md); font-size:0.88rem; display:none;"></div>
+
+                <div class="card" id="l2-complete-box" style="display:none; border-color:var(--success); background-color:var(--success-light); margin-top:16px;">
+                    <div class="repaired-title" style="margin-bottom:12px;">RACE Journey Strategy Approved</div>
+                    <div class="btn-group" style="justify-content: flex-end;">
+                        <button class="btn" onclick="showSummaryDialog(2)">Lock Customer Journey Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Omnichannel Strategy Designer -->
+        <section id="screen-l3" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 3: Omnichannel Strategy Designer</div>
+                    <span style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Omnichannel Lab</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Select a strategic case study scenario on the left, then construct the aligned channel mix, RACE customer journey stage, POE media distribution, and objectives on the right.
+                </div>
+
+                <div class="l3-layout">
+                    <!-- Left: Scenarios List -->
+                    <div class="goals-list">
+                        <div style="font-weight:700; margin-bottom:8px;">Strategic Case Scenarios</div>
+                        <div id="l3-scenarios-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Aligner Work Desk -->
+                    <div class="builder-workspace">
+                        <div class="card-title" id="l3-case-title" style="font-size:1.1rem; margin-bottom:12px;">Select a Case Study</div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Integrated Channel Mix</span>
+                            <select class="builder-select" id="l3-channel-mix">
+                                <option value="none">-- Select Channel Mix --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Customer Journey Stage</span>
+                            <select class="builder-select" id="l3-journey-stage">
+                                <option value="none">-- Select RACE Stage --</option>
+                                <option value="Reach">Reach (Building Traffic & Awareness)</option>
+                                <option value="Act">Act (Interactivity & Product Comparison)</option>
+                                <option value="Convert">Convert (Purchase and Checkout Options)</option>
+                                <option value="Engage">Engage (Loyalty Programs and Retention)</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">POE Media Allocation</span>
+                            <select class="builder-select" id="l3-media-mix">
+                                <option value="none">-- Select POE Allocation --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Primary Objective</span>
+                            <select class="builder-select" id="l3-comm-obj">
+                                <option value="none">-- Select Objective --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Success Measure</span>
+                            <select class="builder-select" id="l3-success-measure">
+                                <option value="none">-- Select Success Metric --</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="resetLevel3()">Reset Desk</button>
+                            <button class="btn" id="l3-verify-btn" onclick="verifyLevel3()" disabled>Verify Omnichannel Strategy</button>
+                        </div>
+
+                        <div id="l3-feedback-box" style="margin-top:16px; padding:16px; border-radius:var(--radius-md); font-size:0.88rem; display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Native Learning Summary Dialog -->
+    <dialog id="summary-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📘</span>
+                <span id="summary-dialog-title">Stage Complete: Strategic Summary</span>
+            </div>
+            <div class="dialog-body" id="summary-dialog-content">
+                <!-- content injected -->
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" id="summary-next-btn" onclick="confirmSummaryNextLevel()">Proceed to Next Stage</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Scorecard Dialog -->
+    <dialog id="scorecard-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📊</span>
+                <span>ConnectHub Strategic Review Scorecard</span>
+            </div>
+            <div class="dialog-body">
+                <div class="scorecard-result">
+                    <div class="scorecard-banner" id="scorecard-banner-status">SUCCESS</div>
+
+                    <div class="scorecard-grid">
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Strategic Metrics Summary</div>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+                                <div style="display:flex; justify-content:space-between;"><span>Channel Selection Accuracy:</span><strong id="card-selection">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Customer Journey Quality:</span><strong id="card-journey">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Omnichannel Integration:</span><strong id="card-integration">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Customer Experience:</span><strong id="card-experience">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Strategic Alignment:</span><strong id="card-alignment">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Digital Engagement:</span><strong id="card-engagement">80%</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">CMO Evaluation Review</div>
+                            <div style="font-size:0.82rem; color:var(--text-dark);" id="scorecard-eval-text">
+                                Feedback description...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem; background-color:var(--bg-light); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                        <strong>Integrated Communications Key Principles:</strong>
+                        <ul style="padding-left:16px;">
+                            <li><strong>Customer Centricity:</strong> Selecting digital channels based on customer profiles rather than platform popularity.</li>
+                            <li><strong>RACE Lifecycle:</strong> Structuring content and media formats according to the customer's decision journey stage.</li>
+                            <li><strong>Omnichannel Consistency:</strong> Ensuring messages and touchpoints coordinate seamlessly across Paid, Owned, and Earned frameworks.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn btn-secondary" onclick="resetFullSimulation()">Restart Laboratory</button>
+                <button class="btn" onclick="scorecardDialog.close()">Close Review</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Help Manual Dialog -->
+    <dialog id="help-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>🏛️</span>
+                <span>Director Strategy Reference Manual</span>
+            </div>
+            <div class="dialog-body">
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:0.9rem;">
+                    <div><strong>Digital Channel Strategy (Chaffey):</strong></div>
+                    <p style="color:var(--text-muted);">Strategy involves selecting optimal touchpoint channels (Website, Search, Email, Social, Mobile, Content, Affiliate) matching specific user segments, ensuring communication objectives are supported coherently.</p>
+
+                    <div><strong>Paid, Owned, and Earned Media:</strong></div>
+                    <p style="color:var(--text-muted);">
+                        - <strong>Paid:</strong> Advertising media bought to drive traffic (PPC Google Ads, Influencer Sponsorship).<br>
+                        - <strong>Owned:</strong> Media properties owned directly by the firm (Website, Organic Instagram, Email lists).<br>
+                        - <strong>Earned:</strong> Free customer advocacy and peer promotions (Customer reviews, organic user sharing).
+                    </p>
+
+                    <div><strong>RACE Customer Journey:</strong></div>
+                    <p style="color:var(--text-muted);">Maps user interactions across Reach (traffic generation), Act (website interaction/content), Convert (checkout transactions), and Engage (loyalty systems and post-purchase database triggers).</p>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeHelpManual()">Return to Console</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Persistent Navigation Footer -->
+    <div class="nav-footer" id="navigationFooter">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Stage</button>
+            <span style="font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--text-dark);"
+                id="footerLevelText">Level 1 of 3</span>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Stage</button>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // System State
+        const state = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true],
+            completedLevels: [false, false, false],
+            kpis: {
+                selection: 0,
+                journey: 0,
+                integration: 0,
+                experience: 0,
+                alignment: 0,
+                engagement: 0
+            },
+
+            // Level 1: Selection Studio variables
+            l1: {
+                activePersona: null,
+                completedPersonas: [],
+                selections: {
+                    primaryChannel: 'none',
+                    primaryMedia: 'none',
+                    objective: 'none'
+                },
+                personas: {
+                    'college': {
+                        id: 'college',
+                        name: 'Gen Z College Students',
+                        desc: 'Seeks visual, short-form interactive media feeds, immediate peer trends, and video reviews. Avoids formal copy.',
+                        correct: {
+                            primaryChannel: 'instagram',
+                            primaryMedia: 'owned',
+                            objective: 'drive-brand-awareness'
+                        },
+                        strategicInfo: {
+                            why: 'Instagram Organic maps to Gen Z visually, serving as high-trust user recommendations.',
+                            commObjective: 'Drive brand awareness & viral peer referrals.',
+                            integration: 'Uses visual owned media to capture interest and coordinates with earned reviews on video hubs.'
+                        }
+                    },
+                    'professional': {
+                        id: 'professional',
+                        name: 'Working Corporate Professionals',
+                        desc: 'Values industry authority updates, thought leadership columns, career platforms, B2B services, and whitepaper case studies.',
+                        correct: {
+                            primaryChannel: 'linkedin',
+                            primaryMedia: 'owned',
+                            objective: 'generate-b2b-leads'
+                        },
+                        strategicInfo: {
+                            why: 'LinkedIn is the premier B2B professional networking channel.',
+                            commObjective: 'Generate B2B leads & establish professional authority.',
+                            integration: 'Combines industry search profile discovery with private direct marketing lists.'
+                        }
+                    },
+                    'senior': {
+                        id: 'senior',
+                        name: 'Retired Senior Citizens',
+                        desc: 'Prefers high-trust, simple desktop website directories. Responsive to personal emails and straightforward discount newsletters.',
+                        correct: {
+                            primaryChannel: 'email',
+                            primaryMedia: 'owned',
+                            objective: 'nurture-customer-loyalty'
+                        },
+                        strategicInfo: {
+                            why: 'Direct newsletter emails build structured communication, linking directly to simple, clear desktop web directories.',
+                            commObjective: 'Nurture client loyalty & simplify purchasing paths.',
+                            integration: 'Coordinates owned promotional newsletter updates with straightforward desktop portal links.'
+                        }
+                    }
+                }
+            },
+
+            // Level 2: Customer Journey variables
+            l2: {
+                correct: {
+                    reach: { channel: 'seo', content: 'search-ads', obj: 'find-solution', behave: 'googling' },
+                    act: { channel: 'website', content: 'whitepaper', obj: 'compare-features', behave: 'viewing-pages' },
+                    convert: { channel: 'checkout', content: 'coupons', obj: 'complete-buy', behave: 'entering-info' },
+                    engage: { channel: 'crm', content: 'newsletter', obj: 'gain-perks', behave: 'reviews' }
+                }
+            },
+
+            // Level 3: Omnichannel Strategies variables
+            l3: {
+                activeCase: null,
+                completedCases: [],
+                selections: {
+                    channelMix: 'none',
+                    journeyStage: 'none',
+                    mediaMix: 'none',
+                    commObj: 'none',
+                    successMeasure: 'none'
+                },
+                cases: {
+                    'retail-loyalty': {
+                        id: 'retail-loyalty',
+                        title: 'Scenario 1: Retail Fashion Loyalty Increase',
+                        desc: 'An established e-commerce clothing retailer wants to drive recurring purchases and customer loyalty among recent buyers.',
+                        correct: {
+                            channelMix: 'email-crm',
+                            journeyStage: 'Engage',
+                            mediaMix: 'owned-earned',
+                            commObj: 'retention-advocacy',
+                            successMeasure: 'repeat-conversion'
+                        },
+                        dropdowns: {
+                            channelMix: [
+                                { val: 'email-crm', text: 'Email Marketing + CRM App Push Alerts' },
+                                { val: 'seo-ads', text: 'Google Search Ads + Programmatic Banner Ads' }
+                            ],
+                            mediaMix: [
+                                { val: 'owned-earned', text: 'Owned Media (App & lists) + Earned Media (Reviews)' },
+                                { val: 'paid-only', text: 'Paid Media (Influencers & Social retargeting)' }
+                            ],
+                            commObj: [
+                                { val: 'retention-advocacy', text: 'Foster repeat retention & loyalty advocate programs' },
+                                { val: 'awareness-drive', text: 'Drive top-of-funnel reach impressions' }
+                            ],
+                            successMeasure: [
+                                { val: 'repeat-conversion', text: 'Customer Repeat Purchase Rate & App retention metric' },
+                                { val: 'click-ctr', text: 'Ad banner CTR impressions & CPM ad costs' }
+                            ]
+                        },
+                        feedback: 'For fashion retention, combining CRM push alerts with email lists (owned) leverages direct client engagement without high ad costs (paid).'
+                    },
+                    'edtech-awareness': {
+                        id: 'edtech-awareness',
+                        title: 'Scenario 2: EdTech Platform Awareness Drive',
+                        desc: 'A newly launched educational software startup wants to drive brand discovery and build user search visibility.',
+                        correct: {
+                            channelMix: 'seo-social',
+                            journeyStage: 'Reach',
+                            mediaMix: 'paid-owned',
+                            commObj: 'brand-discovery',
+                            successMeasure: 'organic-impressions'
+                        },
+                        dropdowns: {
+                            channelMix: [
+                                { val: 'seo-social', text: 'SEO Search Optimization + Content Marketing + Social Ads' },
+                                { val: 'direct-email', text: 'Direct cold email broadcasts + SMS notifications' }
+                            ],
+                            mediaMix: [
+                                { val: 'paid-owned', text: 'Paid Media (Influencer ads) + Owned Media (Blog/SEO)' },
+                                { val: 'earned-only', text: 'Earned Media (Organic customer forums)' }
+                            ],
+                            commObj: [
+                                { val: 'brand-discovery', text: 'Establish search visibility & brand discovery' },
+                                { val: 'nurture-leads', text: 'Support transactional checkout conversion options' }
+                            ],
+                            successMeasure: [
+                                { val: 'organic-impressions', text: 'Organic Search Impressions & PPC Ad Click conversions' },
+                                { val: 'nps-score', text: 'NPS Customer Satisfaction rating score index' }
+                            ]
+                        },
+                        feedback: 'EdTech platforms build awareness by integrating paid influencer campaigns (paid) with search engine optimization (owned) to capture B2B searches.'
+                    },
+                    'health-engagement': {
+                        id: 'health-engagement',
+                        title: 'Scenario 3: Healthcare App Patient Interactivity',
+                        desc: 'A medical diagnostic app wants users to actively log daily habits and evaluate health symptoms.',
+                        correct: {
+                            channelMix: 'app-portal',
+                            journeyStage: 'Act',
+                            mediaMix: 'owned-earned-health',
+                            commObj: 'symptom-check',
+                            successMeasure: 'active-use'
+                        },
+                        dropdowns: {
+                            channelMix: [
+                                { val: 'app-portal', text: 'Interactive App Dashboards + Patient Help Portal' },
+                                { val: 'google-ppc', text: 'Google Search PPC + Programmatic Display Ads' }
+                            ],
+                            mediaMix: [
+                                { val: 'owned-earned-health', text: 'Owned Media (Habit logs & App) + Earned Media (Forums)' },
+                                { val: 'paid-sponsorship', text: 'Paid Media (Celebrity health sponsorships)' }
+                            ],
+                            commObj: [
+                                { val: 'symptom-check', text: 'Drive habit logging, content act, and symptom checks' },
+                                { val: 'advocate-recruit', text: 'Acquire platform partners and affiliates' }
+                            ],
+                            successMeasure: [
+                                { val: 'active-use', text: 'Daily Active User (DAU) logs & help portal click clicks' },
+                                { val: 'revenue-growth', text: 'Total cash reserve conversions & investor shares' }
+                            ]
+                        },
+                        feedback: 'Healthcare symptom logging maps to the Act stage of RACE. Providing owned help portals and habit dashboards secures high customer interactivity.'
+                    }
+                }
+            }
+        };
+
+        const summaries = {
+            1: {
+                title: "Digital Channel Selection Complete",
+                body: `<h3>Key Takeaways</h3>
+                       <p>Digital channels must match consumer habits (e.g. Gen Z visual Instagram feeds vs professional LinkedIn networks). Classifying channels into Paid, Owned, and Earned helps optimize marketing budgets.</p>
+                       <h3>Common Mistakes</h3>
+                       <p>Choosing channels based solely on popularity rather than demographic relevance leads to low conversions and bloated acquisition costs.</p>
+                       <h3>Real-World Application</h3>
+                       <p>E-commerce businesses target search ads (Paid) to capture active buyer intent, linking users to landing portals (Owned).</p>`
+            },
+            2: {
+                title: "RACE Journey Complete",
+                body: `<h3>Key Takeaways</h3>
+                       <p>Dave Chaffey's RACE Framework outlines a customer lifecycle: Reach (acquiring traffic), Act (content interactivity), Convert (completing purchase), and Engage (loyalty triggers).</p>
+                       <h3>Common Mistakes</h3>
+                       <p>Routing cold ad clicks directly to checkouts without Act stages (content, comparison pages) causes high bounce rates.</p>
+                       <h3>Real-World Application</h3>
+                       <p>E-retailers run retargeting ads to reach cart abandoners, linking them to promo checkout coupons (Convert).</p>`
+            }
+        };
+
+        const theoryData = {
+            strategy: `<h3>Digital Channel Strategy</h3>
+                       <p>Dave Chaffey defines digital channel strategy as matching company touchpoints with demographic behaviors:</p>
+                       <ul>
+                           <li><strong>Channel Selection:</strong> Pairing communication hubs with customer habits.</li>
+                           <li><strong>Channel Integration:</strong> Coordinating media touchpoints to ensure brand consistency.</li>
+                           <li><strong>Objectives:</strong> Aligning channels with specific goals (e.g. B2B leads vs direct customer support).</li>
+                       </ul>`,
+            channels: `<h3>Digital Marketing Channels</h3>
+                       <p>Core digital channels deployed in e-business models:</p>
+                       <ul>
+                           <li><strong>Website:</strong> The primary owned hub hosting transactions and directories.</li>
+                           <li><strong>Search (SEO/PPC):</strong> SEO optimizes organic visibility; PPC targets active keywords.</li>
+                           <li><strong>Email:</strong> High-trust direct marketing newsletter list campaigns.</li>
+                           <li><strong>Social:</strong> Visual storytelling (Instagram) and professional networks (LinkedIn).</li>
+                           <li><strong>Mobile:</strong> SMS notifications and transactional app push updates.</li>
+                       </ul>`,
+            media: `<h3>Paid, Owned, and Earned Media</h3>
+                    <p>Dave Chaffey categorizes digital media assets into three sectors:</p>
+                    <ul>
+                        <li><strong>Paid Media:</strong> Purchased visibility (PPC Search Ads, Influencer Sponsorships).</li>
+                        <li><strong>Owned Media:</strong> Properties owned by the firm (Websites, Email lists, Organic Instagram).</li>
+                        <li><strong>Earned Media:</strong> Advocacy gained via brand trust (Customer reviews, user-generated forum sharing).</li>
+                    </ul>`,
+            journey: `<h3>RACE Customer Journey</h3>
+                      <p>The RACE Framework structures integrated marketing communications:</p>
+                      <ul>
+                          <li><strong>Reach:</strong> Building traffic, search awareness, and ad impressions.</li>
+                          <li><strong>Act:</strong> Encouraging brand interaction, page clicks, and resource downloads.</li>
+                          <li><strong>Convert:</strong> Driving purchase actions, checkout completions, and cart recoveries.</li>
+                          <li><strong>Engage:</strong> Building customer relationships, CRM loyalty program updates, and reviews.</li>
+                      </ul>`,
+            omni: `<h3>Omnichannel Strategy</h3>
+                   <p>Successful strategic implementation delivers a seamless cross-channel customer experience:</p>
+                   <ul>
+                       <li><strong>Consistency:</strong> Maintaining unified branding, messaging, and discounts.</li>
+                       <li><strong>Integration:</strong> Ensuring data synchronization between CRM databases and ad feeds.</li>
+                       <li><strong>Unified Communications:</strong> Coordinating paid campaigns with owned CRM touchpoints.</li>
+                   </ul>`
+        };
+
+        const helpDialog = document.getElementById('help-dialog');
+        const summaryDialog = document.getElementById('summary-dialog');
+        const scorecardDialog = document.getElementById('scorecard-dialog');
+
+        function showHelpManual() { helpDialog.showModal(); }
+        function closeHelpManual() { helpDialog.close(); }
+
+        // Start Onboarding
+        function startSimulation() {
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            document.getElementById('kpi-dashboard-card').style.display = 'block';
+            navigateToLevel(1);
+            document.getElementById('navigationFooter').style.display = 'flex';
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        function switchTheoryTab(tab) {
+            const tabs = ['strategy', 'channels', 'media', 'journey', 'omni'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`btn-theory-tab-${t}`);
+                if (t === tab) {
+                    btn.classList.remove('btn-secondary');
+                } else {
+                    btn.classList.add('btn-secondary');
+                }
+            });
+            document.getElementById('theory-content').innerHTML = theoryData[tab];
+        }
+
+        // Stepper Navigation Controller
+        function updateNavigationPills() {
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                const divider = document.getElementById(`step-div-${i}`);
+                const badge = btn.querySelector('.step-badge');
+
+                btn.className = 'step-item unlocked';
+                if (divider) divider.className = 'step-divider unlocked';
+
+                badge.innerText = i;
+
+                if (state.currentLevel === i) {
+                    btn.classList.add('active');
+                }
+
+                if (state.completedLevels[i - 1]) {
+                    btn.classList.add('completed');
+                    if (divider) divider.classList.add('completed');
+                }
+            }
+
+            // Bottom footer logic
+            const prevBtn = document.getElementById('footerPrevBtn');
+            const nextBtn = document.getElementById('footerNextBtn');
+            const levelText = document.getElementById('footerLevelText');
+
+            if (prevBtn && nextBtn && levelText) {
+                levelText.innerText = `Level ${state.currentLevel} of 3`;
+                prevBtn.disabled = (state.currentLevel === 1);
+                nextBtn.disabled = (state.currentLevel === 3);
+            }
+        }
+
+        function navigateToLevel(levelIndex) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            state.currentLevel = levelIndex;
+
+            const targetScreen = document.getElementById(`screen-l${levelIndex}`);
+            targetScreen.classList.add('active');
+
+            if (levelIndex === 1) {
+                switchTheoryTab('strategy');
+                initLevel1();
+            }
+            if (levelIndex === 2) {
+                switchTheoryTab('journey');
+                initLevel2();
+            }
+            if (levelIndex === 3) {
+                switchTheoryTab('omni');
+                initLevel3();
+            }
+
+            updateNavigationPills();
+            showToast(`Marketing Level ${levelIndex} Activated`, 'info');
+        }
+
+        // Toast Notification Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✓';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '🚨';
+
+            toast.innerHTML = `<span>${icon}</span><div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================= LEVEL 1: Channel Selection Studio =================
+        function initLevel1() {
+            const pool = document.getElementById('personas-pool');
+            pool.innerHTML = '';
+
+            for (let id in state.l1.personas) {
+                const persona = state.l1.personas[id];
+                const btn = document.createElement('button');
+                btn.className = 'goal-item-btn';
+                btn.id = `l1-persona-${id}`;
+
+                const isCompleted = state.l1.completedPersonas.includes(id);
+                const isActive = state.l1.activePersona === id;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isActive) {
+                    btn.classList.add('active');
+                }
+
+                btn.innerHTML = `
+                    <span>${persona.name}</span>
+                    <span>${isCompleted ? '✓' : isActive ? '▶' : ''}</span>
+                `;
+
+                if (!isCompleted) {
+                    btn.addEventListener('click', () => selectL1Persona(id));
+                }
+
+                pool.appendChild(btn);
+            }
+
+            populateL1Dropdowns();
+            renderL1RepairedObjectives();
+        }
+
+        function selectL1Persona(personaId) {
+            state.l1.activePersona = personaId;
+            document.getElementById('l1-feedback-box').style.display = 'none';
+
+            // Reset selectors
+            for (let key in state.l1.selections) {
+                state.l1.selections[key] = 'none';
+            }
+
+            document.getElementById('persona-target-title').innerText = `Matching: "${state.l1.personas[personaId].name}"`;
+            initLevel1();
+        }
+
+        function populateL1Dropdowns() {
+            const selects = ['primary-channel', 'primary-media', 'objective'];
+
+            selects.forEach((s) => {
+                const selectEl = document.getElementById(`l1-${s}`);
+                if (state.l1.activePersona) {
+                    selectEl.disabled = false;
+                    selectEl.value = state.l1.selections[s.replace('-c', 'C').replace('-m', 'M')] || 'none';
+                } else {
+                    selectEl.disabled = true;
+                    selectEl.value = 'none';
+                }
+
+                selectEl.onchange = (e) => {
+                    const camelKey = s.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                    state.l1.selections[camelKey] = e.target.value;
+                    checkL1FormCompleteness();
+                };
+            });
+        }
+
+        function checkL1FormCompleteness() {
+            const verifyBtn = document.getElementById('l1-verify-btn');
+            let completed = true;
+            for (let key in state.l1.selections) {
+                if (state.l1.selections[key] === 'none') {
+                    completed = false;
+                    break;
+                }
+            }
+
+            verifyBtn.disabled = !completed;
+        }
+
+        function verifyLevel1() {
+            const personaId = state.l1.activePersona;
+            if (!personaId) return;
+
+            const persona = state.l1.personas[personaId];
+            const feedbackBox = document.getElementById('l1-feedback-box');
+            let firstIncorrectKey = null;
+
+            const checkKeys = ['primaryChannel', 'primaryMedia', 'objective'];
+
+            for (let key of checkKeys) {
+                if (state.l1.selections[key] !== persona.correct[key]) {
+                    firstIncorrectKey = key;
+                    break;
+                }
+            }
+
+            if (!firstIncorrectKey) {
+                // Correct Match
+                feedbackBox.style.display = 'block';
+                feedbackBox.style.background = 'var(--success-light)';
+                feedbackBox.style.border = '1px solid var(--success)';
+                feedbackBox.style.color = 'var(--success)';
+                feedbackBox.innerHTML = `
+                    <div style="font-weight:700; font-size:0.95rem; margin-bottom:8px;">✓ Strategy Aligned!</div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <div><strong>Matching Justification:</strong> ${persona.strategicInfo.why}</div>
+                        <div><strong>Communication Objective:</strong> ${persona.strategicInfo.commObjective}</div>
+                        <div><strong>Integrated Media Approach:</strong> ${persona.strategicInfo.integration}</div>
+                    </div>
+                `;
+
+                showToast("Demographic Channel correctly matched!", "success");
+                state.l1.completedPersonas.push(personaId);
+                state.l1.activePersona = null;
+                document.getElementById('persona-target-title').innerText = 'Select a Persona to Begin';
+
+                // Clear dropdown selections
+                for (let key in state.l1.selections) {
+                    state.l1.selections[key] = 'none';
+                }
+
+                initLevel1();
+                updateKPIs();
+
+                if (state.l1.completedPersonas.length === 3) {
+                    state.completedLevels[0] = true;
+                    updateNavigationPills();
+                }
+            } else {
+                // Diagnostic feedback
+                let errorDetails = "";
+                if (firstIncorrectKey === 'primaryChannel') {
+                    errorDetails = "The <strong>Primary Channel</strong> is incorrect. Match this segment's primary content medium (video reviews vs B2B feeds) to Dave Chaffey's guidelines.";
+                } else if (firstIncorrectKey === 'primaryMedia') {
+                    errorDetails = "The <strong>Media Classification</strong> is incorrect. Classify if organic accounts are Owned, sponsored campaigns are Paid, or reviews are Earned.";
+                } else if (firstIncorrectKey === 'objective') {
+                    errorDetails = "The <strong>Business Objective</strong> is incorrect. Identify what communications goal matches the client interaction expectation.";
+                }
+
+                feedbackBox.style.display = 'block';
+                feedbackBox.style.background = 'var(--danger-light)';
+                feedbackBox.style.border = '1px solid var(--danger)';
+                feedbackBox.style.color = 'var(--danger)';
+                feedbackBox.innerHTML = `
+                    <div style="font-weight:700; margin-bottom:4px;">⚠️ Diagnostic Error: Channel Selection Mismatch</div>
+                    <div>${errorDetails}</div>
+                `;
+                showToast("Match verification failed. Read diagnostics.", "danger");
+            }
+        }
+
+        function renderL1RepairedObjectives() {
+            const container = document.getElementById('l1-repaired-box');
+            const list = document.getElementById('l1-repaired-list');
+            list.innerHTML = '';
+
+            if (state.l1.completedPersonas.length > 0) {
+                container.style.display = 'flex';
+                state.l1.completedPersonas.forEach((id) => {
+                    const persona = state.l1.personas[id];
+                    const div = document.createElement('div');
+                    div.style.padding = '8px';
+                    div.style.borderBottom = '1px solid rgba(46, 125, 50, 0.1)';
+                    div.innerHTML = `<strong>${persona.name}:</strong> <span style="font-size:0.85rem; color:#555;">${persona.strategicInfo.why}</span>`;
+                    list.appendChild(div);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function resetLevel1() {
+            for (let key in state.l1.selections) {
+                state.l1.selections[key] = 'none';
+            }
+            document.getElementById('l1-feedback-box').style.display = 'none';
+            populateL1Dropdowns();
+            checkL1FormCompleteness();
+            showToast("Selection fields reset", "info");
+        }
+
+        // ================= LEVEL 2: RACE Journey Designer =================
+        function initLevel2() {
+            document.getElementById('l2-complete-box').style.display = 'none';
+            document.getElementById('l2-feedback-box').style.display = 'none';
+        }
+
+        function verifyLevel2() {
+            const checkStages = ['reach', 'act', 'convert', 'engage'];
+            let isCorrect = true;
+            let errorText = "";
+
+            for (let stage of checkStages) {
+                const channel = document.getElementById(`race-${stage}-channel`).value;
+                const content = document.getElementById(`race-${stage}-content`).value;
+                const obj = document.getElementById(`race-${stage}-obj`).value;
+                const behave = document.getElementById(`race-${stage}-behave`).value;
+
+                const c = state.l2.correct[stage];
+
+                if (channel !== c.channel || content !== c.content || obj !== c.obj || behave !== c.behave) {
+                    isCorrect = false;
+                    if (stage === 'reach') {
+                        errorText = "Reach Stage Error: Match traffic-driving PPC/SEO ads (Paid/Owned) to customer keyword searches.";
+                    } else if (stage === 'act') {
+                        errorText = "Act Stage Error: Website landing guides (Owned) support customer feature comparison evaluations.";
+                    } else if (stage === 'convert') {
+                        errorText = "Convert Stage Error: Checkout platforms (Owned) use coupons to support transactions.";
+                    } else if (stage === 'engage') {
+                        errorText = "Engage Stage Error: CRM programs (Owned) and reviews (Earned) support post-purchase perks.";
+                    }
+                    break;
+                }
+            }
+
+            const feedbackBox = document.getElementById('l2-feedback-box');
+            feedbackBox.style.display = 'block';
+
+            if (isCorrect) {
+                feedbackBox.style.background = 'var(--success-light)';
+                feedbackBox.style.border = '1px solid var(--success)';
+                feedbackBox.style.color = 'var(--success)';
+                feedbackBox.innerHTML = `
+                    <strong>✓ RACE Customer Journey Strategy Approved!</strong><br>
+                    Integrated channels coordinate seamlessly. Reach PPC campaigns direct leads to Act product directories, driving Conversion checkout transactions, and triggering Engage CRM reviews.
+                `;
+
+                // Highlight stages visually
+                checkStages.forEach(s => {
+                    document.getElementById(`race-${s}-card`).classList.add('active-stage');
+                });
+
+                showToast("Integrated Customer Journey Verified!", "success");
+                state.completedLevels[1] = true;
+                document.getElementById('l2-complete-box').style.display = 'block';
+                updateNavigationPills();
+                updateKPIs();
+            } else {
+                feedbackBox.style.background = 'var(--danger-light)';
+                feedbackBox.style.border = '1px solid var(--danger)';
+                feedbackBox.style.color = 'var(--danger)';
+                feedbackBox.innerHTML = `<strong>⚠️ Mismatch:</strong> ${errorText}`;
+                showToast("Journey verification failed.", "danger");
+            }
+        }
+
+        function resetLevel2() {
+            const checkStages = ['reach', 'act', 'convert', 'engage'];
+            checkStages.forEach(s => {
+                document.getElementById(`race-${s}-channel`).value = 'none';
+                document.getElementById(`race-${s}-content`).value = 'none';
+                document.getElementById(`race-${s}-obj`).value = 'none';
+                document.getElementById(`race-${s}-behave`).value = 'none';
+                document.getElementById(`race-${s}-card`).classList.remove('active-stage');
+            });
+            document.getElementById('l2-complete-box').style.display = 'none';
+            document.getElementById('l2-feedback-box').style.display = 'none';
+            updateKPIs();
+            showToast("Journey forms reset", "info");
+        }
+
+        // ================= LEVEL 3: Omnichannel Strategy Designer =================
+        function initLevel3() {
+            const pool = document.getElementById('l3-scenarios-pool');
+            pool.innerHTML = '';
+
+            for (let id in state.l3.cases) {
+                const c = state.l3.cases[id];
+                const btn = document.createElement('button');
+                btn.className = 'goal-item-btn';
+                btn.id = `l3-case-${id}`;
+
+                const isCompleted = state.l3.completedCases.includes(id);
+                const isActive = state.l3.activeCase === id;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isActive) {
+                    btn.classList.add('active');
+                }
+
+                btn.innerHTML = `
+                    <span>${c.title}</span>
+                    <span>${isCompleted ? '✓' : isActive ? '▶' : ''}</span>
+                `;
+
+                btn.addEventListener('click', () => selectL3Case(id));
+                pool.appendChild(btn);
+            }
+
+            renderL3ActiveCase();
+        }
+
+        function selectL3Case(caseId) {
+            state.l3.activeCase = caseId;
+            document.getElementById('l3-feedback-box').style.display = 'none';
+
+            const cData = state.l3.cases[caseId];
+            const isCompleted = state.l3.completedCases.includes(caseId);
+
+            const selects = ['l3-channel-mix', 'l3-media-mix', 'l3-comm-obj', 'l3-success-measure'];
+
+            // Populate dropdowns dynamically
+            populateL3Dropdown('l3-channel-mix', cData.dropdowns.channelMix);
+            populateL3Dropdown('l3-media-mix', cData.dropdowns.mediaMix);
+            populateL3Dropdown('l3-comm-obj', cData.dropdowns.commObj);
+            populateL3Dropdown('l3-success-measure', cData.dropdowns.successMeasure);
+
+            const selectStage = document.getElementById('l3-journey-stage');
+
+            if (isCompleted) {
+                document.getElementById('l3-channel-mix').value = cData.correct.channelMix;
+                selectStage.value = cData.correct.journeyStage;
+                document.getElementById('l3-media-mix').value = cData.correct.mediaMix;
+                document.getElementById('l3-comm-obj').value = cData.correct.commObj;
+                document.getElementById('l3-success-measure').value = cData.correct.successMeasure;
+
+                selects.forEach(s => document.getElementById(s).disabled = true);
+                selectStage.disabled = true;
+                document.getElementById('l3-verify-btn').disabled = true;
+            } else {
+                for (let key in state.l3.selections) {
+                    state.l3.selections[key] = 'none';
+                }
+                selects.forEach(s => {
+                    const el = document.getElementById(s);
+                    el.disabled = false;
+                    el.value = 'none';
+                });
+                selectStage.disabled = false;
+                selectStage.value = 'none';
+                document.getElementById('l3-verify-btn').disabled = false;
+            }
+
+            initLevel3();
+        }
+
+        function populateL3Dropdown(elementId, dataList) {
+            const select = document.getElementById(elementId);
+            select.innerHTML = '<option value="none">Select...</option>';
+            const list = [...dataList];
+            list.sort(() => Math.random() - 0.5);
+            list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.val;
+                opt.innerText = item.text;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderL3ActiveCase() {
+            const titleEl = document.getElementById('l3-case-title');
+
+            const sChannel = document.getElementById('l3-channel-mix');
+            const sStage = document.getElementById('l3-journey-stage');
+            const sMedia = document.getElementById('l3-media-mix');
+            const sObj = document.getElementById('l3-comm-obj');
+            const sMeasure = document.getElementById('l3-success-measure');
+
+            if (state.l3.activeCase) {
+                const c = state.l3.cases[state.l3.activeCase];
+                titleEl.innerText = c.title;
+
+                sChannel.onchange = (e) => { state.l3.selections.channelMix = e.target.value; checkL3FormCompleteness(); };
+                sStage.onchange = (e) => { state.l3.selections.journeyStage = e.target.value; checkL3FormCompleteness(); };
+                sMedia.onchange = (e) => { state.l3.selections.mediaMix = e.target.value; checkL3FormCompleteness(); };
+                sObj.onchange = (e) => { state.l3.selections.commObj = e.target.value; checkL3FormCompleteness(); };
+                sMeasure.onchange = (e) => { state.l3.selections.successMeasure = e.target.value; checkL3FormCompleteness(); };
+            } else {
+                titleEl.innerText = 'Select a Case Study';
+                sChannel.disabled = true;
+                sStage.disabled = true;
+                sMedia.disabled = true;
+                sObj.disabled = true;
+                sMeasure.disabled = true;
+                document.getElementById('l3-verify-btn').disabled = true;
+            }
+        }
+
+        function checkL3FormCompleteness() {
+            const btn = document.getElementById('l3-verify-btn');
+            let completed = true;
+            for (let key in state.l3.selections) {
+                if (state.l3.selections[key] === 'none') {
+                    completed = false;
+                    break;
+                }
+            }
+
+            btn.disabled = !completed;
+        }
+
+        function verifyLevel3() {
+            const caseId = state.l3.activeCase;
+            if (!caseId) return;
+
+            const cData = state.l3.cases[caseId];
+            const sel = state.l3.selections;
+            const feedbackBox = document.getElementById('l3-feedback-box');
+
+            let isCorrect = true;
+            let errorText = "";
+
+            if (sel.channelMix !== cData.correct.channelMix) {
+                isCorrect = false;
+                errorText = "Channel Mix Mismatch: Select channels that complement each other for this specific market challenge.";
+            } else if (sel.journeyStage !== cData.correct.journeyStage) {
+                isCorrect = false;
+                errorText = "Journey Stage Mismatch: Choose the RACE lifecycle phase that maps to the case's goal.";
+            } else if (sel.mediaMix !== cData.correct.mediaMix) {
+                isCorrect = false;
+                errorText = "Media Allocation Mismatch: Distribute paid search vs owned listings to balance the budget.";
+            } else if (sel.commObj !== cData.correct.commObj) {
+                isCorrect = false;
+                errorText = "Communication Objective Mismatch: Align the objective with the demographic profile.";
+            } else if (sel.successMeasure !== cData.correct.successMeasure) {
+                isCorrect = false;
+                errorText = "Success Measure Mismatch: Check that the success KPI fits the selected channels.";
+            }
+
+            feedbackBox.style.display = 'block';
+            if (isCorrect) {
+                feedbackBox.style.background = 'var(--success-light)';
+                feedbackBox.style.border = '1px solid var(--success)';
+                feedbackBox.style.color = 'var(--success)';
+                feedbackBox.innerHTML = `<strong>✓ Scenario Strategy Aligned!</strong><br>${cData.feedback}<br><span style="font-size:0.75rem; color:#555;">Dave Chaffey Concept: Omnichannel Communications Integration.</span>`;
+
+                showToast("Omnichannel consultation verified!", "success");
+                state.l3.completedCases.push(caseId);
+                state.l3.activeCase = null;
+
+                initLevel3();
+                updateKPIs();
+
+                if (state.l3.completedCases.length === 3) {
+                    state.completedLevels[2] = true;
+                    updateNavigationPills();
+                    setTimeout(() => {
+                        showFinalScorecard();
+                    }, 1200);
+                }
+            } else {
+                feedbackBox.style.background = 'var(--danger-light)';
+                feedbackBox.style.border = '1px solid var(--danger)';
+                feedbackBox.style.color = 'var(--danger)';
+                feedbackBox.innerHTML = `<strong>⚠️ Audit Error:</strong> ${errorText}`;
+                showToast("Omnichannel alignment failed.", "danger");
+            }
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 3) navigateToLevel(state.currentLevel + 1);
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1) navigateToLevel(state.currentLevel - 1);
+        }
+
+        function resetLevel3() {
+            state.l3.completedCases = [];
+            state.l3.activeCase = null;
+            document.getElementById('l3-feedback-box').style.display = 'none';
+            initLevel3();
+            updateKPIs();
+            showToast("Omnichannel desk cleared", "info");
+        }
+
+        // ================= SCORECARD & KPI UPDATES =================
+        function updateKPIs() {
+            // Selection Accuracy from L1
+            const selectionVal = Math.round((state.l1.completedPersonas.length / 3) * 100);
+            
+            // Journey Quality from L2
+            const journeyVal = state.completedLevels[1] ? 100 : 0;
+
+            // Integration & Experience from L3
+            const integrationVal = Math.round((state.l3.completedCases.length / 3) * 100);
+            
+            // Average dimensions
+            const experienceVal = Math.round(selectionVal * 0.4 + journeyVal * 0.3 + integrationVal * 0.3);
+            const alignmentVal = Math.round(selectionVal * 0.3 + journeyVal * 0.4 + integrationVal * 0.3);
+            const engagementVal = Math.round(selectionVal * 0.2 + journeyVal * 0.2 + integrationVal * 0.6);
+
+            state.kpis.selection = selectionVal;
+            state.kpis.journey = journeyVal;
+            state.kpis.integration = integrationVal;
+            state.kpis.experience = experienceVal;
+            state.kpis.alignment = alignmentVal;
+            state.kpis.engagement = engagementVal;
+
+            // UI gauges
+            document.getElementById('kpi-selection').innerText = selectionVal;
+            document.getElementById('fill-selection').style.width = selectionVal + '%';
+
+            document.getElementById('kpi-journey').innerText = journeyVal;
+            document.getElementById('fill-journey').style.width = journeyVal + '%';
+
+            document.getElementById('kpi-integration').innerText = integrationVal;
+            document.getElementById('fill-integration').style.width = integrationVal + '%';
+
+            document.getElementById('kpi-experience').innerText = experienceVal;
+            document.getElementById('fill-experience').style.width = experienceVal + '%';
+
+            document.getElementById('kpi-alignment').innerText = alignmentVal;
+            document.getElementById('fill-alignment').style.width = alignmentVal + '%';
+
+            document.getElementById('kpi-engagement').innerText = engagementVal;
+            document.getElementById('fill-engagement').style.width = engagementVal + '%';
+        }
+
+        function showFinalScorecard() {
+            document.getElementById('card-selection').innerText = state.kpis.selection + '%';
+            document.getElementById('card-journey').innerText = state.kpis.journey + '%';
+            document.getElementById('card-integration').innerText = state.kpis.integration + '%';
+            document.getElementById('card-experience').innerText = state.kpis.experience + '%';
+            document.getElementById('card-alignment').innerText = state.kpis.alignment + '%';
+            document.getElementById('card-engagement').innerText = state.kpis.engagement + '%';
+
+            const passed = state.kpis.alignment >= 75;
+            const banner = document.getElementById('scorecard-banner-status');
+            const evalText = document.getElementById('scorecard-eval-text');
+
+            if (passed) {
+                banner.className = "scorecard-banner success";
+                banner.innerText = "EXCELLENT OMNICHANNEL ALIGNMENT (PASSED)";
+                evalText.innerHTML = "Channel strategy index meets Chaffey Integrated Communications standard. You have successfully aligned touchpoints, wired RACE journey segments, and structured consistent omnichannel metrics.";
+            } else {
+                banner.className = "scorecard-banner failed";
+                banner.innerText = "ALIGNMENT GAPS DETECTED (FAILED)";
+                evalText.innerHTML = "Strategy alignment score is below textbook standard. Re-evaluate customer journey setups and channel allocations to pass review.";
+            }
+
+            scorecardDialog.showModal();
+        }
+
+        function resetFullSimulation() {
+            state.currentLevel = 1;
+            state.completedLevels = [false, false, false];
+            state.l1.completedPersonas = [];
+            state.l1.activePersona = null;
+            state.l3.completedCases = [];
+            state.l3.activeCase = null;
+
+            scorecardDialog.close();
+            summaryDialog.close();
+
+            resetLevel2();
+            resetLevel3();
+
+            document.getElementById('l1-feedback-box').style.display = 'none';
+
+            navigateToLevel(1);
+            updateKPIs();
+            showToast("Simulation restarted", "info");
+        }
+
+        function showSummaryDialog(levelIndex) {
+            const data = summaries[levelIndex];
+            document.getElementById('summary-dialog-title').innerText = data.title;
+            document.getElementById('summary-dialog-content').innerHTML = data.body;
+            document.getElementById('summary-next-btn').setAttribute('data-target-level', levelIndex + 1);
+            summaryDialog.showModal();
+        }
+
+        function confirmSummaryNextLevel() {
+            const nextLevel = parseInt(document.getElementById('summary-next-btn').getAttribute('data-target-level'));
+            summaryDialog.close();
+            if (nextLevel <= 3) {
+                navigateToLevel(nextLevel);
+            }
+        }
+    </script>
+</body>
+
+</html>

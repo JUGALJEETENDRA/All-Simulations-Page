@@ -1,0 +1,3292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Interactive Educational Simulation on Social, Legal, and Ethical Factors in Digital Business, Privacy, Trust, and Data Protection.">
+    <title>Digital Business & Transformation - Module 4.1 Simulation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            /* Theme Color Palette */
+            --red: #C62828;
+            --red-light: #EF5350;
+            --red-dark: #8E0000;
+            --red-deep: #5C0000;
+            --white: #FFFFFF;
+            --bg-main: #F8F9FA;
+            --bg-card: #FFFFFF;
+            --ink: #333333;
+            --ink-muted: #666666;
+            --border-color: #DDDDDD;
+            --border-highlight: #C62828;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            /* Level Indicator Colors */
+            --l1: #1565C0;
+            /* Blue - Privacy Awareness */
+            --l2: #2E7D32;
+            /* Green - Trust Builder */
+            --l3: #E65100;
+            /* Orange - Ethics */
+            --l4: #6A1B9A;
+            /* Purple - Data Defense */
+            --l5: #C62828;
+            /* Red - Survival Challenge */
+
+            /* Functional Colors */
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --warning: #FF9800;
+            --warning-bg: #FFF3E0;
+            --danger: #C62828;
+            --danger-bg: #FFEBEE;
+
+            /* Typography */
+            --body: 'Inter', sans-serif;
+            --display: 'Archivo Black', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            font-family: var(--body);
+            background: var(--bg-main);
+            color: var(--ink);
+            scroll-behavior: smooth;
+            line-height: 1.6;
+        }
+
+        /* ===== HERO HEADER ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            padding: 60px 24px 50px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            border-bottom: 5px solid var(--red-deep);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+            top: -400px;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-family: var(--display);
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            line-height: 1.15;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .hero p.sub {
+            font-size: clamp(0.95rem, 2vw, 1.2rem);
+            max-width: 800px;
+            margin-inline: auto;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px 80px;
+        }
+
+        /* ===== PROGRESS TRACKER ===== */
+        .progress-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .level-strip {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .lvl-pill {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 30px;
+            background: #EEEEEE;
+            border: 1px solid var(--border-color);
+            color: #777777;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .lvl-pill:hover {
+            background: #E0E0E0;
+            color: var(--ink);
+            border-color: var(--red-light);
+        }
+
+        .lvl-pill.active {
+            color: var(--white);
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            cursor: default;
+        }
+
+        .lvl-pill.active:hover {
+            color: var(--white);
+            border-color: transparent;
+        }
+
+        .lvl-pill.active.l1 {
+            background: var(--l1);
+        }
+
+        .lvl-pill.active.l2 {
+            background: var(--l2);
+        }
+
+        .lvl-pill.active.l3 {
+            background: var(--l3);
+        }
+
+        .lvl-pill.active.l4 {
+            background: var(--l4);
+        }
+
+        .lvl-pill.active.l5 {
+            background: var(--l5);
+        }
+
+        .lvl-pill.completed {
+            background: #E8F5E9;
+            color: var(--success);
+            border-color: #A5D6A7;
+        }
+
+        .lvl-pill.completed:hover {
+            background: #C8E6C9;
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .progress-bar-wrap {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(to right, var(--red-light), var(--red));
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ===== SCREENS ===== */
+        .simulation-screen {
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .simulation-screen.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CARDS & CONTAINERS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 5px 5px 0 rgba(198, 40, 40, 0.05);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover {
+            border-color: var(--red-light);
+            box-shadow: 7px 7px 0 rgba(198, 40, 40, 0.1);
+        }
+
+        .card h2 {
+            font-family: var(--display);
+            font-size: 1.6rem;
+            color: var(--red-dark);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            border-bottom: 3px solid var(--red);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .card p {
+            margin-bottom: 15px;
+            color: #444444;
+        }
+
+        .objective-badge {
+            background: rgba(198, 40, 40, 0.05);
+            border-left: 4px solid var(--red);
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .objective-badge strong {
+            color: var(--red-dark);
+            text-transform: uppercase;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            font-family: var(--display);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--red);
+            color: var(--white);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.2);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(198, 40, 40, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 6px rgba(198, 40, 40, 0.2);
+        }
+
+        .btn:disabled {
+            background: #CCCCCC;
+            color: #777777;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--red);
+            border: 2px solid var(--red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: rgba(198, 40, 40, 0.05);
+            color: var(--red-dark);
+            border-color: var(--red-dark);
+        }
+
+        /* ===== INTRO SCREEN ===== */
+        .intro-banner {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .intro-logo {
+            font-family: var(--display);
+            font-size: 2.2rem;
+            color: var(--red);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .intro-logo span {
+            color: var(--ink);
+        }
+
+        .features-list {
+            margin: 25px 0;
+            text-align: left;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-card {
+            background: #F9F9F9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .feature-card-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .feature-card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--red-dark);
+            margin-bottom: 4px;
+        }
+
+        .feature-card-desc {
+            font-size: 0.85rem;
+            color: var(--ink-muted);
+        }
+
+        /* ===== LEVEL 1: SPOT THE DIGITAL RISKS ===== */
+        .l1-instructions {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--ink-muted);
+        }
+
+        .l1-workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #F1F1F1;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed var(--border-color);
+            min-height: 100px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .practice-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ink);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        .practice-card:hover {
+            border-color: var(--red);
+            box-shadow: 4px 4px 0 rgba(198, 40, 40, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .practice-card:active {
+            cursor: grabbing;
+        }
+
+        .practice-card.selected {
+            border-color: var(--red);
+            background: rgba(198, 40, 40, 0.03);
+            box-shadow: 0 0 0 2px var(--red);
+        }
+
+        .sorting-zones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .drop-target {
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .drop-target.safe-zone {
+            background: #E8F5E9;
+            border: 2px dashed #81C784;
+        }
+
+        .drop-target.risky-zone {
+            background: #FFEBEE;
+            border: 2px dashed #E57373;
+        }
+
+        .drop-target.drag-over {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .drop-target.safe-zone.drag-over {
+            border-color: #2E7D32;
+            background: #C8E6C9;
+        }
+
+        .drop-target.risky-zone.drag-over {
+            border-color: #C62828;
+            background: #FFCDD2;
+        }
+
+        .drop-target h3 {
+            font-family: var(--display);
+            font-size: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .drop-target.safe-zone h3 {
+            color: #2E7D32;
+        }
+
+        .drop-target.risky-zone h3 {
+            color: #C62828;
+        }
+
+        .drop-target-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-grow: 1;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .drop-target-empty-msg {
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 0.85rem;
+            font-style: italic;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        /* ===== LEVEL 2: TRUST METER BUILDER ===== */
+        .scenario-box {
+            background: #F9F9F9;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 25px;
+        }
+
+        .scenario-number {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--red);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .scenario-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 20px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-item:hover {
+            border-color: var(--red);
+            background: rgba(198, 40, 40, 0.02);
+            transform: translateX(4px);
+        }
+
+        .option-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .option-item.selected {
+            border-color: var(--red);
+            background: rgba(198, 40, 40, 0.04);
+            font-weight: 600;
+        }
+
+        .option-item.selected .option-radio {
+            border-color: var(--red);
+            background: var(--red);
+        }
+
+        .option-item.selected .option-radio::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--white);
+        }
+
+        .trust-meter-container {
+            margin: 25px 0;
+            padding: 20px;
+            background: #F1F1F1;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .meter-label-wrap {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .meter-fill-bar {
+            background: rgba(0, 0, 0, 0.1);
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(to right, #EF5350, #C62828);
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.6s;
+        }
+
+        /* ===== LEVEL 3: ETHICAL DILEMMA SIMULATOR ===== */
+        .ethics-meter-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #F1F1F1;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ===== LEVEL 4: DATA PROTECTION DEFENSE ===== */
+        .matching-workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .matching-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .matching-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .matching-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .matching-column h4 {
+            font-family: var(--display);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--ink-muted);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .threat-node,
+        .defense-node {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .threat-node:hover,
+        .defense-node:hover {
+            border-color: var(--red-light);
+            background: rgba(198, 40, 40, 0.01);
+            transform: translateX(2px);
+        }
+
+        .threat-node.selected,
+        .defense-node.selected {
+            border-color: var(--red);
+            background: rgba(198, 40, 40, 0.05);
+            box-shadow: 0 0 0 2px var(--red);
+        }
+
+        .threat-node.paired {
+            border-style: solid;
+            background: #F9F9F9;
+            color: #888888;
+            cursor: not-allowed;
+            border-color: #E0E0E0;
+        }
+
+        .defense-node.paired {
+            border-style: solid;
+            background: #F9F9F9;
+            color: #888888;
+            cursor: not-allowed;
+            border-color: #E0E0E0;
+        }
+
+        .node-indicator {
+            font-size: 0.75rem;
+            font-family: var(--mono);
+            color: var(--ink-muted);
+        }
+
+        .pairs-list-container {
+            background: #F9F9F9;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .pairs-list-container h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--ink);
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .pairs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pair-row {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .pair-row-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pair-arrow {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        .btn-unpair {
+            background: none;
+            border: none;
+            color: var(--red);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-unpair:hover {
+            background: rgba(198, 40, 40, 0.05);
+            font-weight: 700;
+        }
+
+        /* ===== LEVEL 5: SURVIVAL CHALLENGE ===== */
+        .survival-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .survival-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .dashboard-metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .metric-title {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-family: var(--display);
+            font-size: 1.8rem;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-metric-card.trust .metric-value {
+            color: var(--l2);
+        }
+
+        .dashboard-metric-card.privacy .metric-value {
+            color: var(--l1);
+        }
+
+        .dashboard-metric-card.ethics .metric-value {
+            color: var(--l3);
+        }
+
+        .dashboard-metric-card.revenue .metric-value {
+            color: var(--red);
+        }
+
+        .metric-progress {
+            background: rgba(0, 0, 0, 0.05);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .metric-progress-bar {
+            height: 100%;
+            background: var(--red);
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s;
+        }
+
+        .dashboard-metric-card.trust .metric-progress-bar {
+            background: var(--l2);
+        }
+
+        .dashboard-metric-card.privacy .metric-progress-bar {
+            background: var(--l1);
+        }
+
+        .dashboard-metric-card.ethics .metric-progress-bar {
+            background: var(--l3);
+        }
+
+        .dashboard-metric-card.revenue .metric-progress-bar {
+            background: var(--red);
+        }
+
+        .survival-workspace {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .survival-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulation-console {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 320px;
+        }
+
+        .console-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .calendar-badge {
+            font-family: var(--display);
+            font-size: 1.1rem;
+            color: var(--red-dark);
+            background: rgba(198, 40, 40, 0.05);
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .simulation-control-btn {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        .console-screen {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: #FAFAFA;
+            border: 1px solid #EAEAEA;
+            margin-bottom: 15px;
+        }
+
+        .console-screen-content {
+            width: 100%;
+        }
+
+        .console-event-card {
+            text-align: left;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .console-event-badge {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--white);
+            background: var(--red);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .console-event-desc {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .console-event-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .console-event-option-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .console-event-option-btn:hover {
+            border-color: var(--red);
+            background: rgba(198, 40, 40, 0.02);
+        }
+
+        .business-log-container {
+            background: #1E1E1E;
+            border-radius: 12px;
+            padding: 20px;
+            color: #A9B2C3;
+            display: flex;
+            flex-direction: column;
+            height: 320px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .business-log-container h3 {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--white);
+            border-bottom: 1px solid #333333;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-terminal-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4CAF50;
+            display: inline-block;
+        }
+
+        .log-terminal-indicator.idle {
+            background: #FF9800;
+        }
+
+        .business-log-feed {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 5px;
+        }
+
+        .business-log-feed::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .business-log-feed::-webkit-scrollbar-thumb {
+            background: #444444;
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            line-height: 1.4;
+            border-left: 2px solid #444444;
+            padding-left: 8px;
+        }
+
+        .log-entry.event {
+            border-left-color: var(--red-light);
+            color: var(--white);
+        }
+
+        .log-entry.success {
+            border-left-color: #4CAF50;
+            color: #81C784;
+        }
+
+        .log-entry.warning {
+            border-left-color: #FFB74D;
+            color: #FFE082;
+        }
+
+        .log-entry.danger {
+            border-left-color: #E57373;
+            color: #EF9A9A;
+        }
+
+        .log-entry-day {
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* ===== FEEDBACK & EXPLANATION DIALOGS ===== */
+        .feedback-box {
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-box.correct {
+            background: var(--success-bg);
+            border-left: 4px solid var(--success);
+            color: var(--success);
+        }
+
+        .feedback-box.wrong {
+            background: var(--danger-bg);
+            border-left: 4px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .explanation-card {
+            background: #E3F2FD;
+            border-left: 4px solid #0D47A1;
+            border-radius: 0 10px 10px 0;
+            padding: 20px;
+            margin: 20px 0;
+            animation: fadeIn 0.4s;
+            display: none;
+        }
+
+        .explanation-card.active {
+            display: block;
+        }
+
+        .explanation-card h4 {
+            font-family: var(--display);
+            font-size: 0.95rem;
+            color: #0D47A1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .explanation-card p {
+            font-size: 0.95rem;
+            color: #1565C0;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .level-completion-explanation {
+            border: 2px solid var(--red-light);
+            background: #FFF8F8;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 25px 0;
+            display: none;
+            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .level-completion-explanation.active {
+            display: block;
+        }
+
+        .level-completion-explanation h3 {
+            font-family: var(--display);
+            color: var(--red-dark);
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--red-light);
+            padding-bottom: 6px;
+        }
+
+        .level-completion-explanation p {
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: var(--ink);
+        }
+
+        /* ===== LEVEL 1 ANALYSIS TABLE ===== */
+        .analysis-table-container {
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        table.analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        table.analysis-table th,
+        table.analysis-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        table.analysis-table th {
+            background: rgba(0, 0, 0, 0.03);
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        table.analysis-table td.correct-val {
+            color: var(--success);
+            font-weight: 700;
+            background: var(--success-bg);
+        }
+
+        table.analysis-table td.incorrect-val {
+            color: var(--danger);
+            font-weight: 700;
+            background: var(--danger-bg);
+        }
+
+        /* ===== FINAL SCREEN SUMMARY ===== */
+        .results-summary-card {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results-status-title {
+            font-family: var(--display);
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .results-status-title.success {
+            color: var(--success);
+        }
+
+        .results-status-title.needs-improvement {
+            color: var(--danger);
+        }
+
+        .results-metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 600px) {
+            .results-metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .results-metric-item {
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .results-metric-name {
+            font-size: 0.75rem;
+            font-family: var(--mono);
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            margin-bottom: 4px;
+        }
+
+        .results-metric-val {
+            font-family: var(--display);
+            font-size: 1.6rem;
+        }
+
+        .results-metric-item.good {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .results-metric-item.bad {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .evaluation-details {
+            text-align: left;
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .evaluation-details h3 {
+            font-family: var(--display);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            color: var(--red-dark);
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .eval-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .eval-list li {
+            position: relative;
+            padding-left: 24px;
+            font-size: 0.95rem;
+        }
+
+        .eval-list li.strength::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 900;
+        }
+
+        .eval-list li.improvement::before {
+            content: "⚠";
+            position: absolute;
+            left: 0;
+            color: var(--warning);
+            font-weight: 900;
+        }
+
+        .final-takeaway {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--ink-muted);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        /* ===== GENERAL STYLING HELPER ===== */
+        .center-btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        /* ===== LEVEL 2: TRUST DASHBOARD MANAGER ===== */
+        .l2-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .l2-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .l2-dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .l2-dashboard-card .metric-val {
+            font-family: var(--display);
+            font-size: 1.5rem;
+            margin-top: 5px;
+        }
+
+        .l2-workspace {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .l2-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .initiatives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #FAFAFA;
+        }
+
+        .initiative-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.03);
+            text-align: left;
+        }
+
+        .initiative-card:hover {
+            border-color: var(--red-light);
+            transform: translateY(-2px);
+        }
+
+        .initiative-card.added {
+            border-color: var(--success);
+            background-color: var(--success-bg);
+        }
+
+        .initiative-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .initiative-cost {
+            font-family: var(--mono);
+            color: var(--red);
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .initiative-details {
+            font-size: 0.82rem;
+            color: var(--ink-muted);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .initiative-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .initiative-impact-tag {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .initiative-impact-tag.high {
+            background: #E3F2FD;
+            color: #0D47A1;
+        }
+
+        .initiative-impact-tag.very-high {
+            background: #EDE7F6;
+            color: #5E35B1;
+        }
+
+        .initiative-impact-tag.medium {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .initiative-impact-tag.negative {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .plan-zone {
+            background: #F9F9F9;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .plan-item {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.02);
+            animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .plan-item-remove {
+            color: var(--red);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .plan-item-remove:hover {
+            background: var(--danger-bg);
+        }
+
+        /* ===== LEVEL 3: CRISIS MANAGEMENT ROOM ===== */
+        .l3-header-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 3px solid var(--red);
+            padding-bottom: 10px;
+        }
+
+        .l3-header-wrap h2 {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .crisis-timer {
+            font-family: var(--mono);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--danger);
+            background: var(--danger-bg);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .crisis-timer.hurry {
+            background: var(--danger);
+            color: var(--white);
+            animation: timerPulse 0.5s infinite alternate;
+        }
+
+        @keyframes timerPulse {
+            from {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(198, 40, 40, 0);
+            }
+
+            to {
+                transform: scale(1.05);
+                box-shadow: 0 0 10px rgba(198, 40, 40, 0.4);
+            }
+        }
+
+        .crisis-card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .crisis-incident-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--red-light);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
+        }
+
+        .crisis-incident-card.ignored {
+            border-left-color: #757575;
+            background: #F5F5F5;
+            opacity: 0.75;
+        }
+
+        .crisis-incident-card.remediated {
+            border-left-color: var(--success);
+            background: #FAFAFA;
+        }
+
+        .crisis-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--red-dark);
+            gap: 10px;
+        }
+
+        .crisis-desc {
+            font-size: 0.88rem;
+            color: var(--ink-muted);
+            line-height: 1.45;
+        }
+
+        .crisis-actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border-top: 1px solid #EEEEEE;
+            padding-top: 12px;
+            margin-top: 5px;
+        }
+
+        .crisis-btn-group {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .crisis-action-btn {
+            background: var(--white);
+            border: none;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-right: 1px solid var(--border-color);
+            color: var(--ink-muted);
+        }
+
+        .crisis-action-btn:last-child {
+            border-right: none;
+        }
+
+        .crisis-action-btn:hover {
+            background: #F5F5F5;
+            color: var(--ink);
+        }
+
+        .crisis-action-btn.selected[data-action="Immediate Fix"] {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .crisis-action-btn.selected[data-action="Investigate"] {
+            background: var(--warning-bg);
+            color: #B26A00;
+        }
+
+        .crisis-action-btn.selected[data-action="Public Communication"] {
+            background: #E3F2FD;
+            color: #0D47A1;
+        }
+
+        .crisis-action-btn.selected[data-action="Ignore"] {
+            background: #616161;
+            color: var(--white);
+        }
+
+        .priority-select-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .priority-select {
+            padding: 6px 10px;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--ink);
+            outline: none;
+        }
+
+        .priority-select:focus {
+            border-color: var(--red);
+        }
+
+        *:focus-visible {
+            outline: 3px solid var(--red-light);
+            outline-offset: 2px;
+        }
+
+        /* Theory Dashboard Panel style */
+        .theory-section {
+            background-color: var(--accent-blue-light);
+            border-left: 4px solid var(--accent-blue);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 20px;
+            font-size: 0.88rem;
+        }
+
+        .theory-title {
+            font-family: var(--display);
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== EDUCATIONAL REINFORCEMENT ===== */
+        .educational-reinforcement {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            text-align: left;
+        }
+        .educational-reinforcement h4 {
+            font-family: var(--display);
+            font-size: 0.95rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--accent-blue-light);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .reinforcement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .reinforcement-card {
+            background-color: #F8F9FA;
+            border: 1px solid #ECEFF1;
+            border-radius: 6px;
+            padding: 12px 15px;
+        }
+        .reinforcement-card strong {
+            font-size: 0.88rem;
+            color: var(--red-dark);
+            display: block;
+            margin-bottom: 6px;
+            font-family: var(--body);
+            font-weight: 700;
+        }
+        .reinforcement-card ul {
+            padding-left: 15px;
+            margin: 0;
+            font-size: 0.82rem;
+            color: var(--ink);
+        }
+        .reinforcement-card li {
+            margin-bottom: 4px;
+            text-align: left;
+        }
+        .reinforcement-card p {
+            font-size: 0.82rem;
+            color: var(--ink);
+            margin: 0;
+            line-height: 1.4;
+            text-align: left;
+        }
+        .textbook-summary {
+            background-color: var(--accent-blue-light);
+            border-radius: 6px;
+            padding: 12px 15px;
+            border-left: 4px solid var(--accent-blue);
+            margin-top: 10px;
+            text-align: left;
+        }
+        .textbook-summary strong {
+            font-size: 0.88rem;
+            color: var(--accent-blue);
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .textbook-summary p {
+            font-size: 0.82rem;
+            color: var(--ink);
+            margin: 0;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .dashboard-metric-card.legal .metric-value {
+            color: var(--l4);
+        }
+        .dashboard-metric-card.legal .metric-progress-bar {
+            background: var(--l4);
+        }
+
+        /* Persistent Footer Navigation */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="hero">
+        <h1>Digital Business &amp; Transformation</h1>
+        <p class="sub">Module 4.1: Social, Legal, and Ethical Factors in Digital Business, Privacy, Trust, and Data
+            Protection</p>
+    </header>
+
+    <!-- ===== MAIN SIMULATION WRAPPER ===== -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Social, Legal, and Ethical Factors (Module 4.1)
+                </h3>
+                <button class="btn btn-outline" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                    style="font-size: 0.75rem; padding: 4px 10px; height: auto;">Hide Reference</button>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--ink);">
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>1. Social, Legal &amp; Ethical Triad:</strong> Startups must
+                        balance social factors (public perception, customer loyalty, user demographics), legal factors
+                        (complying with regulations like GDPR, CCPA, and cyber laws), and ethical factors (doing what is
+                        right, avoiding manipulative dark patterns or silent tracking).</p>
+                    <p><strong>2. Digital Trust &amp; Transparency:</strong> Trust is a business asset. Implementing
+                        clear pricing, explicit consent, easy account deletion, and publishing transparency reports
+                        build customer satisfaction and loyalty, offsetting compliance costs.</p>
+                </div>
+                <div>
+                    <p style="margin-bottom: 10px;"><strong>3. Privacy &amp; Data Protection:</strong> Personal data
+                        collection requires consent. Storing passwords securely (hashing) and delegating financial
+                        transactions to PCI-compliant gateways reduces operational risks and legal liabilities.</p>
+                    <p><strong>4. Security Controls:</strong> Protecting data requires matching specific defenses to
+                        cyber threats: Firewalls for network entry attacks, Two-Factor Authentication (2FA) for
+                        credential protection, Access Controls to limit system access, Awareness Training to prevent
+                        phishing, and Encryption to secure data at rest and in transit.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PROGRESS BAR & LEVEL STATUS ===== -->
+        <section id="progress-section" class="progress-container" aria-label="Level Progress Tracker">
+            <div class="level-strip">
+                <div class="lvl-pill active l1" id="pill-l1">Level 1</div>
+                <div class="lvl-pill l2" id="pill-l2">Level 2</div>
+                <div class="lvl-pill l3" id="pill-l3">Level 3</div>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SCREEN: WELCOME / INTRODUCTION -->
+        <!-- ============================================================ -->
+        <section id="screen-welcome" class="simulation-screen active">
+            <div class="card">
+                <div class="intro-banner">
+                    <div class="intro-logo">Smart<span>Shop</span> Manager</div>
+                    <h3>Simulation Introduction &amp; Learning Objectives</h3>
+                </div>
+
+                <p>Welcome, Manager! You have just been appointed to lead the digital transformation of
+                    <strong>SmartShop</strong>, a growing e-commerce startup. In this simulation, you will make
+                    decisions to guide SmartShop through critical operational challenges while ensuring it remains
+                    trustworthy, ethically responsible, and legally compliant.</p>
+
+                <p>Throughout your journey, you will learn the vital importance of <strong>Social, Legal, and Ethical
+                        Factors</strong> in digital business. Balancing revenue with compliance, customer trust, and
+                    robust technical defense is the key to business survival in the modern digital age.</p>
+
+                <div class="objective-badge">
+                    <strong>Learning Objectives</strong>
+                    Identify safe and unsafe data protection practices, build customer trust through secure and transparent initiatives, and make ethically and legally responsible digital business decisions as described in Dave Chaffey's E-Business and E-Commerce Management (4th Edition).
+                </div>
+
+                <div class="features-list">
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🔎</div>
+                        <div>
+                            <div class="feature-card-title">Level 1: Privacy &amp; Data Protection Detective</div>
+                            <div class="feature-card-desc">Identify safe practices vs. privacy and security risks in online business environments.</div>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">🤝</div>
+                        <div>
+                            <div class="feature-card-title">Level 2: Customer Trust Builder</div>
+                            <div class="feature-card-desc">As an E-Business Manager, select secure and transparent initiatives to build customer confidence within a ₹100,000 budget.</div>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-card-icon">⚖️</div>
+                        <div>
+                            <div class="feature-card-title">Level 3: Ethical &amp; Legal Decision Simulator</div>
+                            <div class="feature-card-desc">As Chief Digital Officer, balance ethics, privacy, legal compliance, and trust across complex, real-world digital scenarios.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-btn-wrap">
+                    <button type="button" class="btn" id="btn-start-sim">
+                        Begin Simulation
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SCREEN: LEVEL 1 (Spot the Digital Risks) -->
+        <!-- ============================================================ -->
+        <section id="screen-l1" class="simulation-screen">
+            <div class="card">
+                <h2>Level 1: Privacy &amp; Data Protection Detective 🔎</h2>
+
+                <div class="objective-badge">
+                    <strong>Level Objective</strong>
+                    Analyze an online e-commerce environment and classify business practices into Safe Practices or Privacy/Data Protection Risks to ensure regulatory and ethical compliance.
+                </div>
+
+                <div class="l1-instructions">
+                    <p>Below are 12 business practices deployed across different components of the **SmartShop** online environment: <strong>Login Page, Registration Form, Checkout Page, User Profile, and Payment Screen</strong>.</p>
+                    <p style="margin-top: 10px;"><strong>Drag and drop</strong> each card into the correct category, or <strong>click a card, then click the category zone</strong> to sort it.</p>
+                </div>
+
+                <div class="l1-workspace">
+                    <!-- Cards Pool -->
+                    <div class="card-pool" id="l1-card-pool" aria-label="Unsorted Practices Pool">
+                        <!-- Practices will be inserted via JS -->
+                    </div>
+
+                    <!-- Sorting Zones -->
+                    <div class="sorting-zones">
+                        <div class="drop-target safe-zone" id="l1-target-safe" data-category="safe">
+                            <h3>✔ Safe Practices</h3>
+                            <div class="drop-target-content" id="l1-safe-content">
+                                <div class="drop-target-empty-msg">Drop Safe Practices Here</div>
+                            </div>
+                        </div>
+
+                        <div class="drop-target risky-zone" id="l1-target-risky" data-category="risky">
+                            <h3>❌ Privacy/Data Protection Risks</h3>
+                            <div class="drop-target-content" id="l1-risky-content">
+                                <div class="drop-target-empty-msg">Drop Risky Practices Here</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="center-btn-wrap">
+                    <button type="button" class="btn" id="btn-submit-l1">Submit Sorting</button>
+                </div>
+
+                <!-- Explanation / feedback at level end -->
+                <div id="l1-completion-box" class="level-completion-explanation">
+                    <h3>Privacy Analysis Completed</h3>
+                    <p>Separating safe practices from privacy risks is critical to digital business compliance and protecting consumer personal information. Let's analyze your results:</p>
+
+                    <div class="analysis-table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Business Practice &amp; Area</th>
+                                    <th>Your Category</th>
+                                    <th>Result</th>
+                                    <th>Detailed Educational Feedback</th>
+                                </tr>
+                            </thead>
+                            <tbody id="l1-analysis-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Educational Reinforcement Panel -->
+                    <div class="educational-reinforcement">
+                        <h4>🎓 Academic Reinforcement &amp; Textbook Connection</h4>
+                        <div class="reinforcement-grid">
+                            <div class="reinforcement-card">
+                                <strong>Key Learning Points:</strong>
+                                <ul>
+                                    <li>Data protection requires both technical security controls (encryption, hashing) and administrative policies (privacy policies, consent).</li>
+                                    <li>Safe practices like 2FA, HTTPS, and regular updates mitigate threat risk and comply with global laws.</li>
+                                    <li>Unsecure systems (unencrypted forms, open Wi-Fi access) and excessive collection trigger severe trust and compliance failures.</li>
+                                </ul>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Common Mistakes:</strong>
+                                <ul>
+                                    <li>Assuming that security features (like firewalls) alone cover user privacy; compliance also requires clear disclosures and consent.</li>
+                                    <li>Collecting extraneous details "just in case," which directly violates the data minimization principle.</li>
+                                </ul>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Real Business Applications:</strong>
+                                <p>E-commerce merchants route financial transactions through certified PCI-DSS payment gateways (e.g., Stripe, PayPal) to offload liability and secure customer transactions.</p>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Relation to Digital Business:</strong>
+                                <p>Customers are highly sensitive to data collection. Reassuring them with transparent cookie consent banners and encrypted profiles leads to higher registration rates and transactions.</p>
+                            </div>
+                        </div>
+                        <div class="textbook-summary">
+                            <strong>Textbook Summary (Dave Chaffey):</strong>
+                            <p>As described in <em>E-Business and E-Commerce Management (4th Edition)</em>, data protection is a primary legal requirement for digital business operations. Managers must implement fair information practices, publish clear privacy statements, ensure customer consent prior to tracking, and use industry-standard encryption to protect personal information.</p>
+                        </div>
+                    </div>
+
+                    <div class="center-btn-wrap" style="margin-top: 25px;">
+                        <button type="button" class="btn" id="btn-next-l2">Proceed to Level 2</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SCREEN: LEVEL 2 (Trust Dashboard Manager) -->
+        <!-- ============================================================ -->
+        <section id="screen-l2" class="simulation-screen">
+            <div class="card">
+                <h2>Level 2: Customer Trust Builder 🤝</h2>
+
+                <div class="objective-badge">
+                    <strong>Level Objective</strong>
+                    As an E-Business Manager, select secure, transparent, and privacy-conscious initiatives to build Customer Trust to at least 80% while staying within the launch budget of ₹100,000.
+                </div>
+
+                <!-- Trust Dashboard Metrics -->
+                <div class="l2-dashboard" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div class="l2-dashboard-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-align: center;">
+                        <div class="metric-title" style="color: var(--l2); font-family: var(--mono); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Customer Trust Meter</div>
+                        <div class="metric-val" id="l2-trust-val" style="font-family: var(--display); font-size: 2.2rem; font-weight: 800; color: var(--l2); margin-top: 5px;">0%</div>
+                        <div class="metric-progress" style="margin-top: 8px; height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden;">
+                            <div class="metric-progress-bar" id="l2-trust-bar"
+                                style="width: 0%; background: var(--l2); height: 100%; transition: width 0.4s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="l2-dashboard-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-align: center;">
+                        <div class="metric-title" style="color: var(--red); font-family: var(--mono); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Remaining Budget</div>
+                        <div class="metric-val" id="l2-budget-val" style="font-family: var(--display); font-size: 2.2rem; font-weight: 800; color: var(--ink); margin-top: 5px;">₹100,000</div>
+                        <div class="metric-progress" style="margin-top: 8px; height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden;">
+                            <div class="metric-progress-bar" id="l2-budget-bar"
+                                style="width: 100%; background: var(--red); height: 100%; transition: width 0.4s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="l2-instructions mb-20">
+                    <p>Select initiatives from the **Available Options** to add them to your **Company Plan**. You must satisfy the target constraint: <strong>Customer Trust >= 80%</strong> and <strong>Spent Budget <= ₹100,000</strong>.</p>
+                </div>
+
+                <!-- Workspace Grid -->
+                <div class="l2-workspace mb-20" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 25px;">
+                    <div>
+                        <h3 class="mb-20">Available Options</h3>
+                        <div class="initiatives-grid" id="l2-initiatives-grid">
+                            <!-- Initiatives cards dynamically loaded -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="mb-20">Selected Company Plan</h3>
+                        <div class="plan-zone" id="l2-plan-zone">
+                            <!-- Selected initiatives populated here -->
+                            <div class="drop-target-empty-msg" id="l2-plan-empty">No initiatives added yet. Select options on the left to allocate budget.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit and Feedback -->
+                <div id="l2-feedback" class="feedback-box wrong">
+                    Plan targets not met! Customer Trust must reach at least 80% and spent budget must not exceed ₹100,000. Adjust your selections and try again.
+                </div>
+
+                <div class="center-btn-wrap">
+                    <button type="button" class="btn" id="btn-submit-l2">Submit Company Plan</button>
+                </div>
+
+                <!-- Level Completion Box -->
+                <div id="l2-completion-box" class="level-completion-explanation">
+                    <h3>Trust Building Completed</h3>
+                    <p>Customer trust is built through secure, reliable, transparent, and privacy-conscious business practices, rather than superficial website enhancements.</p>
+
+                    <!-- Educational Reinforcement Panel -->
+                    <div class="educational-reinforcement">
+                        <h4>🎓 Academic Reinforcement &amp; Textbook Connection</h4>
+                        <div class="reinforcement-grid">
+                            <div class="reinforcement-card">
+                                <strong>Key Learning Points:</strong>
+                                <ul>
+                                    <li>Trust is a multi-dimensional construct comprising Security, Privacy, Reliability, Transparency, and Reputation.</li>
+                                    <li>Direct trust drivers (SSL, Secure Payment Gateways, Audits) significantly mitigate perceived risk and build transaction confidence.</li>
+                                    <li>Misleading/cosmetic investments (decorative graphics, fancy designs) may attract users but do not establish transactional trust.</li>
+                                </ul>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Common Mistakes:</strong>
+                                <ul>
+                                    <li>Spending budget on cosmetic elements (fancy designs, animations) at the expense of fundamental security controls like SSL or payment gateways.</li>
+                                    <li>Relying on random sales promotions to offset trust deficits caused by poor transparency or lack of security.</li>
+                                </ul>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Real Business Applications:</strong>
+                                <p>Major e-commerce companies build customer confidence by publishing detailed seller profiles, enabling verified consumer reviews, and offering transparent return processes.</p>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Relation to Digital Business:</strong>
+                                <p>Digital platforms suffer from information asymmetry (sellers know more than buyers). High trust signals overcome buyer hesitation, increasing conversions and retention.</p>
+                            </div>
+                        </div>
+                        <div class="textbook-summary">
+                            <strong>Textbook Summary (Dave Chaffey):</strong>
+                            <p>As described in <em>E-Business and E-Commerce Management (4th Edition)</em>, building customer trust is key to digital brand adoption. Customer trust is created by combining security (SSL, secure transactions), privacy (respecting data), transparency (contact info, clear policies), and reliability (delivery, return policies). Strategic investments in trust reduce perceived buyer risk and build long-term relationships.</p>
+                        </div>
+                    </div>
+
+                    <div class="center-btn-wrap" style="margin-top: 25px;">
+                        <button type="button" class="btn" id="btn-next-l3">Proceed to Level 3</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- SCREEN: LEVEL 3 (Crisis Management Room) -->
+        <!-- ============================================================ -->
+        <section id="screen-l3" class="simulation-screen">
+            <div class="card">
+                <h2>Level 3: Ethical &amp; Legal Decision Simulator ⚖️</h2>
+
+                <div class="objective-badge">
+                    <strong>Level Objective</strong>
+                    As Chief Digital Officer, balance ethics, privacy, legal compliance, and customer trust while resolving complex real-world digital business scenarios.
+                </div>
+
+                <!-- CDO Dashboard Metrics (reused from Level 5 style) -->
+                <div class="survival-dashboard" id="l3-dashboard" style="margin-bottom: 25px;">
+                    <div class="dashboard-metric-card trust">
+                        <div class="metric-title">Customer Trust</div>
+                        <div class="metric-value" id="l3-trust-val">50%</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar" id="l3-trust-bar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-metric-card privacy">
+                        <div class="metric-title">Privacy Protection</div>
+                        <div class="metric-value" id="l3-privacy-val">50%</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar" id="l3-privacy-bar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-metric-card ethics">
+                        <div class="metric-title">Ethical Reputation</div>
+                        <div class="metric-value" id="l3-ethics-val">50%</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar" id="l3-ethics-bar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-metric-card legal">
+                        <div class="metric-title">Legal Compliance</div>
+                        <div class="metric-value" id="l3-legal-val">50%</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar" id="l3-legal-bar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario Container -->
+                <div class="scenario-box" id="l3-scenario-box" style="margin-bottom: 25px;">
+                    <div class="scenario-number" id="l3-scenario-number" style="font-family: var(--mono); font-size: 0.85rem; color: var(--red); font-weight: 700; margin-bottom: 6px;">Scenario 1 of 5</div>
+                    <div class="scenario-text" id="l3-scenario-text" style="font-size: 1.15rem; font-weight: 600; color: var(--ink); margin-bottom: 20px;">Scenario description here...</div>
+                    
+                    <div class="options-list" id="l3-options-list">
+                        <!-- Options populated via JS -->
+                    </div>
+                </div>
+
+                <!-- Educational Feedback Box (Hidden initially) -->
+                <div id="l3-decision-feedback" class="feedback-box" style="display: none; line-height: 1.6; margin-bottom: 25px; padding: 20px; border-radius: 8px;">
+                    <!-- Feedback contents populated via JS -->
+                </div>
+
+                <div class="center-btn-wrap" style="margin-bottom: 20px;">
+                    <button type="button" class="btn" id="btn-submit-decision">Confirm Decision</button>
+                    <button type="button" class="btn" id="btn-next-scenario" style="display: none;">Next Scenario</button>
+                </div>
+
+                <!-- Level Completion Box -->
+                <div id="l3-completion-box" class="level-completion-explanation">
+                    <h3>Simulation Concluded</h3>
+                    <p id="l3-completion-summary-text">Congratulations! You have completed the Ethical &amp; Legal Decision Simulator.</p>
+                    
+                    <!-- Educational Reinforcement Panel -->
+                    <div class="educational-reinforcement" id="l3-reinforcement">
+                        <h4>🎓 Academic Reinforcement &amp; Textbook Connection</h4>
+                        <div class="reinforcement-grid">
+                            <div class="reinforcement-card">
+                                <strong>Key Learning Points:</strong>
+                                <ul>
+                                    <li>Chief Digital Officers must balance business strategy with ethical practices and legal frameworks.</li>
+                                    <li>Data collection and location tracking should always rely on explicit user opt-in rather than silent tracking.</li>
+                                    <li>Deceptive online practices (dark patterns, hidden cancellation) destroy trust and violate consumer protection law.</li>
+                                </ul>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Common Mistakes:</strong>
+                                <ul>
+                                    <li>Prioritizing short-term data broker payout over customer privacy, which triggers long-term customer boycott and legal penalties.</li>
+                                    <li>Assuming employee monitoring can be done secretly without transparent communication policies.</li>
+                                </ul>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Real Business Applications:</strong>
+                                <p>Major software ecosystems (like iOS ATT) require explicit customer consent before letting third-party cookies track user profiles across apps.</p>
+                            </div>
+                            <div class="reinforcement-card">
+                                <strong>Relation to Digital Business:</strong>
+                                <p>Long-term relationships with digital customers are built on mutual respect and digital responsibility. High ethical standards reduce regulatory compliance costs and build a robust brand reputation.</p>
+                            </div>
+                        </div>
+                        <div class="textbook-summary">
+                            <strong>Textbook Summary (Dave Chaffey):</strong>
+                            <p>As described in <em>E-Business and E-Commerce Management (4th Edition)</em>, managers must balance social, legal, and ethical factors in their micro and macro environment. Responsible digital business models require explicit consent, data anonymization, transparent tracking, respect for accessibility and inclusion, and avoidance of deceptive designs (dark patterns) to ensure digital sustainability.</p>
+                        </div>
+                    </div>
+
+                    <div class="center-btn-wrap" style="margin-top: 25px;">
+                        <button type="button" class="btn" id="btn-restart-sim-l3">Restart Simulation</button>
+                    </div>
+                </div>
+            </div>
+    <!-- Persistent Bottom Nav Bar (No Lock Level Navigation) -->
+    <div class="nav-footer" id="navigationFooter" style="display: none;">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Level</button>
+            <div style="font-family: var(--font-display); font-weight: 700; color: var(--red); font-size: 0.95rem;"
+                id="footerLevelText">
+                Level 1 of 3
+            </div>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    </main>
+
+    <!-- ===== JS SIMULATION CONTROLLER ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ============================================================
+            // GAME STATE MANAGEMENT
+            // ============================================================
+            const gameState = {
+                currentLevel: 0, // 0: Welcome, 1-3: Levels
+                levelsCompleted: [false, false, false], // track completed levels
+                levelProgressPercentages: [0, 50, 100],
+
+                // Level 1: Sorting Practices state (12 practices)
+                l1: {
+                    practices: [
+                        { id: 'p1', text: '[Login Page] Strong Password Policy', category: 'safe', explanation: 'Enforcing password strength complexity prevents unauthorized account takeovers via brute-force, safeguarding user profiles and improving customer trust.' },
+                        { id: 'p2', text: '[Payment Screen] HTTPS Encryption', category: 'safe', explanation: 'HTTPS encrypts communications between the browser and server, defending sensitive checkout entries (like cards) from packet-sniffing.' },
+                        { id: 'p3', text: '[Login Page] Two-Factor Authentication', category: 'safe', explanation: '2FA adds a second verification factor. Even if credentials leak, account security is preserved, protecting profile privacy.' },
+                        { id: 'p4', text: '[User Profile] Public Customer Database', category: 'risky', explanation: 'Leaving database repositories exposed to the public allows anyone to harvest data, causing total privacy loss and severe legal violations.' },
+                        { id: 'p5', text: '[Payment Screen] Unencrypted Payment Form', category: 'risky', explanation: 'Collecting financial details over HTTP sends data in plaintext, exposing credit cards to interception, which destroys customer confidence.' },
+                        { id: 'p6', text: '[Registration Form] Excessive Data Collection', category: 'risky', explanation: 'Demanding redundant information (e.g. hobbies) violates GDPR\'s data minimization principle and reduces signup confidence.' },
+                        { id: 'p7', text: '[Registration Form] Privacy Policy', category: 'safe', explanation: 'A linked privacy policy transparently outlines how data is gathered and stored, complying with global regulations.' },
+                        { id: 'p8', text: '[Registration Form] Cookie Consent', category: 'safe', explanation: 'A cookie consent manager ensures customer consent is granted prior to activating tracker scripts, respecting user choice.' },
+                        { id: 'p9', text: '[Checkout Page] Secure Payment Gateway', category: 'safe', explanation: 'Integrating PCI-compliant gateways (Stripe/PayPal) ensures secure payment operations and offloads transaction liability.' },
+                        { id: 'p10', text: '[Checkout Page] Open Wi-Fi Access', category: 'risky', explanation: 'Allowing users to make checkouts over unencrypted public Wi-Fi exposes credentials to local eavesdroppers.' },
+                        { id: 'p11', text: '[User Profile] Data Encryption', category: 'safe', explanation: 'Encrypting data at rest (AES-256) protects customer information columns from hacker breaches, ensuring compliance.' },
+                        { id: 'p12', text: '[Payment Screen] Regular Security Updates', category: 'safe', explanation: 'Routine security updates patch system flaws before exploits occur, establishing system reliability.' }
+                    ],
+                    selectedCardId: null,
+                    allocations: {
+                        safe: [],
+                        risky: []
+                    },
+                    completed: false
+                },
+
+                // Level 2: Trust Manager state
+                l2: {
+                    budget: 100000,
+                    trust: 0,
+                    selectedInitiatives: [],
+                    initiatives: [
+                        { id: 'i1', name: 'SSL Certificate', cost: 15000, trust: 15, impact: 'High', desc: 'Secure data transit via HTTP encryption.', feedback: 'Enables HTTPS. It secures customer communications, preventing data sniffing and building immediate checkout trust.' },
+                        { id: 'i2', name: 'Privacy Policy', cost: 10000, trust: 10, impact: 'Medium', desc: 'Mandatory documentation explaining data use.', feedback: 'Builds trust through transparency, letting customers know exactly how their personal information is protected.' },
+                        { id: 'i3', name: 'Secure Payment Gateway', cost: 30000, trust: 25, impact: 'Very High', desc: 'PCI-compliant checkout tokenization systems.', feedback: 'Delegates payment details handling to certified partners, protecting transactions and eliminating card theft risks.' },
+                        { id: 'i4', name: 'Two-Factor Authentication', cost: 20000, trust: 10, impact: 'Medium', desc: 'Mandatory multi-factor verification for accounts.', feedback: 'Prevents credential breaches, protecting user profiles and increasing safety confidence.' },
+                        { id: 'i5', name: 'Verified Customer Reviews', cost: 15000, trust: 10, impact: 'Medium', desc: 'Display authentic, unmoderated client ratings.', feedback: 'Builds trust through reputation and reliability, proving that the business delivers on its promises.' },
+                        { id: 'i6', name: 'Transparent Return Policy', cost: 10000, trust: 10, impact: 'Medium', desc: 'No-fuss returns and refund guidelines.', feedback: 'Establishes operational transparency and reliability, reassuring hesitant digital buyers.' },
+                        { id: 'i7', name: 'Contact Information', cost: 5000, trust: 5, impact: 'Low', desc: 'Accessible support lines and address listings.', feedback: 'Demonstrates business legitimacy and transparency, proving you are not a phantom website.' },
+                        { id: 'i8', name: 'Data Encryption', cost: 20000, trust: 15, impact: 'High', desc: 'Secure customer databases using AES-256.', feedback: 'Defends database entries from breaches, ensuring legal compliance and customer data protection.' },
+                        { id: 'i9', name: 'Regular Security Audits', cost: 25000, trust: 15, impact: 'High', desc: 'Routine external penetration assessments.', feedback: 'Ensures system reliability and verifies that vulnerabilities are patched, building a solid reputation.' },
+                        { id: 'i10', name: 'Fancy Website Design', cost: 15000, trust: 0, impact: 'Neutral', desc: 'Premium visual stylesheet and custom graphics.', feedback: 'Improves appearance and attracts visitors, but does not provide technical security or transparency.' },
+                        { id: 'i11', name: 'Excessive Animations', cost: 10000, trust: 0, impact: 'Neutral', desc: 'Elaborate scroll transitions and loading effects.', feedback: 'UI animations do not increase trust and can hurt accessibility and load performance.' },
+                        { id: 'i12', name: 'Random Discounts', cost: 20000, trust: 0, impact: 'Neutral', desc: 'Pop-up coupon codes offering sale price cuts.', feedback: 'Attracts traffic and drives short-term clicks, but does not secure customer data or build long-term trust.' },
+                        { id: 'i13', name: 'Decorative Graphics', cost: 5000, trust: 0, impact: 'Neutral', desc: 'Aesthetic stock illustrations and banner graphics.', feedback: 'Stock illustrations are cosmetic; they have no effect on security, transparency, or compliance.' }
+                    ],
+                    completed: false
+                },
+
+                // Level 3: CDO Decision state (5 scenarios)
+                l3: {
+                    trust: 50,
+                    privacy: 50,
+                    ethics: 50,
+                    legal: 50,
+                    currentScenarioIndex: 0,
+                    selectedOptionIndex: null,
+                    completed: false,
+                    scenarios: [
+                        {
+                            id: 's1',
+                            title: 'Selling Customer Email Addresses',
+                            desc: 'The marketing department suggests selling customer email address lists to third-party advertisers to generate immediate operational cash flow.',
+                            choices: [
+                                {
+                                    text: 'Sell customer email lists immediately without notice.',
+                                    feedback: 'Unethical & Illegal. Selling user emails without consent violates data protection laws (GDPR/CCPA) and breaks trust. Customer profiles are exposed to spam, causing a severe drop in trust, privacy, and ethics.',
+                                    trust: -30, privacy: -30, ethics: -30, legal: -30
+                                },
+                                {
+                                    text: 'Request explicit customer consent (opt-in) before sharing data.',
+                                    feedback: 'Ethical & Legal. Proposing a transparent opt-in banner ensures compliance with data protection laws. Customers feel respected and trust increases.',
+                                    trust: 15, privacy: 15, ethics: 15, legal: 20
+                                },
+                                {
+                                    text: 'Anonymize and aggregate the data before sharing.',
+                                    feedback: 'Ethical & Legal. Aggregating data so individual users cannot be identified protects personal identity. It ensures compliance and maintains ethical standing.',
+                                    trust: 10, privacy: 20, ethics: 15, legal: 15
+                                },
+                                {
+                                    text: 'Reject the proposal to protect user privacy.',
+                                    feedback: 'Highly Ethical. Refusing to monetize user emails demonstrates deep digital responsibility, maximizing trust and ethical reputation.',
+                                    trust: 20, privacy: 20, ethics: 20, legal: 10
+                                }
+                            ]
+                        },
+                        {
+                            id: 's2',
+                            title: 'Customer Location Information',
+                            desc: 'The product team wants to collect background location data from customer devices to optimize delivery route planning and ad targeting.',
+                            choices: [
+                                {
+                                    text: 'Always collect location data silently in the background.',
+                                    feedback: 'Unethical & Illegal. Silent tracking violates privacy rights and electronic transaction norms, inviting massive regulatory fines and customer outrage when discovered.',
+                                    trust: -30, privacy: -35, ethics: -30, legal: -25
+                                },
+                                {
+                                    text: 'Collect location data only with informed customer consent.',
+                                    feedback: 'Ethical & Legal. Providing a clear pop-up explaining *why* location data is needed ensures legal compliance and builds reliability.',
+                                    trust: 15, privacy: 15, ethics: 15, legal: 20
+                                },
+                                {
+                                    text: 'Provide a clear opt-in prompt and let users opt out anytime.',
+                                    feedback: 'Highly Ethical. Giving customers active control over their data collection preferences builds transparency and trust, aligning with modern best practices.',
+                                    trust: 20, privacy: 20, ethics: 20, legal: 20
+                                },
+                                {
+                                    text: 'Collect location details secretly but delete them after 24 hours.',
+                                    feedback: 'Unethical. Silent collection is still a violation of privacy rights and legal rules, regardless of retention length. It damages reputation.',
+                                    trust: -20, privacy: -25, ethics: -25, legal: -20
+                                }
+                            ]
+                        },
+                        {
+                            id: 's3',
+                            title: 'Subscription & Account Cancellation Process',
+                            desc: 'The marketing team suggests complicating the account deletion process by hiding the cancellation button to reduce user churn rates.',
+                            choices: [
+                                {
+                                    text: 'Hide the cancellation button in sub-menus (Dark Pattern).',
+                                    feedback: 'Unethical & Deceptive. Employing manipulative dark patterns breaks trust and violates consumer protection guidelines. Reputation takes severe damage.',
+                                    trust: -25, privacy: -10, ethics: -25, legal: -15
+                                },
+                                {
+                                    text: 'Require customers to call support during business hours to cancel.',
+                                    feedback: 'Unethical. Forcing unnecessary, friction-filled steps onto customers reduces convenience and hurts digital reputation.',
+                                    trust: -20, privacy: -5, ethics: -20, legal: -10
+                                },
+                                {
+                                    text: 'Provide a clear, simple 1-click cancellation process.',
+                                    feedback: 'Highly Ethical & Customer-Centric. Offering a simple cancellation option builds long-term customer relationships and complies with consumer rights.',
+                                    trust: 20, privacy: 10, ethics: 20, legal: 15
+                                },
+                                {
+                                    text: 'Delay processing of cancellation requests by 14 days.',
+                                    feedback: 'Unethical. Artificially stalling cancellation violates customer expectations and fair marketing guidelines, reducing trust.',
+                                    trust: -15, privacy: -5, ethics: -15, legal: -10
+                                }
+                            ]
+                        },
+                        {
+                            id: 's4',
+                            title: 'Remote Employee Activity Monitoring',
+                            desc: 'To verify employee productivity during remote work, the operations manager proposes installing background software that records keystrokes and screen content.',
+                            choices: [
+                                {
+                                    text: 'Install spyware silently on all employee-issued laptops.',
+                                    feedback: 'Unethical & Illegal. Hidden surveillance violates workplace privacy laws and destroys employee trust, leading to ethical issues and employee boycotts.',
+                                    trust: -20, privacy: -30, ethics: -25, legal: -15
+                                },
+                                {
+                                    text: 'Deploy transparent monitoring with clear, written policies.',
+                                    feedback: 'Legal & Balanced. Disclosing monitoring purposes and parameters ensures legal compliance and respects workplace expectations.',
+                                    trust: 10, privacy: 10, ethics: 15, legal: 15
+                                },
+                                {
+                                    text: 'Monitor only business system access logs (e.g. email, CRM).',
+                                    feedback: 'Ethical & Less Invasive. Limiting tracking to business-critical systems balances security concerns with worker privacy rights.',
+                                    trust: 15, privacy: 15, ethics: 20, legal: 15
+                                },
+                                {
+                                    text: 'Refuse keylogger software; evaluate performance on output, not surveillance.',
+                                    feedback: 'Highly Ethical. Prioritizing output-based performance reviews over continuous device surveillance respects worker dignity and maximizes reputation.',
+                                    trust: 20, privacy: 20, ethics: 20, legal: 20
+                                }
+                            ]
+                        },
+                        {
+                            id: 's5',
+                            title: 'Third-Party Access to Personal Data',
+                            desc: 'An external marketing partner requests access to SmartShop\'s raw customer demographic database to conduct a joint promotional campaign.',
+                            choices: [
+                                {
+                                    text: 'Share the raw demographic database immediately.',
+                                    feedback: 'Unethical & Illegal. Exposing raw user details to third parties without consent violates data protection laws, destroying trust and privacy scores.',
+                                    trust: -30, privacy: -35, ethics: -30, legal: -30
+                                },
+                                {
+                                    text: 'Sell the raw customer database in exchange for platform credit.',
+                                    feedback: 'Illegal & Severe Breach. Monetizing client records without permission triggers maximum regulatory fines and a complete loss of market trust.',
+                                    trust: -35, privacy: -35, ethics: -35, legal: -30
+                                },
+                                {
+                                    text: 'Verify the partner\'s legal authority and demand clear user consent.',
+                                    feedback: 'Legal & Secure. Verifying legal authority and checking consent criteria keeps data handling secure, complying with regulations.',
+                                    trust: 20, privacy: 20, ethics: 20, legal: 25
+                                },
+                                {
+                                    text: 'Refuse all requests to share customer data regardless of legal authority.',
+                                    feedback: 'Slightly Illegal. While protective, absolute refusal of court subpoenas or lawful law enforcement requests can lead to legal non-compliance penalties.',
+                                    trust: 10, privacy: 15, ethics: 10, legal: -10
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+
+            // ============================================================
+            // DOM SELECTORS
+            // ============================================================
+            const screens = {
+                welcome: document.getElementById('screen-welcome'),
+                l1: document.getElementById('screen-l1'),
+                l2: document.getElementById('screen-l2'),
+                l3: document.getElementById('screen-l3')
+            };
+
+            const progressSection = document.getElementById('progress-section');
+            const progressBar = document.getElementById('progress-bar');
+            const pills = {
+                l1: document.getElementById('pill-l1'),
+                l2: document.getElementById('pill-l2'),
+                l3: document.getElementById('pill-l3')
+            };
+
+            // Welcome buttons
+            const btnStartSim = document.getElementById('btn-start-sim');
+
+            // Level 1 selectors
+            const l1CardPool = document.getElementById('l1-card-pool');
+            const l1SafeContent = document.getElementById('l1-safe-content');
+            const l1RiskyContent = document.getElementById('l1-risky-content');
+            const btnSubmitL1 = document.getElementById('btn-submit-l1');
+            const l1CompletionBox = document.getElementById('l1-completion-box');
+            const l1AnalysisTbody = document.getElementById('l1-analysis-tbody');
+            const btnNextL2 = document.getElementById('btn-next-l2');
+
+            // Level 2 selectors
+            const l2TrustVal = document.getElementById('l2-trust-val');
+            const l2TrustBar = document.getElementById('l2-trust-bar');
+            const l2BudgetVal = document.getElementById('l2-budget-val');
+            const l2BudgetBar = document.getElementById('l2-budget-bar');
+            const l2InitiativesGrid = document.getElementById('l2-initiatives-grid');
+            const l2PlanZone = document.getElementById('l2-plan-zone');
+            const l2Feedback = document.getElementById('l2-feedback');
+            const btnSubmitL2 = document.getElementById('btn-submit-l2');
+            const l2CompletionBox = document.getElementById('l2-completion-box');
+            const btnNextL3 = document.getElementById('btn-next-l3');
+
+            // Level 3 selectors
+            const l3TrustVal = document.getElementById('l3-trust-val');
+            const l3TrustBar = document.getElementById('l3-trust-bar');
+            const l3PrivacyVal = document.getElementById('l3-privacy-val');
+            const l3PrivacyBar = document.getElementById('l3-privacy-bar');
+            const l3EthicsVal = document.getElementById('l3-ethics-val');
+            const l3EthicsBar = document.getElementById('l3-ethics-bar');
+            const l3LegalVal = document.getElementById('l3-legal-val');
+            const l3LegalBar = document.getElementById('l3-legal-bar');
+
+            const l3ScenarioBox = document.getElementById('l3-scenario-box');
+            const l3ScenarioNumber = document.getElementById('l3-scenario-number');
+            const l3ScenarioText = document.getElementById('l3-scenario-text');
+            const l3OptionsList = document.getElementById('l3-options-list');
+            const l3DecisionFeedback = document.getElementById('l3-decision-feedback');
+
+            const btnSubmitDecision = document.getElementById('btn-submit-decision');
+            const btnNextScenario = document.getElementById('btn-next-scenario');
+            const l3CompletionBox = document.getElementById('l3-completion-box');
+            const btnRestartSimL3 = document.getElementById('btn-restart-sim-l3');
+
+            // ============================================================
+            // NAVIGATION & CORE ROUTING
+            // ============================================================
+            function showScreen(screenId) {
+                // Hide all screens
+                Object.values(screens).forEach(screen => {
+                    if (screen) screen.classList.remove('active');
+                });
+
+                // Show requested screen
+                if (screens[screenId]) {
+                    screens[screenId].classList.add('active');
+                }
+
+                // Update overall progress bar
+                let levelNum = 0;
+                if (screenId === 'welcome') {
+                    progressSection.style.display = 'block';
+                    document.getElementById('theory-dashboard-card').style.display = 'none';
+                    document.getElementById('navigationFooter').style.display = 'none';
+                    levelNum = 0;
+                } else {
+                    progressSection.style.display = 'block';
+                    document.getElementById('theory-dashboard-card').style.display = 'block';
+                    document.getElementById('navigationFooter').style.display = 'flex';
+                    if (screenId === 'l1') levelNum = 1;
+                    else if (screenId === 'l2') levelNum = 2;
+                    else if (screenId === 'l3') levelNum = 3;
+                    document.getElementById('footerLevelText').innerText = `Level ${levelNum} of 3`;
+                }
+
+                gameState.currentLevel = levelNum;
+                updateProgressBar(levelNum);
+                updatePills();
+
+                // Scroll to top of screen content
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function jumpToLevel(levelNum) {
+                showScreen(`l${levelNum}`);
+                if (levelNum === 1) initLevel1();
+                else if (levelNum === 2) initLevel2();
+                else if (levelNum === 3) initLevel3();
+            }
+
+            window.prevLevel = function() {
+                if (gameState.currentLevel > 1) {
+                    jumpToLevel(gameState.currentLevel - 1);
+                }
+            };
+
+            window.nextLevel = function() {
+                if (gameState.currentLevel < 3) {
+                    jumpToLevel(gameState.currentLevel + 1);
+                }
+            };
+
+            function updateProgressBar(levelNum) {
+                if (levelNum === 0) {
+                    progressBar.style.width = `0%`;
+                    return;
+                }
+                const percentage = gameState.levelProgressPercentages[levelNum - 1];
+                progressBar.style.width = `${percentage}%`;
+            }
+
+            function updatePills() {
+                for (let i = 1; i <= 3; i++) {
+                    const pill = pills[`l${i}`];
+                    if (!pill) continue;
+                    pill.className = 'lvl-pill'; // Reset classes
+
+                    if (i === gameState.currentLevel) {
+                        pill.classList.add('active', `l${i}`);
+                    } else if (gameState.levelsCompleted && gameState.levelsCompleted[i - 1]) {
+                        pill.classList.add('completed');
+                    }
+                }
+            }
+
+            // Click level pills to navigate unlocked levels freely
+            Object.keys(pills).forEach((key, index) => {
+                pills[key].addEventListener('click', () => {
+                    showScreen(`l${index + 1}`);
+                    if (index === 0) initLevel1();
+                    else if (index === 1) initLevel2();
+                    else if (index === 2) initLevel3();
+                });
+            });
+
+            // Start simulation button click
+            btnStartSim.addEventListener('click', () => {
+                showScreen('l1');
+                initLevel1();
+            });
+
+            // ============================================================
+            // LEVEL 1: PRIVACY & DATA PROTECTION DETECTIVE
+            // ============================================================
+            function initLevel1() {
+                // Reset Level 1 allocations
+                gameState.l1.allocations.safe = [];
+                gameState.l1.allocations.risky = [];
+                gameState.l1.completed = false;
+                l1CompletionBox.classList.remove('active');
+                btnSubmitL1.style.display = 'inline-block';
+                btnSubmitL1.disabled = false;
+
+                // Render Cards Pool
+                renderL1Cards();
+                setupL1DragAndDrop();
+            }
+
+            function renderL1Cards() {
+                l1CardPool.innerHTML = '';
+                l1SafeContent.innerHTML = '<div class="drop-target-empty-msg" id="l1-safe-empty-msg">Drop Safe Practices Here</div>';
+                l1RiskyContent.innerHTML = '<div class="drop-target-empty-msg" id="l1-risky-empty-msg">Drop Risky Practices Here</div>';
+
+                gameState.l1.practices.forEach(practice => {
+                    const card = document.createElement('div');
+                    card.className = 'practice-card';
+                    card.id = practice.id;
+                    card.textContent = practice.text;
+                    card.draggable = true;
+
+                    // Make keyboard focusable
+                    card.tabIndex = 0;
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('aria-grabbed', 'false');
+
+                    l1CardPool.appendChild(card);
+                });
+            }
+
+            function setupL1DragAndDrop() {
+                const cards = document.querySelectorAll('.practice-card');
+                const targets = document.querySelectorAll('.drop-target');
+
+                // Drag start
+                cards.forEach(card => {
+                    card.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', card.id);
+                        card.classList.add('dragging');
+                    });
+
+                    card.addEventListener('dragend', () => {
+                        card.classList.remove('dragging');
+                    });
+
+                    // Click to move support for accessibility & mobile
+                    card.addEventListener('click', () => {
+                        if (gameState.l1.completed) return;
+
+                        // If another card is selected, deselect it
+                        const currentlySelected = document.querySelector('.practice-card.selected');
+                        if (currentlySelected && currentlySelected !== card) {
+                            currentlySelected.classList.remove('selected');
+                            currentlySelected.setAttribute('aria-grabbed', 'false');
+                        }
+
+                        card.classList.toggle('selected');
+                        const isSelected = card.classList.contains('selected');
+                        card.setAttribute('aria-grabbed', isSelected ? 'true' : 'false');
+                        gameState.l1.selectedCardId = isSelected ? card.id : null;
+                    });
+
+                    // Keyboard activation (Enter/Space)
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+                });
+
+                // Dragover and Drop
+                targets.forEach(target => {
+                    target.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        if (gameState.l1.completed) return;
+                        target.classList.add('drag-over');
+                    });
+
+                    target.addEventListener('dragleave', () => {
+                        target.classList.remove('drag-over');
+                    });
+
+                    target.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        target.classList.remove('drag-over');
+                        if (gameState.l1.completed) return;
+
+                        const cardId = e.dataTransfer.getData('text/plain');
+                        moveL1Card(cardId, target.dataset.category);
+                    });
+
+                    // Click target to move selected card
+                    target.addEventListener('click', () => {
+                        if (gameState.l1.completed || !gameState.l1.selectedCardId) return;
+                        moveL1Card(gameState.l1.selectedCardId, target.dataset.category);
+                    });
+                });
+
+                // Clicking the pool to move card back
+                l1CardPool.addEventListener('click', (e) => {
+                    if (gameState.l1.completed || !gameState.l1.selectedCardId) return;
+                    if (e.target === l1CardPool) {
+                        moveL1Card(gameState.l1.selectedCardId, 'pool');
+                    }
+                });
+            }
+
+            function moveL1Card(cardId, destination) {
+                const card = document.getElementById(cardId);
+                if (!card) return;
+
+                card.classList.remove('selected');
+                card.setAttribute('aria-grabbed', 'false');
+                gameState.l1.selectedCardId = null;
+
+                // Remove card ID from current allocation lists
+                Object.keys(gameState.l1.allocations).forEach(key => {
+                    gameState.l1.allocations[key] = gameState.l1.allocations[key].filter(id => id !== cardId);
+                });
+
+                if (destination === 'safe') {
+                    gameState.l1.allocations.safe.push(cardId);
+                    const safeEmpty = document.getElementById('l1-safe-empty-msg');
+                    if (safeEmpty) safeEmpty.remove();
+                    l1SafeContent.appendChild(card);
+                } else if (destination === 'risky') {
+                    gameState.l1.allocations.risky.push(cardId);
+                    const riskyEmpty = document.getElementById('l1-risky-empty-msg');
+                    if (riskyEmpty) riskyEmpty.remove();
+                    l1RiskyContent.appendChild(card);
+                } else {
+                    l1CardPool.appendChild(card);
+                }
+
+                checkL1EmptyStates();
+            }
+
+            function checkL1EmptyStates() {
+                if (l1SafeContent.querySelectorAll('.practice-card').length === 0) {
+                    l1SafeContent.innerHTML = '<div class="drop-target-empty-msg" id="l1-safe-empty-msg">Drop Safe Practices Here</div>';
+                }
+                if (l1RiskyContent.querySelectorAll('.practice-card').length === 0) {
+                    l1RiskyContent.innerHTML = '<div class="drop-target-empty-msg" id="l1-risky-empty-msg">Drop Risky Practices Here</div>';
+                }
+            }
+
+            btnSubmitL1.addEventListener('click', () => {
+                const unsortedCards = l1CardPool.querySelectorAll('.practice-card');
+                if (unsortedCards.length > 0) {
+                    alert('Please categorize all 12 digital business practices before submitting.');
+                    return;
+                }
+
+                gameState.l1.completed = true;
+                btnSubmitL1.style.display = 'none';
+
+                document.querySelectorAll('.practice-card').forEach(card => {
+                    card.draggable = false;
+                    card.style.cursor = 'default';
+                });
+
+                evaluateLevel1();
+            });
+
+            function evaluateLevel1() {
+                l1AnalysisTbody.innerHTML = '';
+
+                gameState.l1.practices.forEach(practice => {
+                    const isAllocatedSafe = gameState.l1.allocations.safe.includes(practice.id);
+                    const actualCategory = isAllocatedSafe ? 'safe' : 'risky';
+                    const isCorrect = actualCategory === practice.category;
+
+                    const row = document.createElement('tr');
+
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = practice.text;
+                    row.appendChild(nameCell);
+
+                    const userCell = document.createElement('td');
+                    userCell.textContent = isAllocatedSafe ? 'Safe Practice' : 'Risky Practice';
+                    row.appendChild(userCell);
+
+                    const resultCell = document.createElement('td');
+                    resultCell.textContent = isCorrect ? 'Correct' : 'Incorrect';
+                    resultCell.className = isCorrect ? 'correct-val' : 'incorrect-val';
+                    row.appendChild(resultCell);
+
+                    const descCell = document.createElement('td');
+                    descCell.style.textAlign = 'left';
+                    descCell.innerHTML = practice.explanation;
+                    row.appendChild(descCell);
+
+                    l1AnalysisTbody.appendChild(row);
+                });
+
+                gameState.levelsCompleted[0] = true;
+                updatePills();
+                l1CompletionBox.classList.add('active');
+            }
+
+            btnNextL2.addEventListener('click', () => {
+                showScreen('l2');
+                initLevel2();
+            });
+
+            // ============================================================
+            // LEVEL 2: CUSTOMER TRUST BUILDER
+            // ============================================================
+            function initLevel2() {
+                gameState.l2.budget = 100000;
+                gameState.l2.trust = 0;
+                gameState.l2.selectedInitiatives = [];
+                gameState.l2.completed = false;
+
+                // Scramble options to keep them jumbled randomly
+                gameState.l2.initiatives.sort(() => Math.random() - 0.5);
+
+                l2Feedback.classList.remove('show');
+                l2CompletionBox.classList.remove('active');
+                btnSubmitL2.style.display = 'inline-block';
+
+                updateL2Dashboard();
+                renderL2Initiatives();
+            }
+
+            function updateL2Dashboard() {
+                let netTrust = 0;
+                let spent = 0;
+
+                gameState.l2.selectedInitiatives.forEach(id => {
+                    const initItem = gameState.l2.initiatives.find(i => i.id === id);
+                    if (initItem) {
+                        netTrust += initItem.trust;
+                        spent += initItem.cost;
+                    }
+                });
+
+                gameState.l2.trust = Math.max(0, Math.min(100, netTrust));
+                const remaining = 100000 - spent;
+
+                l2TrustVal.textContent = `${gameState.l2.trust}%`;
+                l2TrustBar.style.width = `${gameState.l2.trust}%`;
+
+                l2BudgetVal.textContent = `₹${remaining.toLocaleString()}`;
+                const budgetPercent = Math.max(0, (remaining / 100000) * 100);
+                l2BudgetBar.style.width = `${budgetPercent}%`;
+
+                if (gameState.l2.trust >= 80) {
+                    l2TrustBar.style.background = 'var(--success)';
+                } else {
+                    l2TrustBar.style.background = 'var(--red)';
+                }
+
+                if (remaining < 0) {
+                    l2BudgetBar.style.background = 'var(--danger)';
+                    l2BudgetVal.style.color = 'var(--danger)';
+                } else {
+                    l2BudgetBar.style.background = 'var(--red)';
+                    l2BudgetVal.style.color = 'var(--ink)';
+                }
+            }
+
+            function renderL2Initiatives() {
+                l2InitiativesGrid.innerHTML = '';
+                l2PlanZone.innerHTML = '';
+
+                gameState.l2.initiatives.forEach(item => {
+                    const isAdded = gameState.l2.selectedInitiatives.includes(item.id);
+
+                    const card = document.createElement('div');
+                    card.className = `initiative-card${isAdded ? ' added' : ''}`;
+                    card.style.background = 'var(--bg-card)';
+                    card.style.border = isAdded ? '1px solid var(--red)' : '1px solid var(--border-color)';
+                    card.style.borderRadius = '8px';
+                    card.style.padding = '15px';
+                    card.style.display = 'flex';
+                    card.style.flexDirection = 'column';
+                    card.style.justifyContent = 'space-between';
+                    card.style.gap = '10px';
+                    card.style.cursor = 'pointer';
+
+                    card.innerHTML = `
+                        <div class="initiative-header" style="display:flex; justify-content:space-between; font-weight:700;">
+                            <strong>${item.name}</strong>
+                            <span class="initiative-cost" style="color:var(--red);">₹${item.cost.toLocaleString()}</span>
+                        </div>
+                        <div class="initiative-details" style="font-size:0.85rem; color:var(--ink-muted); text-align:left;">${item.desc}</div>
+                        <div class="initiative-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="initiative-impact-tag ${item.impact.toLowerCase().replace(' ', '-')}" style="font-size:0.75rem; font-weight:600; padding:2px 6px; border-radius:4px; background:#ECEFF1; color:#37474F;">${item.impact} Impact</span>
+                            <button type="button" class="btn ${isAdded ? 'btn-outline' : ''}" style="padding: 6px 12px; font-size: 0.72rem; box-shadow:none; height:auto;">
+                                ${isAdded ? 'Remove' : 'Add Option'}
+                            </button>
+                        </div>
+                    `;
+
+                    const toggleAction = () => {
+                        if (gameState.l2.completed) return;
+                        if (isAdded) {
+                            gameState.l2.selectedInitiatives = gameState.l2.selectedInitiatives.filter(id => id !== item.id);
+                        } else {
+                            gameState.l2.selectedInitiatives.push(item.id);
+                        }
+                        updateL2Dashboard();
+                        renderL2Initiatives();
+                    };
+
+                    card.querySelector('button').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleAction();
+                    });
+                    card.addEventListener('click', toggleAction);
+
+                    l2InitiativesGrid.appendChild(card);
+
+                    if (isAdded) {
+                        const planCard = document.createElement('div');
+                        planCard.className = 'plan-item';
+                        planCard.style.backgroundColor = 'var(--bg-main)';
+                        planCard.style.border = '1px solid var(--border-color)';
+                        planCard.style.borderRadius = '8px';
+                        planCard.style.padding = '12px';
+                        planCard.style.marginBottom = '10px';
+                        planCard.style.display = 'flex';
+                        planCard.style.flexDirection = 'column';
+                        planCard.style.gap = '4px';
+
+                        planCard.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                                <span style="font-weight:700; font-size:0.9rem; text-align:left;">${item.name} (₹${item.cost.toLocaleString()})</span>
+                                <button type="button" class="plan-item-remove" aria-label="Remove ${item.name}" style="background:none; border:none; cursor:pointer; color:var(--red); font-weight:bold; font-size:1.1rem;">✕</button>
+                            </div>
+                            <p style="font-size:0.78rem; color:var(--ink-muted); margin:0; line-height:1.3; text-align:left;">${item.feedback}</p>
+                        `;
+
+                        planCard.querySelector('button').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            gameState.l2.selectedInitiatives = gameState.l2.selectedInitiatives.filter(id => id !== item.id);
+                            updateL2Dashboard();
+                            renderL2Initiatives();
+                        });
+                        l2PlanZone.appendChild(planCard);
+                    }
+                });
+
+                if (gameState.l2.selectedInitiatives.length === 0) {
+                    l2PlanZone.innerHTML = '<div class="drop-target-empty-msg" id="l2-plan-empty">No initiatives added yet. Select options on the left to allocate budget.</div>';
+                }
+            }
+
+            btnSubmitL2.addEventListener('click', () => {
+                const spent = gameState.l2.selectedInitiatives.reduce((acc, id) => {
+                    const item = gameState.l2.initiatives.find(i => i.id === id);
+                    return acc + (item ? item.cost : 0);
+                }, 0);
+
+                const isTrustValid = gameState.l2.trust >= 80;
+                const isBudgetValid = spent <= 100000;
+
+                if (isTrustValid && isBudgetValid) {
+                    gameState.l2.completed = true;
+                    l2Feedback.classList.remove('show');
+                    btnSubmitL2.style.display = 'none';
+
+                    document.querySelectorAll('.initiative-card button').forEach(b => b.disabled = true);
+
+                    gameState.levelsCompleted[1] = true;
+                    updatePills();
+                    l2CompletionBox.classList.add('active');
+                } else {
+                    let errMsg = 'Plan targets not met! ';
+                    if (!isBudgetValid) errMsg += 'Your plan exceeds the ₹100,000 budget. ';
+                    if (!isTrustValid) errMsg += 'Customer Trust must reach at least 80%. ';
+
+                    l2Feedback.textContent = errMsg;
+                    l2Feedback.className = 'feedback-box wrong show';
+                    window.scrollTo({ top: l2Feedback.offsetTop - 50, behavior: 'smooth' });
+                }
+            });
+
+            btnNextL3.addEventListener('click', () => {
+                showScreen('l3');
+                initLevel3();
+            });
+
+            // ============================================================
+            // LEVEL 3: ETHICAL & LEGAL DECISION SIMULATOR
+            // ============================================================
+            function initLevel3() {
+                gameState.l3.trust = 50;
+                gameState.l3.privacy = 50;
+                gameState.l3.ethics = 50;
+                gameState.l3.legal = 50;
+                gameState.l3.currentScenarioIndex = 0;
+                gameState.l3.selectedOptionIndex = null;
+                gameState.l3.completed = false;
+
+                // Scramble choices in each scenario on load to keep them jumbled randomly
+                gameState.l3.scenarios.forEach(scen => {
+                    scen.shuffledChoices = [...scen.choices].sort(() => Math.random() - 0.5);
+                });
+
+                l3ScenarioBox.style.display = 'block';
+                l3DecisionFeedback.style.display = 'none';
+                l3CompletionBox.classList.remove('active');
+                
+                btnSubmitDecision.style.display = 'inline-block';
+                btnSubmitDecision.disabled = false;
+                btnNextScenario.style.display = 'none';
+
+                updateL3Dashboard();
+                renderScenario();
+            }
+
+            function updateL3Dashboard() {
+                gameState.l3.trust = Math.max(0, Math.min(100, gameState.l3.trust));
+                gameState.l3.privacy = Math.max(0, Math.min(100, gameState.l3.privacy));
+                gameState.l3.ethics = Math.max(0, Math.min(100, gameState.l3.ethics));
+                gameState.l3.legal = Math.max(0, Math.min(100, gameState.l3.legal));
+
+                l3TrustVal.textContent = `${gameState.l3.trust}%`;
+                l3TrustBar.style.width = `${gameState.l3.trust}%`;
+
+                l3PrivacyVal.textContent = `${gameState.l3.privacy}%`;
+                l3PrivacyBar.style.width = `${gameState.l3.privacy}%`;
+
+                l3EthicsVal.textContent = `${gameState.l3.ethics}%`;
+                l3EthicsBar.style.width = `${gameState.l3.ethics}%`;
+
+                l3LegalVal.textContent = `${gameState.l3.legal}%`;
+                l3LegalBar.style.width = `${gameState.l3.legal}%`;
+            }
+
+            function renderScenario() {
+                const scenario = gameState.l3.scenarios[gameState.l3.currentScenarioIndex];
+                l3ScenarioNumber.textContent = `Scenario ${gameState.l3.currentScenarioIndex + 1} of 5`;
+                l3ScenarioText.textContent = scenario.desc;
+
+                l3OptionsList.innerHTML = '';
+                gameState.l3.selectedOptionIndex = null;
+
+                scenario.shuffledChoices.forEach((choice, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'option-item';
+                    item.innerHTML = `
+                        <div class="option-radio"></div>
+                        <span style="text-align: left;">${choice.text}</span>
+                    `;
+
+                    item.addEventListener('click', () => {
+                        if (gameState.l3.selectedOptionIndex === idx) return;
+
+                        // Allow changing answer even after submission by rolling back previous choice changes
+                        if (btnSubmitDecision.style.display === 'none' && gameState.l3.selectedOptionIndex !== null) {
+                            const prevChoice = scenario.shuffledChoices[gameState.l3.selectedOptionIndex];
+                            gameState.l3.trust -= prevChoice.trust;
+                            gameState.l3.privacy -= prevChoice.privacy;
+                            gameState.l3.ethics -= prevChoice.ethics;
+                            gameState.l3.legal -= prevChoice.legal;
+                            updateL3Dashboard();
+
+                            // Reset UI button controls and feedback
+                            btnSubmitDecision.style.display = 'inline-block';
+                            btnSubmitDecision.disabled = false;
+                            btnNextScenario.style.display = 'none';
+                            l3DecisionFeedback.style.display = 'none';
+                        }
+                        
+                        document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+                        gameState.l3.selectedOptionIndex = idx;
+                    });
+
+                    l3OptionsList.appendChild(item);
+                });
+            }
+
+            btnSubmitDecision.addEventListener('click', () => {
+                if (gameState.l3.selectedOptionIndex === null) {
+                    alert('Please select a decision choice before confirming.');
+                    return;
+                }
+
+                btnSubmitDecision.disabled = true;
+                
+                const scenario = gameState.l3.scenarios[gameState.l3.currentScenarioIndex];
+                const choice = scenario.shuffledChoices[gameState.l3.selectedOptionIndex];
+
+                gameState.l3.trust += choice.trust;
+                gameState.l3.privacy += choice.privacy;
+                gameState.l3.ethics += choice.ethics;
+                gameState.l3.legal += choice.legal;
+                updateL3Dashboard();
+
+                const sumMetrics = choice.trust + choice.privacy + choice.ethics + choice.legal;
+                l3DecisionFeedback.className = 'feedback-box';
+                if (sumMetrics >= 10) {
+                    l3DecisionFeedback.classList.add('correct');
+                } else if (sumMetrics < -10) {
+                    l3DecisionFeedback.classList.add('wrong');
+                } else {
+                    l3DecisionFeedback.classList.add('show');
+                }
+
+                l3DecisionFeedback.innerHTML = `
+                    <div style="font-weight:700; margin-bottom:8px; font-size:1rem; text-align:left;">Decision Impact Analysis:</div>
+                    <p style="margin-bottom:12px; font-size:0.92rem; text-align:left;">${choice.feedback}</p>
+                    <div style="font-family:var(--mono); font-size:0.8rem; display:flex; gap:15px; justify-content:flex-start; flex-wrap:wrap;">
+                        <span style="color:${choice.trust >= 0 ? 'var(--success)' : 'var(--danger)'}">Trust: ${choice.trust >= 0 ? '+' : ''}${choice.trust}%</span>
+                        <span style="color:${choice.privacy >= 0 ? 'var(--success)' : 'var(--danger)'}">Privacy: ${choice.privacy >= 0 ? '+' : ''}${choice.privacy}%</span>
+                        <span style="color:${choice.ethics >= 0 ? 'var(--success)' : 'var(--danger)'}">Ethics: ${choice.ethics >= 0 ? '+' : ''}${choice.ethics}%</span>
+                        <span style="color:${choice.legal >= 0 ? 'var(--success)' : 'var(--danger)'}">Legal Compliance: ${choice.legal >= 0 ? '+' : ''}${choice.legal}%</span>
+                    </div>
+                `;
+                l3DecisionFeedback.style.display = 'block';
+
+                btnSubmitDecision.style.display = 'none';
+                btnNextScenario.style.display = 'inline-block';
+            });
+
+            btnNextScenario.addEventListener('click', () => {
+                l3DecisionFeedback.style.display = 'none';
+
+                if (gameState.l3.currentScenarioIndex < 4) {
+                    gameState.l3.currentScenarioIndex++;
+                    btnSubmitDecision.disabled = false;
+                    btnSubmitDecision.style.display = 'inline-block';
+                    btnNextScenario.style.display = 'none';
+                    renderScenario();
+                } else {
+                    gameState.l3.completed = true;
+                    l3ScenarioBox.style.display = 'none';
+                    btnSubmitDecision.style.display = 'none';
+                    btnNextScenario.style.display = 'none';
+
+                    gameState.levelsCompleted[2] = true;
+                    updatePills();
+
+                    const isSuccess = gameState.l3.trust >= 50 &&
+                                      gameState.l3.privacy >= 50 &&
+                                      gameState.l3.ethics >= 50 &&
+                                      gameState.l3.legal >= 50;
+
+                    const summaryText = document.getElementById('l3-completion-summary-text');
+                    if (isSuccess) {
+                        summaryText.innerHTML = `<strong>Outcome: Successful Chief Digital Officer!</strong><br><br>You successfully navigated all digital business scenarios while keeping Customer Trust, Privacy Protection, Ethical Reputation, and Legal Compliance above the baseline 50% parameters. SmartShop is primed for sustainable, compliant growth!`;
+                    } else {
+                        summaryText.innerHTML = `<strong>Outcome: Ethical/Legal Recalibration Needed!</strong><br><br>While you completed all scenarios, one or more performance indicators fell below the required 50% threshold due to non-compliant or unethical compromises. Re-evaluate your decisions and try again to balance privacy and digital trust.`;
+                    }
+
+                    l3CompletionBox.classList.add('active');
+                }
+            });
+
+            btnRestartSimL3.addEventListener('click', () => {
+                gameState.levelsCompleted = [false, false, false];
+                updatePills();
+                l3CompletionBox.classList.remove('active');
+                showScreen('welcome');
+            });
+
+            // Toggle Theory reference board
+            window.toggleTheorySection = function () {
+                const content = document.getElementById('theory-content');
+                const btn = document.getElementById('btn-toggle-theory');
+                if (content.style.display === 'none') {
+                    content.style.display = 'grid';
+                    btn.textContent = "Hide Reference";
+                } else {
+                    content.style.display = 'none';
+                    btn.textContent = "Show Reference";
+                }
+            };
+
+        });
+    </script>
+</body>
+
+</html>

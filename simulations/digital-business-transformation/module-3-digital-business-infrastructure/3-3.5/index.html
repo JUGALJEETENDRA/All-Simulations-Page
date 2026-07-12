@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3.5 – Infrastructure Governance &amp; Security</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+        :root {
+            color-scheme: light;
+            --primary: #E63946;
+            --primary-hover: #D62828;
+            --primary-light: rgba(230, 57, 70, 0.08);
+            --secondary: #FF4D6D;
+            --bg-page: #F8F9FA;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: #FFFFFF;
+            --text-main: #1D1D1F;
+            --text-muted: #6E6E73;
+            --border-light: rgba(0, 0, 0, 0.08);
+            --code-bg: #1E1E24;
+            --code-text: #F8F9FA;
+            --code-ok: #2A9D8F;
+            --code-warn: #E9C46A;
+            --code-err: #E63946;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* ─── NAVIGATION ─── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 1000;
+            padding: 0 2rem;
+        }
+
+        .nav-brand {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-right: auto;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-brand span {
+            color: var(--primary);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-md);
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            margin-top: 64px;
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            background: radial-gradient(circle at 50% 0%, var(--primary-light) 0%, transparent 70%);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 99px;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero p {
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat strong {
+            display: block;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .hero-stat span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        /* ─── LAYOUT & SECTIONS ─── */
+        .section {
+            padding: 3rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+            background: var(--bg-card);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-header h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .section-num {
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.08);
+        }
+
+        /* ─── LEVEL PILLS & CARDS ─── */
+        .level-pills {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .level-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-pill:hover {
+            border-color: var(--primary);
+        }
+
+        .level-pill.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+        }
+
+        .level-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .level-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card h3 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        /* ─── CALLOUT BOXES ─── */
+        .info-box,
+        .tip-box,
+        .warn-box,
+        .challenge-box {
+            padding: 1rem 1.2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            margin: 1.2rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box {
+            background: rgba(42, 157, 143, 0.08);
+            border-color: var(--code-ok);
+        }
+
+        .tip-box {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .warn-box {
+            background: rgba(233, 196, 106, 0.15);
+            border-color: var(--code-warn);
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+        }
+
+        .challenge-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-main);
+        }
+
+        .quiz-feedback {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 1.2rem;
+        }
+
+        /* ─── INTERACTIVE ELEMENTS ─── */
+        .run-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .run-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        }
+
+        .run-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tk-entry {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .tk-entry:focus {
+            border-color: var(--primary);
+        }
+
+        .tk-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .gauge-wrap {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .gauge-num {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .gauge-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Badge styling */
+        .badge-locked {
+            filter: grayscale(100%);
+            opacity: 0.4;
+        }
+
+        .badge-unlocked {
+            filter: none;
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        /* Visual Map Styling for L1 */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .map-node {
+            background: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .map-node.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(230, 57, 70, 0.15);
+            background: var(--primary-light);
+        }
+
+        .map-node.secured {
+            border-color: var(--code-ok);
+            background: rgba(42, 157, 143, 0.05);
+        }
+
+        .map-node .node-badge {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--code-ok);
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 99px;
+            font-weight: 700;
+        }
+
+        .map-node.secured .node-badge {
+            display: block;
+        }
+
+        /* Sandbox Layout L2 */
+        .sandbox-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            background: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.8rem;
+        }
+
+        .meter-bar {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 0.3rem;
+        }
+
+        .meter-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-brand">DB<span>/</span>MOD3</div>
+        <a href="#sec35" class="active">3.5 Security</a>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-badge">Module 3.5 · Infrastructure Governance &amp; Security</div>
+        <h1>Infrastructure Governance<br>&amp; Security</h1>
+        <p>Learn Digital Business Governance, Risk Assessment, and Business Continuity. Build architectures, run sandbox
+            impact simulations, and manage real-time operational crises.</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><strong>3</strong><span>Levels</span></div>
+            <div class="hero-stat"><strong>100%</strong><span>Interactive</span></div>
+            <div class="hero-stat"><strong>Live</strong><span>Simulator</span></div>
+        </div>
+    </div>
+
+    <!-- DAVE CHAFFEY CONCISE THEORY BOARD -->
+    <div class="section" id="theory-board">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">📖</div>
+                <div>
+                    <h2>Dave Chaffey's Reference Board</h2>
+                    <p>Concise definitions for digital infrastructure governance</p>
+                </div>
+                <span class="section-num">Ref</span>
+            </div>
+
+            <div class="card">
+                <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+                    <div><strong>Digital Governance:</strong> System of authority and control guiding digital
+                        infrastructure strategy.</div>
+                    <div><strong>Risk Management:</strong> Identifying and mitigating assets' exposure to digital
+                        business disruptions.</div>
+                    <div><strong>Compliance:</strong> Adhering to legal standards (e.g., GDPR, PCI-DSS) governing client
+                        privacy data.</div>
+                    <div><strong>Digital Trust:</strong> Customer confidence in an organization's system security and
+                        reliability.</div>
+                    <div><strong>Information Security:</strong> Protecting digital data assets from unauthorized access
+                        or modification.</div>
+                    <div><strong>Business Continuity:</strong> Plans ensuring critical operations survive major
+                        datacenter outages.</div>
+                    <div><strong>Confidentiality:</strong> Ensuring data records are accessible only to authorized
+                        credentials.</div>
+                    <div><strong>Integrity:</strong> Safeguarding database records from unauthorized alterations.</div>
+                    <div><strong>Availability:</strong> Guaranteeing systems remain responsive and accessible to buyers.
+                    </div>
+                    <div><strong>Governance Controls:</strong> Policies and mechanisms (e.g., MFA, audits) enforcing
+                        compliance rules.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SIMULATION INTERFACE -->
+    <div class="section" id="sec35">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🛡️</div>
+                <div>
+                    <h2>3.5 – Interactive Governance Simulator</h2>
+                    <p>Security Policies, Risk Controls &amp; Crisis Response</p>
+                </div>
+                <span class="section-num">3.5</span>
+            </div>
+
+            <!-- LEVEL PILLS -->
+            <div class="level-pills" id="lp35">
+                <button class="level-pill active" onclick="switchLevel('35',1)">Level 1: Governance Architect</button>
+                <button class="level-pill" onclick="switchLevel('35',2)">Level 2: Governance Optimiser</button>
+                <button class="level-pill" onclick="switchLevel('35',3)">Level 3: Crisis Control Room</button>
+            </div>
+
+            <!-- PROGRESS TRACKER -->
+            <div class="progress-wrap" style="margin-bottom: 2rem;">
+                <div class="progress-label"
+                    style="display:flex; justify-content:space-between; font-size: 0.85rem; font-weight:700; margin-bottom: 0.4rem;">
+                    <span id="prog35-label">Level 1 of 3</span>
+                    <span id="prog35-pct">33%</span>
+                </div>
+                <div class="progress-bar"
+                    style="height: 10px; background: rgba(0,0,0,0.06); border-radius: 99px; overflow:hidden;">
+                    <div class="progress-fill" id="prog35"
+                        style="width:33%; height:100%; background:var(--primary); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <!-- BADGES CONTAINER -->
+            <div class="card"
+                style="padding: 1rem 2rem; display:flex; align-items:center; justify-content:space-around; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; background:rgba(255,255,255,0.5);">
+                <div id="badge-architect" class="badge-locked"
+                    style="text-align:center; font-size: 0.8rem; font-weight:700;">
+                    <span style="font-size:2rem; display:block;">🏆</span> Architect Unlocked
+                </div>
+                <div id="badge-optimiser" class="badge-locked"
+                    style="text-align:center; font-size: 0.8rem; font-weight:700;">
+                    <span style="font-size:2rem; display:block;">💼</span> Optimiser Unlocked
+                </div>
+                <div id="badge-leader" class="badge-locked"
+                    style="text-align:center; font-size: 0.8rem; font-weight:700;">
+                    <span style="font-size:2rem; display:block;">👑</span> CDTO Unlocked
+                </div>
+            </div>
+
+            <!-- LEVEL 1: GOVERNANCE ARCHITECTURE BUILDER -->
+            <div class="level-content active" id="lc35-1">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 1: Mission Brief</span>
+                    <h3>Governance Architecture Builder</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Mission: Secure a rapidly growing digital enterprise. Analyze 12 visual system nodes and assign
+                        the correct governance control to mitigate business continuity risks and build digital trust.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Enterprise System Map</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Select a visual system
+                        node below, choose a governance control, and click Apply.</p>
+
+                    <!-- Visual Map -->
+                    <div class="map-grid" id="l1-map">
+                        <!-- Injected dynamically -->
+                    </div>
+
+                    <!-- Controls Select Dropdown -->
+                    <div style="margin-top:2rem; display:flex; gap:1rem; align-items:flex-end; flex-wrap:wrap;">
+                        <div style="flex-grow:1;">
+                            <span class="tk-label">Choose Governance Control to Apply</span>
+                            <select id="l1-control-select" class="tk-entry" style="width:100%;">
+                                <option value="privacy">Privacy Policy</option>
+                                <option value="auth">Multi-Factor Authentication</option>
+                                <option value="identity">Identity Management</option>
+                                <option value="access">Access Control</option>
+                                <option value="dr">Disaster Recovery Plan</option>
+                                <option value="encryption">Encryption</option>
+                                <option value="incident">Incident Response Plan</option>
+                                <option value="vendor">Vendor Governance</option>
+                                <option value="logging">Audit Logging</option>
+                                <option value="training">Security Awareness Training</option>
+                                <option value="backup">Backup Policy</option>
+                                <option value="monitoring">Monitoring</option>
+                            </select>
+                        </div>
+                        <button class="run-btn" id="l1-apply-btn" onclick="applyL1Control()">▶ Apply Control</button>
+                        <button class="run-btn" style="background:var(--secondary); padding: 0.8rem 1rem;"
+                            onclick="toggleHint(1)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l1-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l1" style="margin-top:1.5rem; line-height: 1.5;"></div>
+
+                    <!-- LEVEL 1 PERFORMANCE DASHBOARD -->
+                    <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+                        <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">
+                            Performance Dashboard</h4>
+                        <div class="gauge-wrap"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-trust">10%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Digital Trust</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-risk" style="color:var(--code-err);">90%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Business Risk</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-comp">10%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Compliance</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-continuity">10%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Business Continuity</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-confidence">10%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Customer Confidence</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l1-hud-resilience">10%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Operational Resilience</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="l1-reinforcement"
+                        style="display:none; margin-top:2rem; padding:1.5rem; background:rgba(42, 157, 143, 0.08); border-left:4px solid var(--code-ok); border-radius:var(--radius-md);">
+                        <!-- Completion reinforcement banner -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 2: GOVERNANCE IMPACT SIMULATOR -->
+            <div class="level-content" id="lc35-2">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 2: Mission Brief</span>
+                    <h3>Governance Impact Simulator</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Mission: Experiment with governance strategies in a sandboxed e-business. Discover how toggling
+                        controls dynamically affects trust, risk, cost, and compliance metrics to reach the target
+                        business objective.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="challenge-box"
+                        style="margin-top:0; border-left-color:var(--primary); background:rgba(230, 57, 70, 0.02);">
+                        <h4 style="color:var(--primary); font-family:'Archivo Black',sans-serif; font-size:0.95rem;">🎯
+                            Strategy Objective:</h4>
+                        <p style="font-size:0.85rem;">Maximize <strong>Customer Trust above 90%</strong> while keeping
+                            <strong>Operational Cost below 60%</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Sandbox Inputs -->
+                    <h4
+                        style="font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-top:1.5rem; margin-bottom:1rem;">
+                        Governance Sandbox Controls</h4>
+
+                    <div class="sandbox-row">
+                        <div>
+                            <h5 style="margin:0; font-size:0.9rem;">Multi-Factor Authentication (MFA)</h5>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">Enforces dual tokens on all login
+                                portals, blocking credential thefts.</p>
+                        </div>
+                        <input type="checkbox" id="l2-opt-mfa" style="width:20px; height:20px; cursor:pointer;"
+                            onchange="recalculateL2Sandbox()">
+                    </div>
+
+                    <div class="sandbox-row">
+                        <div>
+                            <h5 style="margin:0; font-size:0.9rem;">Regular Automated Backups</h5>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">Executes real-time transaction
+                                database backups to remote storage pools.</p>
+                        </div>
+                        <input type="checkbox" id="l2-opt-backup" style="width:20px; height:20px; cursor:pointer;"
+                            onchange="recalculateL2Sandbox()">
+                    </div>
+
+                    <div class="sandbox-row">
+                        <div>
+                            <h5 style="margin:0; font-size:0.9rem;">Employee Security Training</h5>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">Ramps staff awareness against
+                                corporate social engineering risks.</p>
+                        </div>
+                        <input type="checkbox" id="l2-opt-training" style="width:20px; height:20px; cursor:pointer;"
+                            onchange="recalculateL2Sandbox()">
+                    </div>
+
+                    <div class="sandbox-row">
+                        <div>
+                            <h5 style="margin:0; font-size:0.9rem;">Vendor Governance Audits</h5>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">Audits third-party API providers to
+                                verify compliance certificates.</p>
+                        </div>
+                        <input type="checkbox" id="l2-opt-vendor" style="width:20px; height:20px; cursor:pointer;"
+                            onchange="recalculateL2Sandbox()">
+                    </div>
+
+                    <!-- Live Dashboard Board -->
+                    <h4
+                        style="font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-top:2rem; margin-bottom:1rem;">
+                        E-Business Live Dashboard</h4>
+
+                    <div
+                        style="background:rgba(0,0,0,0.02); padding:1.2rem; border-radius:var(--radius-lg); display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                        <div>
+                            <span class="tk-label" style="font-size:0.75rem;">Customer Trust</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-trust" class="meter-fill"
+                                            style="width:50%; background:var(--code-ok);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-trust"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">50%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="tk-label" style="font-size:0.75rem;">Compliance Level</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-compliance" class="meter-fill"
+                                            style="width:50%; background:var(--code-ok);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-compliance"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">50%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="tk-label" style="font-size:0.75rem;">Risk Exposure</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-risk" class="meter-fill"
+                                            style="width:60%; background:var(--code-err);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-risk"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">60%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="tk-label" style="font-size:0.75rem;">Business Continuity</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-continuity" class="meter-fill"
+                                            style="width:50%; background:var(--code-ok);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-continuity"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">50%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="tk-label" style="font-size:0.75rem;">System Availability</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-availability" class="meter-fill"
+                                            style="width:80%; background:var(--code-ok);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-availability"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">80%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="tk-label" style="font-size:0.75rem;">Brand Reputation</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-reputation" class="meter-fill"
+                                            style="width:50%; background:var(--code-ok);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-reputation"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">50%</strong>
+                            </div>
+                        </div>
+                        <div style="grid-column: 1 / -1; border-top:1px solid var(--border-light); padding-top:0.8rem;">
+                            <span class="tk-label" style="font-size:0.75rem;">Operational Cost</span>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <div style="flex-grow:1;">
+                                    <div class="meter-bar">
+                                        <div id="l2-bar-cost" class="meter-fill"
+                                            style="width:20%; background:var(--primary);"></div>
+                                    </div>
+                                </div>
+                                <strong id="l2-val-cost"
+                                    style="font-size:0.85rem; width:35px; text-align:right;">20%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" onclick="submitL2Strategy()">▶ Validate Governance Strategy</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(2)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l2-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l2" style="margin-top:1.5rem; line-height:1.5;"></div>
+
+                    <!-- LEVEL 2 PERFORMANCE DASHBOARD -->
+                    <div style="margin-top: 2rem; border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+                        <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">
+                            Performance Dashboard</h4>
+                        <div class="gauge-wrap"
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-trust">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Business Trust</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-effect">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Gov Effectiveness</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-cost">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Operational Cost</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-comp">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Compliance</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-risk">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Risk Reduction</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-continuity">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Business Continuity</div>
+                            </div>
+                            <div
+                                style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                                <div class="gauge-num" id="l2-hud-maturity">0%</div>
+                                <div class="gauge-sub" style="font-size: 0.65rem;">Digital Maturity</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="l2-reinforcement"
+                        style="display:none; margin-top:2rem; padding:1.5rem; background:rgba(42, 157, 143, 0.08); border-left:4px solid var(--code-ok); border-radius:var(--radius-md);">
+                        <!-- Completion banner -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 3: CRISIS CONTROL ROOM -->
+            <div class="level-content" id="lc35-3">
+                <div class="card"
+                    style="background: radial-gradient(circle at 100% 0%, var(--primary-light) 0%, transparent 50%);">
+                    <span class="hero-badge">Level 3: Command Center</span>
+                    <h3>Crisis Control Room</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.95rem;">
+                        Mission: Manage live infrastructure crises as the Digital Governance Leader. Balance client
+                        trust, budgets, and compliance regulations under limited staff and time constraints.
+                    </p>
+                </div>
+
+                <div class="card" id="l3-gameplay-card">
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+                        <h3 id="l3-incident-title">Crisis Queue Loading...</h3>
+                        <div
+                            style="display:flex; gap:1.2rem; font-size:0.85rem; background:rgba(0,0,0,0.03); padding:0.4rem 1rem; border-radius:var(--radius-md);">
+                            <div><strong>Remaining Budget:</strong> <span id="l3-budget-count"
+                                    style="color:var(--primary); font-weight:700;">₹100,000</span></div>
+                            <div><strong>Active Staff:</strong> <span id="l3-staff-count"
+                                    style="color:var(--code-ok); font-weight:700;">5/5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="warn-box" id="l3-incident-box" style="margin-top:0; border-left-color:var(--code-err);">
+                        <h4
+                            style="color:var(--code-err); font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:0.3rem;">
+                            🚨 Critical Incident Alert!</h4>
+                        <p id="l3-incident-text" style="font-size:0.85rem;"></p>
+                    </div>
+
+                    <h4 style="font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:1rem;">Select
+                        Crisis Action Strategy</h4>
+                    <div id="l3-response-options" style="display:flex; flex-direction:column; gap:0.8rem;">
+                        <!-- Options injected dynamically -->
+                    </div>
+
+                    <div
+                        style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; flex-wrap:wrap; gap:1rem;">
+                        <button class="run-btn" id="l3-submit-btn" onclick="submitL3Response()">▶ Deploy Response
+                            Strategy</button>
+                        <button class="run-btn"
+                            style="background:var(--secondary); padding: 0.4rem 0.8rem; font-size: 0.75rem;"
+                            onclick="toggleHint(3)">💡 Need Help?</button>
+                    </div>
+
+                    <div class="info-box" id="l3-hint-box" style="display:none; margin-top:1rem;"></div>
+                    <div class="quiz-feedback" id="qf-l3" style="margin-top:1.5rem; line-height:1.5;"></div>
+
+                    <button class="run-btn" id="nextL3Btn" style="display:none; margin-top:1.5rem;"
+                        onclick="proceedL3NextCrisis()">Proceed to Next Incident ➔</button>
+                </div>
+
+                <!-- LEVEL 3 INTERACTIVE DASHBOARD -->
+                <div class="card" id="l3-dashboard-card">
+                    <h4 style="font-family:'Archivo Black',sans-serif; font-size:1rem; margin-bottom: 0.8rem;">
+                        Operational Health &amp; Compliance Gauges</h4>
+                    <div class="gauge-wrap"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-trust">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Customer Trust</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-reputation">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Reputation</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-finance">100%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Finance Health</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-continuity">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Continuity</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-compliance">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Compliance</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-risk">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Risk Exposure</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-employee">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Employee Conf</div>
+                        </div>
+                        <div
+                            style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+                            <div class="gauge-num" id="l3-hud-stability">50%</div>
+                            <div class="gauge-sub" style="font-size: 0.65rem;">Stability</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXECUTIVE REVIEW REPORT -->
+                <div id="l3-executive-report" style="display:none; margin-top:2rem;">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+            <!-- PREV / NEXT BOTTOM NAVIGATION PANEL -->
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; border-top:1px solid var(--border-light); padding-top:1.5rem;">
+                <button class="run-btn" id="prevLevelBtn" style="background:var(--secondary);"
+                    onclick="navigateLevel(-1)">◀ Previous Level</button>
+                <button class="run-btn" id="nextLevelBtn" onclick="navigateLevel(1)">Next Level ▶</button>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        Digital Business Simulation Series · <strong>Module 3.5 — Infrastructure Governance &amp; Security</strong>
+    </footer>
+
+    <script>
+        /* ─── GENERAL NAVIGATION & UI STATE ─── */
+        let activeLevel = 1;
+
+        function switchLevel(secId, targetLevel) {
+            activeLevel = targetLevel;
+
+            // Update Pills
+            document.querySelectorAll(`#lp35 .level-pill`).forEach((pill, idx) => {
+                pill.classList.toggle('active', (idx + 1) === targetLevel);
+            });
+
+            // Update Content Panels
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`lc35-${i}`);
+                if (el) el.classList.toggle('active', i === targetLevel);
+            }
+
+            // Update Progress values
+            const pct = Math.round((targetLevel / 3) * 100);
+            document.getElementById('prog35-label').textContent = `Level ${targetLevel} of 3`;
+            document.getElementById('prog35-pct').textContent = `${pct}%`;
+            document.getElementById('prog35').style.width = `${pct}%`;
+
+            // Update Nav Buttons
+            document.getElementById('prevLevelBtn').style.display = (targetLevel === 1) ? 'none' : 'inline-flex';
+            document.getElementById('nextLevelBtn').style.display = (targetLevel === 3) ? 'none' : 'inline-flex';
+        }
+
+        function navigateLevel(direction) {
+            let target = activeLevel + direction;
+            if (target >= 1 && target <= 3) {
+                switchLevel('35', target);
+            }
+        }
+
+        function toggleHint(levelNum) {
+            const box = document.getElementById(`l${levelNum}-hint-box`);
+            if (!box) return;
+            if (box.style.display === "none") {
+                box.style.display = "block";
+                if (levelNum === 1) {
+                    if (!selectedNodeId) {
+                        box.textContent = "Chaffey Tip: Select a system node from the map grid first. E.g. select the Database node, then select Encryption and click Apply.";
+                    } else {
+                        const roundHints = {
+                            "database": "Chaffey Tip: Select 'Encryption' to secure database tables in clear text.",
+                            "backup_system": "Chaffey Tip: Match this node with the 'Backup Policy' control.",
+                            "monitoring_centre": "Chaffey Tip: Match this monitoring node with the 'Monitoring' control.",
+                            "identity_service": "Chaffey Tip: Match the central authentication directory with 'Identity Management'.",
+                            "customer_portal": "Chaffey Tip: Protect user data policies on the public Customer Portal via 'Privacy Policy'.",
+                            "employee_portal": "Chaffey Tip: Prevent credential theft on staff links via 'Multi-Factor Authentication'.",
+                            "erp": "Chaffey Tip: Restrict access levels within administrative nodes via 'Access Control'.",
+                            "cloud_infra": "Chaffey Tip: Guard cloud datacenters against zone physical drops via the 'Disaster Recovery Plan'.",
+                            "payment_gateway": "Chaffey Tip: Manage customer gateway breaches via the 'Incident Response Plan'.",
+                            "supplier_portal": "Chaffey Tip: Ensure partner API connectors remain aligned via 'Vendor Governance'.",
+                            "analytics": "Chaffey Tip: Record access trails on analytics nodes via 'Audit Logging'.",
+                            "crm": "Chaffey Tip: Train client service specialists on CRM data rules via 'Security Awareness Training'."
+                        };
+                        box.textContent = roundHints[selectedNodeId] || "Chaffey Tip: Evaluate standard assets and match them with logical governance controls.";
+                    }
+                } else if (levelNum === 2) {
+                    box.textContent = "Chaffey Tip: Enabling MFA, Backups, and Training increases Customer Trust above 90% while keeping Operational Costs under strategy thresholds.";
+                } else {
+                    const incidentHints = {
+                        1: "Chaffey Hint: Legal escalation secures compliance and decreases risk, but suspend services cautiously.",
+                        2: "Chaffey Hint: Protect core data pipelines. Block the compromised supplier and alert customers immediately.",
+                        3: "Chaffey Hint: Outages collapse business availability. Deploy disaster recovery plans and restore database backups.",
+                        4: "Chaffey Hint: Audits require documentation. Escalate logs immediately to legal teams.",
+                        5: "Chaffey Hint: Active response teams should contain breaches while communicating transparently to customers."
+                    };
+                    box.textContent = incidentHints[l3IncidentIndex] || "Chaffey Hint: Manage incident queues based on digital trust targets.";
+                }
+            } else {
+                box.style.display = "none";
+            }
+        }
+
+        function unlockBadge(id, badgeText) {
+            const badge = document.getElementById(id);
+            if (badge) {
+                badge.className = "badge-unlocked";
+                badge.innerHTML = `<span style="font-size:2rem; display:block;">🏆</span> ${badgeText}`;
+            }
+        }
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        /* ─── LEVEL 1: GOVERNANCE ARCHITECTURE BUILDER ─── */
+        const l1NodesList = [
+            { id: "customer_portal", text: "Customer Portal", correctControl: "privacy" },
+            { id: "employee_portal", text: "Employee Portal", correctControl: "auth" },
+            { id: "crm", text: "CRM", correctControl: "training" },
+            { id: "erp", text: "ERP", correctControl: "access" },
+            { id: "cloud_infra", text: "Cloud Infrastructure", correctControl: "dr" },
+            { id: "database", text: "Database", correctControl: "encryption" },
+            { id: "payment_gateway", text: "Payment Gateway", correctControl: "incident" },
+            { id: "supplier_portal", text: "Supplier Portal", correctControl: "vendor" },
+            { id: "analytics", text: "Analytics Platform", correctControl: "logging" },
+            { id: "identity_service", text: "Identity Service", correctControl: "identity" },
+            { id: "backup_system", text: "Backup System", correctControl: "backup" },
+            { id: "monitoring_centre", text: "Monitoring Centre", correctControl: "monitoring" }
+        ];
+
+        let selectedNodeId = null;
+        let securedNodes = [];
+
+        function renderL1Map() {
+            const container = document.getElementById('l1-map');
+            container.innerHTML = "";
+            l1NodesList.forEach(n => {
+                const isSecured = securedNodes.includes(n.id);
+                const isSelected = selectedNodeId === n.id;
+                let className = "map-node";
+                if (isSecured) className += " secured";
+                else if (isSelected) className += " selected";
+
+                container.innerHTML += `
+      <div class="${className}" onclick="selectL1Node('${n.id}')">
+        <span class="node-badge">✔ Secured</span>
+        <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">${getNodeEmoji(n.id)}</div>
+        <div style="font-size:0.85rem; font-weight:700;">${n.text}</div>
+      </div>
+    `;
+            });
+        }
+
+        function getNodeEmoji(id) {
+            const emojis = {
+                customer_portal: "🌐", employee_portal: "🔑", crm: "👥", erp: "📈",
+                cloud_infra: "☁️", database: "🗄️", payment_gateway: "💳", supplier_portal: "📦",
+                analytics: "📊", identity_service: "🆔", backup_system: "💾", monitoring_centre: "🖥️"
+            };
+            return emojis[id] || "⚙️";
+        }
+
+        function selectL1Node(id) {
+            if (securedNodes.includes(id)) return;
+            selectedNodeId = id;
+            renderL1Map();
+            document.getElementById('qf-l1').innerHTML = "";
+            document.getElementById('l1-hint-box').style.display = "none";
+        }
+
+        function applyL1Control() {
+            const feedback = document.getElementById('qf-l1');
+            if (!selectedNodeId) {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = "<strong>✗ Choose a system node first!</strong> Click on any database, portal, or gateway node from the map grid above.";
+                return;
+            }
+
+            const control = document.getElementById('l1-control-select').value;
+            const node = l1NodesList.find(n => n.id === selectedNodeId);
+
+            if (control === node.correctControl) {
+                securedNodes.push(selectedNodeId);
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = `<strong>✓ Control Successfully Applied!</strong> Applied to ${node.text}.<br>• <strong>Why it helps:</strong> Reduces threat vulnerability index.<br>• <strong>Textbook Concept:</strong> <em>Dave Chaffey Governance Protections</em>.`;
+                selectedNodeId = null;
+                renderL1Map();
+                updateL1HUD();
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = `<strong>✗ Governance Mismatch!</strong><br>• <strong>Business Impact:</strong> Applying this control here fails to protect the asset.<br>• <strong>Consequences:</strong> The database/portal remains vulnerable to outages or credential leaks.<br>• <strong>Better Action:</strong> Choose a control that maps to this specific asset's vulnerabilities (e.g. database needs encryption, backups need backup policies).`;
+            }
+        }
+
+        function updateL1HUD() {
+            const securedCount = securedNodes.length;
+            const totalNodes = l1NodesList.length;
+            const percentage = Math.round((securedCount / totalNodes) * 100);
+
+            const trust = 10 + Math.round(percentage * 0.85);
+            const risk = 90 - Math.round(percentage * 0.8);
+            const comp = 10 + Math.round(percentage * 0.85);
+            const cont = 10 + Math.round(percentage * 0.8);
+            const conf = 10 + Math.round(percentage * 0.85);
+            const res = 10 + Math.round(percentage * 0.8);
+
+            document.getElementById('l1-hud-trust').textContent = `${trust}%`;
+            document.getElementById('l1-hud-risk').textContent = `${risk}%`;
+            document.getElementById('l1-hud-risk').style.color = risk > 50 ? 'var(--code-err)' : 'var(--code-ok)';
+            document.getElementById('l1-hud-comp').textContent = `${comp}%`;
+            document.getElementById('l1-hud-continuity').textContent = `${cont}%`;
+            document.getElementById('l1-hud-confidence').textContent = `${conf}%`;
+            document.getElementById('l1-hud-resilience').textContent = `${res}%`;
+
+            if (securedCount === totalNodes) {
+                unlockBadge('badge-architect', '🏆 Governance Architect');
+                const reinf = document.getElementById('l1-reinforcement');
+                reinf.style.display = "block";
+                reinf.innerHTML = `
+      <h3>Level 1 Complete! Governance Architect Badge Unlocked 🏆</h3>
+      <div class="tip-box" style="margin-top:0.5rem;">
+        <strong>Chaffey's Concept of Governance Mapping:</strong> Enterprise resilience requires deploying targeted governance mechanisms (MFA, backup, encryption) on matching digital systems to prevent system vulnerability siloing.
+      </div>
+      <div style="text-align:center; margin-top:1.5rem;">
+        <button class="run-btn" onclick="switchLevel('35', 2)">Proceed to Level 2: Governance Optimiser ➔</button>
+      </div>
+    `;
+            }
+        }
+
+        /* ─── LEVEL 2: GOVERNANCE IMPACT SIMULATOR (SANDBOX) ─── */
+        function recalculateL2Sandbox() {
+            const mfa = document.getElementById('l2-opt-mfa').checked;
+            const backup = document.getElementById('l2-opt-backup').checked;
+            const training = document.getElementById('l2-opt-training').checked;
+            const vendor = document.getElementById('l2-opt-vendor').checked;
+
+            let trust = 50;
+            let compliance = 50;
+            let risk = 60;
+            let continuity = 50;
+            let availability = 80;
+            let reputation = 50;
+            let cost = 20;
+
+            if (mfa) {
+                trust += 15; compliance += 10; risk -= 20; cost += 10; reputation += 10;
+            }
+            if (backup) {
+                trust += 10; continuity += 30; risk -= 15; cost += 5; availability += 10;
+            }
+            if (training) {
+                trust += 15; risk -= 20; reputation += 15; cost += 15; compliance += 10;
+            }
+            if (vendor) {
+                compliance += 20; risk -= 15; trust += 10; cost += 10; reputation += 10;
+            }
+
+            // Limits clamp
+            trust = Math.min(100, Math.max(0, trust));
+            compliance = Math.min(100, Math.max(0, compliance));
+            risk = Math.min(100, Math.max(0, risk));
+            continuity = Math.min(100, Math.max(0, continuity));
+            availability = Math.min(100, Math.max(0, availability));
+            reputation = Math.min(100, Math.max(0, reputation));
+            cost = Math.min(100, Math.max(0, cost));
+
+            // Render Dashboard
+            document.getElementById('l2-val-trust').textContent = `${trust}%`;
+            document.getElementById('l2-bar-trust').style.width = `${trust}%`;
+
+            document.getElementById('l2-val-compliance').textContent = `${compliance}%`;
+            document.getElementById('l2-bar-compliance').style.width = `${compliance}%`;
+
+            document.getElementById('l2-val-risk').textContent = `${risk}%`;
+            document.getElementById('l2-bar-risk').style.width = `${risk}%`;
+            document.getElementById('l2-bar-risk').style.background = risk > 40 ? 'var(--code-err)' : 'var(--code-ok)';
+
+            document.getElementById('l2-val-continuity').textContent = `${continuity}%`;
+            document.getElementById('l2-bar-continuity').style.width = `${continuity}%`;
+
+            document.getElementById('l2-val-availability').textContent = `${availability}%`;
+            document.getElementById('l2-bar-availability').style.width = `${availability}%`;
+
+            document.getElementById('l2-val-reputation').textContent = `${reputation}%`;
+            document.getElementById('l2-bar-reputation').style.width = `${reputation}%`;
+
+            document.getElementById('l2-val-cost').textContent = `${cost}%`;
+            document.getElementById('l2-bar-cost').style.width = `${cost}%`;
+
+            // Update HUD
+            document.getElementById('l2-hud-trust').textContent = `${trust}%`;
+            document.getElementById('l2-hud-effect').textContent = `${100 - risk}%`;
+            document.getElementById('l2-hud-cost').textContent = `${cost}%`;
+            document.getElementById('l2-hud-comp').textContent = `${compliance}%`;
+            document.getElementById('l2-hud-risk').textContent = `${100 - risk}%`;
+            document.getElementById('l2-hud-continuity').textContent = `${continuity}%`;
+
+            let maturity = "Disconnected";
+            if (trust >= 90 && cost <= 60) maturity = "Integrated";
+            if (trust >= 90 && cost <= 50) maturity = "Optimized";
+            document.getElementById('l2-hud-maturity').textContent = maturity;
+        }
+
+        function submitL2Strategy() {
+            const trustVal = parseInt(document.getElementById('l2-val-trust').textContent);
+            const costVal = parseInt(document.getElementById('l2-val-cost').textContent);
+            const feedback = document.getElementById('qf-l2');
+
+            if (trustVal >= 90 && costVal <= 60) {
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = `<strong>✓ Strategy Verified!</strong><br>• <strong>Why it works:</strong> Balanced controls build massive customer trust while retaining budget efficiency under 60%.<br>• <strong>Textbook Concept:</strong> <em>Information security capability optimization</em>.`;
+                unlockBadge('badge-optimiser', '🏆 Governance Optimiser');
+
+                const reinf = document.getElementById('l2-reinforcement');
+                reinf.style.display = "block";
+                reinf.innerHTML = `
+      <h3>Level 2 Complete! Governance Optimiser Badge Unlocked 🏆</h3>
+      <div class="tip-box" style="margin-top:0.5rem;">
+        <strong>Chaffey's concept of Balance:</strong> Effective e-business governance requires optimizing operational expense structures (budget efficiency) while delivering compliance rules.
+      </div>
+      <div style="text-align:center; margin-top:1.5rem;">
+        <button class="run-btn" onclick="switchLevel('35', 3)">Proceed to Level 3: Crisis Control Room ➔</button>
+      </div>
+    `;
+            } else {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = `<strong>✗ Strategic Mismatch!</strong> Current settings fail to reach targets. Customer Trust is ${trustVal}% (Target: &gt;90%) and Cost is ${costVal}% (Target: &lt;60%). Tweak toggle combinations and retry.`;
+            }
+        }
+
+        /* ─── LEVEL 3: CRISIS CONTROL ROOM ─── */
+        let l3IncidentIndex = 1;
+        let l3Budget = 100000;
+        let l3Answers = [];
+        let l3MistakesCount = 0;
+
+        const l3IncidentsList = {
+            1: {
+                title: "Incident 1: Privacy Compliance Leak",
+                text: "A customer privacy complaints audit reveals employee portals are indexing records on public domains.",
+                options: [
+                    { val: "notify_legal", text: "Escalate to Legal Team & Suspend Service (Cost: ₹20,000, Staff: 2)", cost: 20000, staff: 2, impact: { trust: 10, reputation: 10, compliance: 30, risk: -30, employee: 10, stability: -5, continuity: -15 } },
+                    { val: "delay", text: "Delay response to avoid public relations attention (Cost: ₹0, Staff: 0)", cost: 0, staff: 0, impact: { trust: -30, reputation: -25, compliance: -20, risk: 40, employee: -10, stability: 10, continuity: 5 } }
+                ],
+                correct: "notify_legal",
+                correctFeedback: "<strong>✓ Strategy Deployed!</strong><br>• <strong>Why it helps:</strong> Legal escalation guarantees GDPR compliance, preserving trust.<br>• <strong>Consequences:</strong> suspends access links temporarily.<br>• <strong>Textbook Concept:</strong> <em>Privacy compliance governance</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Delaying the audits leaks transaction logs to public indices.<br>• <strong>Consequences:</strong> Prompts legal fines and drop-offs.<br>• <strong>Better Action:</strong> Suspend portal services and notify legal teams."
+            },
+            2: {
+                title: "Incident 2: Supplier Data Breach",
+                text: "Your supplier partner dashboard API suffers a breach, exposing distributor inventory streams.",
+                options: [
+                    { val: "block_supplier", text: "Block Third-Party Access & Notify Customers (Cost: ₹15,000, Staff: 3)", cost: 15000, staff: 3, impact: { trust: 20, reputation: 15, compliance: 10, risk: -25, employee: 5, stability: -10, continuity: -10 } },
+                    { val: "ignore", text: "Delay response to verify data logs (Cost: ₹0, Staff: 1)", cost: 0, staff: 1, impact: { trust: -25, reputation: -20, compliance: -15, risk: 30, employee: -5, stability: 5, continuity: 5 } }
+                ],
+                correct: "block_supplier",
+                correctFeedback: "<strong>✓ Strategy Deployed!</strong><br>• <strong>Why it helps:</strong> Blocking access boundaries isolates data breaches quickly.<br>• <strong>Textbook Concept:</strong> <em>Vendor Governance & Boundary Protections</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Delays keep databases open, leaking more transactions.<br>• <strong>Better Action:</strong> Disable the partner API connector immediately."
+            },
+            3: {
+                title: "Incident 3: Cloud Datacenter Outage",
+                text: "Your primary hosting provider zone suffers a power failure, taking storefront servers offline.",
+                options: [
+                    { val: "trigger_dr", text: "Enable Disaster Recovery Plan & Restore Backup (Cost: ₹30,000, Staff: 4)", cost: 30000, staff: 4, impact: { trust: 15, reputation: 10, compliance: 5, risk: -25, employee: 10, stability: 15, continuity: 40 } },
+                    { val: "wait", text: "Wait for provider to manually reboot servers (Cost: ₹0, Staff: 1)", cost: 0, staff: 1, impact: { trust: -25, reputation: -20, compliance: -5, risk: 20, employee: -10, stability: -15, continuity: -35 } }
+                ],
+                correct: "trigger_dr",
+                correctFeedback: "<strong>✓ Strategy Deployed!</strong><br>• <strong>Why it helps:</strong> Activating disaster recover options routes traffic to secondary active zones.<br>• <strong>Textbook Concept:</strong> <em>Business Continuity & System Resilience</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Waiting for reboots extends site downtime, losing checkout conversions.<br>• <strong>Better Action:</strong> Failover to standby replicas."
+            },
+            4: {
+                title: "Incident 4: Regulatory Audit Flag",
+                text: "Government compliance inspectors flag missing audit trails on your transactions database.",
+                options: [
+                    { val: "audit_compliance", text: "Provide Audit Logs & Escalate to Legal Team (Cost: ₹10,000, Staff: 2)", cost: 10000, staff: 2, impact: { trust: 10, reputation: 10, compliance: 30, risk: -20, employee: 5, stability: 5, continuity: 5 } },
+                    { val: "hide_records", text: "Delay response and prepare spreadsheets manually (Cost: ₹5,000, Staff: 4)", cost: 5000, staff: 4, impact: { trust: -15, reputation: -15, compliance: -30, risk: 25, employee: -5, stability: -5, continuity: -5 } }
+                ],
+                correct: "audit_compliance",
+                correctFeedback: "<strong>✓ Strategy Deployed!</strong><br>• <strong>Why it helps:</strong> Audit trail compliance maintains digital trust indices.<br>• <strong>Textbook Concept:</strong> <em>Infrastructure Governance & Risk Compliance</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Hiding records leads to audit failure, triggering administrative penalties.<br>• <strong>Better Action:</strong> Escalate audits immediately using logging records."
+            },
+            5: {
+                title: "Incident 5: Customer Data Misuse",
+                text: "A customer services officer leaks patient profile data on personal channels.",
+                options: [
+                    { val: "incident_response", text: "Activate Incident Response & Launch Public Communication (Cost: ₹25,000, Staff: 3)", cost: 25000, staff: 3, impact: { trust: 25, reputation: 20, compliance: 20, risk: -35, employee: 15, stability: 10, continuity: 10 } },
+                    { val: "quiet_fire", text: "Quietly terminate employee without public announcement (Cost: ₹5,000, Staff: 1)", cost: 5000, staff: 1, impact: { trust: -20, reputation: -15, compliance: -25, risk: 20, employee: -5, stability: -5, continuity: -5 } }
+                ],
+                correct: "incident_response",
+                correctFeedback: "<strong>✓ Strategy Deployed!</strong><br>• <strong>Why it helps:</strong> Transparency controls customer trust drops and satisfies GDPR requirements.<br>• <strong>Textbook Concept:</strong> <em>Information Security Governance Controls</em>.",
+                incorrectFeedback: "<strong>✗ Strategic Mismatch!</strong><br>• <strong>Why it fails:</strong> Hiding misuse events compromises trust when the public finds out.<br>• <strong>Better Action:</strong> Deploy incident response plans and announce changes."
+            }
+        };
+
+        // Initial state metrics
+        let l3Trust = 50;
+        let l3Reputation = 50;
+        let l3Finance = 100;
+        let l3Continuity = 50;
+        let l3Compliance = 50;
+        let l3Risk = 50;
+        let l3Employee = 50;
+        let l3Stability = 50;
+
+        function renderL3Incident() {
+            const r = l3IncidentsList[l3IncidentIndex];
+            document.getElementById('l3-incident-title').textContent = `Incident ${l3IncidentIndex} of 5: ${r.title}`;
+            document.getElementById('l3-incident-text').textContent = r.text;
+            document.getElementById('qf-l3').innerHTML = "";
+            document.getElementById('nextL3Btn').style.display = "none";
+            document.getElementById('l3-submit-btn').disabled = false;
+
+            const container = document.getElementById('l3-response-options');
+            container.innerHTML = "";
+
+            let jumbled = shuffleArray(r.options);
+            jumbled.forEach(opt => {
+                container.innerHTML += `
+      <div class="sandbox-row" style="cursor:pointer;" onclick="selectL3Option('${opt.val}')">
+        <div style="display:flex; align-items:center; gap:0.8rem;">
+          <input type="radio" name="l3-opt-grp" id="l3-opt-${opt.val}" value="${opt.val}" style="pointer-events:none;">
+          <div>
+            <h5 style="margin:0; font-size:0.85rem;">${opt.text}</h5>
+          </div>
+        </div>
+      </div>
+    `;
+            });
+        }
+
+        let selectedL3OptionVal = null;
+        function selectL3Option(val) {
+            selectedL3OptionVal = val;
+            const radio = document.getElementById(`l3-opt-${val}`);
+            if (radio) radio.checked = true;
+        }
+
+        function submitL3Response() {
+            const r = l3IncidentsList[l3IncidentIndex];
+            const feedback = document.getElementById('qf-l3');
+
+            if (!selectedL3OptionVal) {
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = "<strong>✗ Choose a response strategy!</strong> Select one of the action options above.";
+                return;
+            }
+
+            const choice = selectedL3OptionVal;
+            const selectedOptObj = r.options.find(o => o.val === choice);
+            const isCorrect = (choice === r.correct);
+
+            if (isCorrect) {
+                // Check resource limits
+                if (l3Budget < selectedOptObj.cost) {
+                    feedback.style.color = "var(--code-err)";
+                    feedback.innerHTML = "<strong>✗ Budget Exhausted!</strong> You do not have enough strategy funds to deploy this control.";
+                    return;
+                }
+
+                // Deduct resources
+                l3Budget -= selectedOptObj.cost;
+
+                // Apply impacts
+                const imp = selectedOptObj.impact;
+                l3Trust = Math.min(100, Math.max(0, l3Trust + imp.trust));
+                l3Reputation = Math.min(100, Math.max(0, l3Reputation + imp.reputation));
+                l3Continuity = Math.min(100, Math.max(0, l3Continuity + imp.continuity));
+                l3Compliance = Math.min(100, Math.max(0, l3Compliance + imp.compliance));
+                l3Risk = Math.min(100, Math.max(0, l3Risk + imp.risk));
+                l3Employee = Math.min(100, Math.max(0, l3Employee + imp.employee));
+                l3Stability = Math.min(100, Math.max(0, l3Stability + imp.stability));
+                l3Finance = Math.round((l3Budget / 100000) * 100);
+
+                // Update HUD
+                document.getElementById('l3-hud-trust').textContent = `${l3Trust}%`;
+                document.getElementById('l3-hud-reputation').textContent = `${l3Reputation}%`;
+                document.getElementById('l3-hud-finance').textContent = `${l3Finance}%`;
+                document.getElementById('l3-hud-continuity').textContent = `${l3Continuity}%`;
+                document.getElementById('l3-hud-compliance').textContent = `${l3Compliance}%`;
+                document.getElementById('l3-hud-risk').textContent = `${l3Risk}%`;
+                document.getElementById('l3-hud-employee').textContent = `${l3Employee}%`;
+                document.getElementById('l3-hud-stability').textContent = `${l3Stability}%`;
+
+                document.querySelectorAll('[id="l3-budget-count"]').forEach(el => el.textContent = `₹${l3Budget.toLocaleString()}`);
+
+                l3Answers.push(choice);
+
+                feedback.style.color = "var(--code-ok)";
+                feedback.innerHTML = r.correctFeedback;
+                document.getElementById('l3-submit-btn').disabled = true;
+                document.getElementById('nextL3Btn').style.display = "inline-flex";
+            } else {
+                l3MistakesCount++;
+                feedback.style.color = "var(--code-err)";
+                feedback.innerHTML = r.incorrectFeedback;
+                document.getElementById('l3-submit-btn').disabled = false;
+                document.getElementById('nextL3Btn').style.display = "none";
+            }
+        }
+
+        function proceedL3NextCrisis() {
+            selectedL3OptionVal = null;
+            if (l3IncidentIndex < 5) {
+                l3IncidentIndex++;
+                renderL3Incident();
+            } else {
+                // End simulator
+                concludeL3Ecosystem();
+            }
+        }
+
+        function concludeL3Ecosystem() {
+            document.getElementById('l3-gameplay-card').style.display = "none";
+            document.getElementById('l3-dashboard-card').style.display = "none";
+
+            const ratingPct = Math.max(20, 100 - (l3MistakesCount * 15));
+            let status = "Critical Governance Improvements Required";
+            if (ratingPct === 100) status = "Excellent Governance Leadership 🏆";
+            else if (ratingPct >= 80) status = "Strong Governance with Minor Risks";
+            else if (ratingPct >= 50) status = "Operationally Stable but Compliance Weaknesses Exist";
+
+            unlockBadge('badge-leader', '🏆 Chief Digital Governance Officer');
+
+            let reportHtml = `
+    <div class="card" style="border: 2px solid var(--primary); background: #fff;">
+      <span class="hero-badge" style="background:var(--primary); color:#fff;">Executive Board Report</span>
+      <h2 style="font-family:'Archivo Black',sans-serif; font-size:1.6rem; margin-top:0.8rem; letter-spacing:-1px;">E-Business Governance Review</h2>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;">Digital Resilience Board Assessment Matrix</p>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; background:rgba(0,0,0,0.02); padding:1rem; border-radius:var(--radius-md);">
+        <div>
+          <span class="gauge-sub" style="font-size:0.7rem;">CEO Evaluation Rating</span>
+          <div style="font-family:'Archivo Black',sans-serif; font-size:1.1rem; color:var(--primary);">${status}</div>
+        </div>
+        <div>
+          <span class="gauge-sub" style="font-size:0.7rem;">Governance Fitness Rating</span>
+          <div style="font-family:'Archivo Black',sans-serif; font-size:1.2rem; color:var(--code-ok);">${ratingPct}% Alignment</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+          <div class="gauge-num" style="font-size:1.4rem;">${Math.round((l3Trust + l3Reputation) / 2)}%</div>
+          <div class="gauge-sub" style="font-size:0.6rem;">Digital Trust Index</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+          <div class="gauge-num" style="font-size:1.4rem;">${ratingPct}%</div>
+          <div class="gauge-sub" style="font-size:0.6rem;">Gov Maturity</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+          <div class="gauge-num" style="font-size:1.4rem;">${l3Continuity}%</div>
+          <div class="gauge-sub" style="font-size:0.6rem;">Continuity Score</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+          <div class="gauge-num" style="font-size:1.4rem;">${l3Risk}%</div>
+          <div class="gauge-sub" style="font-size:0.6rem;">Risk Exposure</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+          <div class="gauge-num" style="font-size:1.4rem;">${l3Compliance}%</div>
+          <div class="gauge-sub" style="font-size:0.6rem;">Compliance Rating</div>
+        </div>
+        <div style="background:#fff; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:0.8rem; text-align:center;">
+          <div class="gauge-num" style="font-size:1.4rem;">${l3Reputation}%</div>
+          <div class="gauge-sub" style="font-size:0.6rem;">Brand Reputation</div>
+        </div>
+      </div>
+
+      <h4 style="font-family:'Archivo Black',sans-serif; font-size:0.95rem; margin-bottom:0.4rem;">Executive Assessment</h4>
+      <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin-bottom:1rem;">
+        Your incident responses have successfully protected primary transaction routes. Standardizing disaster failover paths secures compliance metrics during datacenter drop-offs, while proactive supplier blockades insulate customer datasets from third-party exposures (Ref: <em>Dave Chaffey E-Business Security Controls</em>).
+      </p>
+
+      <div class="tip-box" style="margin-top:1.5rem; text-align:center;">
+        <strong>Simulation Completed Successfully!</strong> You have earned the Chief Digital Governance Officer Badge.
+      </div>
+    </div>
+  `;
+
+            document.getElementById('l3-executive-report').innerHTML = reportHtml;
+            document.getElementById('l3-executive-report').style.display = "block";
+        }
+
+        /* ─── INITIALIZATION ON PAGE LOAD ─── */
+        renderL1Map();
+        recalculateL2Sandbox();
+        renderL3Incident();
+        switchLevel('35', 1);
+    </script>
+</body>
+
+</html>

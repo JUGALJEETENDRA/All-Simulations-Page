@@ -1,0 +1,2897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBT Module 5.3 Simulation - Objective Setting & Value Creation</title>
+    <meta name="description"
+        content="An interactive strategic management simulation for DBT Module 5.3. Act as the Chief Value Officer of ValueHub, formulate SMART goals, balance stakeholder satisfaction, and command value chains.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #C62828;
+            --primary-red-hover: #B71C1C;
+            --primary-red-light: #FFEBEE;
+            --dark-red: #8E0000;
+            --white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #DDDDDD;
+            --success: #2E7D32;
+            --success-light: #E8F5E9;
+            --warning: #F57C00;
+            --warning-light: #FFF3E0;
+            --danger: #C62828;
+            --danger-light: #FFEBEE;
+            --accent-blue: #1565C0;
+            --accent-blue-light: #E3F2FD;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header UI */
+        header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-group h1 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            letter-spacing: -0.5px;
+        }
+
+        .title-group p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Stepper Progress Bar (Unlocked Globally) */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            margin-top: 4px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .step-item.unlocked {
+            color: var(--text-dark);
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .step-item.active {
+            background-color: var(--primary-red-light);
+            color: var(--primary-red);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            opacity: 1;
+        }
+
+        .step-item.completed {
+            color: var(--success);
+            opacity: 1;
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .step-item.unlocked .step-badge {
+            background-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .step-item.active .step-badge {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-badge {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .step-divider {
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--border-color);
+            margin: 0 12px;
+            max-width: 120px;
+        }
+
+        .step-divider.active {
+            background-color: var(--primary-red);
+        }
+
+        .step-divider.completed {
+            background-color: var(--success);
+        }
+
+        /* Main Workspace Container */
+        main {
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Panels */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            color: var(--primary-red);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons & Interactions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-red-hover);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            border-color: var(--text-muted);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-red-light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Native Dialog (Modal) Styles */
+        dialog {
+            margin: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            background-color: var(--white);
+            font-family: var(--font-body);
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .dialog-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-header {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        .dialog-body {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        /* Welcome Onboarding */
+        .welcome-memo {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FFFFFF 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-red);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #FFCDD2;
+            padding-bottom: 16px;
+        }
+
+        .memo-logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .memo-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .memo-body {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memo-highlight {
+            background-color: var(--primary-red-light);
+            border-left: 4px solid var(--primary-red);
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Objective Box */
+        .objective-box {
+            background-color: #ECEFF1;
+            border-left: 4px solid #455A64;
+            padding: 16px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .objective-box strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #37474F;
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Persistent Navigation Footer */
+        .nav-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: none;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 900;
+        }
+
+        .nav-footer-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Toast notifications styling */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background-color: #333333;
+            color: var(--white);
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            pointer-events: auto;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .toast.success { border-left: 5px solid var(--success); }
+        .toast.warning { border-left: 5px solid var(--warning); }
+        .toast.danger { border-left: 5px solid var(--danger); }
+        .toast.info { border-left: 5px solid var(--accent-blue); }
+
+        /* LEVEL 1: SMART Objective Architect */
+        .l1-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l1-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .goals-list {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .goal-item-btn {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .goal-item-btn:hover {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+        }
+
+        .goal-item-btn.active {
+            border-color: var(--primary-red);
+            background-color: var(--primary-red-light);
+            border-left: 5px solid var(--primary-red);
+        }
+
+        .goal-item-btn.completed {
+            border-left: 5px solid var(--success);
+            background-color: var(--success-light);
+            color: var(--success);
+            cursor: default;
+        }
+
+        .builder-workspace {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .builder-component-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .builder-component-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+
+        .component-label {
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .builder-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        .repaired-objectives-card {
+            border: 2px solid var(--success);
+            border-radius: var(--radius-lg);
+            background-color: var(--success-light);
+            padding: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            animation: cardSlideUp 0.4s ease-out forwards;
+        }
+
+        .repaired-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--success);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .repaired-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        /* LEVEL 2: Stakeholder Balance Board */
+        .l2-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .l2-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .circle-board-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            min-height: 380px;
+            position: relative;
+        }
+
+        .stakeholder-circle-graphic {
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+        }
+
+        .circle-sector {
+            fill: #ECEFF1;
+            stroke: var(--white);
+            stroke-width: 4;
+            transition: var(--transition);
+        }
+
+        .circle-sector.active-stakeholder {
+            fill: var(--accent-blue-light);
+            stroke: var(--accent-blue);
+            stroke-width: 4;
+        }
+
+        .circle-sector.tradeoff-stakeholder {
+            fill: var(--primary-red-light);
+            stroke: var(--primary-red);
+            stroke-width: 4;
+        }
+
+        .circle-label {
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            fill: #37474F;
+            pointer-events: none;
+            text-anchor: middle;
+        }
+
+        .circle-center {
+            fill: var(--white);
+            stroke: var(--border-color);
+            stroke-width: 2;
+        }
+
+        .demand-dashboard {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .dashboard-header {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .demand-metric-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .demand-metric-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .metric-bar {
+            height: 8px;
+            background-color: #ECEFF1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            background-color: var(--primary-red);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* LEVEL 3: Value Chain Builder */
+        .value-chain-container {
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .value-chain-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 900px;
+            padding: 16px;
+            position: relative;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+        }
+
+        .value-chain-stage {
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            width: 130px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .value-chain-stage.active-stage {
+            border-color: var(--success);
+            background-color: var(--success-light);
+            box-shadow: 0 0 10px rgba(46, 125, 80, 0.2);
+        }
+
+        .stage-title {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+        }
+
+        .stage-subtitle {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .stage-arrow {
+            color: var(--border-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .chain-pulse-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--success);
+            border-radius: 50%;
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            box-shadow: 0 0 8px var(--success);
+            z-index: 10;
+            display: none;
+        }
+
+        /* KPI dashboard widgets */
+        .kpi-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 1000px) {
+            .kpi-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kpi-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kpi-title {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .kpi-value-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .kpi-gauge-bar {
+            height: 5px;
+            background-color: #ECEFF1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .kpi-gauge-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-red);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Dialog reviews */
+        .scorecard-result {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .scorecard-banner {
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .scorecard-banner.success {
+            background-color: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .scorecard-banner.failed {
+            background-color: var(--danger-light);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+        }
+
+        .scorecard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .scorecard-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .scorecard-box-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header UI Area -->
+    <header>
+        <div class="header-container">
+            <div class="header-main">
+                <div class="title-group">
+                    <h1>DBT Module 5.3: Objective Setting & Value Creation Laboratory</h1>
+                    <p>Dave Chaffey E-Business Strategic Alignment Framework</p>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="showHelpManual()">CVO Manual</button>
+                </div>
+            </div>
+
+            <!-- Stepper Progress Tracker (Unlocked Globally) -->
+            <div class="stepper">
+                <div class="step-item active unlocked" id="step-btn-1" onclick="navigateToLevel(1)">
+                    <span class="step-badge">1</span>
+                    <span>SMART Objective Studio</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-2"></div>
+                <div class="step-item unlocked" id="step-btn-2" onclick="navigateToLevel(2)">
+                    <span class="step-badge">2</span>
+                    <span>Stakeholder Value Designer</span>
+                </div>
+                <div class="step-divider unlocked" id="step-div-3"></div>
+                <div class="step-item unlocked" id="step-btn-3" onclick="navigateToLevel(3)">
+                    <span class="step-badge">3</span>
+                    <span>Digital Value Creation Studio</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main>
+
+        <!-- PERSISTENT CORE THEORY BOARD (Visible during levels) -->
+        <section id="theory-dashboard-card" class="card"
+            style="border-left: 4px solid var(--accent-blue); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3
+                    style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    📘 Strategic Reference Board: Objective Setting & Value Creation (Module 5.3)
+                </h3>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" id="btn-theory-tab-smart" onclick="switchTheoryTab('smart')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">SMART Objectives</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-value" onclick="switchTheoryTab('value')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Value Creation</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-stakeholder" onclick="switchTheoryTab('stakeholder')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Stakeholder Value</button>
+                    <button class="btn btn-secondary" id="btn-theory-tab-chain" onclick="switchTheoryTab('chain')" style="font-size: 0.72rem; padding: 4px 8px; height: auto;">Digital Value Chain</button>
+                    <button class="btn btn-secondary" id="btn-toggle-theory" onclick="toggleTheorySection()"
+                        style="font-size: 0.72rem; padding: 4px 8px; height: auto; background: #666; color: white;">Hide</button>
+                </div>
+            </div>
+            <div id="theory-content"
+                style="font-size: 0.88rem; line-height: 1.6; color: var(--text-dark);">
+                <!-- Dynamic theory -->
+            </div>
+        </section>
+
+        <!-- PERSISTENT STRATEGIC ANALYSIS PERFORMANCE DASHBOARD -->
+        <section id="kpi-dashboard-card" class="card"
+            style="border-left: 4px solid var(--primary-red); background-color: var(--white); margin-bottom: 20px; padding: 20px; display: none;">
+            <h3
+                style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--primary-red); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                📊 Strategic Value Creation Dashboard (Module 5.3)
+            </h3>
+            <div class="kpi-board">
+                <div class="kpi-card">
+                    <span class="kpi-title">SMART Goal Quality</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-smart">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-smart" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Strategic Alignment</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-alignment">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-alignment" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Customer Value</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-customer">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-customer" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Stakeholder Satisfaction</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-stakeholder">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-stakeholder" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Value Creation Score</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-value-score">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-value-score" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Digital Effectiveness</span>
+                    <div class="kpi-value-row">
+                        <span class="kpi-value" id="kpi-digital">0</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">%</span>
+                    </div>
+                    <div class="kpi-gauge-bar">
+                        <div class="kpi-gauge-fill" id="fill-digital" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WELCOME SCREEN & ONBOARDING -->
+        <section id="screen-intro" class="screen active">
+            <div class="welcome-memo">
+                <div class="memo-header">
+                    <div class="memo-logo">
+                        <span>🏛️</span>
+                        <span>ValueHub Executive Council</span>
+                    </div>
+                    <div class="memo-meta">
+                        <div>PROJECT: STRATEGIC ALIGNMENT</div>
+                        <div>ROLE: CHIEF VALUE OFFICER</div>
+                        <div>DATE: JUN 2026</div>
+                    </div>
+                </div>
+
+                <div class="memo-body">
+                    <p><strong>To: Chief Value Officer (CVO)</strong></p>
+                    <p>Welcome to <strong>ValueHub</strong>. Currently, our company suffers from unfocused strategies,
+                        poorly defined goals, and unbalanced stakeholder value, resulting in declining customer
+                        satisfaction and rising churn.</p>
+
+                    <div class="memo-highlight">
+                        Your mission is to completely restructure our business goals, align operational initiatives with
+                        stakeholders, and trace digital value creation stages using Dave Chaffey's textbook frameworks.
+                    </div>
+
+                    <p>Your strategic workbook outlines three core focus levels:</p>
+
+                    <ul
+                        style="padding-left: 24px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem;">
+                        <li><strong>Level 1: SMART Objective Studio</strong> – Reconstruct vague
+                            objectives into precise SMART targets (Specific, Measurable, Achievable, Relevant,
+                            Time-bound).</li>
+                        <li><strong>Level 2: Stakeholder Value Designer</strong> – Present realistic business initiatives and balance benefits, trade-offs, and justifications across Investors, Customers, Employees, Owners, Society, and Partners.</li>
+                        <li><strong>Level 3: Digital Value Creation Studio</strong> – Organize and connect digital processes (Customer Acquisition, Digital Marketing, Sales, CRM, Support, Continuous Improvement) with customer and business value objectives.</li>
+                    </ul>
+
+                    <p>In accordance with leadership parameters, all stage workbooks are unlocked and active. You can
+                        browse through levels using the top navigation pills or the previous/next footer buttons at any
+                        time.</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" onclick="startSimulation()">Initialize Value Council</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 1: SMART Objective Studio -->
+        <section id="screen-l1" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 1: SMART Objective Studio</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--primary-red-light); color: var(--primary-red); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Goal
+                        Repair Studio</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Convert poorly written business goals into SMART objectives. Select a goal on the left, then use the
+                    dropdown slots on the right to build its SMART components. Validate all 5 goals.
+                </div>
+
+                <div class="l1-layout">
+                    <!-- Left: Poor Goals List -->
+                    <div class="goals-list">
+                        <div class="evidence-title" style="font-weight:700; margin-bottom:8px;">Vague Business Goals</div>
+                        <div id="goals-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: SMART Component slots -->
+                    <div class="builder-workspace">
+                        <div class="evidence-title" id="builder-target-title" style="font-weight:700; margin-bottom:8px;">Select a Goal to Repair</div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Specific</span>
+                            <select class="builder-select" id="smart-specific">
+                                <option value="none">-- Select Specific Action --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Measurable</span>
+                            <select class="builder-select" id="smart-measurable">
+                                <option value="none">-- Select Metric --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Achievable</span>
+                            <select class="builder-select" id="smart-achievable">
+                                <option value="none">-- Select Target Path --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Relevant</span>
+                            <select class="builder-select" id="smart-relevant">
+                                <option value="none">-- Select Business Context --</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-component-row">
+                            <span class="component-label">Time-bound</span>
+                            <select class="builder-select" id="smart-timebound">
+                                <option value="none">-- Select Deadline --</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                            <button class="btn btn-secondary" onclick="resetLevel1()">Reset Slots</button>
+                            <button class="btn" id="l1-verify-btn" onclick="verifyL1Objective()" disabled>Verify Objective</button>
+                        </div>
+
+                        <!-- Feedback / Diagnostic message box -->
+                        <div id="l1-feedback-box" style="margin-top: 16px; padding: 16px; border-radius: var(--radius-md); font-size:0.9rem; line-height: 1.5; display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Repaired SMART list -->
+                <div class="repaired-objectives-card" id="l1-repaired-box">
+                    <div class="repaired-title">Repaired SMART Objectives Log</div>
+                    <div class="repaired-list" id="l1-repaired-list">
+                        <!-- Injected -->
+                    </div>
+                    <div class="btn-group" style="justify-content: flex-end; margin-top: 12px;">
+                        <button class="btn" onclick="showSummaryDialog(1)">Lock SMART Objectives Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 2: Stakeholder Value Designer -->
+        <section id="screen-l2" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 2: Stakeholder Value Designer</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--warning-light); color: var(--warning); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Stakeholder
+                        Value</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Evaluate realistic digital business initiatives. Select a scenario on the left, then audit the strategic trade-offs on the right to identify the primary beneficiary, the affected stakeholder, and the balancing justification. Balance all 5 scenarios.
+                </div>
+
+                <div class="l2-layout">
+                    <!-- Left: Situations Pool -->
+                    <div class="goals-list">
+                        <div class="evidence-title" style="font-weight:700; margin-bottom:8px;">Strategic Initiatives</div>
+                        <div id="initiative-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Selection & SVG Visualizer -->
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <!-- SVG Circle board -->
+                        <div class="circle-board-container" style="flex-direction:column; gap:10px;">
+                            <div class="evidence-title" style="font-weight:700;">Stakeholder Impact Wheel</div>
+                            <svg class="stakeholder-circle-graphic" viewBox="0 0 500 500">
+                                <circle class="circle-center" cx="250" cy="250" r="70"></circle>
+
+                                <!-- Sector 1: Customers -->
+                                <path class="circle-sector" id="sec-customers" d="M250 250 L250 50 A200 200 0 0 1 440 185 Z"></path>
+                                <!-- Sector 2: Investors -->
+                                <path class="circle-sector" id="sec-investors" d="M250 250 L440 185 A200 200 0 0 1 368 390 Z"></path>
+                                <!-- Sector 3: Business Owners -->
+                                <path class="circle-sector" id="sec-owners" d="M250 250 L368 390 A200 200 0 0 1 132 390 Z"></path>
+                                <!-- Sector 4: Society -->
+                                <path class="circle-sector" id="sec-society" d="M250 250 L132 390 A200 200 0 0 1 60 185 Z"></path>
+                                <!-- Sector 5: Employees -->
+                                <path class="circle-sector" id="sec-employees" d="M250 250 L60 185 A200 200 0 0 1 250 50 Z"></path>
+
+                                <circle cx="250" cy="250" r="70" fill="none" stroke="var(--border-color)" stroke-width="2"></circle>
+
+                                <text class="circle-label" x="250" y="120">CUSTOMERS</text>
+                                <text class="circle-label" x="350" y="240">INVESTORS</text>
+                                <text class="circle-label" x="250" y="360">OWNERS</text>
+                                <text class="circle-label" x="150" y="300">SOCIETY</text>
+                                <text class="circle-label" x="150" y="180">EMPLOYEES</text>
+
+                                <text x="250" y="245" text-anchor="middle" font-size="10" font-weight="700" fill="var(--text-muted)">BALANCE</text>
+                                <text x="250" y="265" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--primary-red)" id="circle-sat-val">0%</text>
+                            </svg>
+                        </div>
+
+                        <!-- Live Metrics Dashboard -->
+                        <div class="demand-dashboard">
+                            <div class="dashboard-header" id="l2-scenario-title">Select an Initiative</div>
+                            <p style="font-size:0.85rem; color:var(--text-muted); min-height:45px;" id="l2-scenario-desc">Click an active card in the pool to inspect the strategic trade-offs.</p>
+
+                            <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+                                <div style="display:flex; flex-direction:column; gap:4px;">
+                                    <span style="font-size:0.78rem; font-weight:700; color:var(--primary-red); text-transform:uppercase;">Primary Stakeholder Benefited</span>
+                                    <select class="builder-select" id="l2-select-benefit" disabled>
+                                        <option value="none">Select Beneficiary...</option>
+                                        <option value="customers">Customers</option>
+                                        <option value="employees">Employees</option>
+                                        <option value="investors">Investors</option>
+                                        <option value="owners">Business Owners</option>
+                                        <option value="society">Society</option>
+                                        <option value="partners">Business Partners</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:4px;">
+                                    <span style="font-size:0.78rem; font-weight:700; color:var(--primary-red); text-transform:uppercase;">Affected/Trade-off Stakeholder</span>
+                                    <select class="builder-select" id="l2-select-tradeoff" disabled>
+                                        <option value="none">Select Trade-off...</option>
+                                        <option value="customers">Customers</option>
+                                        <option value="employees">Employees</option>
+                                        <option value="investors">Investors</option>
+                                        <option value="owners">Business Owners</option>
+                                        <option value="society">Society</option>
+                                        <option value="partners">Business Partners</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:4px;">
+                                    <span style="font-size:0.78rem; font-weight:700; color:var(--primary-red); text-transform:uppercase;">Strategic Alignment Justification</span>
+                                    <select class="builder-select" id="l2-select-justification" style="font-size:0.8rem;" disabled>
+                                        <option value="none">Select Justification...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="btn-group" style="justify-content: flex-end; margin-top:12px;">
+                                <button class="btn btn-secondary" onclick="resetLevel2()">Reset Board</button>
+                                <button class="btn" id="l2-verify-btn" onclick="verifyLevel2()" disabled>Verify Balance</button>
+                            </div>
+
+                            <div id="l2-feedback-box" style="margin-top:10px; padding:12px; border-radius:var(--radius-md); font-size:0.82rem; display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="l2-complete-box" style="display:none; border-color:var(--success); background-color:var(--success-light);">
+                    <div class="repaired-title">All Initiatives Successfully Aligned</div>
+                    <div class="btn-group" style="justify-content: flex-end;">
+                        <button class="btn" onclick="showSummaryDialog(2)">Lock Stakeholder Balance Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEVEL 3: Digital Value Creation Studio -->
+        <section id="screen-l3" class="screen">
+            <div class="card">
+                <div class="card-header-bar">
+                    <div class="card-title">Level 3: Digital Value Creation Studio</div>
+                    <span class="l1-slot-label"
+                        style="background-color: var(--accent-blue-light); color: var(--accent-blue); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">Value
+                        Creation Flow</span>
+                </div>
+
+                <div class="objective-box">
+                    <strong>Objective</strong>
+                    Act as a Digital Strategy Consultant. Analyze each challenge scenario on the left, and choose the correct value chain alignment options on the right. Track the flow of value through the digital processes.
+                </div>
+
+                <!-- Digital Value Chain Horizontal Flow Diagram -->
+                <div class="value-chain-container">
+                    <div class="value-chain-flow" id="value-chain-flow">
+                        <div class="chain-pulse-dot" id="chain-pulse"></div>
+
+                        <div class="value-chain-stage" id="stage-acquisition">
+                            <span class="stage-title">1. Acquisition</span>
+                            <span class="stage-subtitle">Customer Acquisition</span>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <div class="value-chain-stage" id="stage-marketing">
+                            <span class="stage-title">2. Marketing</span>
+                            <span class="stage-subtitle">Digital Marketing</span>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <div class="value-chain-stage" id="stage-sales">
+                            <span class="stage-title">3. Transactions</span>
+                            <span class="stage-subtitle">Sales & Checkout</span>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <div class="value-chain-stage" id="stage-crm">
+                            <span class="stage-title">4. CRM</span>
+                            <span class="stage-subtitle">Relationship Mgmt</span>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <div class="value-chain-stage" id="stage-support">
+                            <span class="stage-title">5. Support</span>
+                            <span class="stage-subtitle">Service & Support</span>
+                        </div>
+                        <span class="stage-arrow">→</span>
+
+                        <div class="value-chain-stage" id="stage-improvement">
+                            <span class="stage-title">6. Improvement</span>
+                            <span class="stage-subtitle">Continuous Optimize</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lower split layout -->
+                <div class="l1-layout">
+                    <!-- Left: Challenge cases -->
+                    <div class="goals-list">
+                        <div class="evidence-title" style="font-weight:700; margin-bottom:8px;">Business Challenges</div>
+                        <div id="l3-cases-pool" style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Consultant Work desk -->
+                    <div class="demand-dashboard">
+                        <div class="dashboard-header" id="l3-case-title">Select a Case Challenge</div>
+                        <p style="font-size:0.85rem; color:var(--text-muted); min-height:45px;" id="l3-case-desc">Consulting data will load upon selecting an active challenge case.</p>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:8px;">
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.75rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase;">Primary Digital Initiative</span>
+                                <select class="builder-select" id="l3-select-initiative" disabled>
+                                    <option value="none">Select Initiative...</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.75rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase;">Value Chain Focus Process</span>
+                                <select class="builder-select" id="l3-select-stage" disabled>
+                                    <option value="none">Select Stage...</option>
+                                    <option value="Customer Acquisition">Customer Acquisition</option>
+                                    <option value="Digital Marketing">Digital Marketing</option>
+                                    <option value="Sales & Transactions">Sales & Transactions</option>
+                                    <option value="Customer Relationship Management (CRM)">Customer Relationship Management (CRM)</option>
+                                    <option value="Customer Service & Support">Customer Service & Support</option>
+                                    <option value="Continuous Improvement">Continuous Improvement</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.75rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase;">Business Objective Supported</span>
+                                <select class="builder-select" id="l3-select-objective" disabled>
+                                    <option value="none">Select Objective...</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.75rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase;">Expected Customer Value</span>
+                                <select class="builder-select" id="l3-select-custvalue" disabled>
+                                    <option value="none">Select Customer Value...</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.75rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase;">Primary Stakeholder Benefit</span>
+                                <select class="builder-select" id="l3-select-stakeholder" disabled>
+                                    <option value="none">Select Stakeholder...</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <span style="font-size:0.75rem; font-weight:700; color:var(--accent-blue); text-transform:uppercase;">Expected Strategic Outcome</span>
+                                <select class="builder-select" id="l3-select-outcome" disabled>
+                                    <option value="none">Select Outcome...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="btn-group" style="justify-content: flex-end; margin-top:16px;">
+                            <button class="btn btn-secondary" onclick="resetLevel3()">Reset Form</button>
+                            <button class="btn" id="l3-verify-btn" onclick="verifyLevel3()" disabled>Verify Strategic Alignment</button>
+                        </div>
+
+                        <div id="l3-feedback-box" style="margin-top:12px; padding:12px; border-radius:var(--radius-md); font-size:0.85rem; display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Native Learning Summary Dialog -->
+    <dialog id="summary-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📘</span>
+                <span id="summary-dialog-title">Stage Complete: Strategic Summary</span>
+            </div>
+            <div class="dialog-body" id="summary-dialog-content">
+                <!-- content injected -->
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" id="summary-next-btn" onclick="confirmSummaryNextLevel()">Proceed to Next Stage</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Scorecard Dialog -->
+    <dialog id="scorecard-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>📊</span>
+                <span>ValueHub Strategic Scorecard</span>
+            </div>
+            <div class="dialog-body">
+                <div class="scorecard-result">
+                    <div class="scorecard-banner" id="scorecard-banner-status">SUCCESS</div>
+
+                    <div class="scorecard-grid">
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Value Metrics Summary</div>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+                                <div style="display:flex; justify-content:space-between;"><span>SMART Goal Quality:</span><strong id="card-smart">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Strategic Alignment:</span><strong id="card-alignment">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Customer Value:</span><strong id="card-customer">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Stakeholder Satisfaction:</span><strong id="card-stakeholder">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Value Creation Score:</span><strong id="card-value-score">80%</strong></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Digital Effectiveness:</span><strong id="card-digital">80%</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="scorecard-box">
+                            <div class="scorecard-box-title">Consulting Review</div>
+                            <div style="font-size:0.82rem; color:var(--text-dark);" id="scorecard-eval-text">
+                                Feedback description...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:6px; font-size:0.85rem; background-color:var(--bg-light); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                        <strong>Value Creation Key Principles (Dave Chaffey):</strong>
+                        <ul style="padding-left:16px;">
+                            <li><strong>SMART Objectives:</strong> Provides a measurable direction for digital strategy and supports long-term value.</li>
+                            <li><strong>Stakeholder Balancing:</strong> Healthy digital business model architectures balance benefits across all nodes, avoiding lopsided optimization.</li>
+                            <li><strong>Value Creation Chain:</strong> Upstream/downstream digital processes systematically add value to customers and lock in strategic advantages.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn btn-secondary" onclick="resetFullSimulation()">Restart Laboratory</button>
+                <button class="btn" onclick="scorecardDialog.close()">Close Review</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Help Manual Dialog -->
+    <dialog id="help-dialog">
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <span>🏛️</span>
+                <span>Chief Value Officer Reference Manual</span>
+            </div>
+            <div class="dialog-body">
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:0.9rem;">
+                    <div><strong>SMART Objectives (Chaffey):</strong></div>
+                    <p style="color:var(--text-muted);">Goals must be Specific (defining the operational target), Measurable (establishing numeric checks), Achievable (realistic implementation paths), Relevant (aligned with business needs), and Time-bound (securing a clear deadline).</p>
+
+                    <div><strong>Stakeholder Value Balancing:</strong></div>
+                    <p style="color:var(--text-muted);">Modern e-businesses must balance interests across Customers, Employees, Investors, Business Owners, Society, and Business Partners to secure a sustainable long-term model.</p>
+
+                    <div><strong>Digital Value Chain:</strong></div>
+                    <p style="color:var(--text-muted);">Rather than generic activities, value is generated via specialized digital processes including Customer Acquisition, Digital Marketing, Sales/Checkout, CRM database consolidation, Customer Support tools, and Continuous optimization metrics.</p>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="btn" onclick="closeHelpManual()">Return to Lab</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Persistent Navigation Footer -->
+    <div class="nav-footer" id="navigationFooter">
+        <div class="nav-footer-container">
+            <button class="btn btn-secondary" id="footerPrevBtn" onclick="prevLevel()">Previous Stage</button>
+            <span style="font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--text-dark);"
+                id="footerLevelText">Level 1 of 3</span>
+            <button class="btn" id="footerNextBtn" onclick="nextLevel()">Next Stage</button>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // System State
+        const state = {
+            currentLevel: 1,
+            unlockedLevels: [true, true, true],
+            completedLevels: [false, false, false],
+            kpis: {
+                smart: 0,
+                alignment: 0,
+                customer: 0,
+                stakeholder: 0,
+                valueScore: 0,
+                digital: 0
+            },
+
+            // Level 1: SMART Objective Studio variables
+            l1: {
+                activeGoal: null,
+                completedGoals: [],
+                selections: {
+                    specific: 'none',
+                    measurable: 'none',
+                    achievable: 'none',
+                    relevant: 'none',
+                    timebound: 'none'
+                },
+                goals: {
+                    'sales': {
+                        id: 'sales',
+                        poor: 'Increase sales',
+                        repaired: 'Increase monthly sales revenue by 20% through digital marketing campaigns to maximize operating cash reserves within 6 months.',
+                        correct: {
+                            specific: 'increase-sales',
+                            measurable: 'by-20',
+                            achievable: 'marketing-campaigns',
+                            relevant: 'maximize-cash',
+                            timebound: 'six-months'
+                        },
+                        strategicInfo: {
+                            objective: 'Drive e-commerce sales conversion growth.',
+                            benefit: 'Boost operational cash reserves and improve financial runway.',
+                            metric: '20% increase in monthly sales revenue.',
+                            stakeholder: 'Investors & Business Owners.',
+                            custValue: 'Higher promotional campaigns and product discounts from scale economies.'
+                        }
+                    },
+                    'customers': {
+                        id: 'customers',
+                        poor: 'Get more customers',
+                        repaired: 'Acquire new active platform users by 50,000 via referrals and digital ad buys to expand regional market penetration in Q3.',
+                        correct: {
+                            specific: 'acquire-users',
+                            measurable: 'by-50k',
+                            achievable: 'referrals-ads',
+                            relevant: 'expand-penetration',
+                            timebound: 'q3'
+                        },
+                        strategicInfo: {
+                            objective: 'Expand market penetration and user network size.',
+                            benefit: 'Enhances brand presence and increases network effects.',
+                            metric: '50,000 new active platform users.',
+                            stakeholder: 'Customers & Business Partners (more platform interaction).',
+                            custValue: 'More user reviews, higher peer interaction, and better platform ecosystems.'
+                        }
+                    },
+                    'app': {
+                        id: 'app',
+                        poor: 'Improve the app',
+                        repaired: 'Reduce application page load time to under 1.5 seconds by optimizing database queries to prevent checkout cart abandonment before the holiday rush.',
+                        correct: {
+                            specific: 'reduce-load',
+                            measurable: 'under-1-5',
+                            achievable: 'optimizing-queries',
+                            relevant: 'prevent-abandonment',
+                            timebound: 'holiday-rush'
+                        },
+                        strategicInfo: {
+                            objective: 'Improve app performance and digital customer experience.',
+                            benefit: 'Prevent cart abandonment and checkout pipeline leakage.',
+                            metric: 'Page load time under 1.5 seconds.',
+                            stakeholder: 'Customers (friction-free experience).',
+                            custValue: 'A fast, seamless, friction-free purchasing experience.'
+                        }
+                    },
+                    'happy': {
+                        id: 'happy',
+                        poor: 'Make customers happier',
+                        repaired: 'Improve customer NPS rating by 15 points through support staff training to increase customer lifetime retention by year-end.',
+                        correct: {
+                            specific: 'improve-nps',
+                            measurable: 'by-15',
+                            achievable: 'support-training',
+                            relevant: 'increase-retention',
+                            timebound: 'year-end'
+                        },
+                        strategicInfo: {
+                            objective: 'Elevate customer satisfaction and loyalty.',
+                            benefit: 'Boosts Customer Lifetime Value (CLV) and reduces customer acquisition costs.',
+                            metric: '15-point increase in Net Promoter Score (NPS).',
+                            stakeholder: 'Customers & Employees (less complaint pressure).',
+                            custValue: 'Professional, supportive, and efficient customer service.'
+                        }
+                    },
+                    'grow': {
+                        id: 'grow',
+                        poor: 'Grow the business',
+                        repaired: 'Expand retail partner network by 10 accounts by offering incentive bonuses to secure supply-chain self-sufficiency within 90 days.',
+                        correct: {
+                            specific: 'expand-partners',
+                            measurable: 'by-10',
+                            achievable: 'incentive-bonuses',
+                            relevant: 'secure-supply',
+                            timebound: 'ninety-days'
+                        },
+                        strategicInfo: {
+                            objective: 'Secure retail supply chain dependencies.',
+                            benefit: 'Assures inventory availability and operational self-sufficiency.',
+                            metric: '10 new retail partner accounts.',
+                            stakeholder: 'Business Partners & Investors.',
+                            custValue: 'Guaranteed product choice and consistent supply availability.'
+                        }
+                    }
+                },
+                options: {
+                    specific: [
+                        { val: 'increase-sales', text: 'Increase monthly sales revenue' },
+                        { val: 'acquire-users', text: 'Acquire new active platform users' },
+                        { val: 'reduce-load', text: 'Reduce application page load time' },
+                        { val: 'improve-nps', text: 'Improve customer NPS rating' },
+                        { val: 'expand-partners', text: 'Expand retail partner network' }
+                    ],
+                    measurable: [
+                        { val: 'by-20', text: 'by 20%' },
+                        { val: 'by-50k', text: 'by 50,000' },
+                        { val: 'under-1-5', text: 'to under 1.5 seconds' },
+                        { val: 'by-15', text: 'by 15 points' },
+                        { val: 'by-10', text: 'by 10 accounts' }
+                    ],
+                    achievable: [
+                        { val: 'marketing-campaigns', text: 'through digital marketing campaigns' },
+                        { val: 'referrals-ads', text: 'via referrals and digital ad buys' },
+                        { val: 'optimizing-queries', text: 'by optimizing database queries' },
+                        { val: 'support-training', text: 'through support staff training' },
+                        { val: 'incentive-bonuses', text: 'by offering incentive bonuses' }
+                    ],
+                    relevant: [
+                        { val: 'maximize-cash', text: 'to maximize operating cash reserves' },
+                        { val: 'expand-penetration', text: 'to expand regional market penetration' },
+                        { val: 'prevent-abandonment', text: 'to prevent checkout cart abandonment' },
+                        { val: 'increase-retention', text: 'to increase customer lifetime retention' },
+                        { val: 'secure-supply', text: 'to secure supply-chain self-sufficiency' }
+                    ],
+                    timebound: [
+                        { val: 'six-months', text: 'within 6 months' },
+                        { val: 'q3', text: 'in Q3' },
+                        { val: 'holiday-rush', text: 'before the holiday rush' },
+                        { val: 'year-end', text: 'by year-end' },
+                        { val: 'ninety-days', text: 'within 90 days' }
+                    ]
+                }
+            },
+
+            // Level 2: Stakeholder Value Designer variables
+            l2: {
+                activeScenario: null,
+                completedScenarios: [],
+                selections: {
+                    benefit: 'none',
+                    tradeoff: 'none',
+                    justification: 'none'
+                },
+                scenarios: {
+                    'ai-support': {
+                        id: 'ai-support',
+                        title: 'Launching AI Customer Support',
+                        desc: 'ValueHub plans to launch an AI chatbot to resolve customer queries instantly 24/7. This improves service speed but raises job insecurity anxiety among support staff.',
+                        correct: {
+                            benefit: 'customers',
+                            tradeoff: 'employees',
+                            justification: 'balance-support'
+                        },
+                        options: [
+                            { val: 'balance-support', text: 'Upskill employees to customer success roles, routing routine queries to AI.' },
+                            { val: 'ignore-employees', text: 'Reduce staff overhead immediately to optimize investor margins.' },
+                            { val: 'delay-ai', text: 'Delay chatbot rollout indefinitely to avoid employee friction.' }
+                        ],
+                        feedback: 'Upskilling employees to focus on high-value escalations balances customer service speed with employee retention.'
+                    },
+                    'flex-work': {
+                        id: 'flex-work',
+                        title: 'Introducing Flexible Work Policies',
+                        desc: 'The HR team proposes hybrid and remote work models to reduce office overhead and enhance employee morale, but managers worry about team coordination.',
+                        correct: {
+                            benefit: 'employees',
+                            tradeoff: 'owners',
+                            justification: 'balance-work'
+                        },
+                        options: [
+                            { val: 'balance-work', text: 'Establish core collaboration hours and invest in remote leadership tools.' },
+                            { val: 'strict-onsite', text: 'Force 100% onsite attendance to maintain traditional control.' },
+                            { val: 'unmonitored-remote', text: 'Go 100% remote without performance metrics or checks.' }
+                        ],
+                        feedback: 'Setting synchronous collaboration window hours offsets coordination overheads for business owners while retaining employee flexibility.'
+                    },
+                    'cybersecurity': {
+                        id: 'cybersecurity',
+                        title: 'Investing in Cybersecurity',
+                        desc: 'IT requests zero-trust security architecture to prevent customer data breaches, but the complex multi-factor login process adds purchase friction.',
+                        correct: {
+                            benefit: 'investors',
+                            tradeoff: 'customers',
+                            justification: 'balance-security'
+                        },
+                        options: [
+                            { val: 'balance-security', text: 'Implement passwordless biometric validation to protect data with minimal friction.' },
+                            { val: 'max-friction', text: 'Force 5-step authentication on every page visit to prioritize safety.' },
+                            { val: 'no-upgrade', text: 'Avoid upgrades to prevent checkout abandonment, accepting data risks.' }
+                        ],
+                        feedback: 'Biometric and passwordless validation shields business value for investors while preventing customer friction.'
+                    },
+                    'self-service': {
+                        id: 'self-service',
+                        title: 'Improving Customer Self-Service',
+                        desc: 'A new returns and shipment tracking portal gives agency to customers, but requires delivery logistics partners to share real-time telemetry data.',
+                        correct: {
+                            benefit: 'customers',
+                            tradeoff: 'partners',
+                            justification: 'balance-selfservice'
+                        },
+                        options: [
+                            { val: 'balance-selfservice', text: 'Provide logistics partners with free API tools and co-marketing promotions.' },
+                            { val: 'force-compliance', text: 'Threaten to terminate partner contracts unless they build custom feeds.' },
+                            { val: 'abandon-portal', text: 'Scrap the tracking portal to avoid partner negotiation costs.' }
+                        ],
+                        feedback: 'Standard API toolkits reduce partner integration costs while enabling customer tracking value.'
+                    },
+                    'sustainability': {
+                        id: 'sustainability',
+                        title: 'Launching Sustainability Initiatives',
+                        desc: 'ValueHub proposes shifting to 100% biodegradable product packaging to lower environmental footprints, which increases unit packaging costs by 15%.',
+                        correct: {
+                            benefit: 'society',
+                            tradeoff: 'investors',
+                            justification: 'balance-sustainability'
+                        },
+                        options: [
+                            { val: 'balance-sustainability', text: 'Market the green transition to eco-conscious segments to support premium margins.' },
+                            { val: 'absorb-loss', text: 'Absorb the full 15% cost hike, lowering investor dividends.' },
+                            { val: 'cancel-green', text: 'Continue using cheap single-use plastics to maximize short-term profits.' }
+                        ],
+                        feedback: 'Targeting premium eco-friendly customer segments transforms societal packaging benefits into long-term investor value.'
+                    }
+                }
+            },
+
+            // Level 3: Digital Value Creation Studio variables
+            l3: {
+                activeCase: null,
+                completedCases: [],
+                selections: {
+                    initiative: 'none',
+                    stage: 'none',
+                    objective: 'none',
+                    custvalue: 'none',
+                    stakeholder: 'none',
+                    outcome: 'none'
+                },
+                cases: {
+                    'case-1': {
+                        id: 'case-1',
+                        title: 'Case 1: Resolving Declining Customer Satisfaction',
+                        desc: 'Customer surveys indicate support ticket delays and checkout site friction are driving customer satisfaction down.',
+                        dropdowns: {
+                            initiative: [
+                                { val: 'usability', text: 'Optimize checkout flow usability and remove steps' },
+                                { val: 'crm-consolidation', text: 'Build support dashboard CRM consolidation tools' }
+                            ],
+                            objective: [
+                                { val: 'reduce-load', text: 'Reduce application load times and step friction' },
+                                { val: 'improve-nps', text: 'Improve customer NPS rating by year-end' }
+                            ],
+                            custvalue: [
+                                { val: 'frictionless-purchase', text: 'Friction-free, rapid digital checkout experience' },
+                                { val: 'expert-support', text: 'Support reps holding unified client logs' }
+                            ],
+                            stakeholder: [
+                                { val: 'customers-owners', text: 'Customers (better experience) & Owners (fewer abandoned carts)' },
+                                { val: 'employees-partners', text: 'Employees (lower support pressure) & Partners' }
+                            ],
+                            outcome: [
+                                { val: 'higher-conversion', text: 'Higher conversion rate and lower transaction cost' },
+                                { val: 'stable-retention', text: 'Stable customer lifetime value (CLV) retention' }
+                            ]
+                        },
+                        correct: {
+                            initiative: 'usability',
+                            stage: 'Sales & Transactions',
+                            objective: 'reduce-load',
+                            custvalue: 'frictionless-purchase',
+                            stakeholder: 'customers-owners',
+                            outcome: 'higher-conversion'
+                        },
+                        feedback: 'Optimizing sales checkout flow directly builds customer value through a frictionless purchase path, supporting sales conversion targets.'
+                    },
+                    'case-2': {
+                        id: 'case-2',
+                        title: 'Case 2: Building Customer Loyalty',
+                        desc: 'ValueHub notes customer retention is low, with 70% of purchasers buying once and never returning.',
+                        dropdowns: {
+                            initiative: [
+                                { val: 'loyalty-prog', text: 'Launch a points-based digital loyalty program' },
+                                { val: 'personalized-marketing', text: 'Target past purchasers with digital campaigns' }
+                            ],
+                            objective: [
+                                { val: 'increase-retention', text: 'Increase customer lifetime retention by year-end' },
+                                { val: 'acquire-users', text: 'Acquire new active platform users' }
+                            ],
+                            custvalue: [
+                                { val: 'loyalty-incentive', text: 'Recognition, reward incentives, and return benefits' },
+                                { val: 'ad-awareness', text: 'Awareness of niche digital platforms' }
+                            ],
+                            stakeholder: [
+                                { val: 'investors-customers', text: 'Investors (stable lifetime values) & Customers (rewards)' },
+                                { val: 'employees-society', text: 'Employees & Society' }
+                            ],
+                            outcome: [
+                                { val: 'higher-retention', text: 'Higher Repeat Purchase Rate and stable CLV' },
+                                { val: 'brand-reputation', text: 'Increased brand reputation and partner coverage' }
+                            ]
+                        },
+                        correct: {
+                            initiative: 'loyalty-prog',
+                            stage: 'Customer Relationship Management (CRM)',
+                            objective: 'increase-retention',
+                            custvalue: 'loyalty-incentive',
+                            stakeholder: 'investors-customers',
+                            outcome: 'higher-retention'
+                        },
+                        feedback: 'A digital loyalty program within CRM processes creates recognition incentives, aligning with long-term retention goals.'
+                    },
+                    'case-3': {
+                        id: 'case-3',
+                        title: 'Case 3: Defending Competitive Market Position',
+                        desc: 'Aggressive pricing aggregator platforms threaten ValueHub margins. The firm must improve operational delivery speed.',
+                        dropdowns: {
+                            initiative: [
+                                { val: 'routing-algo', text: 'Optimize backend dispatch routing algorithms' },
+                                { val: 'digital-acquisition', text: 'Increase digital search engine acquisition ad spend' }
+                            ],
+                            objective: [
+                                { val: 'secure-supply', text: 'Secure delivery routing and logistics capabilities' },
+                                { val: 'expand-partners', text: 'Expand retail partner network' }
+                            ],
+                            custvalue: [
+                                { val: 'guaranteed-speed', text: 'Guaranteed, fast order fulfillment' },
+                                { val: 'supplier-choice', text: 'Extensive product choice catalog options' }
+                            ],
+                            stakeholder: [
+                                { val: 'owners-customers', text: 'Business Owners (lower costs) & Customers (speed)' },
+                                { val: 'investors-society', text: 'Investors & Society' }
+                            ],
+                            outcome: [
+                                { val: 'cost-differentiation', text: 'Cost leadership and delivery speed differentiation' },
+                                { val: 'supply-sufficiency', text: 'Supply-chain operational self-sufficiency' }
+                            ]
+                        },
+                        correct: {
+                            initiative: 'routing-algo',
+                            stage: 'Continuous Improvement',
+                            objective: 'secure-supply',
+                            custvalue: 'guaranteed-speed',
+                            stakeholder: 'owners-customers',
+                            outcome: 'cost-differentiation'
+                        },
+                        feedback: 'Continuous optimization of backend logistics builds competitive value through service speed differentiation.'
+                    }
+                }
+            }
+        };
+
+        const summaries = {
+            1: {
+                title: "SMART Objectives Complete",
+                body: `<h3>Key Takeaways</h3>
+                       <p>Converting vague corporate goals to SMART objectives prevents capital misallocations and provides operational focus. Success is measured through specific performance metrics.</p>
+                       <h3>Common Mistakes</h3>
+                       <p>Setting objectives without measurable checks (e.g., "Improve the app") makes auditing success impossible.</p>
+                       <h3>Real-World Application</h3>
+                       <p>E-commerce firms trace page load times (KPIs) to prevent checkout abandonment rates.</p>`
+            },
+            2: {
+                title: "Stakeholder Balancing Complete",
+                body: `<h3>Key Takeaways</h3>
+                       <p>Digital strategies must balance interests across Investors, Customers, Employees, Owners, and Partners, rather than optimizing for a single cohort.</p>
+                       <h3>Common Mistakes</h3>
+                       <p>Optimizing short-term investor margins by cutting employee support structures creates severe churn and harms customer satisfaction indexes.</p>
+                       <h3>Real-World Application</h3>
+                       <p>Companies introducing customer self-service portals must support delivery partners with API toolkits to secure digital integration.</p>`
+            }
+        };
+
+        const theoryData = {
+            smart: `<h3>SMART Objectives</h3>
+                    <p>Dave Chaffey defines SMART objectives as core anchors of digital business planning:</p>
+                    <ul>
+                        <li><strong>Specific:</strong> Defines the operational target clearly (e.g., specific transaction actions).</li>
+                        <li><strong>Measurable:</strong> Assigns numeric indices and metrics to check achievement.</li>
+                        <li><strong>Achievable:</strong> Specifies the realistic implementation resources and paths.</li>
+                        <li><strong>Relevant:</strong> Aligns the goal with general organizational business value.</li>
+                        <li><strong>Time-bound:</strong> Establishes a strict deadline to create urgency.</li>
+                    </ul>`,
+            value: `<h3>Value Creation Dimensions</h3>
+                    <p>Firms achieve competitive advantage by generating value across several digital dimensions:</p>
+                    <ul>
+                        <li><strong>Customer Value:</strong> Instant support, frictionless checkouts, and rewards.</li>
+                        <li><strong>Business Value:</strong> Higher conversion rates, lower transaction costs, and margins.</li>
+                        <li><strong>Stakeholder Value:</strong> Balancing employee workplace quality, partner integration ease, and investor returns.</li>
+                    </ul>`,
+            stakeholder: `<h3>Stakeholder Balancing</h3>
+                          <p>Dave Chaffey's framework highlights that digital transformation initiatives affect multiple stakeholders. Sustainable planning resolves conflicts:</p>
+                          <ul>
+                              <li><strong>Customers:</strong> Demand data safety, low friction, and reliable service.</li>
+                              <li><strong>Employees:</strong> Require job security and digital upskilling.</li>
+                              <li><strong>Investors / Owners:</strong> Focus on long-term risk mitigation and business valuation.</li>
+                              <li><strong>Partners:</strong> Need standardized API integrations and business volume stability.</li>
+                          </ul>`,
+            chain: `<h3>Digital Value Chain</h3>
+                    <p>Digital value is added systematically across continuous business activities:</p>
+                    <ul>
+                        <li><strong>Customer Acquisition:</strong> Search ads, content marketing, and inbound paths.</li>
+                        <li><strong>Digital Marketing:</strong> Targeted messaging and retargeting based on user preferences.</li>
+                        <li><strong>Sales & Transactions:</strong> Checkout flow optimization and payment integrations.</li>
+                        <li><strong>CRM:</strong> Database consolidation and customer profile integration.</li>
+                        <li><strong>Service & Support:</strong> Customer self-service, portals, and AI assistance.</li>
+                        <li><strong>Continuous Improvement:</strong> Regular query optimization and performance scans.</li>
+                    </ul>`
+        };
+
+        const helpDialog = document.getElementById('help-dialog');
+        const summaryDialog = document.getElementById('summary-dialog');
+        const scorecardDialog = document.getElementById('scorecard-dialog');
+
+        function showHelpManual() { helpDialog.showModal(); }
+        function closeHelpManual() { helpDialog.close(); }
+
+        // Start Onboarding
+        function startSimulation() {
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('theory-dashboard-card').style.display = 'block';
+            document.getElementById('kpi-dashboard-card').style.display = 'block';
+            navigateToLevel(1);
+            document.getElementById('navigationFooter').style.display = 'flex';
+        }
+
+        function toggleTheorySection() {
+            const content = document.getElementById('theory-content');
+            const btn = document.getElementById('btn-toggle-theory');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = "Hide Reference";
+            } else {
+                content.style.display = 'none';
+                btn.textContent = "Show Reference";
+            }
+        }
+
+        function switchTheoryTab(tab) {
+            const tabs = ['smart', 'value', 'stakeholder', 'chain'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`btn-theory-tab-${t}`);
+                if (t === tab) {
+                    btn.classList.remove('btn-secondary');
+                } else {
+                    btn.classList.add('btn-secondary');
+                }
+            });
+            document.getElementById('theory-content').innerHTML = theoryData[tab];
+        }
+
+        // Navigation Stepper (Unlocked globally)
+        function updateNavigationPills() {
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                const divider = document.getElementById(`step-div-${i}`);
+                const badge = btn.querySelector('.step-badge');
+
+                btn.className = 'step-item unlocked';
+                if (divider) divider.className = 'step-divider unlocked';
+
+                badge.innerText = i;
+
+                if (state.currentLevel === i) {
+                    btn.classList.add('active');
+                }
+
+                if (state.completedLevels[i - 1]) {
+                    btn.classList.add('completed');
+                    if (divider) divider.classList.add('completed');
+                }
+            }
+
+            // Bottom footer logic
+            const prevBtn = document.getElementById('footerPrevBtn');
+            const nextBtn = document.getElementById('footerNextBtn');
+            const levelText = document.getElementById('footerLevelText');
+
+            if (prevBtn && nextBtn && levelText) {
+                levelText.innerText = `Level ${state.currentLevel} of 3`;
+                prevBtn.disabled = (state.currentLevel === 1);
+                nextBtn.disabled = (state.currentLevel === 3);
+            }
+        }
+
+        function navigateToLevel(levelIndex) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            state.currentLevel = levelIndex;
+
+            const targetScreen = document.getElementById(`screen-l${levelIndex}`);
+            targetScreen.classList.add('active');
+
+            if (levelIndex === 1) {
+                switchTheoryTab('smart');
+                initLevel1();
+            }
+            if (levelIndex === 2) {
+                switchTheoryTab('stakeholder');
+                initLevel2();
+            }
+            if (levelIndex === 3) {
+                switchTheoryTab('chain');
+                initLevel3();
+            }
+
+            updateNavigationPills();
+            showToast(`Value Stage ${levelIndex} Activated`, 'info');
+        }
+
+        function nextLevel() {
+            if (state.currentLevel < 3) navigateToLevel(state.currentLevel + 1);
+        }
+
+        function prevLevel() {
+            if (state.currentLevel > 1) navigateToLevel(state.currentLevel - 1);
+        }
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✓';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '🚨';
+
+            toast.innerHTML = `<span>${icon}</span><div>${message}</div>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================= LEVEL 1: SMART Objective Studio =================
+        function initLevel1() {
+            const pool = document.getElementById('goals-pool');
+            pool.innerHTML = '';
+
+            for (let id in state.l1.goals) {
+                const goal = state.l1.goals[id];
+                const btn = document.createElement('button');
+                btn.className = 'goal-item-btn';
+                btn.id = `l1-goal-${id}`;
+
+                const isCompleted = state.l1.completedGoals.includes(id);
+                const isActive = state.l1.activeGoal === id;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isActive) {
+                    btn.classList.add('active');
+                }
+
+                btn.innerHTML = `
+                    <span>${goal.poor}</span>
+                    <span>${isCompleted ? '✓' : isActive ? '▶' : ''}</span>
+                `;
+
+                if (!isCompleted) {
+                    btn.addEventListener('click', () => selectL1Goal(id));
+                }
+
+                pool.appendChild(btn);
+            }
+
+            populateL1Dropdowns();
+            renderL1RepairedObjectives();
+        }
+
+        function selectL1Goal(goalId) {
+            state.l1.activeGoal = goalId;
+            document.getElementById('l1-feedback-box').style.display = 'none';
+
+            // Reset selectors
+            for (let key in state.l1.selections) {
+                state.l1.selections[key] = 'none';
+            }
+
+            document.getElementById('builder-target-title').innerText = `Repairing: "${state.l1.goals[goalId].poor}"`;
+            initLevel1();
+        }
+
+        function populateL1Dropdowns() {
+            const parts = ['specific', 'measurable', 'achievable', 'relevant', 'timebound'];
+
+            parts.forEach((p) => {
+                const select = document.getElementById(`smart-${p}`);
+                select.innerHTML = `<option value="none">-- Select ${p.charAt(0).toUpperCase() + p.slice(1)} component --</option>`;
+
+                if (state.l1.activeGoal) {
+                    const opts = [...state.l1.options[p]];
+                    opts.sort(() => Math.random() - 0.5);
+
+                    opts.forEach((o) => {
+                        const optEl = document.createElement('option');
+                        optEl.value = o.val;
+                        optEl.innerText = o.text;
+                        optEl.selected = state.l1.selections[p] === o.val;
+                        select.appendChild(optEl);
+                    });
+                    select.disabled = false;
+                } else {
+                    select.disabled = true;
+                }
+
+                select.onchange = (e) => {
+                    state.l1.selections[p] = e.target.value;
+                    checkL1FormCompleteness();
+                };
+            });
+        }
+
+        function checkL1FormCompleteness() {
+            const verifyBtn = document.getElementById('l1-verify-btn');
+            let completed = true;
+            for (let key in state.l1.selections) {
+                if (state.l1.selections[key] === 'none') {
+                    completed = false;
+                    break;
+                }
+            }
+            verifyBtn.disabled = !completed;
+        }
+
+        function verifyL1Objective() {
+            const goalId = state.l1.activeGoal;
+            if (!goalId) return;
+
+            const goal = state.l1.goals[goalId];
+            const feedbackBox = document.getElementById('l1-feedback-box');
+            let firstIncorrectKey = null;
+
+            for (let key of ['specific', 'measurable', 'achievable', 'relevant', 'timebound']) {
+                if (state.l1.selections[key] !== goal.correct[key]) {
+                    firstIncorrectKey = key;
+                    break;
+                }
+            }
+
+            if (!firstIncorrectKey) {
+                // Correct Assembly
+                feedbackBox.style.display = 'block';
+                feedbackBox.style.background = 'var(--success-light)';
+                feedbackBox.style.border = '1px solid var(--success)';
+                feedbackBox.style.color = 'var(--success)';
+                feedbackBox.innerHTML = `
+                    <div style="font-weight:700; font-size:0.95rem; margin-bottom:8px;">✓ Objective Successfully Repaired!</div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <div><strong>Strategic Business Objective:</strong> ${goal.strategicInfo.objective}</div>
+                        <div><strong>Business Benefit:</strong> ${goal.strategicInfo.benefit}</div>
+                        <div><strong>Success Metric:</strong> ${goal.strategicInfo.metric}</div>
+                        <div><strong>Primary Stakeholder:</strong> ${goal.strategicInfo.stakeholder}</div>
+                        <div><strong>Expected Customer Value:</strong> ${goal.strategicInfo.custValue}</div>
+                    </div>
+                `;
+
+                showToast("SMART Objective correctly assembled!", "success");
+                state.l1.completedGoals.push(goalId);
+                state.l1.activeGoal = null;
+                document.getElementById('builder-target-title').innerText = 'Select a Goal to Repair';
+
+                // Clear dropdown selections
+                for (let key in state.l1.selections) {
+                    state.l1.selections[key] = 'none';
+                }
+
+                initLevel1();
+                updateKPIs();
+
+                if (state.l1.completedGoals.length === 5) {
+                    state.completedLevels[0] = true;
+                    updateNavigationPills();
+                }
+            } else {
+                // Diagnostic feedback
+                let errorDetails = "";
+                if (firstIncorrectKey === 'specific') {
+                    errorDetails = "Your <strong>Specific</strong> parameter is incorrect. A vague goal must define exactly *what* is changing (e.g. increase monthly revenue vs platform users) to align teams.";
+                } else if (firstIncorrectKey === 'measurable') {
+                    errorDetails = "Your <strong>Measurable</strong> metric does not match. Without the correct numeric scale (e.g. 20% or 50,000 users), auditing the strategic progress remains impossible.";
+                } else if (firstIncorrectKey === 'achievable') {
+                    errorDetails = "Your <strong>Achievable</strong> implementation path is incorrect. Setting the correct operational method (e.g. staff training, ad buys, or query optimizations) is essential for executing the strategy.";
+                } else if (firstIncorrectKey === 'relevant') {
+                    errorDetails = "Your <strong>Relevant</strong> business context is incorrect. Ensure the objective aligns with high-level corporate needs (e.g. preventing checkout cart leaks or supply-chain safety).";
+                } else if (firstIncorrectKey === 'timebound') {
+                    errorDetails = "Your <strong>Time-bound</strong> target is incorrect. Specifying the correct operational deadline secures organizational focus and urgency.";
+                }
+
+                feedbackBox.style.display = 'block';
+                feedbackBox.style.background = 'var(--danger-light)';
+                feedbackBox.style.border = '1px solid var(--danger)';
+                feedbackBox.style.color = 'var(--danger)';
+                feedbackBox.innerHTML = `
+                    <div style="font-weight:700; margin-bottom:4px;">⚠️ Diagnostic Error: ${firstIncorrectKey.toUpperCase()} Parameter Mismatch</div>
+                    <div>${errorDetails}</div>
+                `;
+                showToast("Objective verification failed. Check diagnostic guidance.", "danger");
+            }
+        }
+
+        function renderL1RepairedObjectives() {
+            const container = document.getElementById('l1-repaired-box');
+            const list = document.getElementById('l1-repaired-list');
+            list.innerHTML = '';
+
+            if (state.l1.completedGoals.length > 0) {
+                container.style.display = 'flex';
+                state.l1.completedGoals.forEach((id) => {
+                    const goal = state.l1.goals[id];
+                    const div = document.createElement('div');
+                    div.style.padding = '8px';
+                    div.style.borderBottom = '1px solid rgba(46, 125, 50, 0.1)';
+                    div.innerHTML = `<strong>${goal.poor}:</strong> <span style="font-size:0.85rem; color:#555;">${goal.repaired}</span>`;
+                    list.appendChild(div);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function resetLevel1() {
+            for (let key in state.l1.selections) {
+                state.l1.selections[key] = 'none';
+            }
+            document.getElementById('l1-feedback-box').style.display = 'none';
+            populateL1Dropdowns();
+            checkL1FormCompleteness();
+            showToast("Slots reset", "info");
+        }
+
+        // ================= LEVEL 2: Stakeholder Value Designer =================
+        function initLevel2() {
+            const pool = document.getElementById('initiative-pool');
+            pool.innerHTML = '';
+
+            for (let id in state.l2.scenarios) {
+                const scen = state.l2.scenarios[id];
+                const btn = document.createElement('button');
+                btn.className = 'goal-item-btn';
+                btn.id = `l2-scen-${id}`;
+
+                const isCompleted = state.l2.completedScenarios.includes(id);
+                const isActive = state.l2.activeScenario === id;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isActive) {
+                    btn.classList.add('active');
+                }
+
+                btn.innerHTML = `
+                    <span>${scen.title}</span>
+                    <span>${isCompleted ? '✓' : isActive ? '▶' : ''}</span>
+                `;
+
+                btn.addEventListener('click', () => selectL2Scenario(id));
+                pool.appendChild(btn);
+            }
+
+            renderL2ActiveScenario();
+            drawL2CircleGraphic();
+        }
+
+        function selectL2Scenario(scenId) {
+            state.l2.activeScenario = scenId;
+            document.getElementById('l2-feedback-box').style.display = 'none';
+
+            const scen = state.l2.scenarios[scenId];
+            const isCompleted = state.l2.completedScenarios.includes(scenId);
+
+            const selectBenefit = document.getElementById('l2-select-benefit');
+            const selectTradeoff = document.getElementById('l2-select-tradeoff');
+            const selectJustify = document.getElementById('l2-select-justification');
+
+            if (isCompleted) {
+                // Populate selections
+                selectBenefit.value = scen.correct.benefit;
+                selectTradeoff.value = scen.correct.tradeoff;
+                populateL2Justifications(scenId);
+                selectJustify.value = scen.correct.justification;
+
+                selectBenefit.disabled = true;
+                selectTradeoff.disabled = true;
+                selectJustify.disabled = true;
+                document.getElementById('l2-verify-btn').disabled = true;
+            } else {
+                state.l2.selections.benefit = 'none';
+                state.l2.selections.tradeoff = 'none';
+                state.l2.selections.justification = 'none';
+
+                selectBenefit.value = 'none';
+                selectTradeoff.value = 'none';
+                populateL2Justifications(scenId);
+
+                selectBenefit.disabled = false;
+                selectTradeoff.disabled = false;
+                selectJustify.disabled = false;
+                document.getElementById('l2-verify-btn').disabled = false;
+            }
+
+            initLevel2();
+        }
+
+        function populateL2Justifications(scenId) {
+            const selectJustify = document.getElementById('l2-select-justification');
+            selectJustify.innerHTML = '<option value="none">Select Justification...</option>';
+            const scen = state.l2.scenarios[scenId];
+
+            const opts = [...scen.options];
+            opts.sort(() => Math.random() - 0.5);
+
+            opts.forEach(o => {
+                const optEl = document.createElement('option');
+                optEl.value = o.val;
+                optEl.innerText = o.text;
+                selectJustify.appendChild(optEl);
+            });
+        }
+
+        function renderL2ActiveScenario() {
+            const titleEl = document.getElementById('l2-scenario-title');
+            const descEl = document.getElementById('l2-scenario-desc');
+            const selectBenefit = document.getElementById('l2-select-benefit');
+            const selectTradeoff = document.getElementById('l2-select-tradeoff');
+            const selectJustify = document.getElementById('l2-select-justification');
+
+            if (state.l2.activeScenario) {
+                const scen = state.l2.scenarios[state.l2.activeScenario];
+                titleEl.innerText = scen.title;
+                descEl.innerText = scen.desc;
+
+                selectBenefit.onchange = (e) => { state.l2.selections.benefit = e.target.value; checkL2FormCompleteness(); };
+                selectTradeoff.onchange = (e) => { state.l2.selections.tradeoff = e.target.value; checkL2FormCompleteness(); };
+                selectJustify.onchange = (e) => { state.l2.selections.justification = e.target.value; checkL2FormCompleteness(); };
+            } else {
+                titleEl.innerText = 'Select an Initiative';
+                descEl.innerText = 'Click an active card in the pool to inspect the strategic trade-offs.';
+                selectBenefit.disabled = true;
+                selectTradeoff.disabled = true;
+                selectJustify.disabled = true;
+                document.getElementById('l2-verify-btn').disabled = true;
+            }
+        }
+
+        function checkL2FormCompleteness() {
+            const btn = document.getElementById('l2-verify-btn');
+            const completed = state.l2.selections.benefit !== 'none' &&
+                              state.l2.selections.tradeoff !== 'none' &&
+                              state.l2.selections.justification !== 'none';
+            btn.disabled = !completed;
+        }
+
+        function verifyLevel2() {
+            const scenId = state.l2.activeScenario;
+            if (!scenId) return;
+
+            const scen = state.l2.scenarios[scenId];
+            const sel = state.l2.selections;
+            const feedbackBox = document.getElementById('l2-feedback-box');
+
+            let isCorrect = true;
+            let errorText = "";
+
+            if (sel.benefit !== scen.correct.benefit) {
+                isCorrect = false;
+                errorText = `The Benefited stakeholder is incorrect. Review the initiative parameters: which stakeholder cohort gains directly?`;
+            } else if (sel.tradeoff !== scen.correct.tradeoff) {
+                isCorrect = false;
+                errorText = `The Trade-off stakeholder is incorrect. Who experiences immediate cost, friction, or transition stress?`;
+            } else if (sel.justification !== scen.correct.justification) {
+                isCorrect = false;
+                errorText = `The Balancing Justification is incorrect. Seek a strategic decision that aligns the values without sacrificing long-term goals.`;
+            }
+
+            feedbackBox.style.display = 'block';
+            if (isCorrect) {
+                feedbackBox.style.background = 'var(--success-light)';
+                feedbackBox.style.border = '1px solid var(--success)';
+                feedbackBox.style.color = 'var(--success)';
+                feedbackBox.innerHTML = `<strong>✓ Scenario Aligned!</strong><br>${scen.feedback}`;
+
+                showToast("Initiative trade-offs balanced correctly!", "success");
+                state.l2.completedScenarios.push(scenId);
+                state.l2.activeScenario = null;
+
+                initLevel2();
+                updateKPIs();
+
+                if (state.l2.completedScenarios.length === 5) {
+                    state.completedLevels[1] = true;
+                    document.getElementById('l2-complete-box').style.display = 'block';
+                    updateNavigationPills();
+                }
+            } else {
+                feedbackBox.style.background = 'var(--danger-light)';
+                feedbackBox.style.border = '1px solid var(--danger)';
+                feedbackBox.style.color = 'var(--danger)';
+                feedbackBox.innerHTML = `<strong>⚠️ Mismatch:</strong> ${errorText}`;
+                showToast("Stakeholder alignment failed.", "danger");
+            }
+        }
+
+        function drawL2CircleGraphic() {
+            // Reset active segments
+            const sectors = ['customers', 'investors', 'owners', 'society', 'employees'];
+            sectors.forEach(s => {
+                const path = document.getElementById(`sec-${s}`);
+                path.className.baseVal = 'circle-sector';
+            });
+
+            // Highlight completed ones
+            state.l2.completedScenarios.forEach(id => {
+                const sData = state.l2.scenarios[id];
+                const benPath = document.getElementById(`sec-${sData.correct.benefit}`);
+                const tradePath = document.getElementById(`sec-${sData.correct.tradeoff}`);
+                if (benPath) benPath.classList.add('active-stakeholder');
+                if (tradePath) tradePath.classList.add('tradeoff-stakeholder');
+            });
+
+            // Calculate balance index
+            const balanceScore = Math.round((state.l2.completedScenarios.length / 5) * 100);
+            document.getElementById('circle-sat-val').innerText = `${balanceScore}%`;
+        }
+
+        function resetLevel2() {
+            state.l2.completedScenarios = [];
+            state.l2.activeScenario = null;
+            document.getElementById('l2-complete-box').style.display = 'none';
+            document.getElementById('l2-feedback-box').style.display = 'none';
+            initLevel2();
+            updateKPIs();
+            showToast("Level 2 reset completed", "info");
+        }
+
+        // ================= LEVEL 3: Digital Value Creation Studio =================
+        function initLevel3() {
+            const pool = document.getElementById('l3-cases-pool');
+            pool.innerHTML = '';
+
+            for (let id in state.l3.cases) {
+                const c = state.l3.cases[id];
+                const btn = document.createElement('button');
+                btn.className = 'goal-item-btn';
+                btn.id = `l3-case-${id}`;
+
+                const isCompleted = state.l3.completedCases.includes(id);
+                const isActive = state.l3.activeCase === id;
+
+                if (isCompleted) {
+                    btn.classList.add('completed');
+                } else if (isActive) {
+                    btn.classList.add('active');
+                }
+
+                btn.innerHTML = `
+                    <span>${c.title}</span>
+                    <span>${isCompleted ? '✓' : isActive ? '▶' : ''}</span>
+                `;
+
+                btn.addEventListener('click', () => selectL3Case(id));
+                pool.appendChild(btn);
+            }
+
+            renderL3ActiveCase();
+            drawL3PipelineGraphic();
+        }
+
+        function selectL3Case(caseId) {
+            state.l3.activeCase = caseId;
+            document.getElementById('l3-feedback-box').style.display = 'none';
+
+            const cData = state.l3.cases[caseId];
+            const isCompleted = state.l3.completedCases.includes(caseId);
+
+            const sInitiative = document.getElementById('l3-select-initiative');
+            const sStage = document.getElementById('l3-select-stage');
+            const sObjective = document.getElementById('l3-select-objective');
+            const sCustValue = document.getElementById('l3-select-custvalue');
+            const sStakeholder = document.getElementById('l3-select-stakeholder');
+            const sOutcome = document.getElementById('l3-select-outcome');
+
+            // Populate Dropdowns dynamically
+            populateL3Dropdown(sInitiative, cData.dropdowns.initiative);
+            populateL3Dropdown(sObjective, cData.dropdowns.objective);
+            populateL3Dropdown(sCustValue, cData.dropdowns.custvalue);
+            populateL3Dropdown(sStakeholder, cData.dropdowns.stakeholder);
+            populateL3Dropdown(sOutcome, cData.dropdowns.outcome);
+
+            if (isCompleted) {
+                sInitiative.value = cData.correct.initiative;
+                sStage.value = cData.correct.stage;
+                sObjective.value = cData.correct.objective;
+                sCustValue.value = cData.correct.custvalue;
+                sStakeholder.value = cData.correct.stakeholder;
+                sOutcome.value = cData.correct.outcome;
+
+                sInitiative.disabled = true;
+                sStage.disabled = true;
+                sObjective.disabled = true;
+                sCustValue.disabled = true;
+                sStakeholder.disabled = true;
+                sOutcome.disabled = true;
+                document.getElementById('l3-verify-btn').disabled = true;
+            } else {
+                for (let key in state.l3.selections) {
+                    state.l3.selections[key] = 'none';
+                }
+                sInitiative.value = 'none';
+                sStage.value = 'none';
+                sObjective.value = 'none';
+                sCustValue.value = 'none';
+                sStakeholder.value = 'none';
+                sOutcome.value = 'none';
+
+                sInitiative.disabled = false;
+                sStage.disabled = false;
+                sObjective.disabled = false;
+                sCustValue.disabled = false;
+                sStakeholder.disabled = false;
+                sOutcome.disabled = false;
+                document.getElementById('l3-verify-btn').disabled = false;
+            }
+
+            initLevel3();
+        }
+
+        function populateL3Dropdown(element, dataList) {
+            element.innerHTML = '<option value="none">Select...</option>';
+            const list = [...dataList];
+            list.sort(() => Math.random() - 0.5);
+            list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.val;
+                opt.innerText = item.text;
+                element.appendChild(opt);
+            });
+        }
+
+        function renderL3ActiveCase() {
+            const titleEl = document.getElementById('l3-case-title');
+            const descEl = document.getElementById('l3-case-desc');
+
+            const sInitiative = document.getElementById('l3-select-initiative');
+            const sStage = document.getElementById('l3-select-stage');
+            const sObjective = document.getElementById('l3-select-objective');
+            const sCustValue = document.getElementById('l3-select-custvalue');
+            const sStakeholder = document.getElementById('l3-select-stakeholder');
+            const sOutcome = document.getElementById('l3-select-outcome');
+
+            if (state.l3.activeCase) {
+                const c = state.l3.cases[state.l3.activeCase];
+                titleEl.innerText = c.title;
+                descEl.innerText = c.desc;
+
+                sInitiative.onchange = (e) => { state.l3.selections.initiative = e.target.value; checkL3FormCompleteness(); };
+                sStage.onchange = (e) => { state.l3.selections.stage = e.target.value; checkL3FormCompleteness(); };
+                sObjective.onchange = (e) => { state.l3.selections.objective = e.target.value; checkL3FormCompleteness(); };
+                sCustValue.onchange = (e) => { state.l3.selections.custvalue = e.target.value; checkL3FormCompleteness(); };
+                sStakeholder.onchange = (e) => { state.l3.selections.stakeholder = e.target.value; checkL3FormCompleteness(); };
+                sOutcome.onchange = (e) => { state.l3.selections.outcome = e.target.value; checkL3FormCompleteness(); };
+            } else {
+                titleEl.innerText = 'Select a Case Challenge';
+                descEl.innerText = 'Consulting data will load upon selecting an active challenge case.';
+                sInitiative.disabled = true;
+                sStage.disabled = true;
+                sObjective.disabled = true;
+                sCustValue.disabled = true;
+                sStakeholder.disabled = true;
+                sOutcome.disabled = true;
+                document.getElementById('l3-verify-btn').disabled = true;
+            }
+        }
+
+        function checkL3FormCompleteness() {
+            const btn = document.getElementById('l3-verify-btn');
+            let completed = true;
+            for (let key in state.l3.selections) {
+                if (state.l3.selections[key] === 'none') {
+                    completed = false;
+                    break;
+                }
+            }
+            btn.disabled = !completed;
+        }
+
+        function verifyLevel3() {
+            const caseId = state.l3.activeCase;
+            if (!caseId) return;
+
+            const cData = state.l3.cases[caseId];
+            const sel = state.l3.selections;
+            const feedbackBox = document.getElementById('l3-feedback-box');
+
+            let isCorrect = true;
+            let errorText = "";
+
+            if (sel.initiative !== cData.correct.initiative) {
+                isCorrect = false;
+                errorText = "Initiative Mismatch: The selected digital action does not fit the specific challenge bottleneck.";
+            } else if (sel.stage !== cData.correct.stage) {
+                isCorrect = false;
+                errorText = "Process Mismatch: The initiative is not assigned to the correct digital value chain stage.";
+            } else if (sel.objective !== cData.correct.objective) {
+                isCorrect = false;
+                errorText = "Objective Mismatch: The business target does not correspond to the aligned SMART goals.";
+            } else if (sel.custvalue !== cData.correct.custvalue) {
+                isCorrect = false;
+                errorText = "Customer Value Mismatch: The customer experience enhancement does not align with the initiative.";
+            } else if (sel.stakeholder !== cData.correct.stakeholder) {
+                isCorrect = false;
+                errorText = "Stakeholder Mismatch: The primary benefited group does not match the strategy.";
+            } else if (sel.outcome !== cData.correct.outcome) {
+                isCorrect = false;
+                errorText = "Outcome Mismatch: The strategic metric benefit does not correspond to the process change.";
+            }
+
+            feedbackBox.style.display = 'block';
+            if (isCorrect) {
+                feedbackBox.style.background = 'var(--success-light)';
+                feedbackBox.style.border = '1px solid var(--success)';
+                feedbackBox.style.color = 'var(--success)';
+                feedbackBox.innerHTML = `<strong>✓ Consultation Strategy Verified!</strong><br>${cData.feedback}<br><span style="font-size:0.75rem; color:#555;">Textbook Concept: Value Chain Alignment (Chaffey).</span>`;
+
+                showToast("Digital Value Chain alignment verified!", "success");
+                state.l3.completedCases.push(caseId);
+                state.l3.activeCase = null;
+
+                // Animate pipeline pulse
+                triggerL3PipelinePulse();
+
+                initLevel3();
+                updateKPIs();
+
+                if (state.l3.completedCases.length === 3) {
+                    state.completedLevels[2] = true;
+                    updateNavigationPills();
+                    setTimeout(() => {
+                        showFinalScorecard();
+                    }, 1200);
+                }
+            } else {
+                feedbackBox.style.background = 'var(--danger-light)';
+                feedbackBox.style.border = '1px solid var(--danger)';
+                feedbackBox.style.color = 'var(--danger)';
+                feedbackBox.innerHTML = `<strong>⚠️ Audit Error:</strong> ${errorText}`;
+                showToast("Consulting strategy alignment failed.", "danger");
+            }
+        }
+
+        function triggerL3PipelinePulse() {
+            const pulse = document.getElementById('chain-pulse');
+            pulse.style.display = 'block';
+            pulse.style.left = '70px';
+            pulse.style.transition = 'left 1s linear';
+            
+            setTimeout(() => {
+                pulse.style.left = '850px';
+                setTimeout(() => {
+                    pulse.style.display = 'none';
+                }, 1000);
+            }, 50);
+        }
+
+        function drawL3PipelineGraphic() {
+            // Reset stages
+            const stages = ['acquisition', 'marketing', 'sales', 'crm', 'support', 'improvement'];
+            stages.forEach(s => {
+                document.getElementById(`stage-${s}`).classList.remove('active-stage');
+            });
+
+            // Highlight stages based on completed cases
+            state.l3.completedCases.forEach(caseId => {
+                const c = state.l3.cases[caseId];
+                if (c.correct.stage === 'Sales & Transactions') {
+                    document.getElementById('stage-sales').classList.add('active-stage');
+                } else if (c.correct.stage === 'Customer Relationship Management (CRM)') {
+                    document.getElementById('stage-crm').classList.add('active-stage');
+                } else if (c.correct.stage === 'Continuous Improvement') {
+                    document.getElementById('stage-improvement').classList.add('active-stage');
+                }
+            });
+        }
+
+        function resetLevel3() {
+            state.l3.completedCases = [];
+            state.l3.activeCase = null;
+            document.getElementById('l3-feedback-box').style.display = 'none';
+            initLevel3();
+            updateKPIs();
+            showToast("Level 3 form cleared", "info");
+        }
+
+        // ================= SCORECARD & KPI UPDATES =================
+        function updateKPIs() {
+            // SMART Goal Quality: 20% per goal correctly aligned
+            const smartVal = Math.round((state.l1.completedGoals.length / 5) * 100);
+            
+            // Stakeholder Satisfaction & Strategic Alignment from Level 2
+            const l2Score = state.l2.completedScenarios.length;
+            const alignmentVal = Math.round((l2Score / 5) * 50 + (state.l3.completedCases.length / 3) * 50);
+            const stakeholderVal = Math.round((l2Score / 5) * 100);
+
+            // Customer Value & Digital Effectiveness from Level 3
+            const customerVal = Math.round((state.l1.completedGoals.length / 5) * 40 + (state.l3.completedCases.length / 3) * 60);
+            const digitalVal = Math.round((state.l3.completedCases.length / 3) * 100);
+            const valueScore = Math.round((smartVal + alignmentVal + customerVal + stakeholderVal + digitalVal) / 5);
+
+            state.kpis.smart = smartVal;
+            state.kpis.alignment = alignmentVal;
+            state.kpis.customer = customerVal;
+            state.kpis.stakeholder = stakeholderVal;
+            state.kpis.valueScore = valueScore;
+            state.kpis.digital = digitalVal;
+
+            // UI gauges
+            document.getElementById('kpi-smart').innerText = smartVal;
+            document.getElementById('fill-smart').style.width = smartVal + '%';
+
+            document.getElementById('kpi-alignment').innerText = alignmentVal;
+            document.getElementById('fill-alignment').style.width = alignmentVal + '%';
+
+            document.getElementById('kpi-customer').innerText = customerVal;
+            document.getElementById('fill-customer').style.width = customerVal + '%';
+
+            document.getElementById('kpi-stakeholder').innerText = stakeholderVal;
+            document.getElementById('fill-stakeholder').style.width = stakeholderVal + '%';
+
+            document.getElementById('kpi-value-score').innerText = valueScore;
+            document.getElementById('fill-value-score').style.width = valueScore + '%';
+
+            document.getElementById('kpi-digital').innerText = digitalVal;
+            document.getElementById('fill-digital').style.width = digitalVal + '%';
+        }
+
+        function showFinalScorecard() {
+            document.getElementById('card-smart').innerText = state.kpis.smart + '%';
+            document.getElementById('card-alignment').innerText = state.kpis.alignment + '%';
+            document.getElementById('card-customer').innerText = state.kpis.customer + '%';
+            document.getElementById('card-stakeholder').innerText = state.kpis.stakeholder + '%';
+            document.getElementById('card-value-score').innerText = state.kpis.valueScore + '%';
+            document.getElementById('card-digital').innerText = state.kpis.digital + '%';
+
+            const success = state.kpis.valueScore >= 75;
+            const banner = document.getElementById('scorecard-banner-status');
+            const evalText = document.getElementById('scorecard-eval-text');
+
+            if (success) {
+                banner.className = "scorecard-banner success";
+                banner.innerText = "EXCELLENT VALUE ALIGNMENT (PASSED)";
+                evalText.innerHTML = "Strategic Alignment index meets Chaffey Framework standard. You have successfully structured SMART goals, aligned stakeholder needs, and trace-linked digital value creation paths.";
+            } else {
+                banner.className = "scorecard-banner failed";
+                banner.innerText = "ALIGNMENT GAPS DETECTED (FAILED)";
+                evalText.innerHTML = "Value score is below textbook standard. Re-evaluate SMART goals and alignment justifications to improve strategic focus.";
+            }
+
+            scorecardDialog.showModal();
+        }
+
+        function resetFullSimulation() {
+            state.currentLevel = 1;
+            state.completedLevels = [false, false, false];
+            state.l1.completedGoals = [];
+            state.l1.activeGoal = null;
+            state.l2.completedScenarios = [];
+            state.l2.activeScenario = null;
+            state.l3.completedCases = [];
+            state.l3.activeCase = null;
+
+            scorecardDialog.close();
+            summaryDialog.close();
+
+            document.getElementById('l2-complete-box').style.display = 'none';
+            document.getElementById('l1-feedback-box').style.display = 'none';
+            document.getElementById('l2-feedback-box').style.display = 'none';
+            document.getElementById('l3-feedback-box').style.display = 'none';
+
+            navigateToLevel(1);
+            updateKPIs();
+            showToast("Simulation restarted", "info");
+        }
+
+        function showSummaryDialog(levelIndex) {
+            const data = summaries[levelIndex];
+            document.getElementById('summary-dialog-title').innerText = data.title;
+            document.getElementById('summary-dialog-content').innerHTML = data.body;
+            document.getElementById('summary-next-btn').setAttribute('data-target-level', levelIndex + 1);
+            summaryDialog.showModal();
+        }
+
+        function confirmSummaryNextLevel() {
+            const nextLevel = parseInt(document.getElementById('summary-next-btn').getAttribute('data-target-level'));
+            summaryDialog.close();
+            if (nextLevel <= 3) {
+                navigateToLevel(nextLevel);
+            }
+        }
+    </script>
+</body>
+
+</html>

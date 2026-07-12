@@ -1,0 +1,4021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Debug Detectives: Errors, Exception Handling & Assertions</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+        /* CSS Custom Properties / Design Tokens (White Background, Black Text, Red Accents) */
+        :root {
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --font-body: 'Inter', sans-serif;
+
+            /* Pure White base, Black text, Red highlights */
+            --bg-base: 0 0% 100%; /* Pure White */
+            --bg-surface: 0 0% 100%; /* Pure White */
+            --bg-surface-hover: 0 0% 97%; /* Very Light Gray */
+            --border-muted: 0 0% 85%; /* Light Gray Border */
+            --border-active: 0 100% 40%; /* Red Border */
+            
+            --text-main: 0 0% 0%; /* Pure Black Font */
+            --text-muted: 0 0% 35%; /* Muted Dark Gray Font */
+            
+            --primary: 0 100% 40%; /* Red Accent */
+            --primary-glow: rgba(204, 0, 0, 0.15);
+            --accent: 0 100% 30%; /* Darker Red */
+            
+            --success: 0 100% 40%;
+            --success-glow: rgba(204, 0, 0, 0.1);
+            --crash: 0 100% 40%;
+            --crash-glow: rgba(204, 0, 0, 0.1);
+            --warn: 0 100% 40%;
+            
+            --editor-bg: 0 0% 100%; /* White */
+            --terminal-bg: 0 0% 100%; /* White */
+        }
+
+        /* Basic Resets & Scrollbars */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: hsl(var(--bg-base));
+            color: hsl(var(--text-main));
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: hsl(var(--border-muted));
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: hsl(var(--primary));
+        }
+
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(204, 0, 0, 0.05);
+            transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: hsl(var(--border-active));
+            box-shadow: 0 12px 40px 0 rgba(204, 0, 0, 0.1);
+        }
+
+        /* Background Particle Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* GAME HEADER / DASHBOARD */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid hsl(var(--border-muted));
+            z-index: 50;
+            position: sticky;
+            top: 0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: hsl(var(--primary));
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 800;
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.2);
+        }
+
+        .logo-title h1 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: hsl(var(--text-main));
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            color: hsl(var(--text-muted));
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .stats-hud {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-badge {
+            background: rgba(204, 0, 0, 0.03);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid hsl(var(--border-muted));
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: hsl(var(--text-main));
+        }
+
+        .stat-badge svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .stat-badge.stars-badge {
+            color: hsl(var(--primary));
+        }
+
+        .hud-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hud-btn {
+            background: rgba(204, 0, 0, 0.03);
+            border: 1px solid hsl(var(--border-muted));
+            color: hsl(var(--text-main));
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hud-btn:hover {
+            border-color: hsl(var(--border-active));
+            color: hsl(var(--primary));
+            transform: scale(1.08);
+        }
+
+        /* MAIN APP WRAPPER */
+        .app-body {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 75px);
+            overflow: hidden;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid hsl(var(--border-muted));
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-section-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: hsl(var(--text-muted));
+            padding-left: 8px;
+        }
+
+        .level-node-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .level-nav-node {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(204, 0, 0, 0.02);
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .level-nav-node.active-level {
+            border-color: hsl(var(--border-active));
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .level-nav-node.completed {
+            border-color: hsl(var(--border-active));
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-display);
+        }
+
+        .node-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .node-status-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .node-activities {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .activity-sub-pill {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.03);
+            color: hsl(var(--text-muted));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .activity-sub-pill:hover {
+            background: rgba(204, 0, 0, 0.08);
+            color: hsl(var(--text-main));
+        }
+
+        .activity-sub-pill.active-act {
+            background: hsl(var(--primary));
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .activity-sub-pill.act-done::after {
+            content: "✓";
+            color: hsl(var(--primary));
+            font-weight: bold;
+        }
+
+        .achievements-preview {
+            margin-top: auto;
+            background: rgba(204, 0, 0, 0.03);
+            border: 1px dashed hsl(var(--primary));
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .achievements-preview h4 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            color: hsl(var(--text-main));
+            margin-bottom: 4px;
+        }
+
+        .achievements-preview p {
+            font-size: 0.75rem;
+            color: hsl(var(--text-muted));
+        }
+
+        /* VIEWPORT AREA */
+        .viewport {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .level-panel-content {
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            height: 100%;
+        }
+
+        .level-panel-content.active {
+            display: flex;
+            animation: paneFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes paneFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* INSTRUCTION BOXES */
+        .instruction-box {
+            background: rgba(204, 0, 0, 0.03);
+            border: 1px solid hsl(var(--border-muted));
+            border-left: 4px solid hsl(var(--primary));
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: hsl(var(--text-main));
+            margin-bottom: 12px;
+        }
+
+        .instruction-box ol {
+            padding-left: 20px;
+            margin-top: 6px;
+        }
+
+        .instruction-box li {
+            margin-bottom: 4px;
+        }
+
+        /* SPLIT SCREEN / EDITOR LAYOUT */
+        .workspace-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        @media (max-width: 900px) {
+            .workspace-split {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+            .app-body {
+                flex-direction: column;
+                height: auto;
+                overflow: visible;
+            }
+            .sidebar {
+                width: 100%;
+                height: 250px;
+                border-right: none;
+                border-bottom: 1px solid hsl(var(--border-muted));
+            }
+        }
+
+        /* PREMIUM CODE EDITOR */
+        .code-container {
+            background-color: hsl(var(--editor-bg));
+            border-radius: 12px;
+            border: 1px solid hsl(var(--border-muted));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .editor-header {
+            background: rgba(0, 0, 0, 0.02);
+            padding: 10px 16px;
+            border-bottom: 1px solid hsl(var(--border-muted));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .editor-title {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: hsl(var(--text-muted));
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: hsl(var(--primary));
+            box-shadow: 0 0 6px hsl(var(--primary));
+        }
+
+        .editor-lines {
+            font-family: var(--font-mono);
+            padding: 16px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            counter-reset: line;
+            color: #000000;
+        }
+
+        .code-line {
+            display: flex;
+            position: relative;
+            padding-left: 28px;
+            transition: background 0.25s ease;
+            border-radius: 4px;
+        }
+
+        .code-line::before {
+            counter-increment: line;
+            content: counter(line);
+            position: absolute;
+            left: 0;
+            width: 20px;
+            text-align: right;
+            color: hsl(var(--text-muted));
+            opacity: 0.5;
+            font-size: 0.75rem;
+            padding-right: 8px;
+        }
+
+        .code-line.active-pointer {
+            background: rgba(204, 0, 0, 0.08);
+        }
+
+        .code-line.active-pointer::before {
+            color: hsl(var(--primary));
+            opacity: 1;
+            font-weight: bold;
+        }
+
+        .code-line.flashing-crash {
+            background: rgba(204, 0, 0, 0.15);
+            animation: lineFlashCrash 1s infinite alternate;
+        }
+
+        @keyframes lineFlashCrash {
+            from { box-shadow: inset 4px 0 0 hsl(var(--primary)); }
+            to { box-shadow: inset 4px 0 0 hsl(var(--primary)), 0 0 15px rgba(204, 0, 0, 0.15); }
+        }
+
+        .exec-arrow {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: hsl(var(--primary));
+            font-size: 0.8rem;
+            display: none;
+            animation: arrowWiggle 0.6s infinite alternate;
+        }
+
+        .code-line.active-pointer .exec-arrow {
+            display: block;
+        }
+
+        @keyframes arrowWiggle {
+            0% { transform: translateY(-50%) translateX(0); }
+            100% { transform: translateY(-50%) translateX(3px); }
+        }
+
+        /* SYNTAX HIGHLIGHTING (Red & White Theme) */
+        .hl-keyword { color: hsl(var(--primary)); font-weight: bold; }
+        .hl-string { color: hsl(var(--text-main)); font-weight: 500; text-decoration: underline; text-decoration-color: rgba(204, 0, 0, 0.3); }
+        .hl-comment { color: hsl(var(--text-muted)); font-style: italic; opacity: 0.85; }
+        .hl-builtin { color: hsl(var(--primary)); }
+        .hl-number { color: hsl(var(--primary)); font-weight: 500; }
+        .hl-error { color: hsl(var(--primary)); text-decoration: underline wavy hsl(var(--primary)); }
+        
+        .repair-slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            height: 24px;
+            background: rgba(204, 0, 0, 0.05);
+            border: 1px dashed hsl(var(--primary));
+            border-radius: 4px;
+            margin: 0 4px;
+            padding: 0 8px;
+            vertical-align: middle;
+            color: hsl(var(--primary));
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .repair-slot.hovered {
+            background: rgba(204, 0, 0, 0.15);
+            border-color: hsl(var(--primary));
+            transform: scale(1.05);
+        }
+
+        .repair-slot.correct {
+            border: 1px solid hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.08);
+            color: hsl(var(--primary));
+        }
+
+        .repair-slot.wrong {
+            border: 1px solid hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.2);
+            color: hsl(var(--primary));
+            animation: horizontalShake 0.4s ease;
+        }
+
+        @keyframes horizontalShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ELASTIC DRAG AND DROP POOL */
+        .item-pool-container {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pool-label {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: hsl(var(--text-muted));
+            text-transform: uppercase;
+        }
+
+        .drag-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 50px;
+            align-items: center;
+        }
+
+        .draggable-block {
+            background: #ffffff;
+            color: hsl(var(--primary));
+            border: 1px solid hsl(var(--border-active));
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 10px rgba(204, 0, 0, 0.08);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .draggable-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px var(--primary-glow);
+        }
+
+        .draggable-block:active {
+            cursor: grabbing;
+            transform: translateY(1px);
+        }
+
+        .draggable-block.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+
+        /* ANIMATED TERMINAL */
+        .terminal-container {
+            background-color: hsl(var(--terminal-bg));
+            border-radius: 12px;
+            border: 1px solid hsl(var(--border-muted));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: var(--font-mono);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.03);
+            position: relative;
+        }
+
+        .terminal-header {
+            background: rgba(0, 0, 0, 0.02);
+            padding: 8px 16px;
+            border-bottom: 1px solid hsl(var(--border-muted));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: hsl(var(--text-muted));
+        }
+
+        .terminal-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .term-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: hsl(var(--border-muted));
+        }
+
+        .term-dot.dot-red { background: hsl(var(--primary)); }
+
+        .terminal-body {
+            padding: 16px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            flex: 1;
+            overflow-y: auto;
+            color: #000000;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .terminal-prompt {
+            color: hsl(var(--primary));
+            font-weight: bold;
+        }
+
+        .traceback-header {
+            color: hsl(var(--primary));
+            font-weight: bold;
+        }
+
+        .traceback-line {
+            color: #000000;
+            padding-left: 16px;
+            border-left: 2px solid hsl(var(--border-muted));
+            margin: 4px 0;
+        }
+
+        .traceback-error {
+            background: rgba(204, 0, 0, 0.08);
+            color: hsl(var(--primary));
+            border: 1px solid rgba(204, 0, 0, 0.2);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .terminal-shake {
+            animation: terminalCrashShake 0.4s ease;
+        }
+
+        @keyframes terminalCrashShake {
+            0%, 100% { transform: translate(0, 0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-6px, 0); }
+            20%, 40%, 60%, 80% { transform: translate(6px, 0); }
+        }
+
+        /* VARIABLE INSPECTOR */
+        .inspector-panel {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            border: 1px solid hsl(var(--border-muted));
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .inspector-title {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: hsl(var(--text-muted));
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid hsl(var(--border-muted));
+            padding-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .variables-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .var-name {
+            color: hsl(var(--primary));
+            font-weight: 500;
+        }
+
+        .var-val {
+            color: #000000;
+            word-break: break-all;
+        }
+
+        .var-val.uninitialized {
+            color: hsl(var(--text-muted));
+            font-style: italic;
+        }
+
+        /* SVG FLOWCHART ANIMATOR */
+        .flowchart-container {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: auto;
+            position: relative;
+        }
+
+        .svg-flow {
+            width: 100%;
+            height: 280px;
+            max-width: 480px;
+        }
+
+        .flow-node {
+            fill: #ffffff;
+            stroke: hsl(var(--border-muted));
+            stroke-width: 2;
+            transition: all 0.3s ease;
+        }
+
+        .flow-node.active-node {
+            stroke: hsl(var(--primary));
+            fill: rgba(204, 0, 0, 0.08);
+            filter: drop-shadow(0 0 8px rgba(204, 0, 0, 0.2));
+        }
+
+        .flow-node.correct-node {
+            stroke: hsl(var(--primary));
+            fill: rgba(204, 0, 0, 0.03);
+        }
+
+        .flow-node.crash-node {
+            stroke: hsl(var(--primary));
+            fill: rgba(204, 0, 0, 0.12);
+        }
+
+        .flow-text {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            fill: #000000;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-weight: bold;
+        }
+
+        .flow-path {
+            fill: none;
+            stroke: hsl(var(--border-muted));
+            stroke-width: 2.5;
+            transition: stroke 0.3s ease;
+        }
+
+        .flow-path.active-path {
+            stroke: hsl(var(--primary));
+            stroke-dasharray: 6, 4;
+            animation: flowDashOffset 1s linear infinite;
+        }
+
+        @keyframes flowDashOffset {
+            from { stroke-dashoffset: 20; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* CALL STACK VISUALIZER */
+        .stack-container {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+            border: 1px solid hsl(var(--border-muted));
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 180px;
+        }
+
+        .stack-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: hsl(var(--text-muted));
+            text-transform: uppercase;
+            border-bottom: 1px solid hsl(var(--border-muted));
+            padding-bottom: 6px;
+        }
+
+        .stack-frame-list {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-start;
+        }
+
+        .stack-frame {
+            background: #ffffff;
+            border: 1px solid hsl(var(--primary));
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            animation: framePush 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(204, 0, 0, 0.05);
+        }
+
+        .stack-frame.unwinding {
+            animation: framePopUnwind 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes framePush {
+            from { opacity: 0; transform: translateY(-15px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes framePopUnwind {
+            to { opacity: 0; transform: translateX(50px) scale(0.9); background: rgba(204, 0, 0, 0.1); border-color: hsl(var(--border-muted)); }
+        }
+
+        .frame-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .frame-func {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .frame-line {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: hsl(var(--text-muted));
+        }
+
+        .frame-locals {
+            font-size: 0.75rem;
+            color: #000000;
+            font-family: var(--font-mono);
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+
+        /* ESCAPE ROOM VIEW */
+        .escaperoom-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .escaperoom-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .room-card {
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .room-card.active-room {
+            border-color: hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.05);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .room-card.solved {
+            border-color: hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.02);
+        }
+
+        .room-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            filter: grayscale(100%) sepia(100%) saturate(10000%) hue-rotate(345deg);
+        }
+
+        .room-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .room-status-badge {
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .room-status-badge.status-locked { background: rgba(0, 0, 0, 0.03); color: hsl(var(--text-muted)); }
+        .room-status-badge.status-pending { background: rgba(204, 0, 0, 0.05); color: hsl(var(--primary)); }
+        .room-status-badge.status-solved { background: rgba(204, 0, 0, 0.08); color: hsl(var(--primary)); }
+
+        .escape-timer-bar {
+            height: 6px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .escape-timer-fill {
+            height: 100%;
+            background: hsl(var(--primary));
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        /* AI BOSS BATTLE ARENA */
+        .boss-arena {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .battle-bars {
+            display: grid;
+            grid-template-columns: 1fr 100px 1fr;
+            align-items: center;
+            gap: 16px;
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 16px;
+            padding: 16px 24px;
+        }
+
+        .fighter-hud {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .fighter-hud.right-fighter {
+            text-align: right;
+        }
+
+        .fighter-name {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .hp-bar-outer {
+            height: 14px;
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 7px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .player-hp-fill {
+            background: hsl(var(--primary));
+            width: 100%;
+        }
+
+        .boss-hp-fill {
+            background: hsl(var(--primary));
+            width: 100%;
+        }
+
+        .vs-sign {
+            text-align: center;
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: hsl(var(--primary));
+            text-shadow: 0 0 10px var(--primary-glow);
+            animation: bounceVs 1s infinite alternate;
+        }
+
+        @keyframes bounceVs {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+
+        .boss-chat {
+            background: rgba(204, 0, 0, 0.03);
+            border-left: 3px solid hsl(var(--primary));
+            border-radius: 0 8px 8px 0;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #000000;
+            font-style: italic;
+        }
+
+        /* INTERACTION LAYOUTS & BUTTONS */
+        .btn-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        button.btn-primary {
+            background: hsl(var(--primary));
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 1px solid hsl(var(--primary));
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button.btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        button.btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        button.btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button.btn-secondary {
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            color: #000000;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button.btn-secondary:hover {
+            border-color: hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.02);
+        }
+
+        /* HINT ACCORDIONS */
+        .hint-accordion {
+            border: 2px solid hsl(var(--primary));
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 16px;
+            background: rgba(204, 0, 0, 0.03);
+            box-shadow: 0 4px 12px rgba(204, 0, 0, 0.05);
+        }
+
+        .hint-summary {
+            background: hsl(var(--primary));
+            color: #ffffff;
+            padding: 12px 16px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hint-summary::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: #ffffff;
+            transition: transform 0.2s ease;
+        }
+
+        details[open] .hint-summary::after {
+            transform: rotate(180deg);
+        }
+
+        .hint-content {
+            padding: 14px 18px;
+            background: #ffffff;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border-top: 2px solid hsl(var(--primary));
+            color: #000000;
+            font-weight: 500;
+        }
+
+        /* MODAL / DIALOGS */
+        dialog {
+            margin: auto;
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: calc(100% - 32px);
+            color: #000000;
+            box-shadow: 0 20px 50px rgba(204, 0, 0, 0.08);
+            border-left: 4px solid hsl(var(--primary));
+        }
+
+        dialog::backdrop {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .modal-body {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: hsl(var(--text-muted));
+        }
+
+        /* ACCESSIBILITY & RADAR */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        .interactive-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 12px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .interactive-overlay.overlay-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay-card {
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(204, 0, 0, 0.08);
+            border-top: 4px solid hsl(var(--primary));
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .overlay-card h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .overlay-card p {
+            font-size: 0.85rem;
+            color: hsl(var(--text-muted));
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-button {
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            color: #000000;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .option-button:hover {
+            border-color: hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.03);
+        }
+
+        .option-button:active {
+            transform: scale(0.98);
+        }
+
+        /* ACHIEVEMENT BADGES */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .badge-card {
+            background: #ffffff;
+            border: 1px solid hsl(var(--border-muted));
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        .badge-card.unlocked {
+            opacity: 1;
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.05);
+        }
+
+        .badge-card.unlocked .badge-icon {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px rgba(204, 0, 0, 0.2));
+        }
+
+        .badge-icon {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+            transition: transform 0.3s ease;
+            filter: grayscale(100%) sepia(100%) saturate(10000%) hue-rotate(345deg);
+        }
+
+        .badge-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+
+        .badge-desc {
+            font-size: 0.65rem;
+            color: hsl(var(--text-muted));
+            line-height: 1.2;
+        }
+
+        /* WELCOME / MAP STATE */
+        .welcome-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: 680px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .welcome-pane h2 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .welcome-pane p {
+            color: hsl(var(--text-muted));
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .mission-map-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .map-node {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px dashed hsl(var(--border-muted));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-node.unlocked {
+            border-style: solid;
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .map-node.active-map-node {
+            border-color: hsl(var(--primary));
+            background: rgba(204, 0, 0, 0.03);
+            transform: scale(1.1);
+        }
+
+        .map-node.completed {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 15px rgba(204, 0, 0, 0.1);
+        }
+
+        .map-node-label {
+            position: absolute;
+            bottom: -24px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: hsl(var(--text-muted));
+        }
+
+        .map-node.unlocked .map-node-label {
+            color: hsl(var(--text-main));
+        }
+
+        .map-line {
+            flex: 1;
+            height: 2px;
+            background: hsl(var(--border-muted));
+        }
+
+        .map-line.completed-line {
+            background: hsl(var(--primary));
+        }
+
+        /* RADAR SCANNING RADIAL EFFECT */
+        .radar-scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(204, 0, 0, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+
+        .radar-scan-overlay.scanning {
+            opacity: 1;
+            animation: radarSweep 2s linear infinite;
+        }
+
+        @keyframes radarSweep {
+            0% { transform: scale(0.6); opacity: 0.1; }
+            50% { opacity: 0.4; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas for procedural game animations and sparks/confetti particle effects -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- ACCESSIBILITY: SCREEN READER NOTIFICATIONS -->
+    <div id="sr-announcer" class="sr-only" aria-live="assertive"></div>
+
+    <!-- HEADER / GAME HUD -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo-icon">🕵</div>
+            <div class="logo-title">
+                <h1>Python Debug Detectives</h1>
+                <p>Module 3.1 &bull; Crash Investigator Lab</p>
+            </div>
+        </div>
+
+        <div class="stats-hud">
+            <div class="stat-badge stars-badge" title="Stars Collected">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <span id="stat-stars">0</span> / 6
+            </div>
+        </div>
+
+        <div class="hud-actions">
+            <button class="hud-btn" id="btn-sound-toggle" title="Toggle Synthesized Audio" aria-label="Toggle sound">🔊</button>
+            <button class="hud-btn" id="btn-help" title="Investigation Manual" aria-label="View Help">❓</button>
+            <button class="hud-btn" id="btn-reset" title="Reset Investigation Progress" style="color: hsl(var(--primary)); border-color: rgba(204, 0, 0, 0.3);" aria-label="Reset game">♻</button>
+        </div>
+    </header>
+
+    <!-- APP BODY WRAPPER -->
+    <div class="app-body">
+        
+        <!-- SIDEBAR NAVIGATION (All levels unlocked, lock indicators removed) -->
+        <aside class="sidebar">
+            <h2 class="nav-section-title">Case Files</h2>
+            <div class="level-node-list">
+                
+                <!-- Level 1 Node -->
+                <div class="level-nav-node" id="nav-l1" onclick="app.switchLevel(1)">
+                    <div class="node-header">
+                        <span class="node-title">Level 1: Error Category Sorter</span>
+                        <span class="node-status-icon" id="node-status-l1">🔴</span>
+                    </div>
+                    <div class="node-activities">
+                        <div class="activity-sub-pill" id="pill-l1-a1" onclick="app.switchActivity(1, 1); event.stopPropagation();">
+                            <span>Case 1.1: Crash Lab</span>
+                        </div>
+                        <div class="activity-sub-pill" id="pill-l1-a2" onclick="app.switchActivity(1, 2); event.stopPropagation();">
+                            <span>Case 1.2: Error Surgery</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Level 2 Node -->
+                <div class="level-nav-node" id="nav-l2" onclick="app.switchLevel(2)">
+                    <div class="node-header">
+                        <span class="node-title">Level 2: Exception Rescue</span>
+                        <span class="node-status-icon" id="node-status-l2">🔴</span>
+                    </div>
+                    <div class="node-activities">
+                        <div class="activity-sub-pill" id="pill-l2-a1" onclick="app.switchActivity(2, 1); event.stopPropagation();">
+                            <span>Case 2.1: Flow Builder</span>
+                        </div>
+                        <div class="activity-sub-pill" id="pill-l2-a2" onclick="app.switchActivity(2, 2); event.stopPropagation();">
+                            <span>Case 2.2: Flow Simulator</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Level 3 Node -->
+                <div class="level-nav-node" id="nav-l3" onclick="app.switchLevel(3)">
+                    <div class="node-header">
+                        <span class="node-title">Level 3: Debug Championship</span>
+                        <span class="node-status-icon" id="node-status-l3">🔴</span>
+                    </div>
+                    <div class="node-activities">
+                        <div class="activity-sub-pill" id="pill-l3-a1" onclick="app.switchActivity(3, 1); event.stopPropagation();">
+                            <span>Case 3.1: IDE Escape Room</span>
+                        </div>
+                        <div class="activity-sub-pill" id="pill-l3-a2" onclick="app.switchActivity(3, 2); event.stopPropagation();">
+                            <span>Case 3.2: AI Boss Duel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements Preview -->
+            <div class="achievements-preview" onclick="app.showAchievementsModal()">
+                <h4>🕵 Trophy Cabinet</h4>
+                <p><span id="hud-badge-count">0</span> / 6 Badges Acquired</p>
+            </div>
+        </aside>
+
+        <!-- VIEWPORT AREA -->
+        <main class="viewport">
+            
+            <!-- RADAR SWEEP BACKGROUND SCANNER EFFECT -->
+            <div id="radar-overlay" class="radar-scan-overlay"></div>
+
+            <!-- MAP / WELCOME PANE -->
+            <div class="level-panel-content active" id="pane-welcome">
+                <div class="welcome-pane glass-card">
+                    <h2>Case File: Mainframe Debugging</h2>
+                    <p>The system network is crashing due to unhandled exceptions and logical loops. We need a **Python Debug Detective** to run diagnostics, repair codebase leaks, trace execution pathways, and neutralise the rogue AI compiler **ByteLord**.</p>
+                    
+                    <div class="mission-map-visual">
+                        <div class="map-node unlocked active-map-node" id="map-n1" onclick="app.switchLevel(1)">
+                            <span>L1</span>
+                            <div class="map-node-label">Error Detective</div>
+                        </div>
+                        <div class="map-line completed-line" id="map-l1-l2"></div>
+                        <div class="map-node unlocked" id="map-n2" onclick="app.switchLevel(2)">
+                            <span>L2</span>
+                            <div class="map-node-label">Exception Rescue</div>
+                        </div>
+                        <div class="map-line completed-line" id="map-l2-l3"></div>
+                        <div class="map-node unlocked" id="map-n3" onclick="app.switchLevel(3)">
+                            <span>L3</span>
+                            <div class="map-node-label">AI Boss Battle</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="margin-top: 15px;" onclick="app.switchLevel(1)">Initialize Mission Diagnostics &rarr;</button>
+                </div>
+            </div>
+
+            <!-- ===================== LEVEL 1 ===================== -->
+            <div class="level-panel-content" id="pane-l1">
+                
+                <!-- L1 Activity 1: Crash Investigation Lab -->
+                <div id="l1-a1-content" class="level-panel-content" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <h2 class="nav-section-title" style="color: hsl(var(--primary));">Case 1.1: Crash Investigation Lab</h2>
+                        <p style="font-size: 0.9rem; color: hsl(var(--text-muted));">Analyse code crashes. Run the debugger, examine execution outputs and traceback dumps, and drag the matching error category block into the terminal slot to diagnose the bug.</p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <strong>Activity Instructions:</strong>
+                        <ol>
+                            <li>Click the <strong>▶ Run Traceback Scan</strong> button to simulate code execution.</li>
+                            <li>Observe the output pointer step through the lines and check the traceback log that appears in the console.</li>
+                            <li>Drag the matching classification tag (Syntax Error, Runtime Error, or Logical Error) and drop it inside the <strong>Drop Zone</strong>. (For touch screens/mobile, simply click the tag first, then click inside the Drop Zone).</li>
+                        </ol>
+                    </div>
+
+                    <div class="workspace-split">
+                        <div class="code-container">
+                            <div class="editor-header">
+                                <div class="editor-title"><span class="tab-dot"></span> investigation_script.py</div>
+                                <span class="badge-icon" id="l1-a1-case-star">☆</span>
+                            </div>
+                            <div class="editor-lines" id="l1-a1-editor">
+                                <!-- Generated line by line dynamically -->
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="terminal-container" style="height: 240px;">
+                                <div class="terminal-header">
+                                    <div class="terminal-actions">
+                                        <span class="term-dot dot-red"></span>
+                                    </div>
+                                    <span>Python Diagnostics Terminal</span>
+                                </div>
+                                <div class="terminal-body" id="l1-a1-terminal">
+                                    <div class="terminal-line"><span class="terminal-prompt">detective@host:~$</span> Click RUN to start traceback scan...</div>
+                                </div>
+                            </div>
+
+                            <div class="item-pool-container">
+                                <div class="pool-label">Diagnostic Tools</div>
+                                <div class="drag-pool" id="l1-a1-pool">
+                                    <div class="draggable-block" id="tag-syntax" draggable="true" data-type="syntax">Syntax Error</div>
+                                    <div class="draggable-block" id="tag-runtime" draggable="true" data-type="runtime">Runtime Error</div>
+                                    <div class="draggable-block" id="tag-logical" draggable="true" data-type="logical">Logical Error</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+                                    <span style="font-size: 0.85rem; font-family: var(--font-mono); color: hsl(var(--text-muted));">Drop Zone:</span>
+                                    <div class="repair-slot" id="l1-a1-drop" style="min-width: 160px; height: 32px;" data-expected="">[ Drag Analysis Tag Here ]</div>
+                                </div>
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn-primary" id="btn-l1-a1-run" onclick="l1a1.runAnalysis()">▶ Run Traceback Scan</button>
+                                <button class="btn-secondary" onclick="l1a1.resetMission()">Reset Case</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details class="hint-accordion" open>
+                        <summary class="hint-summary">Direct Case Solution Hints (Click to toggle)</summary>
+                        <div class="hint-content">
+                            <p id="l1-a1-hint-text">Run the analysis diagnostic scan first to see the crash details in the terminal console.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- L1 Activity 2: Error Surgery -->
+                <div id="l1-a2-content" class="level-panel-content" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <h2 class="nav-section-title" style="color: hsl(var(--primary));">Case 1.2: Error Surgery</h2>
+                        <p style="font-size: 0.9rem; color: hsl(var(--text-muted));">Correct code defects live in the code editor. Select the correct tool from your surgical belt, then click the malfunctioning slot in the code to perform the repair operation.</p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <strong>Activity Instructions:</strong>
+                        <ol>
+                            <li>Locate the red-dashed slot placeholder `[...]` inside the code editor.</li>
+                            <li>Select the correct formatting fix tool from the <strong>Surgical Tool Belt</strong> (e.g. Colon Tool, Indent Doctor).</li>
+                            <li>Click directly inside the target slot `[...]` in the code list to apply the surgical correction.</li>
+                            <li>Click <strong>▶ Run Surgery Simulation</strong> to verify if the script compiles successfully.</li>
+                        </ol>
+                    </div>
+
+                    <div class="workspace-split">
+                        <div class="code-container">
+                            <div class="editor-header">
+                                <div class="editor-title"><span class="tab-dot"></span> patch_code.py</div>
+                                <span class="badge-icon" id="l1-a2-case-star">☆</span>
+                            </div>
+                            <div class="editor-lines" id="l1-a2-editor">
+                                <!-- Interactive slots -->
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="terminal-container" style="height: 220px;">
+                                <div class="terminal-header">
+                                    <div class="terminal-actions">
+                                        <span class="term-dot dot-red"></span>
+                                    </div>
+                                    <span>Console Console</span>
+                                </div>
+                                <div class="terminal-body" id="l1-a2-terminal">
+                                    <div class="terminal-line"><span class="terminal-prompt">detective@host:~$</span> Select your active repair tool from the belt below, perform surgery, and hit RUN...</div>
+                                </div>
+                            </div>
+
+                            <div class="item-pool-container">
+                                <div class="pool-label">Surgical Tool Belt</div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="surgery-toolbelt">
+                                    <button class="btn-secondary" style="font-family: var(--font-mono); font-size: 0.8rem; padding: 6px 12px;" onclick="l1a2.selectTool('colon', this)">Colon Tool [ : ]</button>
+                                    <button class="btn-secondary" style="font-family: var(--font-mono); font-size: 0.8rem; padding: 6px 12px;" onclick="l1a2.selectTool('indent', this)">Indent Doctor [ &gt;&gt; ]</button>
+                                    <button class="btn-secondary" style="font-family: var(--font-mono); font-size: 0.8rem; padding: 6px 12px;" onclick="l1a2.selectTool('paren', this)">Paren Spanner [ () ]</button>
+                                    <button class="btn-secondary" style="font-family: var(--font-mono); font-size: 0.8rem; padding: 6px 12px;" onclick="l1a2.selectTool('quote', this)">Quote Clamp [ "" ]</button>
+                                    <button class="btn-secondary" style="font-family: var(--font-mono); font-size: 0.8rem; padding: 6px 12px;" onclick="l1a2.selectTool('operator', this)">Operator Scalpel [ - ]</button>
+                                </div>
+                                <p style="font-size: 0.75rem; color: hsl(var(--text-muted)); font-style: italic; margin-top: 4px;">Active Tool: <strong style="color: hsl(var(--primary));" id="active-tool-indicator">None Selected</strong></p>
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn-primary" onclick="l1a2.runSurgery()">▶ Run Surgery Simulation</button>
+                                <button class="btn-secondary" onclick="l1a2.resetMission()">Reset Case</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details class="hint-accordion" open>
+                        <summary class="hint-summary">Direct Case Solution Hints (Click to toggle)</summary>
+                        <div class="hint-content">
+                            <p id="l1-a2-hint-text">Inspect the slots highlighted in code. Click on the correct surgical tool, and then click directly inside the corresponding repair slot `[...]` in the code editor to perform the injection.</p>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+
+            <!-- ===================== LEVEL 2 ===================== -->
+            <div class="level-panel-content" id="pane-l2">
+                
+                <!-- L2 Activity 1: Exception Builder -->
+                <div id="l2-a1-content" class="level-panel-content" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <h2 class="nav-section-title" style="color: hsl(var(--primary));">Case 2.1: Exception Block Builder</h2>
+                        <p style="font-size: 0.9rem; color: hsl(var(--text-muted));">Drag and arrange the try-except-else-finally blocks in the correct nesting layout. Once structured correctly, execute the code and witness execution vectors glowing on the flowchart.</p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <strong>Activity Instructions:</strong>
+                        <ol>
+                            <li>Drag code lines from the <strong>Flow Module Blocks</strong> pool below.</li>
+                            <li>Drop them into the editor slots in sequence. You must nest the `try:` block at the top, then the nested arithmetic division, followed by the matching error capture `except`, then the success `else:`, and finally the clean-up statement `finally:`.</li>
+                            <li>Click <strong>▶ Run Code Execution</strong> to see how values flow on the SVG Flowchart.</li>
+                        </ol>
+                    </div>
+
+                    <div class="workspace-split">
+                        <div class="code-container" style="flex: 1.2;">
+                            <div class="editor-header">
+                                <div class="editor-title"><span class="tab-dot"></span> transaction_handler.py</div>
+                                <span class="badge-icon" id="l2-a1-case-star">☆</span>
+                            </div>
+                            <div class="editor-lines" id="l2-a1-editor" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Target slots -->
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="flowchart-container">
+                                <div class="inspector-title" style="width: 100%;">
+                                    <span>Real-Time Flowchart Mapping</span>
+                                </div>
+                                <svg class="svg-flow" viewBox="0 0 200 240">
+                                    <path id="path-start-try" class="flow-path" d="M 100 25 L 100 50" />
+                                    <path id="path-try-op" class="flow-path" d="M 100 80 L 100 95" />
+                                    <path id="path-try-except" class="flow-path" d="M 100 80 Q 30 80 30 135" />
+                                    <path id="path-except-finally" class="flow-path" d="M 30 165 Q 30 200 100 200" />
+                                    <path id="path-op-else" class="flow-path" d="M 100 125 L 100 135" />
+                                    <path id="path-else-finally" class="flow-path" d="M 100 165 L 100 185" />
+                                    
+                                    <rect id="node-start" class="flow-node" x="70" y="5" width="60" height="20" rx="10" ry="10" />
+                                    <text x="100" y="16" class="flow-text">START</text>
+
+                                    <rect id="node-try" class="flow-node" x="70" y="50" width="60" height="30" rx="4" />
+                                    <text x="100" y="66" class="flow-text">try</text>
+
+                                    <rect id="node-except" class="flow-node" x="5" y="135" width="60" height="30" rx="4" />
+                                    <text x="35" y="151" class="flow-text">except</text>
+
+                                    <rect id="node-else" class="flow-node" x="70" y="135" width="60" height="30" rx="4" />
+                                    <text x="100" y="151" class="flow-text">else</text>
+
+                                    <rect id="node-finally" class="flow-node" x="70" y="195" width="60" height="30" rx="4" />
+                                    <text x="100" y="211" class="flow-text">finally</text>
+                                </svg>
+                            </div>
+
+                            <div class="item-pool-container">
+                                <div class="pool-label">Flow Module Blocks</div>
+                                <div class="drag-pool" id="l2-a1-pool"></div>
+                            </div>
+
+                            <div class="inspector-panel">
+                                <div class="inspector-title">
+                                    <span>Variable Watcher</span>
+                                    <span>Inputs: X = <span id="l2-a1-input-x">10</span>, Y = <span id="l2-a1-input-y">2</span></span>
+                                </div>
+                                <div class="variables-grid" id="l2-a1-variables">
+                                    <div class="var-name">x:</div><div class="var-val">10</div>
+                                    <div class="var-name">y:</div><div class="var-val">2</div>
+                                    <div class="var-name">result:</div><div class="var-val uninitialized">None</div>
+                                </div>
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn-primary" id="btn-l2-a1-run" onclick="l2a1.executeSimulation()">▶ Run Code Execution</button>
+                                <button class="btn-secondary" onclick="l2a1.toggleInputScenario()">Switch Input Parameters</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details class="hint-accordion" open>
+                        <summary class="hint-summary">Direct Case Solution Hints (Click to toggle)</summary>
+                        <div class="hint-content">
+                            <p id="l2-a1-hint-text">Drag blocks from the bottom pool. Place `try:` at the top. The code that might fail (`result = x / y`) must go inside it. The `except` catches zero division. The `else` runs on success. The `finally` block prints cleanup.</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- L2 Activity 2: Exception Simulator -->
+                <div id="l2-a2-content" class="level-panel-content" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <h2 class="nav-section-title" style="color: hsl(var(--primary));">Case 2.2: Exception Flow Simulator</h2>
+                        <p style="font-size: 0.9rem; color: hsl(var(--text-muted));">Animate nested stack execution. Predict how the interpreter propagates exceptions. Before critical junctions, select where execution will branch next.</p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <strong>Activity Instructions:</strong>
+                        <ol>
+                            <li>Click the <strong>▶ Step Simulation</strong> button repeatedly to trace code lines one-by-line.</li>
+                            <li>Observe the <strong>Call Stack Visualizer</strong> frames changing as functions push/pop.</li>
+                            <li>When a code crash is triggered, an overlay dialog prompts you to predict the next execution line. Answer correctly to proceed.</li>
+                        </ol>
+                    </div>
+
+                    <div class="workspace-split">
+                        <div class="code-container" style="position: relative;">
+                            <div class="editor-header">
+                                <div class="editor-title"><span class="tab-dot"></span> nested_engine.py</div>
+                                <span class="badge-icon" id="l2-a2-case-star">☆</span>
+                            </div>
+                            <div class="editor-lines" id="l2-a2-editor">
+                                <!-- Simulator Code lines -->
+                            </div>
+
+                            <div class="interactive-overlay" id="prediction-overlay">
+                                <div class="overlay-card glass-card">
+                                    <h4>🕵 Detective Branch Prediction</h4>
+                                    <p id="prediction-question">An exception is about to occur at line 5. Where will the Python interpreter jump next?</p>
+                                    <div class="options-list" id="prediction-options"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="stack-container">
+                                <div class="stack-title">Call Stack Visualizer</div>
+                                <div class="stack-frame-list" id="stack-frame-list">
+                                    <div class="stack-frame">
+                                        <div class="frame-header">
+                                            <span class="frame-func">&lt;module&gt;</span>
+                                            <span class="frame-line">line 12</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="inspector-panel">
+                                <div class="inspector-title">Active Variables</div>
+                                <div class="variables-grid" id="l2-a2-variables">
+                                    <div class="var-name">x:</div><div class="var-val">10</div>
+                                </div>
+                            </div>
+
+                            <div class="terminal-container" style="height: 140px;">
+                                <div class="terminal-header">
+                                    <span>Execution Console Output</span>
+                                </div>
+                                <div class="terminal-body" id="l2-a2-terminal"></div>
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn-primary" id="btn-l2-a2-step" onclick="l2a2.stepSim()">▶ Step Simulation</button>
+                                <button class="btn-secondary" onclick="l2a2.resetSimulator()">Restart Engine</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details class="hint-accordion" open>
+                        <summary class="hint-summary">Direct Case Solution Hints (Click to toggle)</summary>
+                        <div class="hint-content">
+                            <p id="l2-a2-hint-text">Step through the code line by line. When an error is raised inside a try block, the immediate executing frame is popped unless there is an active local except block to catch it.</p>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+
+            <!-- ===================== LEVEL 3 ===================== -->
+            <div class="level-panel-content" id="pane-l3">
+                
+                <!-- L3 Activity 1: Python Escape Room -->
+                <div id="l3-a1-content" class="level-panel-content" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <h2 class="nav-section-title" style="color: hsl(var(--primary));">Case 3.1: Python IDE Escape Room</h2>
+                        <p style="font-size: 0.9rem; color: hsl(var(--text-muted));">Crack the code locks of 5 locked server rooms in sequence to restore mainframe security before the system self-destruct countdown hits zero.</p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <strong>Activity Instructions:</strong>
+                        <ol>
+                            <li>Click a <strong>Room card</strong> in the top panel to load its terminal lock bypass details.</li>
+                            <li>Analyze the problem code on the left and the diagnostic logs in the terminal on the right.</li>
+                            <li>Select the correct correction patch code block from the options list.</li>
+                            <li>Click the <strong>▶ Test Lock Bypass Code</strong> button to unlock the door. Bypass all 5 rooms before the timer expires!</li>
+                        </ol>
+                    </div>
+
+                    <!-- Escape Room Grid Map -->
+                    <div class="escaperoom-grid" id="escaperoom-grid"></div>
+
+                    <div class="escape-timer-bar">
+                        <div class="escape-timer-fill" id="escape-timer-fill"></div>
+                    </div>
+
+                    <div class="workspace-split">
+                        <div class="code-container">
+                            <div class="editor-header">
+                                <div class="editor-title"><span class="tab-dot"></span> mainframe_lock.py</div>
+                                <span class="badge-icon" id="l3-a1-case-star">☆</span>
+                            </div>
+                            <div class="editor-lines" id="l3-a1-editor"></div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="terminal-container" style="flex: 1; height: 180px;">
+                                <div class="terminal-header">
+                                    <span>Lock Bypass Terminal Diagnostics</span>
+                                </div>
+                                <div class="terminal-body" id="l3-a1-terminal">
+                                    <div class="terminal-line"><span class="terminal-prompt">detective@security:~$</span> Select Room 1 to begin the bypass operation...</div>
+                                </div>
+                            </div>
+
+                            <div class="item-pool-container" id="l3-a1-options-container" style="display: none;">
+                                <div class="pool-label">Select Code Correction Patch</div>
+                                <div class="options-list" id="l3-a1-options"></div>
+                            </div>
+
+                            <div class="btn-row">
+                                <button class="btn-primary" id="btn-l3-a1-bypass" onclick="l3a1.runDiagnostic()">▶ Test Lock Bypass Code</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details class="hint-accordion" open>
+                        <summary class="hint-summary">Direct Case Solution Hints (Click to toggle)</summary>
+                        <div class="hint-content">
+                            <p id="l3-a1-hint-text">Select Room 1 to load dynamic bypass hints...</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- L3 Activity 2: AI Boss Duel -->
+                <div id="l3-a2-content" class="level-panel-content" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <h2 class="nav-section-title" style="color: hsl(var(--primary));">Case 3.2: AI Compiler Diagnosis</h2>
+                        <p style="font-size: 0.9rem; color: hsl(var(--text-muted));">Diagnose error handling challenges and tracebacks compiled by ByteLord to complete the final diagnostic phase.</p>
+                    </div>
+
+                    <div class="instruction-box">
+                        <strong>Activity Instructions:</strong>
+                        <ol>
+                            <li>Inspect the faulty code in ByteLord's code box on the left.</li>
+                            <li>Read the prompt question on the right.</li>
+                            <li>Click the correct diagnostic classification answer from the options list below.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Cleaned HUD -->
+                    <div class="boss-arena">
+                        <div class="boss-chat" id="boss-chat-msg">
+                            "System trace corruption initiated. You are too slow to resolve my syntax loops, Detective!"
+                        </div>
+
+                        <div class="workspace-split">
+                            <div class="code-container" style="flex: 1.2;">
+                                <div class="editor-header">
+                                    <div class="editor-title"><span class="tab-dot"></span> server_logs.py</div>
+                                    <span class="badge-icon">☠</span>
+                                </div>
+                                <div class="editor-lines" id="l3-a2-code-box" style="font-family: var(--font-mono); font-size: 0.85rem; padding: 16px; overflow-y: auto; line-height: 1.5; color: #000000;"></div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div class="item-pool-container">
+                                    <div class="pool-label" id="boss-question-label">Diagnose the issue:</div>
+                                    <div class="options-list" id="boss-answer-options"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details class="hint-accordion" open>
+                        <summary class="hint-summary">Direct Case Solution Hints (Click to toggle)</summary>
+                        <div class="hint-content">
+                            <p id="l3-a2-hint-text">Select correct diagnostic classification answer...</p>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- HINT & MANUAL MODAL DIALOG -->
+    <dialog id="modal-help">
+        <form method="dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">🕵 Detective's Diagnostic Manual</h3>
+                <button class="hud-btn" style="border: none; font-size: 1.1rem; line-height: 1;" type="submit">&times;</button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+                <p>Welcome to active diagnostic operations, Detective. Master these core Python concepts to repair the network:</p>
+                
+                <h4 style="color: hsl(var(--primary)); font-family: var(--font-display); font-weight: 700; margin-top: 8px;">1. The Error Categories</h4>
+                <ul style="padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+                    <li><strong>Syntax Errors:</strong> Violations in Python grammar (missing colons, uneven brackets, wrong indentation). Detected *before* code executes.</li>
+                    <li><strong>Runtime Errors (Exceptions):</strong> Crashes during program run (division by zero, missing array elements, incompatible variable casts).</li>
+                    <li><strong>Logical Errors:</strong> Code runs fine without tracebacks, but yields mathematically incorrect or flawed results due to logical developer errors.</li>
+                </ul>
+
+                <h4 style="color: hsl(var(--primary)); font-family: var(--font-display); font-weight: 700; margin-top: 8px;">2. Exception Traps</h4>
+                <ul style="padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+                    <li><code>try</code>: Surrounds code which could potentially throw an exception.</li>
+                    <li><code>except</code>: Captures and handles the exception. Does not execute if try succeeds.</li>
+                    <li><code>else</code>: Runs *only* if the try block executes completely without exceptions.</li>
+                    <li><code>finally</code>: Runs *always*, regardless of whether an exception was raised, handled, or completely bypassed. Used for cleanup.</li>
+                </ul>
+
+                <h4 style="color: hsl(var(--primary)); font-family: var(--font-display); font-weight: 700; margin-top: 8px;">3. Assertion Enforcements</h4>
+                <p><code>assert condition, message</code> validates parameters. If <code>condition</code> is False, it immediately raises an <code>AssertionError</code> crash holding your custom details.</p>
+            </div>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" type="submit">Dismiss Manual</button>
+        </form>
+    </dialog>
+
+    <!-- TROPHY / ACHIEVEMENT CABINET DIALOG -->
+    <dialog id="modal-achievements">
+        <form method="dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">🏆 Detective Trophies</h3>
+                <button class="hud-btn" style="border: none; font-size: 1.1rem; line-height: 1;" type="submit">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 12px;">Solve challenges, correct crash structures, and defeat ByteLord to unlock professional badges:</p>
+                <div class="badge-grid" id="badge-container"></div>
+            </div>
+            <button class="btn-primary" style="width: 100%; justify-content: center;" type="submit">Back to Diagnostics</button>
+        </form>
+    </dialog>
+
+    <!-- GAME OVER / RECAP REPORT DIALOG -->
+    <dialog id="modal-gameover">
+        <div class="modal-header">
+            <h3 class="modal-title" id="go-title">Investigation Concluded</h3>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
+            <p id="go-message">You successfully bypassed mainframe security and completed all diagnostics.</p>
+            <div style="background: rgba(0, 0, 0, 0.03); border: 1px solid hsl(var(--border-muted)); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; justify-content: space-between;"><span style="color: hsl(var(--text-muted));">Diagnostic Accuracy:</span> <strong id="go-stat-accuracy">0%</strong></div>
+                <div style="display: flex; justify-content: space-between;"><span style="color: hsl(var(--text-muted));">Stars Earned:</span> <strong id="go-stat-stars">0 / 6</strong></div>
+            </div>
+        </div>
+        <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="document.getElementById('modal-gameover').close(); app.switchLevel(1);">Restart Diagnostics</button>
+    </dialog>
+
+    <!-- CORE LOGIC / JAVASCRIPT GAME ENGINE -->
+    <script>
+        /* ==========================================================================
+           0. TRANSIENT TOAST NOTIFICATIONS (Replaces browser alert popups)
+           ========================================================================== */
+        function showToast(message) {
+            let toast = document.getElementById('game-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'game-toast';
+                toast.style.position = 'fixed';
+                toast.style.bottom = '24px';
+                toast.style.right = '24px';
+                toast.style.background = '#ffffff';
+                toast.style.border = '1px solid hsl(var(--border-active))';
+                toast.style.borderLeft = '4px solid hsl(var(--primary))';
+                toast.style.padding = '12px 20px';
+                toast.style.borderRadius = '8px';
+                toast.style.boxShadow = '0 8px 24px rgba(204, 0, 0, 0.1)';
+                toast.style.zIndex = '1000';
+                toast.style.fontFamily = 'var(--font-body)';
+                toast.style.fontSize = '0.9rem';
+                toast.style.color = '#000000';
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+            
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+            }, 3000);
+        }
+
+        /* ==========================================================================
+           1. PROCEDURAL SOUND SYNTHESISER (Web Audio API - Red & White)
+           ========================================================================== */
+        class SoundSynth {
+            constructor() {
+                this.audioCtx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playBlip() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.audioCtx.createOscillator();
+                const gainNode = this.audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, this.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, this.audioCtx.currentTime + 0.08);
+                
+                gainNode.gain.setValueAtTime(0.08, this.audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.08);
+                
+                osc.connect(gainNode);
+                gainNode.connect(this.audioCtx.destination);
+                
+                osc.start();
+                osc.stop(this.audioCtx.currentTime + 0.08);
+            }
+
+            playSuccess() {
+                if (this.muted) return;
+                this.init();
+                const now = this.audioCtx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = this.audioCtx.createOscillator();
+                    const gainNode = this.audioCtx.createGain();
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    
+                    gainNode.gain.setValueAtTime(0.05, now + idx * 0.08);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.12);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(this.audioCtx.destination);
+                    
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.12);
+                });
+            }
+
+            playCrash() {
+                if (this.muted) return;
+                this.init();
+                const now = this.audioCtx.currentTime;
+                
+                const osc1 = this.audioCtx.createOscillator();
+                const osc2 = this.audioCtx.createOscillator();
+                const gainNode = this.audioCtx.createGain();
+                
+                osc1.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(140, now);
+                osc1.frequency.linearRampToValueAtTime(40, now + 0.4);
+                
+                osc2.type = 'square';
+                osc2.frequency.setValueAtTime(145, now);
+                osc2.frequency.linearRampToValueAtTime(35, now + 0.4);
+                
+                gainNode.gain.setValueAtTime(0.12, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(this.audioCtx.destination);
+                
+                osc1.start();
+                osc2.start();
+                osc1.stop(now + 0.4);
+                osc2.stop(now + 0.4);
+            }
+
+            playLaser() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.audioCtx.createOscillator();
+                const gainNode = this.audioCtx.createGain();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(900, this.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, this.audioCtx.currentTime + 0.15);
+                
+                gainNode.gain.setValueAtTime(0.06, this.audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.15);
+                
+                osc.connect(gainNode);
+                gainNode.connect(this.audioCtx.destination);
+                
+                osc.start();
+                osc.stop(this.audioCtx.currentTime + 0.15);
+            }
+
+            playTrophy() {
+                if (this.muted) return;
+                this.init();
+                const now = this.audioCtx.currentTime;
+                const notes = [587.33, 739.99, 880.00, 1174.66, 1479.98];
+                notes.forEach((freq, idx) => {
+                    const osc = this.audioCtx.createOscillator();
+                    const gainNode = this.audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+                    
+                    gainNode.gain.setValueAtTime(0.06, now + idx * 0.07);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.25);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(this.audioCtx.destination);
+                    
+                    osc.start(now + idx * 0.07);
+                    osc.stop(now + idx * 0.07 + 0.25);
+                });
+            }
+        }
+
+        const sound = new SoundSynth();
+
+        /* ==========================================================================
+           2. HTML5 CANVAS PARTICLE ENGINE (Sparks & Confetti - Strictly Red & White)
+           ========================================================================== */
+        class ParticleEngine {
+            constructor() {
+                this.canvas = document.getElementById('particle-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.animationFrame = null;
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            triggerSparks(x, y, color = '#cc0000') {
+                for (let i = 0; i < 25; i++) {
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8 - 2,
+                        size: Math.random() * 3 + 2,
+                        color: Math.random() > 0.5 ? '#cc0000' : '#ffffff', // Red or White only
+                        alpha: 1,
+                        decay: Math.random() * 0.03 + 0.015,
+                        type: 'spark'
+                    });
+                }
+                this.startLoop();
+            }
+
+            triggerConfetti() {
+                const colors = ['#ff0015', '#cc0014', '#ff4d6d', '#ff758f', '#ffffff']; // Red & White shades
+                for (let i = 0; i < 80; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: -20,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: Math.random() * 5 + 4,
+                        size: Math.random() * 5 + 5,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        alpha: 1,
+                        decay: Math.random() * 0.01 + 0.005,
+                        type: 'confetti',
+                        rotation: Math.random() * 360,
+                        rSpeed: Math.random() * 5 - 2.5
+                    });
+                }
+                this.startLoop();
+            }
+
+            startLoop() {
+                if (!this.animationFrame) {
+                    this.loop();
+                }
+            }
+
+            loop() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.alpha -= p.decay;
+                    
+                    if (p.alpha <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    this.ctx.save();
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.fillStyle = p.color;
+
+                    if (p.type === 'spark') {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.1;
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    } else if (p.type === 'confetti') {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.rotation += p.rSpeed;
+                        this.ctx.translate(p.x, p.y);
+                        this.ctx.rotate(p.rotation * Math.PI / 180);
+                        this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size / 2);
+                    }
+                    this.ctx.restore();
+                }
+
+                if (this.particles.length > 0) {
+                    this.animationFrame = requestAnimationFrame(() => this.loop());
+                } else {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.animationFrame = null;
+                }
+            }
+        }
+
+        let particles;
+
+        /* ==========================================================================
+           3. APPLICATION & GLOBAL STATE ENGINE (All Levels/Activities Unlocked)
+           ========================================================================== */
+        const ACHIEVEMENTS_DATA = [
+            { id: 'l1a1', name: 'Traceback Detective', desc: 'Sort syntax, runtime, and logical script issues.', icon: '🔍' },
+            { id: 'l1a2', name: 'Code Surgeon', desc: 'Perform live code repair surgeries.', icon: '💉' },
+            { id: 'l2a1', name: 'Flow Architect', desc: 'Build logical try-except-else-finally arrays.', icon: '📐' },
+            { id: 'l2a2', name: 'Interpreter Oracle', desc: 'Predict call stack execution pathways.', icon: '🔮' },
+            { id: 'l3a1', name: 'Escape Master', desc: 'Bypass all 5 security network door codes.', icon: '🚪' },
+            { id: 'boss', name: 'ByteLord Slayer', desc: 'Defeat the rogue diagnostic AI boss.', icon: '👑' }
+        ];
+
+        class GameEngine {
+            constructor() {
+                this.state = {
+                    stars: 0,
+                    unlockedLevel: 3, 
+                    unlockedActivity: { 1: 2, 2: 2, 3: 2 }, 
+                    completedActivities: [],
+                    achievements: [],
+                    totalAnswers: 0,
+                    correctAnswers: 0
+                };
+                
+                this.currentLevel = 0;
+                this.currentActivity = 0;
+            }
+
+            init() {
+                this.loadState();
+                
+                this.state.unlockedLevel = 3;
+                this.state.unlockedActivity = { 1: 2, 2: 2, 3: 2 };
+                
+                this.updateHUD();
+                
+                const soundMuted = localStorage.getItem('detective-sound-muted') === 'true';
+                sound.muted = soundMuted;
+                document.getElementById('btn-sound-toggle').textContent = soundMuted ? '🔇' : '🔊';
+
+                this.registerGlobalEvents();
+            }
+
+            registerGlobalEvents() {
+                document.getElementById('btn-sound-toggle').addEventListener('click', () => {
+                    sound.muted = !sound.muted;
+                    localStorage.setItem('detective-sound-muted', sound.muted);
+                    document.getElementById('btn-sound-toggle').textContent = sound.muted ? '🔇' : '🔊';
+                    if (!sound.muted) {
+                        sound.init();
+                        sound.playBlip();
+                    }
+                });
+
+                document.getElementById('btn-help').addEventListener('click', () => {
+                    sound.playBlip();
+                    document.getElementById('modal-help').showModal();
+                });
+
+                document.getElementById('btn-reset').addEventListener('click', () => {
+                    showToast("♻️ Progress successfully reset. Reloading scanner...");
+                    setTimeout(() => {
+                        localStorage.clear();
+                        window.location.reload();
+                    }, 1500);
+                });
+            }
+
+            loadState() {
+                const saved = localStorage.getItem('detective-game-state');
+                if (saved) {
+                    try {
+                        this.state = JSON.parse(saved);
+                    } catch(e) {
+                        console.error("Failed to parse game state, resetting.");
+                    }
+                }
+            }
+
+            saveState() {
+                localStorage.setItem('detective-game-state', JSON.stringify(this.state));
+            }
+
+            addStar(activityId) {
+                if (!this.state.completedActivities.includes(activityId)) {
+                    this.state.completedActivities.push(activityId);
+                    this.state.stars++;
+                    this.updateHUD();
+                    this.saveState();
+                    return true;
+                }
+                return false;
+            }
+
+            unlockBadge(badgeId) {
+                if (!this.state.achievements.includes(badgeId)) {
+                    this.state.achievements.push(badgeId);
+                    this.saveState();
+                    this.updateHUD();
+                    sound.playTrophy();
+                    particles.triggerConfetti();
+                    
+                    const badge = ACHIEVEMENTS_DATA.find(a => a.id === badgeId);
+                    this.announceAccessibility(`Achievement Unlocked: ${badge.name}`);
+                    showToast(`🏆 <strong>ACHIEVEMENT UNLOCKED:</strong> ${badge.name}<br><small style="color: hsl(var(--text-muted));">${badge.desc}</small>`);
+                }
+            }
+
+            updateHUD() {
+                document.getElementById('stat-stars').textContent = this.state.stars;
+                document.getElementById('hud-badge-count').textContent = this.state.achievements.length;
+
+                // All levels always unlocked
+                for (let lvl = 1; lvl <= 3; lvl++) {
+                    const node = document.getElementById(`nav-l${lvl}`);
+                    const icon = document.getElementById('node-status-l' + lvl);
+                    node.classList.remove('locked');
+                    icon.textContent = "🔴";
+                    
+                    const mapNode = document.getElementById(`map-n${lvl}`);
+                    if (mapNode) mapNode.classList.add('unlocked');
+                    
+                    const prevLine = document.getElementById(`map-l${lvl-1}-l${lvl}`);
+                    if (prevLine) prevLine.classList.add('completed-line');
+                }
+
+                this.syncActivityPillState(1, 1, 'l1a1');
+                this.syncActivityPillState(1, 2, 'l1a2');
+                this.syncActivityPillState(2, 1, 'l2a1');
+                this.syncActivityPillState(2, 2, 'l2a2');
+                this.syncActivityPillState(3, 1, 'l3a1');
+                this.syncActivityPillState(3, 2, 'boss');
+            }
+
+            syncActivityPillState(lvl, act, actId) {
+                const pill = document.getElementById(`pill-l${lvl}-a${act}`);
+                if (pill) {
+                    if (this.state.completedActivities.includes(actId)) {
+                        pill.classList.add('act-done');
+                    } else {
+                        pill.classList.remove('act-done');
+                    }
+                }
+            }
+
+            switchLevel(levelNum) {
+                sound.playBlip();
+                this.currentLevel = levelNum;
+                
+                document.getElementById('pane-welcome').classList.remove('active');
+                document.querySelectorAll('.app-body .level-panel-content').forEach(el => el.classList.remove('active'));
+                document.getElementById(`pane-l${levelNum}`).classList.add('active');
+                
+                document.querySelectorAll('.level-nav-node').forEach(el => el.classList.remove('active-level'));
+                document.getElementById(`nav-l${levelNum}`).classList.add('active-level');
+
+                const act = 1;
+                this.switchActivity(levelNum, act);
+            }
+
+            switchActivity(levelNum, activityNum) {
+                sound.playBlip();
+                this.currentLevel = levelNum;
+                this.currentActivity = activityNum;
+
+                document.getElementById('pane-welcome').classList.remove('active');
+                document.querySelectorAll('.app-body .level-panel-content').forEach(el => el.classList.remove('active'));
+                document.getElementById(`pane-l${levelNum}`).classList.add('active');
+                
+                document.querySelectorAll('.activity-sub-pill').forEach(el => el.classList.remove('active-act'));
+                document.getElementById(`pill-l${levelNum}-a${activityNum}`).classList.add('active-act');
+
+                document.getElementById('l1-a1-content').style.display = 'none';
+                document.getElementById('l1-a2-content').style.display = 'none';
+                document.getElementById('l2-a1-content').style.display = 'none';
+                document.getElementById('l2-a2-content').style.display = 'none';
+                document.getElementById('l3-a1-content').style.display = 'none';
+                document.getElementById('l3-a2-content').style.display = 'none';
+
+                document.getElementById(`l${levelNum}-a${activityNum}-content`).style.display = 'flex';
+
+                const radar = document.getElementById('radar-overlay');
+                radar.classList.add('scanning');
+                setTimeout(() => radar.classList.remove('scanning'), 2000);
+
+                if (levelNum === 1 && activityNum === 1) l1a1.init();
+                if (levelNum === 1 && activityNum === 2) l1a2.init();
+                if (levelNum === 2 && activityNum === 1) l2a1.init();
+                if (levelNum === 2 && activityNum === 2) l2a2.init();
+                if (levelNum === 3 && activityNum === 1) l3a1.init();
+                if (levelNum === 3 && activityNum === 2) l3a2.init();
+            }
+
+            checkProgress(currentActId, nextLevelNum, nextActNum) {
+                this.addStar(currentActId);
+                this.saveState();
+                this.updateHUD();
+
+                const mapNode = document.getElementById(`map-n${this.currentLevel}`);
+                if (mapNode) mapNode.classList.add('completed');
+            }
+
+            showAchievementsModal() {
+                sound.playBlip();
+                const container = document.getElementById('badge-container');
+                container.innerHTML = '';
+                
+                ACHIEVEMENTS_DATA.forEach(badge => {
+                    const unlocked = this.state.achievements.includes(badge.id);
+                    const card = document.createElement('div');
+                    card.className = `badge-card ${unlocked ? 'unlocked' : ''}`;
+                    card.innerHTML = `
+                        <div class="badge-icon">${badge.icon}</div>
+                        <div class="badge-name">${badge.name}</div>
+                        <div class="badge-desc">${badge.desc}</div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                document.getElementById('modal-achievements').showModal();
+            }
+
+            announceAccessibility(text) {
+                const el = document.getElementById('sr-announcer');
+                el.textContent = text;
+            }
+
+            concludeGame() {
+                sound.playTrophy();
+                particles.triggerConfetti();
+                
+                const accuracy = this.state.totalAnswers > 0 
+                    ? Math.round((this.state.correctAnswers / this.state.totalAnswers) * 100) 
+                    : 100;
+                
+                document.getElementById('go-stat-accuracy').textContent = `${accuracy}%`;
+                document.getElementById('go-stat-stars').textContent = `${this.state.stars} / 6`;
+                
+                document.getElementById('modal-gameover').showModal();
+            }
+        }
+
+        const app = new GameEngine();
+
+        /* ==========================================================================
+           4. LEVEL 1 ACTIVITY 1: CRASH INVESTIGATION LAB
+           ========================================================================== */
+        class CrashInvestigationLab {
+            constructor() {
+                this.cases = [
+                    {
+                        code: [
+                            { text: '# Authentication Validator', hl: 'comment' },
+                            { text: 'user_role = "admin"', hl: '' },
+                            { text: 'if user_role == "admin"', hl: 'error' },
+                            { text: '    print("Console Access Unlocked")', hl: '' }
+                        ],
+                        crashLine: 3,
+                        errorType: 'syntax',
+                        terminalLogs: [
+                            'Executing authentication_validator.py...',
+                            'Analyzing grammar sequence...',
+                            '  File "authentication_validator.py", line 3',
+                            '    if user_role == "admin"',
+                            '                           ^',
+                            'SyntaxError: expected \':\''
+                        ],
+                        hint: '💡 **Direct Answer**: Drag the **Syntax Error** tag from the pool and drop it directly into the Drop Zone!',
+                        repairCode: 'if user_role == "admin":',
+                        explanation: 'SyntaxError: Python requires a colon (`:`) to establish the head block of an `if` conditional statement. Without it, compilation crashes before execution starts.'
+                    },
+                    {
+                        code: [
+                            { text: '# Compute average server load factor', hl: 'comment' },
+                            { text: 'total_jobs = 450', hl: '' },
+                            { text: 'active_threads = 0', hl: '' },
+                            { text: 'avg_load = total_jobs / active_threads', hl: 'error' },
+                            { text: 'print("Jobs successfully distributed")', hl: '' }
+                        ],
+                        crashLine: 4,
+                        errorType: 'runtime',
+                        terminalLogs: [
+                            'Running load_balancer.py...',
+                            'Thread allocation successful.',
+                            'Traceback (most recent call last):',
+                            '  File "load_balancer.py", line 4, in <module>',
+                            '    avg_load = total_jobs / active_threads',
+                            'ZeroDivisionError: division by zero'
+                        ],
+                        hint: '💡 **Direct Answer**: Drag the **Runtime Error** tag from the pool and drop it directly into the Drop Zone!',
+                        repairCode: 'avg_load = total_jobs / (active_threads if active_threads > 0 else 1)',
+                        explanation: 'ZeroDivisionError: This is a Runtime Exception. Python compiles code successfully, but mathematical execution breaks down when it encounters a division by zero denominator.'
+                    },
+                    {
+                        code: [
+                            { text: '# Apply VIP membership 15% discount', hl: 'comment' },
+                            { text: 'price = 200', hl: '' },
+                            { text: 'discount_pct = 15', hl: '' },
+                            { text: 'final_price = price + (price * discount_pct / 100)', hl: 'error' },
+                            { text: 'print("Final transaction price:", final_price)', hl: '' }
+                        ],
+                        crashLine: 4,
+                        errorType: 'logical',
+                        terminalLogs: [
+                            'Running billing_ledger.py...',
+                            'Transaction calculation completed.',
+                            'Output Log: Final transaction price: 230.0',
+                            'SYSTEM REJECT: Unit tests failed. Expected output: 170.0'
+                        ],
+                        hint: '💡 **Direct Answer**: Drag the **Logical Error** tag from the pool and drop it directly into the Drop Zone!',
+                        repairCode: 'final_price = price - (price * discount_pct / 100)',
+                        explanation: 'Logical Error: The script runs to completion, but produces incorrect outputs because the code uses addition (`+`) instead of subtraction (`-`) to compute a discount.'
+                    }
+                ];
+                
+                this.currentCaseIdx = 0;
+            }
+
+            init() {
+                this.currentCaseIdx = 0;
+                this.loadCase(0);
+                this.setupDragAndDrop();
+            }
+
+            loadCase(idx) {
+                const c = this.cases[idx];
+                const editor = document.getElementById('l1-a1-editor');
+                editor.innerHTML = '';
+                
+                c.code.forEach((line, index) => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'code-line';
+                    lineDiv.id = `l1a1-line-${index + 1}`;
+                    
+                    const arrow = document.createElement('span');
+                    arrow.className = 'exec-arrow';
+                    arrow.textContent = "▶";
+                    lineDiv.appendChild(arrow);
+
+                    const codeSpan = document.createElement('span');
+                    codeSpan.innerHTML = this.highlightKeywords(line.text);
+                    lineDiv.appendChild(codeSpan);
+                    
+                    editor.appendChild(lineDiv);
+                });
+
+                document.getElementById('l1-a1-case-star').textContent = app.state.completedActivities.includes('l1a1') ? '★' : '☆';
+                document.getElementById('l1-a1-case-star').style.color = app.state.completedActivities.includes('l1a1') ? 'hsl(var(--primary))' : 'hsl(var(--text-muted))';
+                
+                const term = document.getElementById('l1-a1-terminal');
+                term.innerHTML = '<div class="terminal-line"><span class="terminal-prompt">detective@host:~$</span> Click RUN to start traceback scan...</div>';
+                
+                const drop = document.getElementById('l1-a1-drop');
+                drop.className = 'repair-slot';
+                drop.textContent = '[ Drag Analysis Tag Here ]';
+                drop.dataset.expected = c.errorType;
+
+                document.getElementById('l1-a1-hint-text').innerHTML = "Run the diagnostic test traceback scan to observe crash behaviors.";
+                document.getElementById('btn-l1-a1-run').disabled = false;
+            }
+
+            highlightKeywords(text) {
+                return text
+                    .replace(/\b(def|if|else|elif|try|except|finally|assert|import|return|in)\b/g, '<span class="hl-keyword">$1</span>')
+                    .replace(/(VIP membership 15% discount|Authentication Validator|Compute average server load factor)/g, '<span class="hl-comment">$1</span>')
+                    .replace(/("[^"]*")/g, '<span class="hl-string">$1</span>')
+                    .replace(/\b(print|sum|len|int|float)\b/g, '<span class="hl-builtin">$1</span>')
+                    .replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
+            }
+
+            setupDragAndDrop() {
+                const pool = document.getElementById('l1-a1-pool');
+                const dropZone = document.getElementById('l1-a1-drop');
+
+                document.querySelectorAll('#l1-a1-pool .draggable-block').forEach(block => {
+                    block.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', block.id);
+                        block.classList.add('dragging');
+                    });
+                    
+                    block.addEventListener('dragend', () => {
+                        block.classList.remove('dragging');
+                    });
+
+                    block.addEventListener('click', () => {
+                        sound.playBlip();
+                        document.querySelectorAll('#l1-a1-pool .draggable-block').forEach(b => b.style.outline = 'none');
+                        block.style.outline = '2px solid hsl(var(--primary))';
+                        this.selectedMobileBlock = block;
+                    });
+                });
+
+                dropZone.addEventListener('dragover', (e) => e.preventDefault());
+                dropZone.addEventListener('dragenter', () => dropZone.classList.add('hovered'));
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hovered'));
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('hovered');
+                    const id = e.dataTransfer.getData('text/plain');
+                    const draggable = document.getElementById(id);
+                    if (draggable) this.handleDrop(draggable.dataset.type, draggable.textContent);
+                });
+
+                dropZone.addEventListener('click', () => {
+                    if (this.selectedMobileBlock) {
+                        this.handleDrop(this.selectedMobileBlock.dataset.type, this.selectedMobileBlock.textContent);
+                        this.selectedMobileBlock.style.outline = 'none';
+                        this.selectedMobileBlock = null;
+                    }
+                });
+            }
+
+            handleDrop(type, label) {
+                sound.playBlip();
+                const dropZone = document.getElementById('l1-a1-drop');
+                const term = document.getElementById('l1-a1-terminal');
+                dropZone.textContent = label;
+                dropZone.dataset.actual = type;
+
+                app.state.totalAnswers++;
+                if (type === dropZone.dataset.expected) {
+                    app.state.correctAnswers++;
+                    dropZone.className = 'repair-slot correct';
+                    this.executeSuccess();
+                } else {
+                    dropZone.className = 'repair-slot wrong';
+                    sound.playCrash();
+                    
+                    term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary)); font-weight: bold;">[WARNING] Analysis failed. Try alternative error tags. Check hints.</div>`;
+                    term.scrollTop = term.scrollHeight;
+                    
+                    showToast("❌ Analysis Failed. Check the direct hints below!");
+                    document.getElementById('l1-a1-hint-text').innerHTML = `${this.cases[this.currentCaseIdx].hint}`;
+                }
+            }
+
+            runAnalysis() {
+                document.getElementById('btn-l1-a1-run').disabled = true;
+                const c = this.cases[this.currentCaseIdx];
+                const term = document.getElementById('l1-a1-terminal');
+                term.innerHTML = '';
+                
+                let lineIdx = 0;
+                const printLogs = () => {
+                    if (lineIdx < c.terminalLogs.length) {
+                        const line = document.createElement('div');
+                        line.className = 'terminal-line';
+                        
+                        if (c.terminalLogs[lineIdx].includes('Error:')) {
+                            line.innerHTML = `<span class="traceback-error">${c.terminalLogs[lineIdx]}</span>`;
+                        } else if (c.terminalLogs[lineIdx].includes('Traceback')) {
+                            line.innerHTML = `<span class="traceback-header">${c.terminalLogs[lineIdx]}</span>`;
+                        } else {
+                            line.textContent = c.terminalLogs[lineIdx];
+                        }
+                        
+                        term.appendChild(line);
+                        term.scrollTop = term.scrollHeight;
+                        lineIdx++;
+                        sound.playBlip();
+                        setTimeout(printLogs, 250);
+                    } else {
+                        sound.playCrash();
+                        document.getElementById(`l1a1-line-${c.crashLine}`).classList.add('flashing-crash');
+                        document.querySelector('.terminal-container').classList.add('terminal-shake');
+                        setTimeout(() => document.querySelector('.terminal-container').classList.remove('terminal-shake'), 400);
+                        document.getElementById('l1-a1-hint-text').innerHTML = `${c.hint}`;
+                    }
+                };
+
+                let pointerLine = 1;
+                const stepPointer = () => {
+                    if (pointerLine <= c.crashLine) {
+                        document.querySelectorAll('#l1-a1-editor .code-line').forEach(el => el.classList.remove('active-pointer'));
+                        document.getElementById(`l1a1-line-${pointerLine}`).classList.add('active-pointer');
+                        pointerLine++;
+                        setTimeout(stepPointer, 300);
+                    } else {
+                        document.querySelectorAll('#l1-a1-editor .code-line').forEach(el => el.classList.remove('active-pointer'));
+                        printLogs();
+                    }
+                };
+
+                stepPointer();
+            }
+
+            executeSuccess() {
+                sound.playSuccess();
+                particles.triggerSparks(window.innerWidth / 2, window.innerHeight / 2, '#cc0000');
+                
+                const c = this.cases[this.currentCaseIdx];
+                const term = document.getElementById('l1-a1-terminal');
+                
+                const crashLineDiv = document.getElementById(`l1a1-line-${c.crashLine}`);
+                crashLineDiv.classList.remove('flashing-crash');
+                crashLineDiv.querySelector('span:last-child').innerHTML = this.highlightKeywords(c.repairCode);
+                crashLineDiv.style.boxShadow = 'inset 4px 0 0 hsl(var(--primary))';
+
+                term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary)); font-weight: bold; margin-top: 8px;">INTEGRITY PATCH DEPLOYED: SYSTEM RESTORED.</div>`;
+                term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--text-muted)); font-size: 0.8rem;">${c.explanation}</div>`;
+                term.scrollTop = term.scrollHeight;
+
+                showToast("🎉 Case 1.1 Complete! Loading next check...");
+
+                setTimeout(() => {
+                    if (this.currentCaseIdx < this.cases.length - 1) {
+                        this.currentCaseIdx++;
+                        this.loadCase(this.currentCaseIdx);
+                    } else {
+                        app.checkProgress('l1a1', 1, 2);
+                        showToast("🎉 Case 1.1 Complete! Loading Case 1.2...");
+                        app.switchActivity(1, 2);
+                    }
+                }, 3500);
+            }
+
+            resetMission() {
+                sound.playBlip();
+                this.loadCase(this.currentCaseIdx);
+            }
+        }
+
+        const l1a1 = new CrashInvestigationLab();
+
+        /* ==========================================================================
+           5. LEVEL 1 ACTIVITY 2: ERROR SURGERY
+           ========================================================================== */
+        class ErrorSurgery {
+            constructor() {
+                this.cases = [
+                    {
+                        rawLines: [
+                            'def calculate_tax(income)', 
+                            '    threshold = 50000',
+                            '    if income > threshold:',
+                            '        return income * 0.2',
+                            '    return 0'
+                        ],
+                        slots: [
+                            { line: 1, text: 'def calculate_tax(income)<span class="repair-slot" id="surg-slot-1" data-tool="colon">[...]</span>', expected: 'colon', fix: 'def calculate_tax(income):' }
+                        ],
+                        expectedOut: 'SyntaxError: expected \':\' at line 1',
+                        hint: '💡 **Direct Answer**: Select the **Colon Tool [ : ]** in the belt below, and then click directly inside the `[...]` slot on Line 1.',
+                        explanation: 'Adding the colon resolves the SyntaxError, letting the interpreter compile the function signature structure.'
+                    },
+                    {
+                        rawLines: [
+                            'def double_value(x):',
+                            'return x * 2', 
+                            'print(double_value(10))'
+                        ],
+                        slots: [
+                            { line: 2, text: '<span class="repair-slot" id="surg-slot-1" data-tool="indent">[...]</span>return x * 2', expected: 'indent', fix: '    return x * 2' }
+                        ],
+                        expectedOut: 'IndentationError: expected an indented block on line 2',
+                        hint: '💡 **Direct Answer**: Select the **Indent Doctor [ >> ]** tool in the belt below, and then click directly inside the `[...]` slot on Line 2.',
+                        explanation: 'Python uses Indentation to delineate execution scopes. Shifting the return statement corrects the scope.'
+                    },
+                    {
+                        rawLines: [
+                            'username = "Agent_Zero', 
+                            'msg = "Access authorization granted: " + username',
+                            'print(msg)'
+                        ],
+                        slots: [
+                            { line: 1, text: 'username = "Agent_Zero<span class="repair-slot" id="surg-slot-1" data-tool="quote">[...]</span>', expected: 'quote', fix: 'username = "Agent_Zero"' }
+                        ],
+                        expectedOut: 'SyntaxError: unterminated string literal on line 1',
+                        hint: '💡 **Direct Answer**: Select the **Quote Clamp [ "" ]** tool in the belt below, and then click directly inside the `[...]` slot on Line 1.',
+                        explanation: 'Unclosed quotes raise SyntaxError at parser level because the interpreter gets confused about code vs literal values.'
+                    }
+                ];
+                this.currentCaseIdx = 0;
+                this.activeTool = null;
+            }
+
+            init() {
+                this.currentCaseIdx = 0;
+                this.activeTool = null;
+                document.getElementById('active-tool-indicator').textContent = 'None Selected';
+                document.querySelectorAll('#surgery-toolbelt button').forEach(b => b.style.borderColor = 'hsl(var(--border-muted))');
+                this.loadCase(0);
+            }
+
+            selectTool(toolName, btn) {
+                sound.playBlip();
+                this.activeTool = toolName;
+                document.querySelectorAll('#surgery-toolbelt button').forEach(b => b.style.borderColor = 'hsl(var(--border-muted))');
+                btn.style.borderColor = 'hsl(var(--primary))';
+                document.getElementById('active-tool-indicator').textContent = toolName.toUpperCase();
+            }
+
+            loadCase(idx) {
+                const c = this.cases[idx];
+                const editor = document.getElementById('l1-a2-editor');
+                editor.innerHTML = '';
+
+                c.rawLines.forEach((text, index) => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'code-line';
+                    lineDiv.id = `l1a2-line-${index + 1}`;
+
+                    const arrow = document.createElement('span');
+                    arrow.className = 'exec-arrow';
+                    arrow.textContent = "▶";
+                    lineDiv.appendChild(arrow);
+
+                    const slotData = c.slots.find(s => s.line === (index + 1));
+                    const codeSpan = document.createElement('span');
+                    if (slotData) {
+                        codeSpan.innerHTML = this.highlightKeywords(slotData.text);
+                    } else {
+                        codeSpan.innerHTML = this.highlightKeywords(text);
+                    }
+                    lineDiv.appendChild(codeSpan);
+                    editor.appendChild(lineDiv);
+                });
+
+                document.getElementById('l1-a2-case-star').textContent = app.state.completedActivities.includes('l1a2') ? '★' : '☆';
+                document.getElementById('l1-a2-case-star').style.color = app.state.completedActivities.includes('l1a2') ? 'hsl(var(--primary))' : 'hsl(var(--text-muted))';
+
+                document.querySelectorAll('#l1-a2-editor .repair-slot').forEach(slot => {
+                    slot.addEventListener('click', () => this.applySurgery(slot));
+                });
+
+                document.getElementById('l1-a2-terminal').innerHTML = '<div class="terminal-line"><span class="terminal-prompt">detective@host:~$</span> Select your active repair tool from the belt below, perform surgery, and hit RUN...</div>';
+                document.getElementById('l1-a2-hint-text').textContent = "Select your surgical tool, then click directly on the matching [...] slot in the editor.";
+            }
+
+            highlightKeywords(text) {
+                return text
+                    .replace(/\b(def|if|else|return)\b/g, '<span class="hl-keyword">$1</span>')
+                    .replace(/("[^"]*")/g, '<span class="hl-string">$1</span>')
+                    .replace(/\b(print)\b/g, '<span class="hl-builtin">$1</span>')
+                    .replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
+            }
+
+            applySurgery(slot) {
+                if (!this.activeTool) {
+                    sound.playCrash();
+                    
+                    const term = document.getElementById('l1-a2-terminal');
+                    term.innerHTML = '<div class="terminal-line" style="color: hsl(var(--primary));">[WARNING] Please select a surgical tool from the toolbelt first!</div>';
+                    
+                    showToast("⚠️ Please select a surgical tool from the toolbelt first.");
+                    return;
+                }
+
+                sound.playBlip();
+                const expected = slot.dataset.tool;
+                
+                app.state.totalAnswers++;
+                if (this.activeTool === expected) {
+                    app.state.correctAnswers++;
+                    slot.className = 'repair-slot correct';
+                    
+                    const mappings = { colon: ':', indent: '&nbsp;&nbsp;&nbsp;&nbsp;', quote: '"' };
+                    slot.innerHTML = mappings[expected] || '';
+                    
+                    sound.playSuccess();
+                } else {
+                    slot.className = 'repair-slot wrong';
+                    sound.playCrash();
+                    
+                    showToast("❌ Incorrect tool applied! Check hints.");
+                    document.getElementById('l1-a2-hint-text').innerHTML = `${this.cases[this.currentCaseIdx].hint}`;
+                    setTimeout(() => slot.className = 'repair-slot', 1000);
+                }
+            }
+
+            runSurgery() {
+                const c = this.cases[this.currentCaseIdx];
+                const term = document.getElementById('l1-a2-terminal');
+                term.innerHTML = '';
+
+                const slots = document.querySelectorAll('#l1-a2-editor .repair-slot');
+                let allCorrect = true;
+                slots.forEach(s => {
+                    if (!s.classList.contains('correct')) allCorrect = false;
+                });
+
+                let line = 1;
+                const animateLines = () => {
+                    if (line <= c.rawLines.length) {
+                        document.querySelectorAll('#l1-a2-editor .code-line').forEach(el => el.classList.remove('active-pointer'));
+                        const currentLine = document.getElementById(`l1a2-line-${line}`);
+                        currentLine.classList.add('active-pointer');
+                        
+                        sound.playBlip();
+                        
+                        const hasUncorrectedBug = c.slots.some(s => s.line === line) && !allCorrect;
+                        
+                        if (hasUncorrectedBug) {
+                            setTimeout(() => {
+                                sound.playCrash();
+                                currentLine.classList.remove('active-pointer');
+                                currentLine.classList.add('flashing-crash');
+                                
+                                term.innerHTML += `<div class="terminal-line"><span class="traceback-error">${c.expectedOut}</span></div>`;
+                                term.scrollTop = term.scrollHeight;
+                                document.querySelector('.terminal-container').classList.add('terminal-shake');
+                                setTimeout(() => document.querySelector('.terminal-container').classList.remove('terminal-shake'), 400);
+                                document.getElementById('l1-a2-hint-text').innerHTML = `${c.hint}`;
+                            }, 300);
+                        } else {
+                            if (line === c.rawLines.length && allCorrect) {
+                                setTimeout(() => {
+                                    sound.playSuccess();
+                                    particles.triggerConfetti();
+                                    term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary)); font-weight: bold;">SURGERY DIAGNOSTICS: SUCCESS. All logical units compiled.</div>`;
+                                    term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--text-muted)); font-size: 0.8rem;">${c.explanation}</div>`;
+                                    term.scrollTop = term.scrollHeight;
+                                    
+                                    showToast("🎉 Case complete! Loading next scanner...");
+
+                                    setTimeout(() => {
+                                        if (this.currentCaseIdx < this.cases.length - 1) {
+                                            this.currentCaseIdx++;
+                                            this.loadCase(this.currentCaseIdx);
+                                        } else {
+                                            app.checkProgress('l1a2', 2, 1);
+                                            app.unlockBadge('l1a2');
+                                            showToast("🎉 Level 1 Complete! Unlocking Level 2 Exception Rescue...");
+                                            app.switchLevel(2);
+                                        }
+                                    }, 3000);
+                                }, 300);
+                            } else {
+                                line++;
+                                setTimeout(animateLines, 400);
+                            }
+                        }
+                    }
+                };
+
+                animateLines();
+            }
+
+            resetMission() {
+                sound.playBlip();
+                this.loadCase(this.currentCaseIdx);
+            }
+        }
+
+        const l1a2 = new ErrorSurgery();
+
+        /* ==========================================================================
+           6. LEVEL 2 ACTIVITY 1: EXCEPTION BLOCK BUILDER
+           ========================================================================== */
+        class ExceptionBuilder {
+            constructor() {
+                this.jumbledBlocks = [
+                    { id: 'b-try', text: 'try:', indent: 0, type: 'structure' },
+                    { id: 'b-divide', text: '    result = x / y', indent: 1, type: 'action' },
+                    { id: 'b-except', text: 'except ZeroDivisionError:', indent: 0, type: 'structure' },
+                    { id: 'b-handler', text: '    result = "Undefined"', indent: 1, type: 'action' },
+                    { id: 'b-else', text: 'else:', indent: 0, type: 'structure' },
+                    { id: 'b-else-action', text: '    result = round(result, 2)', indent: 1, type: 'action' },
+                    { id: 'b-finally', text: 'finally:', indent: 0, type: 'structure' },
+                    { id: 'b-finally-action', text: '    print("Calculated:", result)', indent: 1, type: 'action' }
+                ];
+                
+                this.correctSequence = ['b-try', 'b-divide', 'b-except', 'b-handler', 'b-else', 'b-else-action', 'b-finally', 'b-finally-action'];
+                this.scenarioInput = 'valid';
+            }
+
+            init() {
+                this.scenarioInput = 'valid';
+                document.getElementById('l2-a1-input-x').textContent = '10';
+                document.getElementById('l2-a1-input-y').textContent = '2';
+                
+                document.getElementById('l2-a1-case-star').textContent = app.state.completedActivities.includes('l2a1') ? '★' : '☆';
+                document.getElementById('l2-a1-case-star').style.color = app.state.completedActivities.includes('l2a1') ? 'hsl(var(--primary))' : 'hsl(var(--text-muted))';
+                
+                this.resetBuilder();
+                this.resetFlowchart();
+            }
+
+            resetBuilder() {
+                const editor = document.getElementById('l2-a1-editor');
+                editor.innerHTML = '';
+                
+                for (let i = 0; i < this.jumbledBlocks.length; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'code-line repair-slot';
+                    slot.style.display = 'flex';
+                    slot.style.minHeight = '32px';
+                    slot.style.width = '100%';
+                    slot.id = `l2a1-slot-${i}`;
+                    slot.dataset.index = i;
+                    slot.textContent = `[ Drop Slot ${i + 1} ]`;
+                    editor.appendChild(slot);
+                }
+
+                const pool = document.getElementById('l2-a1-pool');
+                pool.innerHTML = '';
+                const shuffled = this.shuffle([...this.jumbledBlocks]);
+                
+                shuffled.forEach(block => {
+                    const el = document.createElement('div');
+                    el.className = 'draggable-block';
+                    el.id = block.id;
+                    el.draggable = true;
+                    el.textContent = block.text;
+                    el.dataset.indent = block.indent;
+                    pool.appendChild(el);
+                });
+
+                this.setupDragAndDrop();
+                this.updateVariables();
+                
+                document.getElementById('l2-a1-hint-text').innerHTML = `💡 **Direct Answer**: Arrange blocks in this sequence: <br>
+                1. <strong>try:</strong> <br>
+                2. <strong>result = x / y</strong> <br>
+                3. <strong>except ZeroDivisionError:</strong> <br>
+                4. <strong>result = "Undefined"</strong> <br>
+                5. <strong>else:</strong> <br>
+                6. <strong>result = round(result, 2)</strong> <br>
+                7. <strong>finally:</strong> <br>
+                8. <strong>print("Calculated:", result)</strong>`;
+            }
+
+            shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            setupDragAndDrop() {
+                const slots = document.querySelectorAll('#l2-a1-editor .repair-slot');
+
+                document.querySelectorAll('#l2-a1-pool .draggable-block').forEach(block => {
+                    block.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', block.id);
+                        block.classList.add('dragging');
+                    });
+                    
+                    block.addEventListener('dragend', () => block.classList.remove('dragging'));
+
+                    block.addEventListener('click', () => {
+                        sound.playBlip();
+                        document.querySelectorAll('#l2-a1-pool .draggable-block').forEach(b => b.style.outline = 'none');
+                        block.style.outline = '2px solid hsl(var(--primary))';
+                        this.selectedMobileBlock = block;
+                    });
+                });
+
+                slots.forEach(slot => {
+                    slot.addEventListener('dragover', (e) => e.preventDefault());
+                    slot.addEventListener('dragenter', () => slot.classList.add('hovered'));
+                    slot.addEventListener('dragleave', () => slot.classList.remove('hovered'));
+                    
+                    slot.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        slot.classList.remove('hovered');
+                        const id = e.dataTransfer.getData('text/plain');
+                        const draggable = document.getElementById(id);
+                        if (draggable) this.placeBlock(slot, draggable);
+                    });
+
+                    slot.addEventListener('click', () => {
+                        if (this.selectedMobileBlock) {
+                            this.placeBlock(slot, this.selectedMobileBlock);
+                            this.selectedMobileBlock.style.outline = 'none';
+                            this.selectedMobileBlock = null;
+                        }
+                    });
+                });
+            }
+
+            placeBlock(slot, block) {
+                sound.playBlip();
+                
+                if (slot.children.length > 0) {
+                    const existing = slot.children[0];
+                    document.getElementById('l2-a1-pool').appendChild(existing);
+                }
+
+                slot.textContent = '';
+                slot.appendChild(block);
+                slot.className = 'code-line repair-slot correct';
+                
+                const indent = parseInt(block.dataset.indent);
+                block.style.marginLeft = `${indent * 24}px`;
+            }
+
+            toggleInputScenario() {
+                sound.playBlip();
+                if (this.scenarioInput === 'valid') {
+                    this.scenarioInput = 'crash';
+                    document.getElementById('l2-a1-input-x').textContent = '10';
+                    document.getElementById('l2-a1-input-y').textContent = '0';
+                } else {
+                    this.scenarioInput = 'valid';
+                    document.getElementById('l2-a1-input-x').textContent = '10';
+                    document.getElementById('l2-a1-input-y').textContent = '2';
+                }
+                this.updateVariables();
+                this.resetFlowchart();
+            }
+
+            updateVariables(resultVal = 'None') {
+                const x = 10;
+                const y = this.scenarioInput === 'valid' ? 2 : 0;
+                
+                const grid = document.getElementById('l2-a1-variables');
+                grid.innerHTML = `
+                    <div class="var-name">x:</div><div class="var-val">${x}</div>
+                    <div class="var-name">y:</div><div class="var-val">${y}</div>
+                    <div class="var-name">result:</div><div class="var-val ${resultVal === 'None' ? 'uninitialized' : ''}">${resultVal}</div>
+                `;
+            }
+
+            resetFlowchart() {
+                document.querySelectorAll('.flow-node').forEach(n => {
+                    n.classList.remove('active-node', 'correct-node', 'crash-node');
+                });
+                document.querySelectorAll('.flow-path').forEach(p => {
+                    p.classList.remove('active-path');
+                });
+            }
+
+            executeSimulation() {
+                const slots = document.querySelectorAll('#l2-a1-editor .repair-slot');
+                let currentSeq = [];
+                slots.forEach(s => {
+                    if (s.children.length > 0) {
+                        currentSeq.push(s.children[0].id);
+                    }
+                });
+
+                if (currentSeq.length < this.correctSequence.length) {
+                    sound.playCrash();
+                    showToast("⚠️ Arrangement Incomplete! Drag and place all blocks first.");
+                    return;
+                }
+
+                let matches = true;
+                for (let i = 0; i < this.correctSequence.length; i++) {
+                    if (currentSeq[i] !== this.correctSequence[i]) matches = false;
+                }
+
+                app.state.totalAnswers++;
+                if (!matches) {
+                    sound.playCrash();
+                    showToast("❌ Sequence Incorrect! Check hints box below.");
+                    return;
+                }
+
+                app.state.correctAnswers++;
+                document.getElementById('btn-l2-a1-run').disabled = true;
+                this.resetFlowchart();
+
+                const timeline = [
+                    { node: 'node-start', line: 0, text: 'Executing program...', path: 'path-start-try' },
+                    { node: 'node-try', line: 0, text: 'Entering try block...', path: 'path-try-op' }
+                ];
+
+                if (this.scenarioInput === 'valid') {
+                    timeline.push(
+                        { node: 'node-try', line: 1, text: 'Division calculated: 10 / 2', result: 5 },
+                        { node: 'node-else', line: 4, text: 'Bypassing exception check... Entering else block...', path: 'path-op-else' },
+                        { node: 'node-else', line: 5, text: 'Rounding result to 2 decimals', result: 5.0, path: 'path-else-finally' },
+                        { node: 'node-finally', line: 6, text: 'Entering finally block...', result: 5.0 },
+                        { node: 'node-finally', line: 7, text: 'Stdout log printed: "Calculated: 5.0"', result: 5.0, correct: true }
+                    );
+                } else {
+                    timeline.push(
+                        { node: 'node-try', line: 1, text: 'ZeroDivisionError occurred inside try block!', path: 'path-try-except', crash: true },
+                        { node: 'node-except', line: 2, text: 'Except block intercepted exception', path: 'path-except-finally' },
+                        { node: 'node-except', line: 3, text: 'Setting fallback value: result = "Undefined"', result: 'Undefined' },
+                        { node: 'node-finally', line: 6, text: 'Entering finally block...', result: 'Undefined' },
+                        { node: 'node-finally', line: 7, text: 'Stdout log printed: "Calculated: Undefined"', result: 'Undefined', correct: true }
+                    );
+                }
+
+                let step = 0;
+                const animateStep = () => {
+                    if (step < timeline.length) {
+                        const s = timeline[step];
+                        sound.playBlip();
+
+                        document.querySelectorAll('#l2-a1-editor .repair-slot').forEach(el => el.classList.remove('active-pointer'));
+                        if (s.line >= 0) {
+                            document.getElementById(`l2a1-slot-${s.line}`).classList.add('active-pointer');
+                        }
+
+                        document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-node'));
+                        const node = document.getElementById(s.node);
+                        node.classList.add('active-node');
+                        
+                        if (s.crash) node.classList.add('crash-node');
+
+                        if (s.path) {
+                            document.getElementById(s.path).classList.add('active-path');
+                        }
+
+                        if (s.result !== undefined) {
+                            this.updateVariables(s.result);
+                        }
+
+                        app.announceAccessibility(s.text);
+                        step++;
+                        setTimeout(animateStep, 1200);
+                    } else {
+                        document.querySelectorAll('#l2-a1-editor .repair-slot').forEach(el => el.classList.remove('active-pointer'));
+                        document.querySelectorAll('.flow-node').forEach(n => {
+                            if (n.classList.contains('active-node')) {
+                                n.classList.remove('active-node');
+                                n.classList.add('correct-node');
+                            }
+                        });
+
+                        sound.playSuccess();
+                        particles.triggerConfetti();
+
+                        document.getElementById('btn-l2-a1-run').disabled = false;
+
+                        setTimeout(() => {
+                            app.checkProgress('l2a1', 2, 2);
+                            showToast("🎉 Case 2.1 Complete! Loading Case 2.2...");
+                            app.switchActivity(2, 2);
+                        }, 2000);
+                    }
+                };
+
+                animateStep();
+            }
+        }
+
+        const l2a1 = new ExceptionBuilder();
+
+        /* ==========================================================================
+           7. LEVEL 2 ACTIVITY 2: EXCEPTION SIMULATOR
+           ========================================================================== */
+        class ExceptionSimulator {
+            constructor() {
+                this.codeLines = [
+                    { text: 'def handle_data(data):', indent: 0 },
+                    { text: '    print("Start process")', indent: 1 },
+                    { text: '    try:', indent: 1 },
+                    { text: '        assert len(data) &gt; 0, "No inputs"', indent: 2 },
+                    { text: '        val = int(data[0])', indent: 2 },
+                    { text: '        risk = 100 / val', indent: 2 },
+                    { text: '    except AssertionError as ae:', indent: 1 },
+                    { text: '        print("Failed verification:", ae)', indent: 2 },
+                    { text: '        risk = -1', indent: 2 },
+                    { text: '    except ValueError:', indent: 1 },
+                    { text: '        print("Parse Error")', indent: 2 },
+                    { text: '        risk = 0', indent: 2 },
+                    { text: '    finally:', indent: 1 },
+                    { text: '        print("Finalizing...")', indent: 2 },
+                    { text: '    return risk', indent: 1 }
+                ];
+
+                this.scenarios = [
+                    {
+                        name: 'Scenario A: Empty data list data=[]',
+                        inputs: { data: [] },
+                        steps: [
+                            { line: 1, action: 'print', val: 'Start process', stdout: 'Start process' },
+                            { line: 2, action: 'try' },
+                            {
+                                line: 3,
+                                action: 'predict',
+                                question: 'The data list parameter is empty ([]). The assertion check fails, throwing an AssertionError. Where does Python jump next to handle this?',
+                                choices: [
+                                    { text: 'Jump to: line 7 (except AssertionError as ae:)', correct: true },
+                                    { text: 'Next line: line 5 (val = int(data[0]))', correct: false },
+                                    { text: 'Jump to: line 10 (except ValueError:)', correct: false },
+                                    { text: 'Jump to: line 13 (finally:)', correct: false }
+                                ]
+                            },
+                            { line: 7, action: 'print', val: 'Failed verification: No inputs', stdout: 'Failed verification: No inputs' },
+                            { line: 8, action: 'assign', var: 'risk', val: -1 },
+                            { line: 13, action: 'print', val: 'Finalizing...', stdout: 'Finalizing...' },
+                            { line: 14, action: 'return', val: -1 }
+                        ]
+                    },
+                    {
+                        name: 'Scenario B: Mismatched text type data=["abc"]',
+                        inputs: { data: ["abc"] },
+                        steps: [
+                            { line: 1, action: 'print', val: 'Start process', stdout: 'Start process' },
+                            { line: 2, action: 'try' },
+                            { line: 3, action: 'assert_pass' },
+                            {
+                                line: 4,
+                                action: 'predict',
+                                question: 'The function tries `int("abc")`. Letters cannot be parsed as integers, raising a ValueError. Where does Python jump next?',
+                                choices: [
+                                    { text: 'Jump to: line 10 (except ValueError:)', correct: true },
+                                    { text: 'Next line: line 6 (risk = 100 / val)', correct: false },
+                                    { text: 'Jump to: line 7 (except AssertionError as ae:)', correct: false },
+                                    { text: 'Jump to: line 13 (finally:)', correct: false }
+                                ]
+                            },
+                            { line: 10, action: 'print', val: 'Parse Error', stdout: 'Parse Error' },
+                            { line: 11, action: 'assign', var: 'risk', val: 0 },
+                            { line: 13, action: 'print', val: 'Finalizing...', stdout: 'Finalizing...' },
+                            { line: 14, action: 'return', val: 0 }
+                        ]
+                    }
+                ];
+
+                this.currentScenarioIdx = 0;
+                this.stepIndex = 0;
+                this.variables = {};
+                this.callStack = [];
+            }
+
+            init() {
+                this.currentScenarioIdx = 0;
+                this.loadScenario(0);
+                
+                document.getElementById('l2-a2-case-star').textContent = app.state.completedActivities.includes('l2a2') ? '★' : '☆';
+                document.getElementById('l2-a2-case-star').style.color = app.state.completedActivities.includes('l2a2') ? 'hsl(var(--primary))' : 'hsl(var(--text-muted))';
+            }
+
+            loadScenario(idx) {
+                this.currentScenarioIdx = idx;
+                this.stepIndex = 0;
+                this.variables = { ...this.scenarios[idx].inputs };
+                this.callStack = ['<module>', `handle_data(data=${JSON.stringify(this.variables.data)})`];
+
+                const editor = document.getElementById('l2-a2-editor');
+                editor.innerHTML = '';
+                
+                this.codeLines.forEach((l, index) => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'code-line';
+                    lineDiv.id = `l2a2-line-${index}`;
+                    
+                    const arrow = document.createElement('span');
+                    arrow.className = 'exec-arrow';
+                    arrow.textContent = "▶";
+                    lineDiv.appendChild(arrow);
+
+                    const codeSpan = document.createElement('span');
+                    codeSpan.style.marginLeft = `${l.indent * 24}px`;
+                    codeSpan.innerHTML = this.highlightKeywords(l.text);
+                    lineDiv.appendChild(codeSpan);
+                    
+                    editor.appendChild(lineDiv);
+                });
+
+                document.getElementById('l2-a2-terminal').innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@host:~$</span> Scenario selected: ${this.scenarios[idx].name}. Click Step Simulation...</div>`;
+                
+                this.updateVariablesPanel();
+                this.updateStackPanel();
+                document.getElementById('btn-l2-a2-step').disabled = false;
+                
+                document.querySelectorAll('#l2-a2-editor .code-line').forEach(el => el.classList.remove('active-pointer'));
+                
+                document.getElementById('l2-a2-hint-text').innerHTML = `💡 **Direct Answer**: Step through the simulation. When the branch prediction popup appears, click the top option (starts with <strong>Jump to: line 7</strong> or <strong>Jump to: line 10</strong>) to progress successfully.`;
+            }
+
+            highlightKeywords(text) {
+                return text
+                    .replace(/\b(def|try|except|finally|assert|return|as)\b/g, '<span class="hl-keyword">$1</span>')
+                    .replace(/("[^"]*")/g, '<span class="hl-string">$1</span>')
+                    .replace(/\b(print|len|int)\b/g, '<span class="hl-builtin">$1</span>')
+                    .replace(/\b(\d+)\b/g, '<span class="hl-number">$1</span>');
+            }
+
+            updateVariablesPanel() {
+                const grid = document.getElementById('l2-a2-variables');
+                grid.innerHTML = '';
+                for (const [key, val] of Object.entries(this.variables)) {
+                    grid.innerHTML += `<div class="var-name">${key}:</div><div class="var-val">${JSON.stringify(val)}</div>`;
+                }
+            }
+
+            updateStackPanel() {
+                const list = document.getElementById('stack-frame-list');
+                list.innerHTML = '';
+                this.callStack.forEach((frame, idx) => {
+                    const frameDiv = document.createElement('div');
+                    frameDiv.className = 'stack-frame';
+                    frameDiv.innerHTML = `
+                        <div class="frame-header">
+                            <span class="frame-func">${frame}</span>
+                            <span class="frame-line">Active frame</span>
+                        </div>
+                    `;
+                    list.appendChild(frameDiv);
+                });
+            }
+
+            stepSim() {
+                const sc = this.scenarios[this.currentScenarioIdx];
+                if (this.stepIndex >= sc.steps.length) {
+                    this.concludeScenario();
+                    return;
+                }
+
+                const step = sc.steps[this.stepIndex];
+
+                document.querySelectorAll('#l2-a2-editor .code-line').forEach(el => el.classList.remove('active-pointer', 'flashing-crash'));
+
+                const codeLineDiv = document.getElementById(`l2a2-line-${step.line}`);
+                codeLineDiv.classList.add('active-pointer');
+
+                if (step.action === 'predict') {
+                    this.showPredictionOverlay(step);
+                    return;
+                }
+
+                sound.playBlip();
+                const term = document.getElementById('l2-a2-terminal');
+
+                if (step.action === 'print') {
+                    term.innerHTML += `<div class="terminal-line">${step.stdout}</div>`;
+                    term.scrollTop = term.scrollHeight;
+                } else if (step.action === 'assign') {
+                    this.variables[step.var] = step.val;
+                    this.updateVariablesPanel();
+                } else if (step.action === 'return') {
+                    term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary));">Function returned: ${step.val}</div>`;
+                    term.scrollTop = term.scrollHeight;
+                    this.callStack.pop();
+                    this.updateStackPanel();
+                }
+
+                this.stepIndex++;
+            }
+
+            showPredictionOverlay(step) {
+                const overlay = document.getElementById('prediction-overlay');
+                const quest = document.getElementById('prediction-question');
+                const opts = document.getElementById('prediction-options');
+
+                quest.textContent = step.question;
+                opts.innerHTML = '';
+
+                // Jumble options randomly
+                const shuffled = this.shuffle([...step.choices]);
+                shuffled.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-button';
+                    btn.textContent = opt.text;
+                    btn.addEventListener('click', () => {
+                        overlay.classList.remove('overlay-visible');
+                        this.verifyPrediction(opt.correct);
+                    });
+                    opts.appendChild(btn);
+                });
+
+                overlay.classList.add('overlay-visible');
+            }
+
+            shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            verifyPrediction(isCorrect) {
+                app.state.totalAnswers++;
+                if (isCorrect) {
+                    app.state.correctAnswers++;
+                    sound.playSuccess();
+                    particles.triggerSparks(window.innerWidth / 2, window.innerHeight / 2, '#cc0000');
+                    this.stepIndex++;
+                    setTimeout(() => this.stepSim(), 500);
+                } else {
+                    sound.playCrash();
+                    showToast("❌ Wrong branch prediction! Choose the CORRECT option.");
+                }
+            }
+
+            concludeScenario() {
+                sound.playSuccess();
+                if (this.currentScenarioIdx < this.scenarios.length - 1) {
+                    showToast("🎉 Scenario complete! Loading Scenario B...");
+                    this.loadScenario(1);
+                } else {
+                    app.checkProgress('l2a2', 3, 1);
+                    app.unlockBadge('l2a2');
+                    showToast("🎉 Level 2 Complete! Unlocking Level 3 Debug Championship...");
+                    app.switchLevel(3);
+                }
+            }
+
+            resetSimulator() {
+                sound.playBlip();
+                this.loadScenario(this.currentScenarioIdx);
+            }
+        }
+
+        const l2a2 = new ExceptionSimulator();
+
+        /* ==========================================================================
+           8. LEVEL 3 ACTIVITY 1: IDE ESCAPE ROOM (All Rooms Unlocked)
+           ========================================================================== */
+        class EscapeRoom {
+            constructor() {
+                this.rooms = [
+                    {
+                        name: 'Gateway (Syntax)',
+                        icon: '🚪',
+                        question: 'Room 1 (Syntax): Fix the syntax error. The conditional statement `if token == "123"` is missing a trailing colon (:). Which patch is correct?',
+                        code: 'if token == "123"\n    return True',
+                        options: [
+                            { text: 'if token == "123":', correct: true },
+                            { text: 'if token === "123":', correct: false },
+                            { text: 'if token == "123" {', correct: false }
+                        ]
+                    },
+                    {
+                        name: 'Core (Division)',
+                        icon: '💥',
+                        question: 'Room 2 (ZeroDivisionError): The code crashes if `data` is empty because `ratio` becomes 0. Which block wraps this division safely in a try-except structure?',
+                        code: 'ratio = len(data)\nreturn [x / ratio for x in data]',
+                        options: [
+                            { text: 'try:\n    ratio = len(data)\n    return [x / ratio for x in data]\nexcept ZeroDivisionError:\n    return []\n', correct: true },
+                            { text: 'if data != []:\n    return [x/len(data) for x in data]\n', correct: false }
+                        ]
+                    },
+                    {
+                        name: 'Vault (Value)',
+                        icon: '🔒',
+                        question: 'Room 3 (ValueError): Casting strings to numbers via `int(age_str)` will crash with a ValueError if the string is non-numeric (e.g. "abc"). Which exception trap captures this?',
+                        code: 'age_str = input_val\nreturn int(age_str)',
+                        options: [
+                            { text: 'try:\n    return int(age_str)\nexcept ValueError:\n    return 0\n', correct: true },
+                            { text: 'try:\n    return int(age_str)\nexcept Exception:\n    return -1\n', correct: false }
+                        ]
+                    },
+                    {
+                        name: 'Archive (Logic)',
+                        icon: '🧠',
+                        question: 'Room 4 (Logical Loops): The loop `while n > 0:` runs infinitely because the value of `n` never decrements. How do you resolve this logical loop bug?',
+                        code: 'while n > 0:\n    result.append(n)',
+                        options: [
+                            { text: 'while n > 0:\n    result.append(n)\n    n -= 1\n', correct: true },
+                            { text: 'while n > 0:\n    result.append(n)\n    n += 1\n', correct: false }
+                        ]
+                    },
+                    {
+                        name: 'Control (Assert)',
+                        icon: '⚡',
+                        question: 'Room 5 (Assertions): The line `assert clearance >= 3` crashes if clearance is less than 3. Which value assignment allows the script to pass successfully?',
+                        code: 'clearance = input_param\nassert clearance >= 3, "Failed"',
+                        options: [
+                            { text: 'clearance = 5\n', correct: true },
+                            { text: 'clearance = 2\n', correct: false },
+                            { text: 'clearance = 0\n', correct: false }
+                        ]
+                    }
+                ];
+
+                this.currentRoom = 0;
+                this.timeLeft = 120;
+                this.timerInterval = null;
+            }
+
+            init() {
+                this.currentRoom = 0;
+                this.timeLeft = 120;
+                
+                document.getElementById('l3-a1-case-star').textContent = app.state.completedActivities.includes('l3a1') ? '★' : '☆';
+                document.getElementById('l3-a1-case-star').style.color = app.state.completedActivities.includes('l3a1') ? 'hsl(var(--primary))' : 'hsl(var(--text-muted))';
+
+                this.renderRoomGrid();
+                this.loadRoom(0);
+                this.startTimer();
+            }
+
+            startTimer() {
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    const fill = document.getElementById('escape-timer-fill');
+                    const pct = (this.timeLeft / 120) * 100;
+                    fill.style.width = `${pct}%`;
+                    
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        sound.playCrash();
+                        
+                        const term = document.getElementById('l3-a1-terminal');
+                        term.innerHTML = `<div class="terminal-line" style="color: hsl(var(--primary)); font-weight: bold;">[CRITICAL] Mainframe locked down. Restarting room diagnostics.</div>`;
+                        
+                        showToast("🚨 TIMEOUT! Mainframe auto-destruct triggered. Restarting...");
+                        this.init();
+                    }
+                }, 1000);
+            }
+
+            renderRoomGrid() {
+                const grid = document.getElementById('escaperoom-grid');
+                grid.innerHTML = '';
+                this.rooms.forEach((r, idx) => {
+                    const card = document.createElement('div');
+                    card.className = `room-card ${idx === this.currentRoom ? 'active-room' : ''} ${idx < this.currentRoom ? 'solved' : ''}`;
+                    card.innerHTML = `
+                        <div class="room-icon">${r.icon}</div>
+                        <div class="room-name">${r.name}</div>
+                        <span class="room-status-badge ${idx < this.currentRoom ? 'status-solved' : 'status-pending'}">
+                            ${idx < this.currentRoom ? 'Bypassed' : 'Active'}
+                        </span>
+                    `;
+                    card.addEventListener('click', () => {
+                        this.currentRoom = idx;
+                        this.loadRoom(idx);
+                    });
+                    grid.appendChild(card);
+                });
+            }
+
+            loadRoom(idx) {
+                sound.playBlip();
+                const r = this.rooms[idx];
+                const editor = document.getElementById('l3-a1-editor');
+                editor.innerHTML = `<pre style="font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6; color: hsl(var(--text-main));">${r.code}</pre>`;
+
+                const term = document.getElementById('l3-a1-terminal');
+                term.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@security:~$</span> ${r.question}</div>`;
+
+                const optBox = document.getElementById('l3-a1-options');
+                optBox.innerHTML = '';
+                r.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-button';
+                    btn.innerHTML = `<pre style="margin: 0; font-family: var(--font-mono); font-size: 0.75rem;">${opt.text}</pre>`;
+                    btn.addEventListener('click', () => this.selectPatch(opt.correct, opt.text));
+                    optBox.appendChild(btn);
+                });
+
+                document.getElementById('l3-a1-options-container').style.display = 'block';
+                
+                const grid = document.getElementById('escaperoom-grid');
+                Array.from(grid.children).forEach((card, cIdx) => {
+                    card.className = `room-card ${cIdx === this.currentRoom ? 'active-room' : ''} ${cIdx < this.currentRoom ? 'solved' : ''}`;
+                    const badge = card.querySelector('.room-status-badge');
+                    badge.className = `room-status-badge ${cIdx < this.currentRoom ? 'status-solved' : 'status-pending'}`;
+                    badge.textContent = cIdx < this.currentRoom ? 'Bypassed' : 'Active';
+                });
+
+                const hints = [
+                    "💡 **Direct Answer**: Bypass Room 1 by selecting the option: <code>if token == \"123\":</code>",
+                    "💡 **Direct Answer**: Bypass Room 2 by selecting the option containing the <code>try ... except ZeroDivisionError:</code> block.",
+                    "💡 **Direct Answer**: Bypass Room 3 by selecting the option containing the <code>try ... except ValueError:</code> block.",
+                    "💡 **Direct Answer**: Bypass Room 4 by selecting the option containing <code>n -= 1</code>.",
+                    "💡 **Direct Answer**: Bypass Room 5 by selecting the option containing <code>clearance = 5</code>."
+                ];
+                document.getElementById('l3-a1-hint-text').innerHTML = hints[idx];
+            }
+
+            selectPatch(isCorrect, text) {
+                const term = document.getElementById('l3-a1-terminal');
+                term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary));">Selected patch:</div><pre style="color: hsl(var(--text-main)); font-size: 0.8rem; margin: 4px 0 8px 16px;">${text}</pre>`;
+                
+                this.pendingCorrect = isCorrect;
+                this.pendingText = text;
+            }
+
+            runDiagnostic() {
+                if (this.pendingCorrect === undefined) {
+                    sound.playCrash();
+                    showToast("⚠️ Please select a correction patch option first.");
+                    return;
+                }
+
+                sound.playBlip();
+                const term = document.getElementById('l3-a1-terminal');
+                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@security:~$</span> Verifying compiler output...</div>`;
+
+                app.state.totalAnswers++;
+                if (this.pendingCorrect) {
+                    app.state.correctAnswers++;
+                    sound.playSuccess();
+                    particles.triggerConfetti();
+                    
+                    term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary)); font-weight: bold;">[SUCCESS] Code bypass accepted. Room ${this.currentRoom + 1} unlocked!</div>`;
+                    this.timeLeft += 20;
+                    
+                    document.getElementById('l3-a1-editor').innerHTML = `<pre style="font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6; color: hsl(var(--primary));">${this.pendingText}</pre>`;
+
+                    setTimeout(() => {
+                        this.pendingCorrect = undefined;
+                        if (this.currentRoom < this.rooms.length - 1) {
+                            this.currentRoom++;
+                            this.loadRoom(this.currentRoom);
+                        } else {
+                            clearInterval(this.timerInterval);
+                            app.checkProgress('l3a1', 3, 2);
+                            app.unlockBadge('l3a1');
+                            showToast("🎉 Room bypass complete! Entering Boss Duel...");
+                            app.switchActivity(3, 2);
+                        }
+                    }, 2000);
+                } else {
+                    sound.playCrash();
+                    term.innerHTML += `<div class="terminal-line" style="color: hsl(var(--primary)); font-weight: bold; opacity: 0.8;">[FAILURE] Crash detected. Local exceptions unhandled. Select option marked CORRECT.</div>`;
+                    showToast("❌ Bypass failed. Select the CORRECT OPTION patch.");
+                }
+            }
+        }
+
+        const l3a1 = new EscapeRoom();
+
+        /* ==========================================================================
+           9. LEVEL 3 ACTIVITY 2: AI BOSS DUEL
+           ========================================================================== */
+        class BossBattle {
+            constructor() {
+                this.challenges = [
+                    {
+                        code: 'my_list = [10, 20]\nvalue = my_list[2]',
+                        q: 'Challenge 1: Accessing indices beyond list boundaries (my_list has size 2, index 2 is element 3). Which error is raised?',
+                        opts: ['IndexError (CORRECT - index is out of bounds)', 'TypeError (Incorrect)', 'ValueError (Incorrect)', 'KeyError (Incorrect)'],
+                        ans: 'IndexError (CORRECT - index is out of bounds)'
+                    },
+                    {
+                        code: 'try:\n    res = 10 / 0\nexcept Exception:\n    res = -1\nelse:\n    res = 1',
+                        q: 'Challenge 2: What is the final value of `res`? Division by zero raises an exception, running the except block.',
+                        opts: ['-1 (CORRECT - except block sets res to -1)', '1 (Incorrect)', 'ZeroDivisionError (Incorrect)', 'None (Incorrect)'],
+                        ans: '-1 (CORRECT - except block sets res to -1)'
+                    },
+                    {
+                        code: 'try:\n    print("Try")\nfinally:\n    print("Finally")',
+                        q: 'Challenge 3: Which statements execute and print values? The try block has no error, and finally ALWAYS runs.',
+                        opts: ['Both "Try" and "Finally" (CORRECT - try prints and finally cleanup runs)', 'Only "Try" (Incorrect)', 'Only "Finally" (Incorrect)', 'Syntax Error (No except block) (Incorrect)'],
+                        ans: 'Both "Try" and "Finally" (CORRECT - try prints and finally cleanup runs)'
+                    },
+                    {
+                        code: 'x = "150"\nassert type(x) == int, "Must be int"',
+                        q: 'Challenge 4: Does the code pass or crash? Variable x is a string (`"150"`), which fails `type(x) == int`.',
+                        opts: ['Crashes with AssertionError (CORRECT - assertion condition is False)', 'Passes successfully (Incorrect)', 'Crashes with TypeError (Incorrect)', 'Crashes with ValueError (Incorrect)'],
+                        ans: 'Crashes with AssertionError (CORRECT - assertion condition is False)'
+                    },
+                    {
+                        code: 'class MyError(BaseException):\n    pass\ntry:\n    raise MyError("alert")\nexcept Exception as e:\n    print("Caught")',
+                        q: 'Challenge 5: Is the exception caught? MyError inherits from BaseException. `except Exception` only catches classes inheriting from Exception (not BaseException directly).',
+                        opts: ['No (CORRECT - Exception does not intercept direct BaseException subclasses)', 'Yes (Incorrect)', 'Syntax Error (Incorrect)', 'AttributeError (Incorrect)'],
+                        ans: 'No (CORRECT - Exception does not intercept direct BaseException subclasses)'
+                    }
+                ];
+
+                this.currentChallengeIdx = 0;
+            }
+
+            init() {
+                this.currentChallengeIdx = 0;
+                document.getElementById('boss-chat-msg').textContent = '"I control the stack vectors. You will never resolve my tracebacks, Detective!"';
+                this.loadChallenge(0);
+            }
+
+            loadChallenge(idx) {
+                this.currentChallengeIdx = idx;
+                const c = this.challenges[idx];
+
+                const codeBox = document.getElementById('l3-a2-code-box');
+                codeBox.innerHTML = `<pre style="color: hsl(var(--primary)); font-family: var(--font-mono);">${c.code}</pre>`;
+                
+                document.getElementById('boss-question-label').textContent = c.q;
+
+                const choicesBox = document.getElementById('boss-answer-options');
+                choicesBox.innerHTML = '';
+                c.opts.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-button';
+                    btn.textContent = opt;
+                    btn.addEventListener('click', () => this.handleAnswer(opt));
+                    choicesBox.appendChild(btn);
+                });
+
+                const hints = [
+                    "💡 **Direct Answer**: Select the option: <code>IndexError (CORRECT - index is out of bounds)</code>",
+                    "💡 **Direct Answer**: Select the option: <code>-1 (CORRECT - except block sets res to -1)</code>",
+                    "💡 **Direct Answer**: Select the option: <code>Both \"Try\" and \"Finally\" (CORRECT - try prints and finally cleanup runs)</code>",
+                    "💡 **Direct Answer**: Select the option: <code>Crashes with AssertionError (CORRECT - assertion condition is False)</code>",
+                    "💡 **Direct Answer**: Select the option: <code>No (CORRECT - Exception does not intercept direct BaseException subclasses)</code>"
+                ];
+                document.getElementById('l3-a2-hint-text').innerHTML = hints[idx];
+            }
+
+            handleAnswer(selected) {
+                const c = this.challenges[this.currentChallengeIdx];
+                app.state.totalAnswers++;
+                
+                if (selected === c.ans) {
+                    app.state.correctAnswers++;
+                    sound.playSuccess();
+                    particles.triggerSparks(window.innerWidth * 0.7, window.innerHeight * 0.25, '#cc0000');
+                    
+                    document.getElementById('boss-chat-msg').textContent = '"Argh! My exception filters are bypass compromised. You solved it fast..."';
+                    showToast("🎉 Correct classification! Loading next check...");
+
+                    setTimeout(() => {
+                        if (this.currentChallengeIdx < this.challenges.length - 1) {
+                            this.nextRound();
+                        } else {
+                            this.victory();
+                        }
+                    }, 1500);
+                } else {
+                    sound.playCrash();
+                    document.getElementById('boss-chat-msg').textContent = '"Hahaha! Diagnostic error unhandled. Mainframe system integrity sinking."';
+                    showToast("❌ Incorrect classification! Try again.");
+                }
+            }
+
+            nextRound() {
+                const nextIdx = this.currentChallengeIdx + 1;
+                this.loadChallenge(nextIdx);
+            }
+
+            victory() {
+                app.addStar('boss');
+                app.unlockBadge('boss');
+                showToast("🏆 VICTORY! All system logs successfully analyzed.");
+                app.concludeGame();
+            }
+        }
+
+        const l3a2 = new BossBattle();
+
+        /* ==========================================================================
+           10. APP INITIALIZATION ON DOM CONTENT LOADED
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            particles = new ParticleEngine();
+            app.init();
+        });
+    </script>
+</body>
+</html>

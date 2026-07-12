@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.1 Definitions - E-Business</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fef2f2;
+      --bg-panel: #ffffff;
+      --border-color: #fca5a5;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --accent: #ef4444;
+      --accent-hover: #dc2626;
+      
+      --color-trad: #8b5cf6;
+      --color-digi: #10b981;
+      --color-ecom: #3b82f6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Layout */
+    .layout { display: flex; width: 100%; height: 100%; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 400px; background-color: var(--bg-panel); border-right: 1px solid var(--border-color);
+      display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    }
+
+    .header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background-color: var(--accent); color: white; }
+    .back-link {
+      color: #fee2e2; text-decoration: none; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; transition: color 0.2s;
+    }
+    .back-link:hover { color: white; }
+    .header h2 { font-size: 1.25rem; font-weight: 700; }
+
+    .levels {
+      padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; border-bottom: 1px solid var(--border-color);
+    }
+    .level-btn {
+      background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
+      padding: 0.75rem 1rem; border-radius: 8px; text-align: left; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .level-btn:hover { background: var(--bg-main); color: var(--text-main); }
+    .level-btn.active { background: #fee2e2; border-color: var(--accent); color: var(--accent-hover); }
+    .level-btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: #cbd5e1; color: #94a3b8; background: transparent !important; }
+
+    .explanation-box { padding: 1.5rem; flex: 1; overflow-y: auto; }
+    .explanation-box h3 { margin-bottom: 1rem; color: var(--accent); font-size: 1.1rem; }
+    .explanation-box p { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem; }
+    .explanation-box strong { color: var(--text-main); }
+
+    /* Main Area */
+    .main-area {
+      flex: 1; position: relative; display: flex; flex-direction: column;
+      background: radial-gradient(circle at center, #ffffff 0%, #fef2f2 100%);
+    }
+
+    /* Simulation Containers */
+    .sim-container {
+      display: none; width: 100%; height: 100%; flex-direction: column;
+      align-items: center; justify-content: center; position: absolute; top: 0; left: 0;
+    }
+    .sim-container.active { display: flex; }
+
+    /* SIM 1: Swipe Cards */
+    .legend { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .legend span { display: flex; align-items: center; gap: 0.5rem; }
+    .legend-color { width: 12px; height: 12px; border-radius: 50%; }
+    
+    .swipe-container { position: relative; width: 360px; height: 460px; perspective: 1000px; z-index: 5; }
+    .card-stack { position: absolute; width: 100%; height: 100%; }
+    
+    .swipe-card {
+      position: absolute; width: 100%; height: 100%; background: #ffffff;
+      border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(239, 68, 68, 0.2);
+      border: 2px solid var(--border-color); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 2.5rem; text-align: center;
+      cursor: grab; user-select: none; transform-origin: 50% 100%;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    }
+    .swipe-card.dragging { transition: none; cursor: grabbing; box-shadow: 0 30px 60px -12px rgba(239, 68, 68, 0.4); }
+    .card-icon { width: 80px; height: 80px; margin-bottom: 1.5rem; color: var(--accent); background: #fee2e2; padding: 15px; border-radius: 50%; }
+    .card-title { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; }
+    .card-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.5; font-weight: 500; }
+    
+    .stamp {
+      position: absolute; top: 40px; padding: 0.4rem 1.2rem; border-radius: 8px; font-size: 1.5rem; font-weight: 800;
+      text-transform: uppercase; opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s; pointer-events: none;
+    }
+    .stamp-left { right: 20px; color: var(--color-trad); border: 4px solid var(--color-trad); transform: rotate(15deg) scale(0.5); }
+    .stamp-right { left: 20px; color: var(--color-ecom); border: 4px solid var(--color-ecom); transform: rotate(-15deg) scale(0.5); }
+    .stamp-up { top: auto; bottom: 40px; left: 50%; color: var(--color-digi); border: 4px solid var(--color-digi); transform: translateX(-50%) rotate(-5deg) scale(0.5); }
+    .swipe-card.dragging-left .stamp-left { opacity: 1; transform: rotate(15deg) scale(1); }
+    .swipe-card.dragging-right .stamp-right { opacity: 1; transform: rotate(-15deg) scale(1); }
+    .swipe-card.dragging-up .stamp-up { opacity: 1; transform: translateX(-50%) rotate(-5deg) scale(1); }
+
+    /* SIM 2: Drag & Drop Builder */
+    .builder-area { display: flex; width: 80%; height: 70%; gap: 2rem; }
+    .inventory { width: 30%; background: white; border: 2px dashed var(--border-color); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
+    .inventory h4 { text-align: center; color: var(--text-muted); margin-bottom: 1rem; }
+    
+    .draggable-item {
+      background: var(--bg-main); border: 2px solid var(--border-color); padding: 1rem;
+      border-radius: 8px; font-weight: 600; cursor: grab; text-align: center;
+      transition: transform 0.2s;
+    }
+    .draggable-item:active { cursor: grabbing; transform: scale(1.05); }
+    
+    .dropzones { flex: 1; display: flex; gap: 1.5rem; }
+    .dropzone {
+      flex: 1; background: white; border: 3px solid #e5e7eb; border-radius: 12px;
+      padding: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-content: flex-start;
+      transition: background 0.3s, border-color 0.3s; position: relative;
+    }
+    .dropzone.drag-over { background: #fee2e2; border-color: var(--accent); }
+    .dropzone h4 { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #d1d5db; font-size: 2rem; pointer-events: none; }
+    
+    .dropzone .draggable-item { z-index: 2; }
+    .dz-title { width: 100%; font-size: 1.2rem; font-weight: 800; color: var(--text-main); z-index: 2; margin-bottom: 0.5rem; }
+
+    .validation-msg { position: absolute; bottom: 20px; font-weight: 700; font-size: 1.2rem; }
+
+    /* SIM 3: Scaling Chart */
+    .chart-container { width: 80%; height: 500px; background: white; border: 2px solid var(--border-color); border-radius: 12px; padding: 2rem; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    #scaleCanvas { width: 100%; height: 100%; }
+    
+    .chart-controls { width: 80%; margin-top: 2rem; background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid var(--border-color); display: flex; align-items: center; gap: 2rem; }
+    .slider-group { flex: 1; }
+    .slider-group label { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 0.5rem; }
+    .slider { width: 100%; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; background: #e5e7eb; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 3px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+    .s3-slot { transition: border-color 0.3s, background-color 0.3s; }
+    .s3-slot.drag-over { background-color: #fee2e2 !important; border-color: var(--accent) !important; }
+    #s3-inventory.drag-over { background-color: #fee2e2 !important; border-color: var(--accent) !important; }
+
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="header">
+        <a href="../../index.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          Back to Hub
+        </a>
+        <h2>1.1 Definitions</h2>
+      </div>
+      
+      <div class="levels">
+        <button class="level-btn active" id="btn-lvl-1" onclick="loadLevel(1)">Sim 1: Traditional vs E-Business</button>
+        <button class="level-btn" id="btn-lvl-2" onclick="loadLevel(2)">Sim 2: Inside an E-Business</button>
+        <button class="level-btn" id="btn-lvl-3" onclick="loadLevel(3)">Sim 3: E-Business Integration Stages</button>
+        
+        <div class="nav-buttons" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button class="level-btn" id="btn-prev-sim" onclick="changeSim(-1)" style="flex: 1; text-align: center; justify-content: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">← Prev</button>
+          <button class="level-btn" id="btn-next-sim" onclick="changeSim(1)" style="flex: 1; text-align: center; justify-content: center; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">Next →</button>
+        </div>
+      </div>
+
+      <div class="explanation-box" id="explanation"></div>
+    </aside>
+
+    <main class="main-area">
+      <!-- SIMULATION 1: Swipe Cards -->
+      <div class="sim-container active" id="sim-1">
+        <div class="legend">
+          <span><div class="legend-color" style="background: var(--color-trad)"></div> Traditional Business (Swipe Left)</span>
+          <span><div class="legend-color" style="background: var(--color-digi)"></div> E-Business (Swipe Right)</span>
+        </div>
+        <div class="swipe-container"><div id="card-stack" class="card-stack"></div></div>
+        <div id="sim-1-msg" style="margin-top: 3.5rem; margin-bottom: 1.5rem; min-height: 4.5rem; width: 360px; text-align: center; font-size: 0.9rem; font-weight: 600; padding: 0.8rem 1rem; border-radius: 8px; transition: all 0.3s; box-sizing: border-box;"></div>
+      </div>
+
+      <!-- SIMULATION 2: Drag and Drop -->
+      <div class="sim-container" id="sim-2">
+        <h2 style="margin-bottom: 2rem; color: var(--text-main);">Inside an E-Business</h2>
+        <div class="builder-area">
+          <div class="inventory" id="inventory" ondragover="allowDrop(event)" ondrop="drop(event, 'inventory')">
+            <h4>Components</h4>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-1" data-target="internal">Employee Intranet</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-2" data-target="internal">CRM</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-3" data-target="internal">ERP</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-4" data-target="internal">Knowledge Management</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-5" data-target="internal">Internal Workflow</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-6" data-target="internal">Supplier Collaboration</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-7" data-target="ecommerce">Online Shopping</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-8" data-target="ecommerce">Online Payment</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-9" data-target="ecommerce">Customer Orders</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-10" data-target="ecommerce">Online Product Catalogue</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-11" data-target="ecommerce">Electronic Customer Transactions</div>
+            <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item-12" data-target="ecommerce">Supplier Ordering Portal</div>
+          </div>
+          <div class="dropzones">
+            <div class="dropzone" id="dz-internal" ondragover="allowDrop(event)" ondrop="drop(event, 'internal')">
+              <div class="dz-title">Internal E-Business</div>
+              <h4>Drop Here</h4>
+            </div>
+            <div class="dropzone" id="dz-ecommerce" ondragover="allowDrop(event)" ondrop="drop(event, 'ecommerce')">
+              <div class="dz-title">E-Commerce</div>
+              <h4>Drop Here</h4>
+            </div>
+          </div>
+        </div>
+        <div class="validation-msg" id="sim-2-msg"></div>
+      </div>
+
+      <!-- SIMULATION 3: E-Business Integration Stages -->
+      <div class="sim-container" id="sim-3">
+        <h2 style="margin-bottom: 1rem; color: var(--text-main);" id="sim-3-title">E-Business Integration Stages Challenge</h2>
+        
+        <!-- Timeline Sorter (Hidden when solved) -->
+        <div id="sim-3-sorter" style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; width: 85%; margin: auto;">
+          <p style="color: var(--text-muted); text-align: center; font-weight: 500; font-size: 0.95rem; margin-bottom: 0.5rem;">
+            Drag the stages of e-business adoption into their correct progression sequence (from earliest to most integrated).
+          </p>
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.5rem; min-height: 60px; width: 100%; border: 2px dashed #e5e7eb; border-radius: 8px; padding: 0.5rem;" id="s3-inventory" ondragover="allowDrop(event)" ondrop="dropS3Inventory(event)">
+            <!-- Shuffled stage boxes will be generated here -->
+          </div>
+          <div style="display: flex; gap: 1rem; width: 100%; justify-content: space-between;">
+            <div class="s3-slot" data-index="1" ondragover="allowDrop(event)" ondrop="dropS3(event, 1)" style="flex: 1; min-height: 90px; background: white; border: 2px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; position: relative;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #9ca3af; margin-bottom: 0.3rem;">STAGE 1</span>
+              <div class="s3-slot-content" id="s3-content-1" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+            <div class="s3-slot" data-index="2" ondragover="allowDrop(event)" ondrop="dropS3(event, 2)" style="flex: 1; min-height: 90px; background: white; border: 2px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; position: relative;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #9ca3af; margin-bottom: 0.3rem;">STAGE 2</span>
+              <div class="s3-slot-content" id="s3-content-2" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+            <div class="s3-slot" data-index="3" ondragover="allowDrop(event)" ondrop="dropS3(event, 3)" style="flex: 1; min-height: 90px; background: white; border: 2px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; position: relative;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #9ca3af; margin-bottom: 0.3rem;">STAGE 3</span>
+              <div class="s3-slot-content" id="s3-content-3" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+            <div class="s3-slot" data-index="4" ondragover="allowDrop(event)" ondrop="dropS3(event, 4)" style="flex: 1; min-height: 90px; background: white; border: 2px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; position: relative;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #9ca3af; margin-bottom: 0.3rem;">STAGE 4</span>
+              <div class="s3-slot-content" id="s3-content-4" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+            <div class="s3-slot" data-index="5" ondragover="allowDrop(event)" ondrop="dropS3(event, 5)" style="flex: 1; min-height: 90px; background: white; border: 2px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.5rem; position: relative;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #9ca3af; margin-bottom: 0.3rem;">STAGE 5</span>
+              <div class="s3-slot-content" id="s3-content-5" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"></div>
+            </div>
+          </div>
+          <div id="sim-3-msg" style="font-weight: 700; font-size: 0.95rem; min-height: 1.5rem; text-align: center;"></div>
+        </div>
+
+        <!-- Diagram Workspace (Shown when solved) -->
+        <div id="sim-3-workspace" style="display: none; width: 100%; height: 100%; flex-direction: column; align-items: center;">
+          <div class="chart-container" style="height: 480px; width: 85%;">
+            <canvas id="scaleCanvas"></canvas>
+          </div>
+          <div class="chart-controls" style="width: 85%;">
+            <div class="slider-group">
+              <label>Level of E-Business Adoption: <span id="lbl-stage" style="color: var(--accent)">Traditional Business</span></label>
+              <input type="range" id="sl-stage" class="slider" min="1" max="5" value="1" step="1" oninput="updateChart()">
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let currentLevel = 1;
+
+    const levelsData = {
+      1: {
+        title: "Traditional Business vs E-Business",
+        desc: "<p>Traditional businesses mainly rely on physical operations and manual processes.</p><p><strong>E-Business</strong> uses electronic technologies throughout the organization to improve internal processes and external interactions.</p><p>E-Commerce is one important part of E-Business.</p><p><em>Swipe the cards to classify them correctly (Left for Traditional, Right for E-Business).</em></p>"
+      },
+      2: {
+        title: "Inside an E-Business",
+        desc: "<p>An e-business consists of both internal electronic processes and external e-commerce transactions.</p><p>Drag and drop each activity to classify it as either an <strong>Internal E-Business</strong> process or an external <strong>E-Commerce</strong> transaction.</p>"
+      },
+      3: {
+        title: "E-Business Integration Stages",
+        desc: "<p>As organizations adopt e-business, they improve communication, efficiency, information sharing, customer service, and business process integration.</p><p><strong>E-Business</strong> transforms business processes rather than simply automating existing ones.</p><p><em>Adjust the E-Business Adoption Level slider to see how the organization becomes increasingly integrated.</em></p>"
+      }
+    };
+
+    function loadLevel(level) {
+      currentLevel = level;
+      document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('btn-lvl-' + level).classList.add('active');
+      
+      document.querySelectorAll('.sim-container').forEach(c => c.classList.remove('active'));
+      document.getElementById('sim-' + level).classList.add('active');
+      
+      const exp = document.getElementById('explanation');
+      exp.innerHTML = '<h3>' + levelsData[level].title + '</h3>' + levelsData[level].desc;
+
+      // Update sidebar prev/next buttons
+      document.getElementById('btn-prev-sim').disabled = (level === 1);
+      document.getElementById('btn-next-sim').disabled = (level === 3);
+      
+      if(level === 1) initSim1();
+      if(level === 2) initSim2();
+      if(level === 3) { setTimeout(initSim3, 100); } // slight delay to ensure canvas is visible for measurements
+    }
+
+    window.changeSim = function(dir) {
+      let target = currentLevel + dir;
+      if (target >= 1 && target <= 3) {
+        loadLevel(target);
+      }
+    };
+
+    // --- SIMULATION 1: Swipe Cards ---
+    const iconStore = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>';
+    const iconCart = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>';
+    const iconIntegration = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>';
+
+    const cardsData = [
+      { title: "Local Bakery", desc: "Sells bread to walk-in customers only.", type: "left", icon: iconStore, explanation: "Local Bakery relies on physical visits and manual sales transactions without electronic mediation." },
+      { title: "Employee Intranet", desc: "A portal for internal communications, employee announcements, and workflow management.", type: "right", icon: iconIntegration, explanation: "An intranet coordinates internal processes electronically, which is a core e-business function." },
+      { title: "Paper Records", desc: "Documenting all sales and customer logs in paper files.", type: "left", icon: iconStore, explanation: "Paper files are physical and manual records typical of a traditional business." },
+      { title: "Supplier Integration", desc: "A manufacturer electronically shares inventory and purchasing information with suppliers.", type: "right", icon: iconIntegration, explanation: "Electronic communication with suppliers integrates external stakeholders into the business processes." },
+      { title: "Walk-in Store", desc: "Customers must physically visit the location to browse and purchase items.", type: "left", icon: iconStore, explanation: "Walk-in stores rely on physical presence and manual point-of-sale processes." },
+      { title: "CRM System", desc: "Software that tracks customer interactions, support history, and customer relations.", type: "right", icon: iconIntegration, explanation: "A Customer Relationship Management (CRM) system manages and automates support relationships electronically." },
+      { title: "Manual Billing", desc: "Hand-writing invoices and sending them via post mail.", type: "left", icon: iconStore, explanation: "Manual invoicing is a traditional, paper-based administrative process." },
+      { title: "ERP System", desc: "A system that integrates core business processes electronically.", type: "right", icon: iconIntegration, explanation: "Enterprise Resource Planning (ERP) databases integrate internal processes electronically across the business." },
+      { title: "Online Inventory Management", desc: "Digital system tracking stock levels in real-time across warehouses.", type: "right", icon: iconIntegration, explanation: "Electronic inventory management automates stock tracking across the business's warehouses." },
+      { title: "Online Customer Support", desc: "Digital chat and ticketing system helping customers resolve questions online.", type: "right", icon: iconIntegration, explanation: "Handling customer requests online integrates digital communication into client relationships." }
+    ];
+    let currentCardIndex = 0;
+    
+    function initSim1() {
+      currentCardIndex = 0;
+      const msg = document.getElementById('sim-1-msg');
+      if (msg) {
+        msg.innerHTML = '';
+        msg.style.border = 'none';
+        msg.style.background = 'transparent';
+      }
+      
+      // Shuffle cardsData
+      for (let i = cardsData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cardsData[i], cardsData[j]] = [cardsData[j], cardsData[i]];
+      }
+      
+      renderCards();
+    }
+
+    function renderCards() {
+      const stack = document.getElementById('card-stack');
+      stack.innerHTML = '';
+      
+      for (let i = cardsData.length - 1; i >= currentCardIndex; i--) {
+        const s = cardsData[i];
+        const offset = i - currentCardIndex;
+
+        const card = document.createElement('div');
+        card.className = 'swipe-card';
+        card.dataset.type = s.type;
+        card.dataset.index = i;
+        card.style.transform = 'scale(' + (1 - offset * 0.05) + ') translateY(' + (offset * 15) + 'px)';
+        card.style.zIndex = cardsData.length - offset;
+        
+        card.innerHTML = 
+          '<div class="stamp stamp-left">Traditional</div>' +
+          '<div class="stamp stamp-right">E-Business</div>' +
+          '<div class="card-icon">' + s.icon + '</div>' +
+          '<div class="card-title">' + s.title + '</div>' +
+          '<div class="card-desc">' + s.desc + '</div>';
+        
+        if (offset === 0) initDrag(card);
+        stack.appendChild(card);
+      }
+
+      if (currentCardIndex >= cardsData.length) {
+        const msg = document.getElementById('sim-1-msg');
+        if (msg) {
+          msg.innerHTML = '';
+          msg.style.border = 'none';
+          msg.style.background = 'transparent';
+        }
+        stack.innerHTML = 
+          '<div class="swipe-card" style="border-color: #10b981; box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);">' +
+            '<div class="card-icon" style="color: #10b981; background: #ecfdf5;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>' +
+            '<div class="card-title">Sorter Complete!</div>' +
+            '<div class="card-desc">Move to Simulation 2 from the sidebar.</div>' +
+          '</div>';
+      }
+    }
+
+    function handleSwipe(direction, card) {
+      const s = cardsData[currentCardIndex];
+      const msg = document.getElementById('sim-1-msg');
+      
+      if (direction !== s.type) {
+        if (msg) {
+          msg.style.color = '#ef4444';
+          msg.style.background = '#fef2f2';
+          msg.style.border = '1px solid #fca5a5';
+          msg.innerHTML = `<strong>Incorrect!</strong> ${s.title} belongs to ${s.type === 'left' ? 'Traditional Business' : 'E-Business'}.<br><span style="font-weight: 500; font-size: 0.82rem; color: var(--text-muted);">${s.explanation}</span>`;
+        }
+        
+        card.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+        return;
+      }
+      
+      if (msg) {
+        msg.style.color = '#047857';
+        msg.style.background = '#e6fffa';
+        msg.style.border = '1px solid #10b981';
+        msg.innerHTML = `<strong>Correct!</strong> ${s.title} is classified successfully.`;
+      }
+
+      let x = direction === 'left' ? -800 : 800;
+      let y = 0;
+      let rot = direction === 'left' ? -45 : 45;
+      
+      card.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease';
+      card.style.transform = 'translate(' + x + 'px, ' + y + 'px) rotate(' + rot + 'deg)';
+      card.style.opacity = '0';
+
+      setTimeout(() => {
+        currentCardIndex++;
+        renderCards();
+      }, 300);
+    }
+
+    function initDrag(card) {
+      let isDragging = false;
+      let startX, startY;
+
+      const onMove = (e) => {
+        if (!isDragging) return;
+        const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+        const y = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+        const deltaX = x - startX;
+        const deltaY = y - startY;
+        const rot = deltaX * 0.05;
+        
+        card.style.transform = 'translate(' + deltaX + 'px, ' + deltaY + 'px) rotate(' + rot + 'deg)';
+        card.classList.remove('dragging-left', 'dragging-right');
+        if (deltaX < -80) card.classList.add('dragging-left');
+        else if (deltaX > 80) card.classList.add('dragging-right');
+
+        if (e.type.includes('touch')) {
+          if (e.cancelable) e.preventDefault();
+        }
+      };
+
+      const onEnd = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        card.classList.remove('dragging', 'dragging-left', 'dragging-right');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+
+        const transformStr = card.style.transform;
+        const matchX = transformStr.match(/translate\(([-\d.]+)px/);
+        const dx = matchX ? parseFloat(matchX[1]) : 0;
+
+        if (dx < -100) handleSwipe('left', card);
+        else if (dx > 100) handleSwipe('right', card);
+        else card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+      };
+
+      const onStart = (e) => {
+        isDragging = true;
+        card.classList.add('dragging');
+        startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+        startY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+        if (e.type.includes('mouse')) {
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onEnd);
+        } else {
+          document.addEventListener('touchmove', onMove, { passive: false });
+          document.addEventListener('touchend', onEnd);
+        }
+      };
+      card.addEventListener('mousedown', onStart);
+      card.addEventListener('touchstart', onStart, { passive: true });
+    }
+
+    // --- SIMULATION 2: Drag & Drop ---
+    let sim3Solved = false;
+
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+    
+    function allowDrop(ev) {
+      ev.preventDefault();
+      const dz = ev.target.closest('.dropzone') || ev.target.closest('.inventory') || ev.target.closest('.s3-slot') || ev.target.closest('#s3-inventory');
+      if(dz) dz.classList.add('drag-over');
+    }
+
+    function drop(ev, targetZoneId) {
+      ev.preventDefault();
+      document.querySelectorAll('.dropzone, .inventory, .s3-slot, #s3-inventory').forEach(el => el.classList.remove('drag-over'));
+      
+      var data = ev.dataTransfer.getData("text");
+      var item = document.getElementById(data);
+      if (!item || item.id.startsWith('s3-item')) return; // Ensure it's not a Sim 3 item
+      
+      const zone = document.getElementById(targetZoneId === 'inventory' ? 'inventory' : 'dz-' + targetZoneId);
+      if(zone) {
+        zone.appendChild(item);
+        checkSim2Completion();
+      }
+    }
+
+    function dropS3(ev, slotIndex) {
+      ev.preventDefault();
+      document.querySelectorAll('.dropzone, .inventory, .s3-slot, #s3-inventory').forEach(el => el.classList.remove('drag-over'));
+      
+      var data = ev.dataTransfer.getData("text");
+      var item = document.getElementById(data);
+      if (!item || !item.id.startsWith('s3-item')) return; // Ensure it's a Sim 3 item
+
+      const slot = document.getElementById('s3-content-' + slotIndex);
+      if (slot) {
+        if (slot.firstElementChild) {
+          document.getElementById('s3-inventory').appendChild(slot.firstElementChild);
+        }
+        slot.appendChild(item);
+        checkSim3Completion();
+      }
+    }
+
+    function dropS3Inventory(ev) {
+      ev.preventDefault();
+      document.querySelectorAll('.dropzone, .inventory, .s3-slot, #s3-inventory').forEach(el => el.classList.remove('drag-over'));
+      
+      var data = ev.dataTransfer.getData("text");
+      var item = document.getElementById(data);
+      if (item && item.id.startsWith('s3-item')) {
+        document.getElementById('s3-inventory').appendChild(item);
+        checkSim3Completion();
+      }
+    }
+
+    document.addEventListener('dragleave', (ev) => {
+      const dz = ev.target.closest('.dropzone') || ev.target.closest('.inventory') || ev.target.closest('.s3-slot') || ev.target.closest('#s3-inventory');
+      if(dz) dz.classList.remove('drag-over');
+    });
+
+    function shuffleInventory() {
+      const inventory = document.getElementById('inventory');
+      const items = Array.from(inventory.children).filter(el => el.classList.contains('draggable-item'));
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      items.forEach(item => inventory.appendChild(item));
+    }
+
+    function initSim2() {
+      const inventory = document.getElementById('inventory');
+      document.querySelectorAll('.dropzone .draggable-item').forEach(item => {
+        inventory.appendChild(item);
+      });
+      shuffleInventory();
+      const msg = document.getElementById('sim-2-msg');
+      if (msg) msg.innerHTML = '';
+      document.querySelectorAll('.draggable-item').forEach(item => {
+        item.style.borderColor = 'var(--border-color)';
+        item.style.color = 'var(--text-main)';
+      });
+    }
+
+      function getItemExplanation(itemId) {
+        const explanations = {
+          'item-1': "An intranet is an internal portal for employee communication, internal processes, and workflows.",
+          'item-2': "CRM handles internal customer records, support logs, and support databases to coordinate relationships.",
+          'item-3': "ERP integrates core internal business processes electronically across all departments.",
+          'item-4': "Knowledge management systems share and organize internal documentation and insights among employees.",
+          'item-5': "Internal workflows automate operational tasks and routines between internal staff members.",
+          'item-6': "Supplier collaboration refers to coordinating supply chain steps and schedules internally with suppliers.",
+          'item-7': "Online shopping is an external customer transaction for browsing and purchasing goods.",
+          'item-8': "Online payment handles external financial transfers between the client and the organization.",
+          'item-9': "Customer orders represent external buy/sell transactions with customers.",
+          'item-10': "An online catalogue is an external-facing interface displaying products to prospective buyers.",
+          'item-11': "Electronic transactions represent actual buy/sell exchanges with external clients.",
+          'item-12': "A supplier portal facilitates external purchase transactions and orders with supplier partners."
+        };
+        return explanations[itemId] || "";
+      }
+
+      function checkSim2Completion() {
+        const internalZone = document.getElementById('dz-internal');
+        const ecommerceZone = document.getElementById('dz-ecommerce');
+        
+        let allCorrect = true;
+        let totalPlaced = 0;
+        let wrongItems = [];
+
+        internalZone.querySelectorAll('.draggable-item').forEach(item => {
+          totalPlaced++;
+          if (item.dataset.target !== 'internal') {
+            allCorrect = false;
+            item.style.borderColor = '#ef4444';
+            item.style.color = '#ef4444';
+            wrongItems.push({ name: item.innerText, target: 'Internal E-Business', reason: getItemExplanation(item.id) });
+          } else {
+            item.style.borderColor = 'var(--border-color)';
+            item.style.color = 'var(--text-main)';
+          }
+        });
+        
+        ecommerceZone.querySelectorAll('.draggable-item').forEach(item => {
+          totalPlaced++;
+          if (item.dataset.target !== 'ecommerce') {
+            allCorrect = false;
+            item.style.borderColor = '#ef4444';
+            item.style.color = '#ef4444';
+            wrongItems.push({ name: item.innerText, target: 'E-Commerce', reason: getItemExplanation(item.id) });
+          } else {
+            item.style.borderColor = 'var(--border-color)';
+            item.style.color = 'var(--text-main)';
+          }
+        });
+
+        // Reset items in inventory
+        document.getElementById('inventory').querySelectorAll('.draggable-item').forEach(item => {
+          item.style.borderColor = 'var(--border-color)';
+          item.style.color = 'var(--text-main)';
+        });
+
+        const msg = document.getElementById('sim-2-msg');
+        if (totalPlaced === 12) {
+          if (allCorrect) {
+            msg.innerHTML = "<span style='color: #10b981; font-weight: 800;'>E-Commerce is one component of a complete E-Business.</span>";
+          } else {
+            let reasons = wrongItems.map(w => `• <strong>${w.name}</strong> belongs to <strong>${w.target === 'Internal E-Business' ? 'E-Commerce' : 'Internal E-Business'}</strong>: ${w.reason}`).join('<br>');
+            msg.innerHTML = `<span style='color: #ef4444; font-weight: 800;'>Incorrect placement:</span><div style='font-size: 0.85rem; text-align: left; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.4; max-height: 120px; overflow-y: auto;'>${reasons}</div>`;
+          }
+        } else {
+          if (wrongItems.length > 0) {
+            let reasons = wrongItems.map(w => `• <strong>${w.name}</strong> is misplaced: ${w.reason}`).join('<br>');
+            msg.innerHTML = `<span style='color: #ef4444; font-weight: 800;'>Misplaced item(s) detected:</span><div style='font-size: 0.85rem; text-align: left; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.4;'>${reasons}</div>`;
+          } else {
+            msg.innerHTML = "";
+          }
+        }
+      }
+
+    // --- SIMULATION 3: Scaling Chart ---
+    let canvas, ctx, cWidth, cHeight;
+    function initSim3() {
+      if (sim3Solved) {
+        document.getElementById('sim-3-sorter').style.display = 'none';
+        document.getElementById('sim-3-workspace').style.display = 'flex';
+        document.getElementById('sim-3-title').innerText = 'E-Business Integration Diagram';
+        
+        canvas = document.getElementById('scaleCanvas');
+        ctx = canvas.getContext('2d');
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width - 64; // accounting for padding
+        canvas.height = rect.height - 64;
+        cWidth = canvas.width;
+        cHeight = canvas.height;
+        updateChart();
+        return;
+      }
+
+      document.getElementById('sim-3-sorter').style.display = 'flex';
+      document.getElementById('sim-3-workspace').style.display = 'none';
+      document.getElementById('sim-3-title').innerText = 'E-Business Integration Stages Challenge';
+
+      const inventory = document.getElementById('s3-inventory');
+      document.querySelectorAll('.s3-slot-content').forEach(slot => {
+        if (slot.firstElementChild) {
+          inventory.appendChild(slot.firstElementChild);
+        }
+      });
+
+      const msg = document.getElementById('sim-3-msg');
+      if (msg) msg.innerHTML = '';
+      document.querySelectorAll('.s3-slot').forEach(slot => {
+        slot.style.borderColor = 'var(--border-color)';
+      });
+
+      const stagesList = [
+        { id: 's3-item-1', stage: 1, name: 'Traditional Business' },
+        { id: 's3-item-2', stage: 2, name: 'Manual Processes' },
+        { id: 's3-item-3', stage: 3, name: 'Internal Digital Integration' },
+        { id: 's3-item-4', stage: 4, name: 'External Electronic Transactions' },
+        { id: 's3-item-5', stage: 5, name: 'Complete E-Business' }
+      ];
+      
+      for (let i = stagesList.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [stagesList[i], stagesList[j]] = [stagesList[j], stagesList[i]];
+      }
+
+      inventory.innerHTML = '';
+      stagesList.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'draggable-item';
+        item.draggable = true;
+        item.id = s.id;
+        item.dataset.stage = s.stage;
+        item.innerText = s.name;
+        item.ondragstart = drag;
+        inventory.appendChild(item);
+      });
+    }
+
+    function checkSim3Completion() {
+      let totalPlaced = 0;
+      let allCorrect = true;
+      
+      const slots = document.querySelectorAll('.s3-slot');
+      slots.forEach(slot => {
+        const slotIndex = parseInt(slot.dataset.index);
+        const content = slot.querySelector('.s3-slot-content');
+        if (content && content.firstElementChild) {
+          totalPlaced++;
+          const item = content.firstElementChild;
+          const stageVal = parseInt(item.dataset.stage);
+          if (stageVal !== slotIndex) {
+            allCorrect = false;
+            slot.style.borderColor = '#ef4444';
+          } else {
+            slot.style.borderColor = '#10b981';
+          }
+        } else {
+          slot.style.borderColor = 'var(--border-color)';
+        }
+      });
+
+      const msg = document.getElementById('sim-3-msg');
+      if (totalPlaced === 5) {
+        if (allCorrect) {
+          sim3Solved = true;
+          msg.innerHTML = "<span style='color: #10b981'>Correct! Timeline unlocked. Loading diagram...</span>";
+          setTimeout(() => {
+            initSim3();
+          }, 1500);
+        } else {
+          msg.innerHTML = "<span style='color: #ef4444'>Incorrect sequence. Review explanations:</span>" +
+            "<div style='font-size: 0.85rem; font-weight: 500; text-align: left; margin-top: 0.5rem; color: var(--text-muted); line-height: 1.4;'>" +
+            "Traditional models (Stage 1) use localized manual workflows (Stage 2). Electronic systems start internally (Stage 3), " +
+            "then connect externally (Stage 4), before achieving complete integrated E-Business (Stage 5).</div>";
+        }
+      } else {
+        msg.innerHTML = "";
+      }
+    }
+
+      function drawRoundedRect(x, y, w, h, r, fill, stroke, strokeWidth = 2) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = strokeWidth;
+          ctx.stroke();
+        }
+      }
+
+      function drawArrow(fromX, fromY, toX, toY, color, label, isSolid, isGlow) {
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(toX, toY);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = isGlow ? 4 : 2;
+        if (isGlow) {
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 8;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        if (!isSolid) {
+          ctx.setLineDash([4, 4]);
+        } else {
+          ctx.setLineDash([]);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.shadowBlur = 0;
+
+        const angle = Math.atan2(toY - fromY, toX - fromX);
+        ctx.beginPath();
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(toX - 10 * Math.cos(angle - Math.PI / 6), toY - 10 * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(toX - 10 * Math.cos(angle + Math.PI / 6), toY - 10 * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        ctx.fillStyle = '#4b5563';
+        ctx.font = 'bold 9px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, (fromX + toX) / 2, (fromY + toY) / 2 - 8);
+      }
+
+      function updateChart() {
+        if(!ctx) return;
+        const stage = parseInt(document.getElementById('sl-stage').value);
+        
+        const stages = [
+          "Traditional Business",
+          "Manual Processes",
+          "Internal Digital Integration",
+          "External Electronic Transactions",
+          "Complete E-Business"
+        ];
+        document.getElementById('lbl-stage').innerText = stages[stage - 1];
+
+        ctx.clearRect(0, 0, cWidth, cHeight);
+        
+        const boxH = 70;
+        const boxW = 100;
+        
+        const supX = 40;
+        const supY = cHeight / 2 - 80;
+        
+        const custX = cWidth - 40 - boxW;
+        const custY = cHeight / 2 - 80;
+        
+        const orgW = 285;
+        const orgH = 160;
+        const orgX = cWidth / 2 - orgW / 2;
+        const orgY = cHeight / 2 - 120;
+
+        // Draw Suppliers Box
+        drawRoundedRect(supX, supY, boxW, boxH, 8, '#f9fafb', '#d1d5db', 2);
+        ctx.fillStyle = 'var(--text-main)';
+        ctx.font = 'bold 11px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('SUPPLIERS', supX + boxW/2, supY + boxH/2 + 4);
+
+        // Draw Customers Box
+        drawRoundedRect(custX, custY, boxW, boxH, 8, '#f9fafb', '#d1d5db', 2);
+        ctx.fillStyle = 'var(--text-main)';
+        ctx.font = 'bold 11px Inter';
+        ctx.fillText('CUSTOMERS', custX + boxW/2, custY + boxH/2 + 4);
+
+        // Draw Organization Box
+        drawRoundedRect(orgX, orgY, orgW, orgH, 12, '#ffffff', 'var(--border-color)', 2);
+        ctx.beginPath();
+        ctx.moveTo(orgX, orgY + 30);
+        ctx.lineTo(orgX + orgW, orgY + 30);
+        ctx.strokeStyle = 'var(--border-color)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = 'var(--text-main)';
+        ctx.font = 'bold 11px Inter';
+        ctx.fillText('OUR ORGANIZATION', orgX + orgW/2, orgY + 20);
+
+        // Define sub-boxes coordinates
+        const intX = orgX + 15, intY = orgY + 45, intW = 115, intH = 95;
+        const extX = orgX + 155, extY = orgY + 45, extW = 115, extH = 95;
+
+        // Draw Sub-boxes based on Stage
+        if (stage === 1 || stage === 2) {
+          // Internal Processes box
+          drawRoundedRect(intX, intY, intW, intH, 6, '#f3f4f6', '#d1d5db', 1.5);
+          ctx.fillStyle = '#9ca3af';
+          ctx.font = '10px Inter';
+          ctx.fillText('Internal Processes', intX + intW/2, intY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText(stage === 1 ? 'Manual Files' : 'Paper Ledgers', intX + intW/2, intY + 55);
+
+          // External Transactions box
+          drawRoundedRect(extX, extY, extW, extH, 6, '#f3f4f6', '#d1d5db', 1.5);
+          ctx.fillStyle = '#9ca3af';
+          ctx.font = '10px Inter';
+          ctx.fillText('External Trans.', extX + extW/2, extY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText(stage === 1 ? 'In-Person Sales' : 'Physical Catalog', extX + extW/2, extY + 55);
+        }
+        else if (stage === 3) {
+          // Internal Processes box (Active - Green)
+          drawRoundedRect(intX, intY, intW, intH, 6, '#e6fffa', '#10b981', 2);
+          ctx.fillStyle = '#047857';
+          ctx.font = '10px Inter';
+          ctx.fillText('Internal Processes', intX + intW/2, intY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('Intranet & ERP', intX + intW/2, intY + 55);
+
+          // External Transactions box (Inactive)
+          drawRoundedRect(extX, extY, extW, extH, 6, '#f3f4f6', '#d1d5db', 1.5);
+          ctx.fillStyle = '#9ca3af';
+          ctx.font = '10px Inter';
+          ctx.fillText('External Trans.', extX + extW/2, extY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('Physical Catalog', extX + extW/2, extY + 55);
+        }
+        else if (stage === 4) {
+          // Internal Processes box (Inactive)
+          drawRoundedRect(intX, intY, intW, intH, 6, '#f3f4f6', '#d1d5db', 1.5);
+          ctx.fillStyle = '#9ca3af';
+          ctx.font = '10px Inter';
+          ctx.fillText('Internal Processes', intX + intW/2, intY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('Paper Ledgers', intX + intW/2, intY + 55);
+
+          // External Transactions box (Active - Blue)
+          drawRoundedRect(extX, extY, extW, extH, 6, '#ebf8ff', '#3b82f6', 2);
+          ctx.fillStyle = '#1d4ed8';
+          ctx.font = '10px Inter';
+          ctx.fillText('External Trans.', extX + extW/2, extY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('E-Commerce', extX + extW/2, extY + 55);
+        }
+        else if (stage === 5) {
+          // Internal Processes box (Active - Green)
+          drawRoundedRect(intX, intY, intW, intH, 6, '#e6fffa', '#10b981', 2);
+          ctx.fillStyle = '#047857';
+          ctx.font = '10px Inter';
+          ctx.fillText('Internal Processes', intX + intW/2, intY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('Intranet & ERP', intX + intW/2, intY + 55);
+
+          // External Transactions box (Active - Blue)
+          drawRoundedRect(extX, extY, extW, extH, 6, '#ebf8ff', '#3b82f6', 2);
+          ctx.fillStyle = '#1d4ed8';
+          ctx.font = '10px Inter';
+          ctx.fillText('External Trans.', extX + extW/2, extY + 35);
+          ctx.font = 'bold 10px Inter';
+          ctx.fillText('E-Commerce', extX + extW/2, extY + 55);
+
+          // Draw connection line/bridge between them
+          ctx.beginPath();
+          ctx.moveTo(intX + intW, intY + intH/2);
+          ctx.lineTo(extX, extY + extH/2);
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 6;
+          ctx.stroke();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = '#d97706';
+          ctx.lineWidth = 1;
+          drawRoundedRect(orgX + orgW/2 - 35, intY + intH/2 - 10, 70, 20, 4, '#f59e0b', '#d97706', 1);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 8px Inter';
+          ctx.fillText('INTEGRATED', orgX + orgW/2, intY + intH/2 + 3);
+        }
+
+        // Draw external connection arrows
+        const arrowY = cHeight / 2 - 45;
+        if (stage <= 3) {
+          // Traditional / Manual external paths
+          const supArrowLabel = stage === 1 ? 'Paper Mail' : (stage === 2 ? 'Fax Orders' : 'Fax / Phone');
+          const custArrowLabel = stage === 1 ? 'In-Person Store' : 'Mail Orders';
+          drawArrow(supX + boxW, arrowY, orgX, arrowY, '#9ca3af', supArrowLabel, false, false);
+          drawArrow(orgX + orgW, arrowY, custX, arrowY, '#9ca3af', custArrowLabel, false, false);
+        } else if (stage === 4) {
+          // E-Commerce external paths (Active - Blue)
+          drawArrow(supX + boxW, arrowY, orgX, arrowY, '#3b82f6', 'E-procurement', true, false);
+          drawArrow(orgX + orgW, arrowY, custX, arrowY, '#3b82f6', 'Online Sales', true, false);
+        } else if (stage === 5) {
+          // Integrated E-Business (Active - Green / Glowing)
+          drawArrow(supX + boxW, arrowY, orgX, arrowY, '#10b981', 'Automated EDI', true, true);
+          drawArrow(orgX + orgW, arrowY, custX, arrowY, '#10b981', 'Integrated Sales', true, true);
+        }
+
+        // Draw Stage Description
+        ctx.fillStyle = 'var(--text-muted)';
+        ctx.font = 'italic 11px Inter';
+        ctx.textAlign = 'center';
+        
+        let stageDesc = "";
+        if (stage === 1) {
+          stageDesc = "Traditional Business: Heavy reliance on physical presence and manual processes.";
+        } else if (stage === 2) {
+          stageDesc = "Manual Processes: Slow communication, high latency, and paper-based workflows.";
+        } else if (stage === 3) {
+          stageDesc = "Internal Digital Integration: Staff use intranet and ERP systems to share internal data.";
+        } else if (stage === 4) {
+          stageDesc = "External Transactions: Customers and suppliers interact online via e-commerce.";
+        } else if (stage === 5) {
+          stageDesc = "Complete E-Business: Seamless integration of internal processes and external transactions.";
+        }
+        ctx.fillText(stageDesc, cWidth / 2, cHeight - 95);
+
+        // Draw Realized Benefits box
+        const benX = 40, benY = cHeight - 80, benW = cWidth - 80, benH = 70;
+        drawRoundedRect(benX, benY, benW, benH, 8, '#f9fafb', '#fca5a5', 1.5);
+        
+        ctx.fillStyle = 'var(--text-main)';
+        ctx.font = 'bold 11px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('REALIZED BENEFITS (CHAPTER 1):', benX + 15, benY + 20);
+
+        ctx.font = '10px Inter';
+        
+        let benefits = [];
+        if (stage === 1 || stage === 2) {
+          benefits = ["Traditional Business: No electronic integration benefits realized."];
+        } else if (stage === 3) {
+          benefits = [
+            "✓ Better Information Sharing (Internal)",
+            "✓ Faster Communication (Internal)"
+          ];
+        } else if (stage === 4) {
+          benefits = [
+            "✓ Improved Customer Service (External)",
+            "✓ Better Supplier Collaboration (External)"
+          ];
+        } else if (stage === 5) {
+          benefits = [
+            "✓ Better Information Sharing",
+            "✓ Faster Communication",
+            "✓ Improved Customer Service",
+            "✓ Better Supplier Collaboration",
+            "✓ Increased Operational Efficiency"
+          ];
+        }
+
+        if (stage === 1 || stage === 2) {
+          ctx.fillStyle = 'var(--text-muted)';
+          ctx.fillText(benefits[0], benX + 15, benY + 45);
+        } else {
+          let drawX = benX + 15;
+          let drawY = benY + 42;
+          benefits.forEach((ben, i) => {
+            if (stage === 5 && i >= 3) {
+              if (i === 3) {
+                drawX = benX + 15;
+                drawY = benY + 58;
+              }
+            }
+            ctx.fillStyle = stage === 5 ? '#047857' : (stage === 3 ? '#047857' : '#1d4ed8');
+            ctx.fillText(ben, drawX, drawY);
+            drawX += ctx.measureText(ben).width + 20;
+          });
+        }
+      }
+
+    // Window resize handling for canvas
+    window.addEventListener('resize', () => {
+      if(currentLevel === 3) initSim3();
+    });
+
+    window.onload = () => loadLevel(1);
+  </script>
+</body>
+</html>

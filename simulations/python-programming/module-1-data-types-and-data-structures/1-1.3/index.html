@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Module 1.3 — Interactive String Architect</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-main: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(225, 6, 0, 0.12);
+            --red: #e10600;
+            --red-dark: #b30500;
+            --red-deep: #7a0000;
+            --white: #ffffff;
+            --ink: #1e1212;
+            --mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --display: 'Archivo Black', sans-serif;
+            --body: 'Inter', sans-serif;
+
+            --correct: #2e7d32;
+            --correct-bg: rgba(46, 125, 50, 0.05);
+            --wrong: #c62828;
+            --wrong-bg: rgba(198, 40, 40, 0.05);
+            --warning: #ef6c00;
+            --terminal-bg: #110b0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--body);
+            background-color: var(--bg-main);
+            color: var(--ink);
+            scroll-behavior: smooth;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(225, 6, 0, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.03) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header Style */
+        header.dashboard-header {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            padding: 28px 40px;
+            box-shadow: 0 4px 30px rgba(225, 6, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid var(--red-deep);
+            z-index: 50;
+        }
+
+        header.dashboard-header h1 {
+            font-family: var(--display);
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(to right, #ffffff, #ffe3e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header.dashboard-header p {
+            font-size: 0.95rem;
+            color: #ffeaea;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* Top level navigator cards */
+        .level-navigator {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 32px auto 0;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .level-navigator {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .level-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 8px 32px rgba(225, 6, 0, 0.02);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .level-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--red);
+            box-shadow: 0 12px 30px rgba(225, 6, 0, 0.08);
+        }
+
+        .level-card.active {
+            background: var(--white);
+            border-color: var(--red);
+            box-shadow: 0 16px 40px rgba(225, 6, 0, 0.12);
+        }
+
+        .level-card.active::after {
+            background: var(--red);
+        }
+
+        .level-card .lvl-num {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .level-card .lvl-title {
+            font-family: var(--display);
+            font-size: 1.15rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .level-card .lvl-desc {
+            font-size: 0.85rem;
+            color: #5a4b4b;
+            line-height: 1.5;
+        }
+
+        /* Top Controls Bar Styles */
+        .top-controls-bar {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .top-hint-box {
+            max-width: 1200px;
+            margin: 14px auto 0;
+            padding: 18px 24px;
+            background: #fffde7;
+            border-left: 5px solid #fbc02d;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #5a4f4f;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            animation: fadeIn 0.3s;
+        }
+
+        /* Secondary Activity Navigator */
+        .activity-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 28px auto;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .activity-tab {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: #5a4b4b;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-tab:hover {
+            background: rgba(225, 6, 0, 0.05);
+            border-color: rgba(225, 6, 0, 0.2);
+            color: var(--red);
+            transform: translateY(-1px);
+        }
+
+        .activity-tab.active {
+            background: var(--red);
+            color: var(--white);
+            border-color: var(--red);
+            box-shadow: 0 8px 20px rgba(225, 6, 0, 0.25);
+        }
+
+        /* Workspace Grid */
+        .workspace {
+            max-width: 1250px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 20px 60px;
+            display: grid;
+            grid-template-columns: 1.85fr 1.15fr;
+            gap: 32px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 992px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Active Canvas Panels */
+        .activity-canvas {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 12px 40px rgba(225, 6, 0, 0.03);
+            display: none;
+            flex-direction: column;
+            position: relative;
+            min-height: 580px;
+        }
+
+        .activity-canvas.active {
+            display: flex;
+            animation: slideIn .4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .canvas-header {
+            margin-bottom: 24px;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+            padding-bottom: 16px;
+        }
+
+        .canvas-header h2 {
+            font-family: var(--display);
+            font-size: 1.4rem;
+            color: var(--red-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .canvas-header p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        /* Sidebar Panels */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .sidebar-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.01);
+            backdrop-filter: blur(8px);
+        }
+
+        .sidebar-card h3 {
+            font-family: var(--display);
+            font-size: 0.85rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 6px;
+        }
+
+        /* Live Python Code visualizer */
+        .code-visualizer {
+            background: #faf8f8;
+            border: 1px solid #ffd5d8;
+            border-radius: 12px;
+            padding: 18px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--ink);
+            line-height: 1.7;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+            min-height: 120px;
+        }
+
+        .code-visualizer .line {
+            display: block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            transition: all 0.25s;
+        }
+
+        .code-visualizer .line.executing {
+            background-color: rgba(225, 6, 0, 0.08);
+            border-left: 4px solid var(--red);
+            font-weight: bold;
+        }
+
+        .code-visualizer .comment { color: #6a8759; font-style: italic; }
+        .code-visualizer .keyword { color: #cc7832; font-weight: 700; }
+        .code-visualizer .string { color: #5c7ee6; }
+        .code-visualizer .number { color: #6897bb; }
+        .code-visualizer .builtin { color: #9c27b0; }
+
+        /* Terminal styling */
+        .terminal {
+            background-color: var(--terminal-bg);
+            color: #ececec;
+            border-radius: 12px;
+            padding: 18px;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            line-height: 1.6;
+            min-height: 160px;
+            max-height: 240px;
+            overflow-y: auto;
+            box-shadow: inset 0 3px 15px rgba(0, 0, 0, 0.7);
+            border: 1px solid #2a1f1f;
+        }
+
+        .terminal .line-out { display: block; margin-bottom: 6px; }
+        .terminal .line-out.in { color: #ffeb3b; }
+        .terminal .line-out.err { color: #ff5252; font-weight: 700; }
+        .terminal .line-out.ok { color: #00e676; font-weight: bold; }
+        .terminal .line-out.info { color: #00b0ff; }
+
+        /* Support actions button styles */
+        .support-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            font-family: var(--display);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 14px 22px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--red);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(225, 6, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225, 6, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0eae9;
+            color: #5c4746;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .btn-secondary:hover {
+            background: #e2d9d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-hint {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+            flex-grow: 1;
+        }
+
+        .btn-hint:hover {
+            background: #ffe0b2;
+            transform: translateY(-2px);
+        }
+
+        /* Draggable Badges Pool styling */
+        .interactive-pool-header {
+            font-family: var(--display);
+            font-size: 0.72rem;
+            color: #8c7676;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badges-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 12px;
+            background: #fdfdfd;
+            border: 2px dashed rgba(225, 6, 0, 0.15);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            min-height: 64px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .draggable-badge {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--ink);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .draggable-badge:hover {
+            border-color: var(--red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225, 6, 0, 0.08);
+        }
+
+        .draggable-badge.selected-pulse {
+            box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.35);
+            border-color: var(--red);
+            transform: scale(1.05);
+        }
+
+        .drop-slot {
+            min-width: 72px;
+            height: 38px;
+            border: 2px dashed rgba(225, 6, 0, 0.25);
+            border-radius: 8px;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: #999;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            vertical-align: middle;
+        }
+
+        .drop-slot.active-occupied {
+            border-style: solid;
+            border-color: var(--red);
+            color: var(--red-dark);
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(225, 6, 0, 0.05);
+        }
+
+        .drop-slot.drag-over {
+            background: rgba(225, 6, 0, 0.05);
+            border-color: var(--red);
+        }
+
+        /* ==========================================
+           STRING TIMELINE STYLING
+           ========================================== */
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+            background: #faf8f8;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 10px;
+            padding: 10px 16px;
+        }
+
+        .timeline-step .step-method {
+            font-family: var(--mono);
+            font-weight: bold;
+            color: var(--red);
+            font-size: 0.85rem;
+        }
+
+        .timeline-step .step-val {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--ink);
+        }
+
+        /* ==========================================
+           CHARACTER CELL SCANNERS (LEVEL 2 ACTIVITY 2)
+           ========================================== */
+        .char-scanner-container {
+            display: flex;
+            gap: 4px;
+            margin: 20px 0;
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding: 10px;
+            background: #faf8f8;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 10px;
+        }
+
+        .char-cell {
+            width: 32px;
+            height: 38px;
+            flex-shrink: 0;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-weight: bold;
+            font-size: 0.85rem;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .char-cell .char-index {
+            font-size: 0.55rem;
+            color: #887a7a;
+            position: absolute;
+            bottom: 1px;
+        }
+
+        .char-cell.scanning {
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.05);
+            transform: scale(1.1);
+        }
+
+        .char-cell.matched {
+            border-color: var(--correct);
+            background: var(--correct-bg);
+            color: var(--correct);
+        }
+
+        /* ==========================================
+           STRING SURGERY SLIDERS (LEVEL 3 ACTIVITY 1)
+           ========================================== */
+        .slider-control-panel {
+            background: #faf8f8;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .slider-row label {
+            width: 160px;
+            margin-bottom: 0;
+        }
+
+        .slider-row input[type=range] {
+            flex-grow: 1;
+            accent-color: var(--red);
+        }
+
+        .slider-row .slider-val-badge {
+            min-width: 40px;
+            text-align: center;
+            font-family: var(--mono);
+            font-weight: bold;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+        }
+
+        /* ==========================================
+           COMPLETION SUCCESS MODAL OVERLAYS
+           ========================================== */
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 11, 11, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .completion-card {
+            background: var(--white);
+            border: 2px solid var(--correct);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(46, 125, 50, 0.15);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .completion-card.show {
+            transform: translateY(0);
+        }
+
+        .completion-card h3 {
+            font-family: var(--display);
+            font-size: 1.6rem;
+            color: var(--correct);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .completion-card p {
+            font-size: 0.95rem;
+            color: #5a4b4b;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .completion-card .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: scalePulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes scalePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Footer styling */
+        footer.app-footer {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: #8c7676;
+            margin-top: auto;
+            padding: 24px;
+            border-top: 1px dashed #ffd1d5;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Block -->
+    <header class="dashboard-header">
+        <div>
+            <h1>Python String Architect</h1>
+            <p>Master Python strings, slicing indices, formatting, and casting modules visually</p>
+        </div>
+        <div>
+            <span style="font-family: var(--mono); font-size: 0.8rem; background: var(--white); color: var(--red); padding: 8px 16px; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                MODULE 1.3 REDESIGN
+            </span>
+        </div>
+    </header>
+
+    <!-- Top Level Cards -->
+    <div class="level-navigator">
+        <div class="level-card active" id="btn-lvl-1" onclick="switchLevel(1)">
+            <span class="lvl-num">Level 1</span>
+            <span class="lvl-title">Text Builder Studio</span>
+            <span class="lvl-desc">Assemble standard print parameters, join variables, and configure templates.</span>
+        </div>
+        <div class="level-card" id="btn-lvl-2" onclick="switchLevel(2)">
+            <span class="lvl-num">Level 2</span>
+            <span class="lvl-title">String Detective Lab</span>
+            <span class="lvl-desc">Trace sequential string methods and evaluate character scanners indexes.</span>
+        </div>
+        <div class="level-card" id="btn-lvl-3" onclick="switchLevel(3)">
+            <span class="lvl-num">Level 3</span>
+            <span class="lvl-title">String Engineering Challenge</span>
+            <span class="lvl-desc">Slice boundary indices using sliders and cast clean database variable values.</span>
+        </div>
+    </div>
+
+    <!-- Top Controls Bar -->
+    <div class="top-controls-bar">
+        <div class="nav-buttons" style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="prevLevel()">◀ Prev Level</button>
+            <button class="btn btn-secondary" onclick="nextLevel()">Next Level ▶</button>
+        </div>
+        <div class="clue-control" style="display: flex; gap: 10px;">
+            <button class="btn btn-hint" onclick="getHint()">💡 Request Clue</button>
+            <button class="btn btn-secondary" onclick="resetActiveActivity()">🔄 Reset</button>
+        </div>
+    </div>
+    <div class="top-hint-box" id="hint-panel">
+        No clues active. Click "Request Clue" for progressive hints.
+    </div>
+
+    <!-- Secondary Tab Navigator -->
+    <div class="activity-bar" id="activity-selector-bar">
+        <!-- Generated dynamically -->
+    </div>
+
+    <!-- Main Workspace Container -->
+    <main class="workspace">
+
+        <!-- Column 1: Puzzles and Workbenches -->
+        <div class="canvas-container">
+
+            <!-- LEVEL 1 ACTIVITY 1: SMART MESSAGE COMPOSER -->
+            <div class="activity-canvas" id="canvas-1-1">
+                <div class="canvas-header">
+                    <h2>Activity 1 — Smart Message Composer</h2>
+                    <p>Construct message outputs using standard print calls, sep arguments, and end parameters.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Target Goal: <strong id="l1a1-target-formula">Student ID Card</strong><br>
+                    <div id="l1a1-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Print "Aisha - ID: 102" using dynamic variables.</div>
+                </div>
+
+                <div class="interactive-pool-header">Draggable Tokens</div>
+                <div class="badges-pool" id="l1a1-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1.1rem; display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:16px;" id="l1a1-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="evaluateL1A1Message()">⚡ Run Print Script</button>
+                    <button class="btn btn-secondary" onclick="l1a1NextComposer()">Next Template</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 1 ACTIVITY 2: DYNAMIC TEMPLATE DESIGNER -->
+            <div class="activity-canvas" id="canvas-1-2">
+                <div class="canvas-header">
+                    <h2>Activity 2 — Dynamic Template Designer</h2>
+                    <p>Design formatting templates comparing f-string placeholders vs .format() side-by-side.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Formatting Goal: <strong id="l1a2-target-title">User Greeting Card</strong><br>
+                    <div id="l1a2-instruction-text" style="margin-top: 6px; font-weight: 500;">Variables: name="Aisha", city="Pune". Result expected: "Hello Aisha from Pune".</div>
+                </div>
+
+                <div class="interactive-pool-header">Draggable Placeholders</div>
+                <div class="badges-pool" id="l1a2-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:16px;">
+                        <span style="font-family:var(--mono); font-size:0.75rem; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:8px;">f-string Template</span>
+                        <div style="font-family:var(--mono); display:flex; align-items:center; flex-wrap:wrap; gap:4px;" id="l1a2-fstring-slots">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                    <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:16px;">
+                        <span style="font-family:var(--mono); font-size:0.75rem; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:8px;">.format() Template</span>
+                        <div style="font-family:var(--mono); display:flex; align-items:center; flex-wrap:wrap; gap:4px;" id="l1a2-format-slots">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="verifyL1A2Templates()">⚡ Verify Templates</button>
+                    <button class="btn btn-secondary" onclick="l1a2NextTemplate()">Next Formatting Scenario</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 2 ACTIVITY 1: TEXT REPAIR MACHINE -->
+            <div class="activity-canvas" id="canvas-2-1">
+                <div class="canvas-header">
+                    <h2>Activity 1 — Text Repair Machine</h2>
+                    <p>Clean corrupted or inconsistent string inputs by building a timeline method chain.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Original Messy Input: <code id="l2a1-input-text">"   PYTHON  is  AWESOME   "</code><br>
+                    <div id="l2a1-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Convert to clean string: "python is awesome".</div>
+                </div>
+
+                <div class="interactive-pool-header">Methods Chain Pool</div>
+                <div class="badges-pool" id="l2a1-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1.1rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;" id="l2a1-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div class="timeline-container" id="l2a1-timeline">
+                    <!-- String transformation timeline display -->
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="runL2A1RepairPipeline()">⚡ Run Repair Timeline</button>
+                    <button class="btn btn-secondary" onclick="l2a1NextRepair()">Next Repair Challenge</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 2 ACTIVITY 2: SEARCH ENGINE CHALLENGE -->
+            <div class="activity-canvas" id="canvas-2-2">
+                <div class="canvas-header">
+                    <h2>Activity 2 — Search Engine Challenge</h2>
+                    <p>Build string scanners to locate keywords, index tags, and evaluate search conditions.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Scan Request: <strong id="l2a2-target-title">Locate Hashtag Symbol</strong><br>
+                    <div id="l2a2-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Search string "Check #python tutorials" to scan index of hashtag character.</div>
+                </div>
+
+                <div class="interactive-pool-header">Search Operators</div>
+                <div class="badges-pool" id="l2a2-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;" id="l2a2-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div class="char-scanner-container" id="l2a2-scanner-track">
+                    <!-- Scanning cells loaded dynamically -->
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="runL2A2SearchScanner()">⚡ Launch Search Engine</button>
+                    <button class="btn btn-secondary" onclick="l2a2NextSearch()">Next Search Challenge</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 3 ACTIVITY 1: STRING SURGERY LABORATORY -->
+            <div class="activity-canvas" id="canvas-3-1">
+                <div class="canvas-header">
+                    <h2>Activity 1 — String Surgery Laboratory</h2>
+                    <p>Surgical slice extraction. Adjust start, stop, and step sliders to crop out the exact target substring.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Target Slice Output: <code id="l3a1-target-slice">"yth"</code><br>
+                    <div id="l3a1-instruction-text" style="margin-top: 6px; font-weight: 500;">Base String: <code>s = "Python"</code>. Extract using [start:stop:step].</div>
+                </div>
+
+                <div class="char-scanner-container" id="l3a1-char-track">
+                    <!-- Character cell indicators loaded dynamically -->
+                </div>
+
+                <div class="slider-control-panel">
+                    <div class="slider-row">
+                        <label>Start Index (start)</label>
+                        <input type="range" id="l3a1-slider-start" min="-6" max="6" value="0" oninput="updateL3A1Surgery()">
+                        <span class="slider-val-badge" id="l3a1-val-start">0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Stop Index (stop)</label>
+                        <input type="range" id="l3a1-slider-stop" min="-6" max="6" value="6" oninput="updateL3A1Surgery()">
+                        <span class="slider-val-badge" id="l3a1-val-stop">6</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Iteration Step (step)</label>
+                        <input type="range" id="l3a1-slider-step" min="-3" max="3" value="1" oninput="updateL3A1Surgery()">
+                        <span class="slider-val-badge" id="l3a1-val-step">1</span>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="verifyL3A1Surgery()">⚡ Lock Slice Extraction</button>
+                    <button class="btn btn-secondary" onclick="l3a1NextSurgery()">Next Slicing Challenge</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 3 ACTIVITY 2: AI DATA CLEANER -->
+            <div class="activity-canvas" id="canvas-3-2">
+                <div class="canvas-header">
+                    <h2>Activity 2 — AI Data Cleaner</h2>
+                    <p>Clean messy database records combining splitting, title format conversions, and type casting functions.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Corrupted CSV Row: <code id="l3a2-input-csv">"102,  t-shirt , 25.50"</code><br>
+                    <div id="l3a2-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Parse into clean variables: ID=102 (int), Item="T-shirt" (str), Price=25.5 (float).</div>
+                </div>
+
+                <div class="interactive-pool-header">Cleaning Modules</div>
+                <div class="badges-pool" id="l3a2-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:0.92rem; display:flex; flex-direction:column; gap:12px;" id="l3a2-slots-container">
+                    <!-- Dynamic slots structures generated here -->
+                </div>
+
+                <div class="memory-grid-panel" id="l3a2-memory-inspect" style="display:none;">
+                    <!-- Variable conversions displayed here -->
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="runL3A2DataCleaner()">⚡ Execute Clean Run</button>
+                    <button class="btn btn-secondary" onclick="l3a2NextCleaner()">Next Database Row</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Column 2: Educational Control Panels -->
+        <div class="sidebar">
+
+            <!-- Live Python Code View -->
+            <div class="sidebar-card">
+                <h3>Live Python Code</h3>
+                <div class="code-visualizer" id="live-code-view">
+                    <span class="line executing"><span class="comment"># Code will generate here</span></span>
+                </div>
+            </div>
+
+            <!-- Simulated compiler output -->
+            <div class="sidebar-card">
+                <h3>Terminal Output</h3>
+                <div class="terminal" id="terminal-view">
+                    <span class="line-out info">*** Python Sandbox Initialized ***</span>
+                    <span class="line-out">>>> </span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Completion Success Modal -->
+    <div class="completion-modal" id="completion-modal-view">
+        <div class="completion-card" id="completion-card-view">
+            <span class="badge-icon">🏆</span>
+            <h3 id="completion-title">Activity Cleared!</h3>
+            <p id="completion-desc">You've successfully solved all scenarios for this challenge and verified the Python statements output.</p>
+            <button class="btn btn-primary" id="btn-completion-proceed">Proceed to Next Activity ▶</button>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        PYTHON FOUNDATIONS LEARNING SUITE · REDESIGNED CLASSROOM APP
+    </footer>
+
+    <!-- Interactive script code -->
+    <script>
+        // Core game navigation states
+        let currentLevel = 1;
+        let currentActivity = 1;
+        let hintIndex = 0;
+        let selectedDragEl = null;
+
+        // Shuffle utility to jumble all dynamic pool variables
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Completion Modal display trigger
+        function showCompletionModal(title, desc, buttonText, onProceed) {
+            const modal = document.getElementById('completion-modal-view');
+            const card = document.getElementById('completion-card-view');
+            document.getElementById('completion-title').textContent = title;
+            document.getElementById('completion-desc').innerHTML = desc;
+            
+            const proceedBtn = document.getElementById('btn-completion-proceed');
+            proceedBtn.textContent = buttonText;
+            proceedBtn.onclick = () => {
+                card.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    if (onProceed) onProceed();
+                }, 200);
+            };
+
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 50);
+        }
+
+        // Progressive Hints Database
+        const hintsDB = {
+            "1-1": [
+                "Clue 1: Check variables matches. For Student ID, print name, separator and id.",
+                "Clue 2: To separate parameters using a dash, place sep=' - ' as the print argument.",
+                "Clue 3: The receipt needs sep='' to display item text and money values directly side-by-side.",
+                "Full Explanation: Override default print sep=' ' with custom strings to control stdout streaming output formats."
+            ],
+            "1-2": [
+                "Clue 1: f-strings use curly brackets containing expressions directly: {name}.",
+                "Clue 2: .format() maps parameters sequentially to empty curly brackets: {}.",
+                "Clue 3: Exam rating formatting needs decimals precision formats: {score:.1f} or {:.1f}.",
+                "Full Explanation: Both f-strings and format() compile placeholders. f-strings are direct, while format() binds parameters sequentially."
+            ],
+            "2-1": [
+                "Clue 1: Timeline repair methods run left-to-right. Strip spaces first: .strip().",
+                "Clue 2: Convert to lowercase or format: .lower() or .title().",
+                "Clue 3: Replace double spaces: .replace('  ', ' ').",
+                "Full Explanation: Strings are immutable. Timeline method chains return copies representing cleaned outputs."
+            ],
+            "2-2": [
+                "Clue 1: Check username membership using logical operator 'in'.",
+                "Clue 2: To locate index positions, find() is safer as it returns -1 if absent, avoiding ValueError crashes.",
+                "Clue 3: Drag find() and target string to parse index ranges.",
+                "Full Explanation: find() returns character offsets, index() triggers ValueErrors, and 'in' returns boolean."
+            ],
+            "3-1": [
+                "Clue 1: index values: [start:stop:step]. 'yth' is from index 1 to index 4 (exclusive stop).",
+                "Clue 2: To jump indices, use step. 'Pt' needs start 0, stop 4, and step 2.",
+                "Clue 3: Reversing strings requires a negative step value: [::-1].",
+                "Full Explanation: Slicing extracts sub-arrays using starts, stops, and steps. Negative steps traverse backwards."
+            ],
+            "3-2": [
+                "Clue 1: CSV cleaner needs type casts. Split records by comma first: split(',').",
+                "Clue 2: Strip fields, format, and apply int() or float() to numeric fields.",
+                "Clue 3: Drag appropriate converters into slots corresponding to destination variables.",
+                "Full Explanation: Type casting turns string data blocks into numbers or boolean flags for databases."
+            ]
+        };
+
+        // Navigation state setup
+        const levelActivities = {
+            1: [
+                { id: "1-1", title: "Smart Message Composer" },
+                { id: "1-2", title: "Dynamic Template Designer" }
+            ],
+            2: [
+                { id: "2-1", title: "Text Repair Machine" },
+                { id: "2-2", title: "Search Engine Challenge" }
+            ],
+            3: [
+                { id: "3-1", title: "String Surgery Lab" },
+                { id: "3-2", title: "AI Data Cleaner" }
+            ]
+        };
+
+        function switchLevel(lvlNum) {
+            currentLevel = lvlNum;
+            currentActivity = 1;
+
+            // Highlight Level Card
+            document.querySelectorAll('.level-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`btn-lvl-${lvlNum}`).classList.add('active');
+
+            // Draw Activity Tabs
+            const actContainer = document.getElementById('activity-selector-bar');
+            actContainer.innerHTML = '';
+
+            const acts = levelActivities[lvlNum];
+            acts.forEach((act, index) => {
+                const btn = document.createElement('button');
+                btn.className = `activity-tab ${index === 0 ? 'active' : ''}`;
+                btn.textContent = act.title;
+                btn.onclick = () => switchActivity(index + 1);
+                actContainer.appendChild(btn);
+            });
+
+            switchActivity(1);
+        }
+
+        function switchActivity(actNum) {
+            currentActivity = actNum;
+            hintIndex = 0;
+            document.getElementById('hint-panel').style.display = 'none';
+
+            // Highlight tabs
+            const tabs = document.querySelectorAll('.activity-tab');
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active', index === actNum - 1);
+            });
+
+            // Display active canvas
+            document.querySelectorAll('.activity-canvas').forEach(c => c.classList.remove('active'));
+            const targetCanvas = document.getElementById(`canvas-${currentLevel}-${actNum}`);
+            if (targetCanvas) {
+                targetCanvas.classList.add('active');
+            }
+
+            // Launch activity specific states
+            initActivityState(currentLevel, actNum);
+        }
+
+        function prevLevel() {
+            let nextLvl = currentLevel - 1;
+            if (nextLvl < 1) nextLvl = 3;
+            switchLevel(nextLvl);
+        }
+
+        function nextLevel() {
+            let nextLvl = currentLevel + 1;
+            if (nextLvl > 3) nextLvl = 1;
+            switchLevel(nextLvl);
+        }
+
+        function resetActiveActivity() {
+            initActivityState(currentLevel, currentActivity);
+            printTerminal(">>> Activity Reset Successfully.", "info");
+        }
+
+        function getHint() {
+            const key = `${currentLevel}-${currentActivity}`;
+            const hints = hintsDB[key];
+            if (!hints) return;
+
+            const box = document.getElementById('hint-panel');
+            box.style.display = 'block';
+
+            if (hintIndex < hints.length) {
+                box.innerHTML = `<strong>Clue Level ${hintIndex + 1}:</strong><br>${hints[hintIndex]}`;
+                hintIndex++;
+            } else {
+                box.innerHTML = `<strong>Full Guide:</strong><br>${hints[hints.length - 1]}`;
+            }
+        }
+
+        // Terminal Log helpers
+        function clearTerminal() {
+            const view = document.getElementById('terminal-view');
+            if (view) {
+                view.innerHTML = '<span class="line-out info">*** Python Sandbox Initialized ***</span><span class="line-out">>>> </span>';
+            }
+        }
+
+        function printTerminal(text, type = "") {
+            const view = document.getElementById('terminal-view');
+            if (!view) return;
+            const l = document.createElement('span');
+            l.className = `line-out ${type}`;
+            l.textContent = text;
+            view.appendChild(l);
+            view.scrollTop = view.scrollHeight;
+        }
+
+        function updateLiveCodeView(linesHtml) {
+            const view = document.getElementById('live-code-view');
+            if (view) view.innerHTML = linesHtml;
+        }
+
+        // Drag and Drop core helpers
+        function setupDragEvents(elements, dropzones, onDropCallback) {
+            elements.forEach(el => {
+                el.setAttribute('draggable', 'true');
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', el.id);
+                    el.classList.add('selected-pulse');
+                    selectedDragEl = el;
+                });
+                el.addEventListener('dragend', () => {
+                    el.classList.remove('selected-pulse');
+                });
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.selected-pulse').forEach(item => item.classList.remove('selected-pulse'));
+                    el.classList.add('selected-pulse');
+                    selectedDragEl = el;
+                });
+            });
+
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => e.preventDefault());
+                zone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const id = e.dataTransfer.getData('text/plain');
+                    const dragged = document.getElementById(id) || selectedDragEl;
+                    if (dragged) {
+                        onDropCallback(dragged, zone);
+                    }
+                    selectedDragEl = null;
+                });
+                zone.addEventListener('click', () => {
+                    if (selectedDragEl) {
+                        onDropCallback(selectedDragEl, zone);
+                        selectedDragEl.classList.remove('selected-pulse');
+                        selectedDragEl = null;
+                    }
+                });
+            });
+        }
+
+        function createCodeLabel(text) {
+            const span = document.createElement('span');
+            span.style.fontFamily = 'var(--mono)';
+            span.style.fontSize = '1.1rem';
+            span.style.fontWeight = 'bold';
+            span.style.color = 'var(--ink)';
+            span.style.display = 'inline-flex';
+            span.style.alignItems = 'center';
+            span.style.height = '38px';
+            span.textContent = text;
+            return span;
+        }
+
+        function createSlot(prefix, idx) {
+            const slot = document.createElement('div');
+            slot.className = "drop-slot";
+            slot.id = `${prefix}-slot-${idx}`;
+            slot.textContent = `Slot ${idx+1}`;
+            return slot;
+        }
+
+        // ==========================================
+        // LEVEL 1 ACTIVITY 1: SMART MESSAGE COMPOSER
+        // ==========================================
+        const l1a1Composers = [
+            {
+                title: "Student ID Card",
+                targetText: "Aisha - ID: 102",
+                vars: { name: "Aisha", id: 102 },
+                slotsCount: 5,
+                pool: ["print", "name", '" - ID: "', "id", "sep=''", "sep=' - '", "end='\\n'"],
+                desc: "Goal: Print student ID layout: Aisha - ID: 102. Drag parameters."
+            },
+            {
+                title: "Grocery Receipt",
+                targetText: "Total:$45.0",
+                vars: { label: "Total:", price: "$45.0" },
+                slotsCount: 4,
+                pool: ["print", "label", "price", "sep=''", "sep=' '", "end='!'"],
+                desc: "Goal: Print label and price without a separating space: Total:$45.0."
+            }
+        ];
+
+        let l1a1Idx = 0;
+        let l1a1SlotsState = [];
+
+        function initLevel1Act1() {
+            clearTerminal();
+            l1a1SlotsState = [];
+            loadL1A1Composer();
+        }
+
+        function loadL1A1Composer() {
+            const comp = l1a1Composers[l1a1Idx];
+            document.getElementById('l1a1-target-formula').textContent = comp.title;
+            document.getElementById('l1a1-instruction-text').innerHTML = comp.desc;
+
+            // Render slots dynamically based on slotsCount
+            const slotsContainer = document.getElementById('l1a1-slots-container');
+            slotsContainer.innerHTML = '';
+            l1a1SlotsState = [];
+            
+            if (comp.slotsCount === 5) {
+                l1a1SlotsState = ["", "", "", "", ""];
+                const s1 = createSlot('l1a1', 0);
+                const s2 = createSlot('l1a1', 1);
+                const s3 = createSlot('l1a1', 2);
+                const s4 = createSlot('l1a1', 3);
+                const s5 = createSlot('l1a1', 4);
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(createCodeLabel(" ( "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(createCodeLabel(" , "));
+                slotsContainer.appendChild(s3);
+                slotsContainer.appendChild(createCodeLabel(" , "));
+                slotsContainer.appendChild(s4);
+                slotsContainer.appendChild(createCodeLabel(" , "));
+                slotsContainer.appendChild(s5);
+                slotsContainer.appendChild(createCodeLabel(" )"));
+            } else {
+                l1a1SlotsState = ["", "", "", ""];
+                const s1 = createSlot('l1a1', 0);
+                const s2 = createSlot('l1a1', 1);
+                const s3 = createSlot('l1a1', 2);
+                const s4 = createSlot('l1a1', 3);
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(createCodeLabel(" ( "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(createCodeLabel(" , "));
+                slotsContainer.appendChild(s3);
+                slotsContainer.appendChild(createCodeLabel(" , "));
+                slotsContainer.appendChild(s4);
+                slotsContainer.appendChild(createCodeLabel(" )"));
+            }
+
+            // Jumble pool
+            const poolContainer = document.getElementById('l1a1-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(comp.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l1a1-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            l1a1UpdateLiveCode();
+            setupL1A1DragAndDrop();
+        }
+
+        function setupL1A1DragAndDrop() {
+            const badges = document.querySelectorAll('#l1a1-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l1a1-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l1a1SlotsState[idx] = dragged.dataset.val;
+
+                l1a1UpdateLiveCode();
+            });
+        }
+
+        function l1a1UpdateLiveCode() {
+            const tokens = [...l1a1SlotsState];
+            let expr = "";
+            if (tokens.length === 5) {
+                const s0 = tokens[0] || "[func]";
+                const s1 = tokens[1] || "[val]";
+                const s2 = tokens[2] || "[val]";
+                const s3 = tokens[3] || "[val]";
+                const s4 = tokens[4] || "[param]";
+                expr = `${s0}(${s1}, ${s2}, ${s3}, ${s4})`;
+            } else {
+                const s0 = tokens[0] || "[func]";
+                const s1 = tokens[1] || "[val]";
+                const s2 = tokens[2] || "[val]";
+                const s3 = tokens[3] || "[param]";
+                expr = `${s0}(${s1}, ${s2}, ${s3})`;
+            }
+
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Output streaming logic</span></span>
+<span class="line">${expr}</span>
+            `);
+        }
+
+        function evaluateL1A1Message() {
+            const tokens = [...l1a1SlotsState];
+            if (tokens.some(t => !t)) {
+                printTerminal("SyntaxError: incomplete print call arguments.", "err");
+                return;
+            }
+
+            const comp = l1a1Composers[l1a1Idx];
+            printTerminal(">>> Compiling stream output...", "info");
+
+            setTimeout(() => {
+                // Mock stream print evaluation
+                let finalOut = "";
+                let paramToken = tokens[tokens.length - 1];
+                let hasSep = paramToken.includes("sep=");
+                let sepVal = " ";
+                if (hasSep) {
+                    sepVal = paramToken.replace("sep=", "").replace(/'/g, "");
+                }
+
+                // Map values
+                if (tokens.length === 5) {
+                    let v1 = comp.vars[tokens[1]] !== undefined ? comp.vars[tokens[1]] : tokens[1].replace(/"/g, "");
+                    let v2 = comp.vars[tokens[2]] !== undefined ? comp.vars[tokens[2]] : tokens[2].replace(/"/g, "");
+                    let v3 = comp.vars[tokens[3]] !== undefined ? comp.vars[tokens[3]] : tokens[3].replace(/"/g, "");
+                    finalOut = `${v1}${sepVal}${v2}${sepVal}${v3}`;
+                } else {
+                    let v1 = comp.vars[tokens[1]] !== undefined ? comp.vars[tokens[1]] : tokens[1].replace(/"/g, "");
+                    let v2 = comp.vars[tokens[2]] !== undefined ? comp.vars[tokens[2]] : tokens[2].replace(/"/g, "");
+                    finalOut = `${v1}${sepVal}${v2}`;
+                }
+
+                printTerminal(finalOut, "ok");
+
+                if (finalOut === comp.targetText) {
+                    printTerminal("🎉 Success! Stream matched target output.", "ok");
+                    
+                    if (l1a1Idx < l1a1Composers.length - 1) {
+                        showCompletionModal(
+                            "Stream Verified!",
+                            "Your print sep configuration output matches. Proceed to the next scenario.",
+                            "Next Template ▶",
+                            () => l1a1NextComposer()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Activity 1 Complete!",
+                            "Print streaming completed! Proceed to <strong>Activity 2: Dynamic Template Designer</strong>.",
+                            "Proceed to Activity 2 ▶",
+                            () => switchActivity(2)
+                        );
+                    }
+                } else {
+                    printTerminal(`Stream Error! Expected '${comp.targetText}', got '${finalOut}'`, "err");
+                }
+            }, 800);
+        }
+
+        function l1a1NextComposer() {
+            l1a1Idx = (l1a1Idx + 1) % l1a1Composers.length;
+            initLevel1Act1();
+        }
+
+        // ==========================================
+        // LEVEL 1 ACTIVITY 2: TEMPLATE DESIGNER
+        // ==========================================
+        const l1a2Templates = [
+            {
+                title: "User Greeting Card",
+                vars: { name: "Aisha", city: "Pune" },
+                target: "Hello Aisha from Pune",
+                pool: ["name", "city", "{name}", "{city}", "{}", "{}"],
+                desc: "Goal: Match variables to greeting slots. Target: \"Hello Aisha from Pune\".",
+                layoutType: "greeting"
+            },
+            {
+                title: "Exam Score Card",
+                vars: { subject: "Python", score: 98.5 },
+                target: "Python: 98.5%",
+                pool: ["subject", "score", "{subject}", "{score:.1f}", "{}", "{:.1f}"],
+                desc: "Goal: Match score parameters. Target: \"Python: 98.5%\".",
+                layoutType: "score"
+            }
+        ];
+
+        let l1a2Idx = 0;
+        let l1a2FstringState = ["", ""];
+        let l1a2FormatState = ["", ""];
+
+        function initLevel1Act2() {
+            clearTerminal();
+            l1a2FstringState = ["", ""];
+            l1a2FormatState = ["", ""];
+            loadL1A2Template();
+        }
+
+        function loadL1A2Template() {
+            const temp = l1a2Templates[l1a2Idx];
+            document.getElementById('l1a2-target-title').textContent = temp.title;
+            document.getElementById('l1a2-instruction-text').innerHTML = temp.desc;
+
+            // Render f-string slots: f"Hello {slot1} from {slot2}"
+            const fslots = document.getElementById('l1a2-fstring-slots');
+            fslots.innerHTML = '';
+            
+            const fs1 = createSlot('l1a2-f', 0);
+            const fs2 = createSlot('l1a2-f', 1);
+
+            if (temp.layoutType === "score") {
+                // Format: f"{subject}: {score:.1f}%"
+                fslots.appendChild(document.createTextNode('f"'));
+                fslots.appendChild(fs1);
+                fslots.appendChild(document.createTextNode(": "));
+                fslots.appendChild(fs2);
+                fslots.appendChild(document.createTextNode('%"'));
+            } else {
+                fslots.appendChild(document.createTextNode('f"Hello '));
+                fslots.appendChild(fs1);
+                fslots.appendChild(document.createTextNode(" from "));
+                fslots.appendChild(fs2);
+                fslots.appendChild(document.createTextNode('"'));
+            }
+
+            // Render format slots: "Hello {} from {}".format(slot1, slot2)
+            const fmtslots = document.getElementById('l1a2-format-slots');
+            fmtslots.innerHTML = '';
+            const fms1 = createSlot('l1a2-m', 0);
+            const fms2 = createSlot('l2a2-m', 1);
+
+            if (temp.layoutType === "score") {
+                fmtslots.appendChild(document.createTextNode('"{}: {:.1f}%".format('));
+                fmtslots.appendChild(fms1);
+                fmtslots.appendChild(document.createTextNode(" , "));
+                fmtslots.appendChild(fms2);
+                fmtslots.appendChild(document.createTextNode(" )"));
+            } else {
+                fmtslots.appendChild(document.createTextNode('"Hello {} from {}".format( '));
+                fmtslots.appendChild(fms1);
+                fmtslots.appendChild(document.createTextNode(" , "));
+                fmtslots.appendChild(fms2);
+                fmtslots.appendChild(document.createTextNode(" )"));
+            }
+
+            // Jumble pool
+            const poolContainer = document.getElementById('l1a2-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(temp.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l1a2-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            l1a2UpdateLiveCode();
+            setupL1A2DragAndDrop();
+        }
+
+        function setupL1A2DragAndDrop() {
+            const badges = document.querySelectorAll('#l1a2-pool .draggable-badge');
+            const fSlots = document.querySelectorAll('#l1a2-fstring-slots .drop-slot');
+            const mSlots = document.querySelectorAll('#l1a2-format-slots .drop-slot');
+
+            setupDragEvents(badges, [...fSlots, ...mSlots], (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                if (slot.id.includes('l1a2-f')) {
+                    l1a2FstringState[idx] = dragged.dataset.val;
+                } else {
+                    l1a2FormatState[idx] = dragged.dataset.val;
+                }
+
+                l1a2UpdateLiveCode();
+            });
+        }
+
+        function l1a2UpdateLiveCode() {
+            const temp = l1a2Templates[l1a2Idx];
+            const fs0 = l1a2FstringState[0] || "{var}";
+            const fs1 = l1a2FstringState[1] || "{var}";
+            const fm0 = l1a2FormatState[0] || "var";
+            const fm1 = l1a2FormatState[1] || "var";
+
+            let exprF = "";
+            let exprM = "";
+            if (temp.layoutType === "score") {
+                exprF = `f"${fs0}: ${fs1}%"`;
+                exprM = `"{}: {:.1f}%".format(${fm0}, ${fm1})`;
+            } else {
+                exprF = `f"Hello ${fs0} from ${fs1}"`;
+                exprM = `"Hello {} from {}".format(${fm0}, ${fm1})`;
+            }
+
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Template Formatting options</span></span>
+<span class="line">fstring = ${exprF}</span>
+<span class="line">format_fn = ${exprM}</span>
+            `);
+        }
+
+        function verifyL1A2Templates() {
+            const temp = l1a2Templates[l1a2Idx];
+            printTerminal(">>> Evaluating string templates...", "info");
+
+            setTimeout(() => {
+                let fsCorrect = (l1a2FstringState[0] === "{name}" && l1a2FstringState[1] === "{city}") || (l1a2FstringState[0] === "{subject}" && l1a2FstringState[1] === "{score:.1f}");
+                let fmCorrect = (l1a2FormatState[0] === "name" && l1a2FormatState[1] === "city") || (l1a2FormatState[0] === "subject" && l1a2FormatState[1] === "score");
+
+                if (fsCorrect && fmCorrect) {
+                    printTerminal("🎉 Formatting templates matched target specifications!", "ok");
+                    
+                    if (l1a2Idx < l1a2Templates.length - 1) {
+                        showCompletionModal(
+                            "Templates Verified!",
+                            "Placeholder formats are aligned! Proceed to the next template.",
+                            "Next Template ▶",
+                            () => l1a2NextTemplate()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Level 1 Complete!",
+                            "Excellent! You've matched print streams and templates. Proceed to <strong>Level 2: String Detective Laboratory</strong>!",
+                            "Proceed to Level 2 ▶",
+                            () => switchLevel(2)
+                        );
+                    }
+                } else {
+                    printTerminal("Formatting Error! Check bracket placeholder mapping declarations.", "err");
+                }
+            }, 800);
+        }
+
+        function l1a2NextTemplate() {
+            l1a2Idx = (l1a2Idx + 1) % l1a2Templates.length;
+            initLevel1Act2();
+        }
+
+        // ==========================================
+        // LEVEL 2 ACTIVITY 1: TEXT REPAIR MACHINE
+        // ==========================================
+        const l2a1Repairs = [
+            {
+                input: "   PYTHON  is  AWESOME   ",
+                target: "python is awesome",
+                desc: "Goal: Trim whitespace, convert to lowercase, and remove double spacing.",
+                pool: [".strip()", ".lower()", ".replace('  ', ' ')"],
+                slotsCount: 3
+            },
+            {
+                input: "john DOE",
+                target: "John Doe",
+                desc: "Goal: Capitalize proper name variables cleanly.",
+                pool: [".title()", ".lower()", ".strip()"],
+                slotsCount: 1
+            }
+        ];
+
+        let l2a1Idx = 0;
+        let l2a1SlotsState = [];
+
+        function initLevel2Act1() {
+            clearTerminal();
+            l2a1SlotsState = [];
+            loadL2A1Repair();
+        }
+
+        function loadL2A1Repair() {
+            const repair = l2a1Repairs[l2a1Idx];
+            document.getElementById('l2a1-input-text').textContent = `"${repair.input}"`;
+            document.getElementById('l2a1-instruction-text').innerHTML = repair.desc;
+
+            // Render slots
+            const slotsContainer = document.getElementById('l2a1-slots-container');
+            slotsContainer.innerHTML = '';
+            l2a1SlotsState = [];
+            for (let i = 0; i < repair.slotsCount; i++) {
+                l2a1SlotsState.push("");
+                const slot = document.createElement('div');
+                slot.className = "drop-slot";
+                slot.id = `l2a1-slot-${i}`;
+                slot.textContent = `Method ${i+1}`;
+                slotsContainer.appendChild(slot);
+            }
+
+            // Jumble pool
+            const poolContainer = document.getElementById('l2a1-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(repair.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l2a1-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            document.getElementById('l2a1-timeline').innerHTML = '<span style="color:#aaa;">Drag methods to start repair timeline</span>';
+            l2a1UpdateLiveCode();
+            setupL2A1DragAndDrop();
+        }
+
+        function setupL2A1DragAndDrop() {
+            const badges = document.querySelectorAll('#l2a1-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l2a1-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l2a1SlotsState[idx] = dragged.dataset.val;
+
+                l2a1RenderTimeline();
+                l2a1UpdateLiveCode();
+            });
+        }
+
+        function l2a1RenderTimeline() {
+            const repair = l2a1Repairs[l2a1Idx];
+            const timeline = document.getElementById('l2a1-timeline');
+            timeline.innerHTML = '';
+
+            let currentVal = repair.input;
+            
+            // Add original step
+            timeline.appendChild(createTimelineStep("Original input", currentVal));
+
+            l2a1SlotsState.filter(Boolean).forEach(method => {
+                if (method === ".strip()") currentVal = currentVal.trim();
+                if (method === ".lower()") currentVal = currentVal.toLowerCase();
+                if (method === ".title()") currentVal = currentVal.replace(/\b\w/g, c => c.toUpperCase()).replace(/\b[A-Z]+/g, c => c.charAt(0) + c.slice(1).toLowerCase());
+                if (method === ".replace('  ', ' ')") currentVal = currentVal.replace(/  /g, ' ');
+
+                timeline.appendChild(createTimelineStep(method, currentVal));
+            });
+        }
+
+        function createTimelineStep(method, val) {
+            const row = document.createElement('div');
+            row.className = "timeline-step";
+            row.innerHTML = `
+                <span class="step-method">${method}</span>
+                <span class="step-val">"${val}"</span>
+            `;
+            return row;
+        }
+
+        function l2a1UpdateLiveCode() {
+            const repair = l2a1Repairs[l2a1Idx];
+            const chain = l2a1SlotsState.filter(Boolean).join("") || "";
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Immutable string transformation</span></span>
+<span class="line">messy = "${repair.input}"</span>
+<span class="line">clean = messy${chain}</span>
+            `);
+        }
+
+        function runL2A1RepairPipeline() {
+            const repair = l2a1Repairs[l2a1Idx];
+            let currentVal = repair.input;
+
+            l2a1SlotsState.forEach(method => {
+                if (method === ".strip()") currentVal = currentVal.trim();
+                if (method === ".lower()") currentVal = currentVal.toLowerCase();
+                if (method === ".title()") currentVal = currentVal.replace(/\b\w/g, c => c.toUpperCase()).replace(/\b[A-Z]+/g, c => c.charAt(0) + c.slice(1).toLowerCase());
+                if (method === ".replace('  ', ' ')") currentVal = currentVal.replace(/  /g, ' ');
+            });
+
+            printTerminal(">>> Engaging Text Repair Machine timeline...", "info");
+
+            setTimeout(() => {
+                if (currentVal === repair.target) {
+                    printTerminal(`🎉 Restored output: "${currentVal}"`, "ok");
+                    
+                    if (l2a1Idx < l2a1Repairs.length - 1) {
+                        showCompletionModal(
+                            "Text Repaired!",
+                            "Timeline transformation verified! Proceed to the next repair puzzle.",
+                            "Next Puzzle ▶",
+                            () => l2a1NextRepair()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Activity 1 Complete!",
+                            "Text Repair pipelines solved! Proceed to <strong>Activity 2: Search Engine Challenge</strong>.",
+                            "Proceed to Activity 2 ▶",
+                            () => switchActivity(2)
+                        );
+                    }
+                } else {
+                    printTerminal(`Clean Failed! Expected '${repair.target}', got '${currentVal}'`, "err");
+                }
+            }, 800);
+        }
+
+        function l2a1NextRepair() {
+            l2a1Idx = (l2a1Idx + 1) % l2a1Repairs.length;
+            initLevel2Act1();
+        }
+
+        // ==========================================
+        // LEVEL 2 ACTIVITY 2: SEARCH ENGINE CHALLENGE
+        // ==========================================
+        const l2a2Searches = [
+            {
+                title: "Locate Hashtag Symbol",
+                text: "Check #python tutorials",
+                targetChar: "#",
+                expected: "find",
+                pool: ["find", "index", "in", '"#"', '"@"', '"admin"'],
+                desc: "Goal: Search index offset location of hashtag tag inside database text stream."
+            },
+            {
+                title: "Verify Account Membership",
+                text: "admin@gmail.com",
+                targetChar: "@",
+                expected: "in",
+                pool: ["in", "find", "index", '"@"', '".com"', '"admin"'],
+                desc: "Goal: Verify if domain symbol exists using membership condition checks."
+            }
+        ];
+
+        let l2a2Idx = 0;
+        let l2a2SlotsState = [];
+
+        function initLevel2Act2() {
+            clearTerminal();
+            l2a2SlotsState = [];
+            loadL2A2Search();
+        }
+
+        function loadL2A2Search() {
+            const search = l2a2Searches[l2a2Idx];
+            document.getElementById('l2a2-target-title').textContent = search.title;
+            document.getElementById('l2a2-instruction-text').innerHTML = search.desc;
+
+            // Render slots dynamically based on expected search type
+            const slotsContainer = document.getElementById('l2a2-slots-container');
+            slotsContainer.innerHTML = '';
+            
+            if (search.expected === "find" || search.expected === "index") {
+                l2a2SlotsState = ["", ""];
+                const s1 = createSlot('l2a2', 0);
+                s1.textContent = "method";
+                const s2 = createSlot('l2a2', 1);
+                s2.textContent = "value";
+
+                slotsContainer.appendChild(document.createTextNode("s . "));
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(document.createTextNode(" ( "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(document.createTextNode(" )"));
+            } else {
+                l2a2SlotsState = [""];
+                const s1 = createSlot('l2a2', 0);
+                s1.textContent = "value";
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(document.createTextNode(" in s"));
+            }
+
+            // Render scanner cells
+            const scannerTrack = document.getElementById('l2a2-scanner-track');
+            scannerTrack.innerHTML = '';
+            for (let idx = 0; idx < search.text.length; idx++) {
+                const cell = document.createElement('div');
+                cell.className = "char-cell";
+                cell.id = `char-cell-${idx}`;
+                cell.innerHTML = `
+                    <span>${search.text[idx]}</span>
+                    <span class="char-index">${idx}</span>
+                `;
+                scannerTrack.appendChild(cell);
+            }
+
+            // Jumble pool
+            const poolContainer = document.getElementById('l2a2-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(search.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l2a2-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            l2a2UpdateLiveCode();
+            setupL2A2DragAndDrop();
+        }
+
+        function setupL2A2DragAndDrop() {
+            const badges = document.querySelectorAll('#l2a2-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l2a2-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l2a2SlotsState[idx] = dragged.dataset.val;
+
+                l2a2UpdateLiveCode();
+            });
+        }
+
+        function l2a2UpdateLiveCode() {
+            const search = l2a2Searches[l2a2Idx];
+            const tokens = [...l2a2SlotsState];
+            let expr = "";
+            if (search.expected === "find" || search.expected === "index") {
+                const s0 = tokens[0] || "[method]";
+                const s1 = tokens[1] || "[value]";
+                expr = `s.${s0}(${s1})`;
+            } else {
+                const s0 = tokens[0] || "[value]";
+                expr = `${s0} in s`;
+            }
+
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Search engine query</span></span>
+<span class="line">found = ${expr}</span>
+            `);
+        }
+
+        function runL2A2SearchScanner() {
+            const tokens = [...l2a2SlotsState];
+            if (tokens.some(t => !t)) {
+                printTerminal("SyntaxError: incomplete search query.", "err");
+                return;
+            }
+
+            const search = l2a2Searches[l2a2Idx];
+            printTerminal(">>> Launching scanner engine scanner pointer...", "info");
+
+            // Verify tokens structure
+            let correct = false;
+            if (search.expected === "find" || search.expected === "index") {
+                let methodCorrect = tokens[0] === search.expected;
+                let valCorrect = tokens[1] === '"#"';
+                correct = methodCorrect && valCorrect;
+            } else {
+                correct = tokens[0] === '"@"';
+            }
+
+            if (!correct) {
+                printTerminal(`Engine Alert: invalid search query structure.`, "err");
+                return;
+            }
+
+            // Animate scanning pointer index-by-index
+            let idx = 0;
+            function scanStep() {
+                if (idx < search.text.length) {
+                    const cell = document.getElementById(`char-cell-${idx}`);
+                    cell.classList.add('scanning');
+
+                    if (search.text[idx] === search.targetChar) {
+                        cell.classList.remove('scanning');
+                        cell.classList.add('matched');
+                        printTerminal(`Match found at offset index: ${idx}`, "ok");
+                        
+                        setTimeout(() => {
+                            showCompletionModal(
+                                "Search Completed! 🔎",
+                                `Index offsets mapped correctly. "${search.targetChar}" resolved successfully.`,
+                                l2a2Idx < l2a2Searches.length - 1 ? "Next Search ▶" : "Proceed to Level 3 ▶",
+                                () => {
+                                    if (l2a2Idx < l2a2Searches.length - 1) {
+                                        l2a2Idx++;
+                                        initLevel2Act2();
+                                    } else {
+                                        switchLevel(3);
+                                    }
+                                }
+                            );
+                        }, 800);
+                        return;
+                    }
+
+                    setTimeout(() => {
+                        cell.classList.remove('scanning');
+                        idx++;
+                        scanStep();
+                    }, 250);
+                } else {
+                    printTerminal("Search finished. Character not found.", "err");
+                }
+            }
+            scanStep();
+        }
+
+        function l2a2NextSearch() {
+            l2a2Idx = (l2a2Idx + 1) % l2a2Searches.length;
+            initLevel2Act2();
+        }
+
+        // ==========================================
+        // LEVEL 3 ACTIVITY 1: STRING SURGERY LAB
+        // ==========================================
+        const l3a1Surgeries = [
+            {
+                str: "Python",
+                target: "yth",
+                desc: "Goal: Extract substring 'yth' from 'Python' utilizing [start:stop:step] offsets.",
+                expStart: 1,
+                expStop: 4,
+                expStep: 1
+            },
+            {
+                str: "Python",
+                target: "Pt",
+                desc: "Goal: Jump extraction steps to crop characters 'Pt' from the base string.",
+                expStart: 0,
+                expStop: 4,
+                expStep: 2
+            },
+            {
+                str: "Python",
+                target: "nohtyP",
+                desc: "Goal: Reverse the character boundaries traversal.",
+                expStart: 6,
+                expStop: -7,
+                expStep: -1
+            }
+        ];
+
+        let l3a1Idx = 0;
+
+        function initLevel3Act1() {
+            clearTerminal();
+            loadL3A1Surgery();
+        }
+
+        function loadL3A1Surgery() {
+            const surgery = l3a1Surgeries[l3a1Idx];
+            document.getElementById('l3a1-target-slice').textContent = `"${surgery.target}"`;
+            document.getElementById('l3a1-instruction-text').innerHTML = surgery.desc;
+
+            // Render cells
+            const track = document.getElementById('l3a1-char-track');
+            track.innerHTML = '';
+            for (let idx = 0; idx < surgery.str.length; idx++) {
+                const cell = document.createElement('div');
+                cell.className = "char-cell";
+                cell.id = `surgery-cell-${idx}`;
+                cell.innerHTML = `
+                    <span>${surgery.str[idx]}</span>
+                    <span class="char-index">${idx}</span>
+                `;
+                track.appendChild(cell);
+            }
+
+            // Reset sliders
+            document.getElementById('l3a1-slider-start').value = 0;
+            document.getElementById('l3a1-slider-stop').value = surgery.str.length;
+            document.getElementById('l3a1-slider-step').value = 1;
+
+            updateL3A1Surgery();
+        }
+
+        function updateL3A1Surgery() {
+            const startVal = parseInt(document.getElementById('l3a1-slider-start').value);
+            const stopVal = parseInt(document.getElementById('l3a1-slider-stop').value);
+            const stepVal = parseInt(document.getElementById('l3a1-slider-step').value);
+
+            document.getElementById('l3a1-val-start').textContent = startVal;
+            document.getElementById('l3a1-val-stop').textContent = stopVal;
+            document.getElementById('l3a1-val-step').textContent = stepVal;
+
+            const surgery = l3a1Surgeries[l3a1Idx];
+            
+            // Map highlighted selection
+            // Clear cells
+            for (let idx = 0; idx < surgery.str.length; idx++) {
+                document.getElementById(`surgery-cell-${idx}`).classList.remove('matched');
+            }
+
+            let startIdx = startVal < 0 ? surgery.str.length + startVal : startVal;
+            let stopIdx = stopVal < 0 ? surgery.str.length + stopVal : stopVal;
+
+            if (stepVal > 0) {
+                for (let i = startIdx; i < stopIdx; i += stepVal) {
+                    const cell = document.getElementById(`surgery-cell-${i}`);
+                    if (cell) cell.classList.add('matched');
+                }
+            } else if (stepVal < 0) {
+                // Backward loop
+                for (let i = startIdx; i > stopIdx; i += stepVal) {
+                    const cell = document.getElementById(`surgery-cell-${i}`);
+                    if (cell) cell.classList.add('matched');
+                }
+            }
+
+            // Live code update
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># String Surgery offsets</span></span>
+<span class="line">s = "${surgery.str}"</span>
+<span class="line">slice_result = s[${startVal}:${stopVal}:${stepVal}]</span>
+            `);
+        }
+
+        function verifyL3A1Surgery() {
+            const startVal = parseInt(document.getElementById('l3a1-slider-start').value);
+            const stopVal = parseInt(document.getElementById('l3a1-slider-stop').value);
+            const stepVal = parseInt(document.getElementById('l3a1-slider-step').value);
+
+            const surgery = l3a1Surgeries[l3a1Idx];
+
+            printTerminal(">>> Initiating string incision check...", "info");
+
+            setTimeout(() => {
+                // Compute result slice
+                let sliced = "";
+                let startIdx = startVal < 0 ? surgery.str.length + startVal : startVal;
+                let stopIdx = stopVal < 0 ? surgery.str.length + stopVal : stopVal;
+
+                if (stepVal > 0) {
+                    for (let i = startIdx; i < stopIdx; i += stepVal) {
+                        sliced += surgery.str[i] || "";
+                    }
+                } else if (stepVal < 0) {
+                    for (let i = startIdx; i > stopIdx; i += stepVal) {
+                        sliced += surgery.str[i] || "";
+                    }
+                }
+
+                if (sliced === surgery.target) {
+                    printTerminal(`🎉 Incision Success! Cropped substring: "${sliced}"`, "ok");
+                    
+                    if (l3a1Idx < l3a1Surgeries.length - 1) {
+                        showCompletionModal(
+                            "Incision Successful!",
+                            "Index boundaries verified! Proceed to the next surgical challenge.",
+                            "Next Surgery ▶",
+                            () => l3a1NextSurgery()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Activity 1 Complete!",
+                            "String Slicing mastered! Proceed to <strong>Activity 2: AI Data Cleaner</strong>.",
+                            "Proceed to Activity 2 ▶",
+                            () => switchActivity(2)
+                        );
+                    }
+                } else {
+                    printTerminal(`Incision Error! Sliced output resulted in "${sliced}" instead of target "${surgery.target}"`, "err");
+                }
+            }, 800);
+        }
+
+        function l3a1NextSurgery() {
+            l3a1Idx = (l3a1Idx + 1) % l3a1Surgeries.length;
+            initLevel3Act1();
+        }
+
+        // ==========================================
+        // LEVEL 3 ACTIVITY 2: AI DATA CLEANER
+        // ==========================================
+        const l3a2Cleaners = [
+            {
+                input: "102,  t-shirt , 25.50",
+                target: "ID=102, Item=T-shirt, Price=25.5",
+                pool: ["split(',')", "int()", "float()", "strip()", "title()", "str()", "replace()"],
+                layoutType: "csv-clean",
+                desc: "Goal: Parse messy CSV record row. Target clean variables: ID=102 (int), Item=T-shirt (str), Price=25.5 (float)."
+            }
+        ];
+
+        let l3a2Idx = 0;
+        let l3a2SlotsState = [];
+
+        function initLevel3Act2() {
+            clearTerminal();
+            l3a2SlotsState = [];
+            loadL3A2Cleaner();
+        }
+
+        function loadL3A2Cleaner() {
+            const cleaner = l3a2Cleaners[l3a2Idx];
+            document.getElementById('l3a2-input-csv').textContent = `"${cleaner.input}"`;
+            document.getElementById('l3a2-instruction-text').innerHTML = cleaner.desc;
+
+            // Render dynamic slots
+            const slotsContainer = document.getElementById('l3a2-slots-container');
+            slotsContainer.innerHTML = '';
+            l3a2SlotsState = ["", "", "", "", ""];
+
+            // Layout split and casts rows:
+            // parts = row.[slot 0]
+            // item_id = [slot 1](parts[0].[slot 2])
+            // price = [slot 3](parts[2].[slot 4])
+            const d1 = document.createElement('div');
+            d1.appendChild(document.createTextNode("parts = row."));
+            d1.appendChild(createSlot('l3a2', 0));
+            slotsContainer.appendChild(d1);
+
+            const d2 = document.createElement('div');
+            d2.appendChild(document.createTextNode("item_id = "));
+            d2.appendChild(createSlot('l3a2', 1));
+            d2.appendChild(document.createTextNode(" ( parts[0]."));
+            d2.appendChild(createSlot('l3a2', 2));
+            d2.appendChild(document.createTextNode(" )"));
+            slotsContainer.appendChild(d2);
+
+            const d3 = document.createElement('div');
+            d3.appendChild(document.createTextNode("price_val = "));
+            d3.appendChild(createSlot('l3a2', 3));
+            d3.appendChild(document.createTextNode(" ( parts[2]."));
+            d3.appendChild(createSlot('l3a2', 4));
+            d3.appendChild(document.createTextNode(" )"));
+            slotsContainer.appendChild(d3);
+
+            // Jumble pool
+            const poolContainer = document.getElementById('l3a2-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(cleaner.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l3a2-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            document.getElementById('l3a2-memory-inspect').style.display = 'none';
+            l3a2UpdateLiveCode();
+            setupL3A2DragAndDrop();
+        }
+
+        function setupL3A2DragAndDrop() {
+            const badges = document.querySelectorAll('#l3a2-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l3a2-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l3a2SlotsState[idx] = dragged.dataset.val;
+
+                l3a2UpdateLiveCode();
+            });
+        }
+
+        function l3a2UpdateLiveCode() {
+            const tokens = [...l3a2SlotsState];
+            const s0 = tokens[0] || "split()";
+            const s1 = tokens[1] || "cast()";
+            const s2 = tokens[2] || "method()";
+            const s3 = tokens[3] || "cast()";
+            const s4 = tokens[4] || "method()";
+
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Database row ingestion</span></span>
+<span class="line">parts = row.${s0}</span>
+<span class="line">item_id = ${s1}(parts[0].${s2})</span>
+<span class="line">price = ${s3}(parts[2].${s4})</span>
+            `);
+        }
+
+        function runL3A2DataCleaner() {
+            const tokens = [...l3a2SlotsState];
+            if (tokens.some(t => !t)) {
+                printTerminal("SyntaxError: incomplete clean script blocks.", "err");
+                return;
+            }
+
+            const cleaner = l3a2Cleaners[l3a2Idx];
+            printTerminal(">>> Compiling and checking variable data cleaning suite...", "info");
+
+            setTimeout(() => {
+                // Verify operations
+                let hasSplit = tokens[0] === "split(',')";
+                let hasCastId = tokens[1] === "int()";
+                let hasStripId = tokens[2] === "strip()";
+                let hasCastPrice = tokens[3] === "float()";
+                let hasStripPrice = tokens[4] === "strip()";
+
+                if (hasSplit && hasCastId && hasStripId && hasCastPrice && hasStripPrice) {
+                    document.getElementById('l3a2-memory-inspect').innerHTML = `
+                        <span style="font-size:0.75rem; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:8px;">Memory variables conversions result:</span>
+                        <div class="memory-grid-cell">
+                            <span class="cell-var-name">item_id</span>
+                            <div class="cell-value-box" style="color:var(--correct);">102 (int)</div>
+                        </div>
+                        <div class="memory-grid-cell" style="margin-top:6px;">
+                            <span class="cell-var-name">price_val</span>
+                            <div class="cell-value-box" style="color:var(--correct);">25.5 (float)</div>
+                        </div>
+                    `;
+                    document.getElementById('l3a2-memory-inspect').style.display = 'block';
+
+                    printTerminal("🎉 Database variables cleaned and cast correctly!", "ok");
+                    
+                    showCompletionModal(
+                        "All Levels Complete! 🏆",
+                        "Congratulations! You've mastered Python strings, slicing indices, formatting layouts, and database cleaning castings in Module 1.3!",
+                        "Restart Module 1.3 🔄",
+                        () => switchLevel(1)
+                    );
+                } else {
+                    printTerminal("LogicError: incorrect transformations led to database parser crashes.", "err");
+                }
+            }, 800);
+        }
+
+        function l3a2NextCleaner() {
+            l3a2Idx = (l3a2Idx + 1) % l3a2Cleaners.length;
+            initLevel3Act2();
+        }
+
+        // ==========================================
+        // GLOBAL LEVEL CONTROLLER
+        // ==========================================
+        function initActivityState(level, activity) {
+            clearTerminal();
+
+            if (level === 1) {
+                if (activity === 1) initLevel1Act1();
+                if (activity === 2) initLevel1Act2();
+            } else if (level === 2) {
+                if (activity === 1) initLevel2Act1();
+                if (activity === 2) initLevel2Act2();
+            } else if (level === 3) {
+                if (activity === 1) initLevel3Act1();
+                if (activity === 2) initLevel3Act2();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            switchLevel(1);
+        });
+    </script>
+</body>
+</html>

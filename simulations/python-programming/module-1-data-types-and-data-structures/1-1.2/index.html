@@ -1,0 +1,2641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Module 1.2 — Interactive Expression Architect</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-main: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(225, 6, 0, 0.12);
+            --red: #e10600;
+            --red-dark: #b30500;
+            --red-deep: #7a0000;
+            --red-glow: rgba(225, 6, 0, 0.05);
+            --white: #ffffff;
+            --ink: #1e1212;
+            --mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --display: 'Archivo Black', sans-serif;
+            --body: 'Inter', sans-serif;
+
+            --correct: #2e7d32;
+            --correct-bg: rgba(46, 125, 50, 0.05);
+            --wrong: #c62828;
+            --wrong-bg: rgba(198, 40, 40, 0.05);
+            --warning: #ef6c00;
+            --terminal-bg: #110b0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--body);
+            background-color: var(--bg-main);
+            color: var(--ink);
+            scroll-behavior: smooth;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(225, 6, 0, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.03) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header Style */
+        header.dashboard-header {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            padding: 28px 40px;
+            box-shadow: 0 4px 30px rgba(225, 6, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid var(--red-deep);
+            z-index: 50;
+        }
+
+        header.dashboard-header h1 {
+            font-family: var(--display);
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(to right, #ffffff, #ffe3e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header.dashboard-header p {
+            font-size: 0.95rem;
+            color: #ffeaea;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* Top level navigator cards */
+        .level-navigator {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 32px auto 0;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .level-navigator {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .level-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 8px 32px rgba(225, 6, 0, 0.02);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .level-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--red);
+            box-shadow: 0 12px 30px rgba(225, 6, 0, 0.08);
+        }
+
+        .level-card.active {
+            background: var(--white);
+            border-color: var(--red);
+            box-shadow: 0 16px 40px rgba(225, 6, 0, 0.12);
+        }
+
+        .level-card.active::after {
+            background: var(--red);
+        }
+
+        .level-card .lvl-num {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .level-card .lvl-title {
+            font-family: var(--display);
+            font-size: 1.15rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .level-card .lvl-desc {
+            font-size: 0.85rem;
+            color: #5a4b4b;
+            line-height: 1.5;
+        }
+
+        /* Top Controls Bar Styles */
+        .top-controls-bar {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .top-hint-box {
+            max-width: 1200px;
+            margin: 14px auto 0;
+            padding: 18px 24px;
+            background: #fffde7;
+            border-left: 5px solid #fbc02d;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #5a4f4f;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+            animation: fadeIn 0.3s;
+        }
+
+        /* Secondary Activity Navigator */
+        .activity-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 28px auto;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .activity-tab {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            color: #5a4b4b;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-tab:hover {
+            background: rgba(225, 6, 0, 0.05);
+            border-color: rgba(225, 6, 0, 0.2);
+            color: var(--red);
+            transform: translateY(-1px);
+        }
+
+        .activity-tab.active {
+            background: var(--red);
+            color: var(--white);
+            border-color: var(--red);
+            box-shadow: 0 8px 20px rgba(225, 6, 0, 0.25);
+        }
+
+        /* Workspace Grid */
+        .workspace {
+            max-width: 1250px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 20px 60px;
+            display: grid;
+            grid-template-columns: 1.85fr 1.15fr;
+            gap: 32px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 992px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Active Canvas Panels */
+        .activity-canvas {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 12px 40px rgba(225, 6, 0, 0.03);
+            display: none;
+            flex-direction: column;
+            position: relative;
+            min-height: 580px;
+        }
+
+        .activity-canvas.active {
+            display: flex;
+            animation: slideIn .4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .canvas-header {
+            margin-bottom: 24px;
+            border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+            padding-bottom: 16px;
+        }
+
+        .canvas-header h2 {
+            font-family: var(--display);
+            font-size: 1.4rem;
+            color: var(--red-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .canvas-header p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        /* Sidebar Panels */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .sidebar-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.01);
+            backdrop-filter: blur(8px);
+        }
+
+        .sidebar-card h3 {
+            font-family: var(--display);
+            font-size: 0.85rem;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 6px;
+        }
+
+        /* Live Python Code visualizer */
+        .code-visualizer {
+            background: #faf8f8;
+            border: 1px solid #ffd5d8;
+            border-radius: 12px;
+            padding: 18px;
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--ink);
+            line-height: 1.7;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+            min-height: 120px;
+        }
+
+        .code-visualizer .line {
+            display: block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            transition: all 0.25s;
+        }
+
+        .code-visualizer .line.executing {
+            background-color: rgba(225, 6, 0, 0.08);
+            border-left: 4px solid var(--red);
+            font-weight: bold;
+        }
+
+        .code-visualizer .comment { color: #6a8759; font-style: italic; }
+        .code-visualizer .keyword { color: #cc7832; font-weight: 700; }
+        .code-visualizer .string { color: #5c7ee6; }
+        .code-visualizer .number { color: #6897bb; }
+        .code-visualizer .builtin { color: #9c27b0; }
+
+        /* Terminal styling */
+        .terminal {
+            background-color: var(--terminal-bg);
+            color: #ececec;
+            border-radius: 12px;
+            padding: 18px;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            line-height: 1.6;
+            min-height: 160px;
+            max-height: 240px;
+            overflow-y: auto;
+            box-shadow: inset 0 3px 15px rgba(0, 0, 0, 0.7);
+            border: 1px solid #2a1f1f;
+        }
+
+        .terminal .line-out { display: block; margin-bottom: 6px; }
+        .terminal .line-out.in { color: #ffeb3b; }
+        .terminal .line-out.err { color: #ff5252; font-weight: 700; }
+        .terminal .line-out.ok { color: #00e676; font-weight: bold; }
+        .terminal .line-out.info { color: #00b0ff; }
+
+        /* Support actions button styles */
+        .support-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            font-family: var(--display);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 14px 22px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--red);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(225, 6, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225, 6, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0eae9;
+            color: #5c4746;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .btn-secondary:hover {
+            background: #e2d9d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-hint {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+            flex-grow: 1;
+        }
+
+        .btn-hint:hover {
+            background: #ffe0b2;
+            transform: translateY(-2px);
+        }
+
+        /* Draggable Badges Pool styling */
+        .interactive-pool-header {
+            font-family: var(--display);
+            font-size: 0.72rem;
+            color: #8c7676;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badges-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 12px;
+            background: #fdfdfd;
+            border: 2px dashed rgba(225, 6, 0, 0.15);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            min-height: 64px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .draggable-badge {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--ink);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .draggable-badge:hover {
+            border-color: var(--red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(225, 6, 0, 0.08);
+        }
+
+        .draggable-badge.selected-pulse {
+            box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.35);
+            border-color: var(--red);
+            transform: scale(1.05);
+        }
+
+        .drop-slot {
+            min-width: 72px;
+            height: 38px;
+            border: 2px dashed rgba(225, 6, 0, 0.25);
+            border-radius: 8px;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: #999;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            vertical-align: middle;
+        }
+
+        .drop-slot.active-occupied {
+            border-style: solid;
+            border-color: var(--red);
+            color: var(--red-dark);
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(225, 6, 0, 0.05);
+        }
+
+        .drop-slot.drag-over {
+            background: rgba(225, 6, 0, 0.05);
+            border-color: var(--red);
+        }
+
+        /* ==========================================
+           EXPRESSION TREE STYLING
+           ========================================== */
+        .tree-visualizer-container {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            background: #faf8f8;
+            padding: 24px;
+            margin: 20px 0;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .tree-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 12px;
+            position: relative;
+        }
+
+        .tree-op {
+            background: var(--red);
+            color: white;
+            font-family: var(--mono);
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.15);
+            margin-bottom: 16px;
+            z-index: 5;
+            transition: all 0.3s;
+        }
+
+        .tree-op.evaluating-pulse {
+            background: #ffc107;
+            box-shadow: 0 0 12px #ffc107;
+            transform: scale(1.1);
+        }
+
+        .tree-children {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            width: 100%;
+        }
+
+        .tree-children::before {
+            content: '';
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            width: 2px;
+            height: 16px;
+            background: rgba(225, 6, 0, 0.2);
+        }
+
+        .tree-leaf {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            color: var(--ink);
+            font-family: var(--mono);
+            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            text-align: center;
+            min-width: 48px;
+            transition: all 0.3s;
+        }
+
+        .tree-leaf.empty {
+            border-style: dashed;
+            color: #999;
+        }
+
+        .tree-leaf.evaluating-pulse {
+            border-color: #ffc107;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* ==========================================
+           LEVEL 2 ACTIVITY 1: SMART SYSTEM VISUALS
+           ========================================== */
+        .system-designer-row {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 20px 0;
+            background: #fcfcfc;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .test-subjects-track {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .subject-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 12px;
+            padding: 12px 18px;
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.02);
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .subject-card.approved {
+            border-color: var(--correct);
+            background: rgba(46, 125, 50, 0.02);
+        }
+
+        .subject-card.denied {
+            border-color: var(--wrong);
+            background: rgba(198, 40, 40, 0.02);
+        }
+
+        .subject-card .badge-status {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 20px;
+            color: white;
+            text-transform: uppercase;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .subject-card.approved .badge-status { background: var(--correct); }
+        .subject-card.denied .badge-status { background: var(--wrong); }
+
+        /* ==========================================
+           LEVEL 2 ACTIVITY 2: MEMORY LAYOUT CELL
+           ========================================== */
+        .memory-grid-panel {
+            background: #faf8f8;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .memory-grid-cell {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .memory-grid-cell .cell-address {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: #887a7a;
+        }
+
+        .memory-grid-cell .cell-var-name {
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            font-weight: bold;
+            color: var(--red-deep);
+        }
+
+        .memory-grid-cell .cell-value-box {
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            font-weight: bold;
+            background: #faf8f8;
+            border: 1px solid rgba(0,0,0,0.04);
+            border-radius: 4px;
+            padding: 2px 6px;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        /* ==========================================
+           LEVEL 3 ACTIVITY 1: ESCAPE ROOM GRID
+           ========================================== */
+        .escape-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .escape-room-cell {
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            background: #faf8f8;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .escape-room-cell.current-room {
+            border-color: var(--red);
+            background: rgba(225, 6, 0, 0.02);
+            box-shadow: 0 0 12px rgba(225, 6, 0, 0.08);
+        }
+
+        .escape-room-cell.unlocked {
+            border-color: var(--correct);
+            background: rgba(46, 125, 50, 0.02);
+        }
+
+        .escape-room-cell .status-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* ==========================================
+           COMPLETION SUCCESS MODAL OVERLAYS
+           ========================================== */
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 11, 11, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .completion-card {
+            background: var(--white);
+            border: 2px solid var(--correct);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(46, 125, 50, 0.15);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .completion-card.show {
+            transform: translateY(0);
+        }
+
+        .completion-card h3 {
+            font-family: var(--display);
+            font-size: 1.6rem;
+            color: var(--correct);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .completion-card p {
+            font-size: 0.95rem;
+            color: #5a4b4b;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .completion-card .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: scalePulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes scalePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Footer styling */
+        footer.app-footer {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: #8c7676;
+            margin-top: auto;
+            padding: 24px;
+            border-top: 1px dashed #ffd1d5;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Block -->
+    <header class="dashboard-header">
+        <div>
+            <h1>Python Expression Architect</h1>
+            <p>Master Python mathematical and logical operators using visual AST expression trees</p>
+        </div>
+        <div>
+            <span style="font-family: var(--mono); font-size: 0.8rem; background: var(--white); color: var(--red); padding: 8px 16px; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                MODULE 1.2 REDESIGN
+            </span>
+        </div>
+    </header>
+
+    <!-- Top Level Cards -->
+    <div class="level-navigator">
+        <div class="level-card active" id="btn-lvl-1" onclick="switchLevel(1)">
+            <span class="lvl-num">Level 1</span>
+            <span class="lvl-title">Expression Engineering Lab</span>
+            <span class="lvl-desc">Build Python expression trees and optimize mathematical code statements.</span>
+        </div>
+        <div class="level-card" id="btn-lvl-2" onclick="switchLevel(2)">
+            <span class="lvl-num">Level 2</span>
+            <span class="lvl-title">Logic Engineering Center</span>
+            <span class="lvl-desc">Design logic gates checks and debug comparison/logical operator crash bugs.</span>
+        </div>
+        <div class="level-card" id="btn-lvl-3" onclick="switchLevel(3)">
+            <span class="lvl-num">Level 3</span>
+            <span class="lvl-title">Python Expression Architect</span>
+            <span class="lvl-desc">Solve key room escape equations and complete database variable calculations.</span>
+        </div>
+    </div>
+
+    <!-- Top Controls Bar -->
+    <div class="top-controls-bar">
+        <div class="nav-buttons" style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="prevLevel()">◀ Prev Level</button>
+            <button class="btn btn-secondary" onclick="nextLevel()">Next Level ▶</button>
+        </div>
+        <div class="clue-control" style="display: flex; gap: 10px;">
+            <button class="btn btn-hint" onclick="getHint()">💡 Request Clue</button>
+            <button class="btn btn-secondary" onclick="resetActiveActivity()">🔄 Reset</button>
+        </div>
+    </div>
+    <div class="top-hint-box" id="hint-panel">
+        No clues active. Click "Request Clue" for progressive hints.
+    </div>
+
+    <!-- Secondary Tab Navigator -->
+    <div class="activity-bar" id="activity-selector-bar">
+        <!-- Generated dynamically -->
+    </div>
+
+    <!-- Main Workspace Container -->
+    <main class="workspace">
+
+        <!-- Column 1: Puzzles and Workbenches -->
+        <div class="canvas-container">
+
+            <!-- LEVEL 1 ACTIVITY 1: EXPRESSION CONSTRUCTOR -->
+            <div class="activity-canvas" id="canvas-1-1">
+                <div class="canvas-header">
+                    <h2>Activity 1 — Expression Constructor</h2>
+                    <p>Construct a Python expression that yields the target output using precedence brackets and operators.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Target Formula: <strong id="l1a1-target-formula">Kinetic Energy = 72.0</strong><br>
+                    <div id="l1a1-instruction-text" style="margin-top: 6px; font-weight: 500;">Variables state: <code>m = 4</code>, <code>v = 6</code>.</div>
+                </div>
+
+                <div class="interactive-pool-header">Draggable Tokens</div>
+                <div class="badges-pool" id="l1a1-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1.1rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;" id="l1a1-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div class="tree-visualizer-container" id="l1a1-tree">
+                    <!-- Dynamic AST Rendered here -->
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="evaluateL1A1Expression()">⚡ Evaluate Expression</button>
+                    <button class="btn btn-secondary" onclick="l1a1NextFormula()">Next Formula</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 1 ACTIVITY 2: EXPRESSION OPTIMIZER -->
+            <div class="activity-canvas" id="canvas-1-2">
+                <div class="canvas-header">
+                    <h2>Activity 2 — Expression Optimizer</h2>
+                    <p>Optimize redundant expressions inside code pipelines. Make the expression shorter while keeping output identical.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Optimizer Target Challenge:
+                    <div id="l1a2-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Write a simplified expression using a shorthand assignment operator.</div>
+                </div>
+
+                <div class="interactive-pool-header">Tokens Pool</div>
+                <div class="badges-pool" id="l1a2-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1.1rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;" id="l1a2-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div class="tree-visualizer-container" id="l1a2-tree">
+                    <!-- Dynamic AST Rendered here -->
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="verifyL1A2Optimized()">⚡ Verify Optimization</button>
+                    <button class="btn btn-secondary" onclick="l1a2NextOptimizer()">Next Optimizer Puzzle</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 2 ACTIVITY 1: SMART SYSTEM DESIGNER -->
+            <div class="activity-canvas" id="canvas-2-1">
+                <div class="canvas-header">
+                    <h2>Activity 1 — Smart System Designer</h2>
+                    <p>Design a decision gate validation condition. Test subjects will simulate access to verify your logical checks.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Active Gate: <strong id="l2a1-gate-title">Airport Boarding Gate</strong><br>
+                    <div id="l2a1-instruction-text" style="margin-top: 6px; font-weight: 500;">Condition Goal: Require passenger to be adult (<code>age &gt;= 18</code>) AND have boarding pass (<code>boarding_pass</code>).</div>
+                </div>
+
+                <div class="interactive-pool-header">Operators and Variables</div>
+                <div class="badges-pool" id="l2a1-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1.1rem; display:flex; align-items:center; gap:8px; margin-bottom:16px;" id="l2a1-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div class="system-designer-row">
+                    <span style="font-family:var(--mono); font-size:0.75rem; text-transform:uppercase; font-weight:bold;">Test Subjects verification tracks:</span>
+                    <div class="test-subjects-track" id="l2a1-subjects">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="runL2A1SystemSimulation()">⚡ Run System Simulation</button>
+                    <button class="btn btn-secondary" onclick="l2a1NextSystem()">Next System Designer</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 2 ACTIVITY 2: OPERATOR DEBUG STUDIO -->
+            <div class="activity-canvas" id="canvas-2-2">
+                <div class="canvas-header">
+                    <h2>Activity 2 — Operator Debug Studio</h2>
+                    <p>Debug expressions returning incorrect states. Inspect live variables tables to correct logical and relational operators.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Bug Scenario: <strong id="l2a2-bug-title">Game Over Status Code</strong><br>
+                    <div id="l2a2-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Correct the operator so the game resolves game over when health hits 0 or below, or lives hit 0.</div>
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1.1rem; margin-bottom:20px;">
+                    <span class="keyword">def</span> check_game_over(health, lives):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;game_over = health &lt;= 0 
+                    <select id="l2a2-bug-op-selector" style="width:100px; display:inline-block;" onchange="l2a2UpdateVisualizer()">
+                        <option value="and">and</option>
+                        <option value="or">or</option>
+                        <option value="==">==</option>
+                    </select>
+                    lives == 0<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;return game_over
+                </div>
+
+                <div class="memory-grid-panel" id="l2a2-vars-inspect">
+                    <!-- Variable states displayed here -->
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="verifyL2A2Debug()">⚡ Validate Code Fix</button>
+                    <button class="btn btn-secondary" onclick="l2a2NextDebug()">Next Bug Scenario</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 3 ACTIVITY 1: ESCAPE ROOM CHALLENGE -->
+            <div class="activity-canvas" id="canvas-3-1">
+                <div class="canvas-header">
+                    <h2>Activity 1 — Escape Room Challenge</h2>
+                    <p>Solve cryptographic locked keypads combining math built-ins and operators to navigate the robot to the exit gate.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Locked Chamber: <strong id="l3a1-room-title">Chamber 1 key</strong><br>
+                    Keypad Target Output: <code id="l3a1-room-target">225</code>.<br>
+                    <div id="l3a1-instruction-text" style="margin-top: 6px; font-weight: 500;">Variables: <code>target = 100</code>, <code>input = 85</code>.</div>
+                </div>
+
+                <div class="interactive-pool-header">Math Built-ins and Operators</div>
+                <div class="badges-pool" id="l3a1-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:1rem; display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:16px;" id="l3a1-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div class="escape-grid-container">
+                    <div class="escape-room-cell current-room" id="escape-cell-0">
+                        <span class="status-icon">🤖</span>
+                        <span>Chamber 1</span>
+                    </div>
+                    <div class="escape-room-cell" id="escape-cell-1">
+                        <span class="status-icon">🔒</span>
+                        <span>Chamber 2</span>
+                    </div>
+                    <div class="escape-room-cell" id="escape-cell-2">
+                        <span class="status-icon">🔒</span>
+                        <span>Exit Gate</span>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="verifyL3A1Keypad()">⚡ Execute Decryption</button>
+                </div>
+            </div>
+
+            <!-- LEVEL 3 ACTIVITY 2: PROGRAMMING MISSION BUILDER -->
+            <div class="activity-canvas" id="canvas-3-2">
+                <div class="canvas-header">
+                    <h2>Activity 2 — Programming Mission Builder</h2>
+                    <p>Build complete Python calculation algorithms satisfying database verification tests.</p>
+                </div>
+
+                <div style="background: #eef9ff; border: 1px solid #bce0fd; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.5; color: #374151;">
+                    🎯 Mission Requirement: <strong id="l3a2-mission-title">Calculate Employee Bonus</strong><br>
+                    <div id="l3a2-instruction-text" style="margin-top: 6px; font-weight: 500;">Goal: Total Salary = base salary + bonus. Given rating, if rating > 3, bonus is 500 per rating above 3 (use max built-in).</div>
+                </div>
+
+                <div class="interactive-pool-header">Mission Blocks</div>
+                <div class="badges-pool" id="l3a2-pool">
+                    <!-- Loaded dynamically -->
+                </div>
+
+                <div style="background:#faf8f8; border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:var(--mono); font-size:0.95rem; display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:16px;" id="l3a2-slots-container">
+                    <!-- Slots dynamically generated -->
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" onclick="verifyL3A2Mission()">⚡ Compile &amp; Run Test DB</button>
+                    <button class="btn btn-secondary" onclick="l3a2NextMission()">Next Mission</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Column 2: Educational Control Panels -->
+        <div class="sidebar">
+
+            <!-- Live Python Code View -->
+            <div class="sidebar-card">
+                <h3>Live Python Code</h3>
+                <div class="code-visualizer" id="live-code-view">
+                    <span class="line executing"><span class="comment"># Code will generate here</span></span>
+                </div>
+            </div>
+
+            <!-- Simulated compiler output -->
+            <div class="sidebar-card">
+                <h3>Terminal Output</h3>
+                <div class="terminal" id="terminal-view">
+                    <span class="line-out info">*** Python Sandbox Initialized ***</span>
+                    <span class="line-out">>>> </span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Completion Success Modal -->
+    <div class="completion-modal" id="completion-modal-view">
+        <div class="completion-card" id="completion-card-view">
+            <span class="badge-icon">🏆</span>
+            <h3 id="completion-title">Activity Cleared!</h3>
+            <p id="completion-desc">You've successfully solved all scenarios for this challenge and verified the Python statements output.</p>
+            <button class="btn btn-primary" id="btn-completion-proceed">Proceed to Next Activity ▶</button>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        PYTHON FOUNDATIONS LEARNING SUITE · REDESIGNED CLASSROOM APP
+    </footer>
+
+    <!-- Interactive script code -->
+    <script>
+        // Core game navigation states
+        let currentLevel = 1;
+        let currentActivity = 1;
+        let hintIndex = 0;
+        let selectedDragEl = null;
+
+        // Shuffle utility to jumble all dynamic pool variables
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Completion Modal display trigger
+        function showCompletionModal(title, desc, buttonText, onProceed) {
+            const modal = document.getElementById('completion-modal-view');
+            const card = document.getElementById('completion-card-view');
+            document.getElementById('completion-title').textContent = title;
+            document.getElementById('completion-desc').innerHTML = desc;
+            
+            const proceedBtn = document.getElementById('btn-completion-proceed');
+            proceedBtn.textContent = buttonText;
+            proceedBtn.onclick = () => {
+                card.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    if (onProceed) onProceed();
+                }, 200);
+            };
+
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 50);
+        }
+
+        // Progressive Hints Database
+        const hintsDB = {
+            "1-1": [
+                "Clue 1: Kinetic Energy needs mass and velocity squared. The formula is 0.5 * m * v**2.",
+                "Clue 2: Parentheses specify operation priority groups before standard multiplication checks.",
+                "Clue 3: Place 0.5, then *, then m, then *, then v, then ** and 2 to raise velocity to power.",
+                "Full Explanation: Compute kinetic energy as 0.5 * m * v ** 2. Precedence handles power '**' before multiplication '*'."
+            ],
+            "1-2": [
+                "Clue 1: Shorthand operations simplify long formulas. 'score = score + 5' simplifies to 'score += 5'.",
+                "Clue 2: The statement is 'total_score = total_score + (score * 1)'. First, simplify (score * 1) to score.",
+                "Clue 3: Use the target variable, addition shorthand operator, and score: total_score += score.",
+                "Full Explanation: Shorthand += combines addition and assignment. Inefficient expressions are optimized to keep execution pathways clean."
+            ],
+            "2-1": [
+                "Clue 1: Gate checks require logical operators. Use relational checks like >= first.",
+                "Clue 2: Check age: age >= 18. Combine with boarding pass verification using logical 'and'.",
+                "Clue 3: Assemble statement: age >= 18 and boarding_pass.",
+                "Full Explanation: Logical operator 'and' evaluates to True only if both sub-clauses resolve to True."
+            ],
+            "2-2": [
+                "Clue 1: Inspect the condition in the code block. Health must be <= 0 OR lives must be == 0 to trigger game over.",
+                "Clue 2: The current script checks if both must happen using 'and'. This is logic error! Change it to 'or'.",
+                "Clue 3: Select 'or' from the dropdown to allow either condition to end the game.",
+                "Full Explanation: Logical 'or' permits true evaluation if at least one parameter resolves to True."
+            ],
+            "3-1": [
+                "Clue 1: Chamber 1 needs Target 225. Difference is target - input. Power is pow(diff, 2).",
+                "Clue 2: Absolute value abs(target - input) guarantees positive result before exponentiation.",
+                "Clue 3: Assemble tokens: pow(abs(target - input), 2).",
+                "Full Explanation: Nesting built-in functions evaluates inside-out. abs calculates first, pow raises it to 2."
+            ],
+            "3-2": [
+                "Clue 1: Salary bonus: base + max(0, rating - 3) * 500.",
+                "Clue 2: Drag tokens in order: base, +, max, 0, rating, -, 3, *, 500.",
+                "Clue 3: Verify slot values inside parentheses are separated by comma: max(0, rating - 3).",
+                "Full Explanation: max(0, rating - 3) ensures that values lower than 3 resolve to 0 rating offset, preventing negative salary reductions."
+            ]
+        };
+
+        // Navigation state setup
+        const levelActivities = {
+            1: [
+                { id: "1-1", title: "Expression Constructor" },
+                { id: "1-2", title: "Expression Optimizer" }
+            ],
+            2: [
+                { id: "2-1", title: "Smart System Designer" },
+                { id: "2-2", title: "Operator Debug Studio" }
+            ],
+            3: [
+                { id: "3-1", title: "Escape Room Challenge" },
+                { id: "3-2", title: "Programming Mission Builder" }
+            ]
+        };
+
+        function switchLevel(lvlNum) {
+            currentLevel = lvlNum;
+            currentActivity = 1;
+
+            // Highlight Level Card
+            document.querySelectorAll('.level-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`btn-lvl-${lvlNum}`).classList.add('active');
+
+            // Draw Activity Tabs
+            const actContainer = document.getElementById('activity-selector-bar');
+            actContainer.innerHTML = '';
+
+            const acts = levelActivities[lvlNum];
+            acts.forEach((act, index) => {
+                const btn = document.createElement('button');
+                btn.className = `activity-tab ${index === 0 ? 'active' : ''}`;
+                btn.textContent = act.title;
+                btn.onclick = () => switchActivity(index + 1);
+                actContainer.appendChild(btn);
+            });
+
+            switchActivity(1);
+        }
+
+        function switchActivity(actNum) {
+            currentActivity = actNum;
+            hintIndex = 0;
+            document.getElementById('hint-panel').style.display = 'none';
+
+            // Highlight tabs
+            const tabs = document.querySelectorAll('.activity-tab');
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active', index === actNum - 1);
+            });
+
+            // Display active canvas
+            document.querySelectorAll('.activity-canvas').forEach(c => c.classList.remove('active'));
+            const targetCanvas = document.getElementById(`canvas-${currentLevel}-${actNum}`);
+            if (targetCanvas) {
+                targetCanvas.classList.add('active');
+            }
+
+            // Launch activity specific states
+            initActivityState(currentLevel, actNum);
+        }
+
+        // Global Reset Hook
+        function resetActiveActivity() {
+            initActivityState(currentLevel, currentActivity);
+            printTerminal(">>> Activity Reset Successfully.", "info");
+        }
+
+        function getHint() {
+            const key = `${currentLevel}-${currentActivity}`;
+            const hints = hintsDB[key];
+            if (!hints) return;
+
+            const box = document.getElementById('hint-panel');
+            box.style.display = 'block';
+
+            if (hintIndex < hints.length) {
+                box.innerHTML = `<strong>Clue Level ${hintIndex + 1}:</strong><br>${hints[hintIndex]}`;
+                hintIndex++;
+            } else {
+                box.innerHTML = `<strong>Full Guide:</strong><br>${hints[hints.length - 1]}`;
+            }
+        }
+
+        function prevLevel() {
+            let nextLvl = currentLevel - 1;
+            if (nextLvl < 1) nextLvl = 3;
+            switchLevel(nextLvl);
+        }
+
+        function nextLevel() {
+            let nextLvl = currentLevel + 1;
+            if (nextLvl > 3) nextLvl = 1;
+            switchLevel(nextLvl);
+        }
+
+        // Terminal Log helpers
+        function clearTerminal() {
+            const view = document.getElementById('terminal-view');
+            if (view) {
+                view.innerHTML = '<span class="line-out info">*** Python Sandbox Initialized ***</span><span class="line-out">>>> </span>';
+            }
+        }
+
+        function printTerminal(text, type = "") {
+            const view = document.getElementById('terminal-view');
+            if (!view) return;
+            const l = document.createElement('span');
+            l.className = `line-out ${type}`;
+            l.textContent = text;
+            view.appendChild(l);
+            view.scrollTop = view.scrollHeight;
+        }
+
+        // Code Visualizer helper
+        function updateLiveCodeView(linesHtml) {
+            const view = document.getElementById('live-code-view');
+            if (view) view.innerHTML = linesHtml;
+        }
+
+        // Drag and Drop helpers
+        function setupDragEvents(elements, dropzones, onDropCallback) {
+            elements.forEach(el => {
+                el.setAttribute('draggable', 'true');
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', el.id);
+                    el.classList.add('selected-pulse');
+                    selectedDragEl = el;
+                });
+                el.addEventListener('dragend', () => {
+                    el.classList.remove('selected-pulse');
+                });
+                // Touch fallback
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.selected-pulse').forEach(item => item.classList.remove('selected-pulse'));
+                    el.classList.add('selected-pulse');
+                    selectedDragEl = el;
+                });
+            });
+
+            dropzones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => e.preventDefault());
+                zone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const id = e.dataTransfer.getData('text/plain');
+                    const dragged = document.getElementById(id) || selectedDragEl;
+                    if (dragged) {
+                        onDropCallback(dragged, zone);
+                    }
+                    selectedDragEl = null;
+                });
+                // Touch click placement
+                zone.addEventListener('click', () => {
+                    if (selectedDragEl) {
+                        onDropCallback(selectedDragEl, zone);
+                        selectedDragEl.classList.remove('selected-pulse');
+                        selectedDragEl = null;
+                    }
+                });
+            });
+        }
+
+        // ==========================================
+        // EXPRESSION TREE PARSER & RENDERER ENGINE
+        // ==========================================
+        function parseExpression(str) {
+            const tokens = [];
+            let i = 0;
+            while (i < str.length) {
+                let char = str[i];
+                if (/\s/.test(char)) { i++; continue; }
+                if (/[0-9]/.test(char)) {
+                    let num = "";
+                    while (i < str.length && /[0-9\.]/.test(str[i])) { num += str[i]; i++; }
+                    tokens.push({ type: 'NUMBER', value: parseFloat(num) });
+                    continue;
+                }
+                if (/[a-zA-Z_]/.test(char)) {
+                    let ident = "";
+                    while (i < str.length && /[a-zA-Z0-9_]/.test(str[i])) { ident += str[i]; i++; }
+                    if (['and', 'or', 'not'].includes(ident)) {
+                        tokens.push({ type: 'OPERATOR', value: ident });
+                    } else if (['abs', 'round', 'max', 'min', 'sum', 'pow'].includes(ident)) {
+                        tokens.push({ type: 'CALL_NAME', value: ident });
+                    } else {
+                        tokens.push({ type: 'VARIABLE', value: ident });
+                    }
+                    continue;
+                }
+                if (char === '+' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '+=' }); i += 2; continue; }
+                if (char === '-' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '-=' }); i += 2; continue; }
+                if (char === '*' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '*=' }); i += 2; continue; }
+                if (char === '/' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '/=' }); i += 2; continue; }
+                if (char === '%' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '%=' }); i += 2; continue; }
+                if (char === '*' && str[i+1] === '*') { tokens.push({ type: 'OPERATOR', value: '**' }); i += 2; continue; }
+                if (char === '/' && str[i+1] === '/') { tokens.push({ type: 'OPERATOR', value: '//' }); i += 2; continue; }
+                if (char === '=' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '==' }); i += 2; continue; }
+                if (char === '!' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '!=' }); i += 2; continue; }
+                if (char === '>' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '>=' }); i += 2; continue; }
+                if (char === '<' && str[i+1] === '=') { tokens.push({ type: 'OPERATOR', value: '<=' }); i += 2; continue; }
+                if (['+', '-', '*', '/', '%', '>', '<', '(', ')', ',', '='].includes(char)) {
+                    tokens.push({ type: ['(', ')'].includes(char) ? 'PAREN' : (char === ',' ? 'COMMA' : 'OPERATOR'), value: char });
+                    i++;
+                    continue;
+                }
+                i++;
+            }
+
+            let tokenIdx = 0;
+            function peek() { return tokens[tokenIdx]; }
+            function consume() { return tokens[tokenIdx++]; }
+
+            const PRECEDENCE = {
+                '=': 0, '+=': 0, '-=': 0, '*=': 0, '/=': 0, '%=': 0,
+                'or': 1, 'and': 2, 'not': 3,
+                '==': 4, '!=': 4, '>': 4, '<': 4, '>=': 4, '<=': 4,
+                '+': 5, '-': 5,
+                '*': 6, '/': 6, '//': 6, '%': 6,
+                '**': 7
+            };
+
+            function parsePrimary() {
+                let t = consume();
+                if (!t) return null;
+                if (t.type === 'NUMBER' || t.type === 'VARIABLE') {
+                    return { type: t.type, value: t.value };
+                }
+                if (t.type === 'CALL_NAME') {
+                    let next = consume(); // should be '('
+                    let args = [];
+                    if (peek() && peek().value !== ')') {
+                        while (true) {
+                            args.push(parseExpressionWithPrecedence(0));
+                            if (peek() && peek().value === ',') {
+                                consume();
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    consume(); // consume ')'
+                    return { type: 'CALL', name: t.value, args: args };
+                }
+                if (t.value === 'not') {
+                    let expr = parseExpressionWithPrecedence(PRECEDENCE['not']);
+                    return { type: 'UNARY', op: 'not', right: expr };
+                }
+                if (t.value === '(') {
+                    let expr = parseExpressionWithPrecedence(0);
+                    consume(); // consume ')'
+                    return expr;
+                }
+                return null;
+            }
+
+            function parseExpressionWithPrecedence(minPrec) {
+                let left = parsePrimary();
+                if (!left) return null;
+
+                while (true) {
+                    let opToken = peek();
+                    if (!opToken || opToken.type !== 'OPERATOR') break;
+                    let opPrec = PRECEDENCE[opToken.value] || 0;
+                    if (opPrec < minPrec) break;
+
+                    consume();
+                    let right = parseExpressionWithPrecedence(opPrec + 1);
+                    left = { type: 'BINARY', op: opToken.value, left: left, right: right };
+                }
+                return left;
+            }
+
+            return parseExpressionWithPrecedence(0);
+        }
+
+        function renderASTToHTML(node, uniqueId = {val: 0}) {
+            if (!node) return '<div class="tree-leaf empty">?</div>';
+            uniqueId.val++;
+            let nodeKey = `ast-node-${uniqueId.val}`;
+            node.domId = nodeKey;
+
+            if (node.type === 'NUMBER' || node.type === 'VARIABLE') {
+                return `<div class="tree-leaf" id="${nodeKey}">${node.value}</div>`;
+            }
+            if (node.type === 'UNARY') {
+                return `
+                    <div class="tree-branch">
+                        <div class="tree-op" id="${nodeKey}">${node.op}</div>
+                        <div class="tree-children">
+                            ${renderASTToHTML(node.right, uniqueId)}
+                        </div>
+                    </div>
+                `;
+            }
+            if (node.type === 'BINARY') {
+                return `
+                    <div class="tree-branch">
+                        <div class="tree-op" id="${nodeKey}">${node.op}</div>
+                        <div class="tree-children">
+                            ${renderASTToHTML(node.left, uniqueId)}
+                            ${renderASTToHTML(node.right, uniqueId)}
+                        </div>
+                    </div>
+                `;
+            }
+            if (node.type === 'CALL') {
+                return `
+                    <div class="tree-branch">
+                        <div class="tree-op" id="${nodeKey}">${node.name}()</div>
+                        <div class="tree-children">
+                            ${node.args.map(arg => renderASTToHTML(arg, uniqueId)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function getEvaluationSteps(node, vars = {}) {
+            const steps = [];
+            function traverse(n) {
+                if (!n) return 0;
+                if (n.type === 'NUMBER') return n.value;
+                if (n.type === 'VARIABLE') {
+                    let val = vars[n.value] !== undefined ? vars[n.value] : 0;
+                    steps.push({ node: n, text: `Load variable '${n.value}' → ${val}`, value: val });
+                    return val;
+                }
+                if (n.type === 'UNARY') {
+                    let rVal = traverse(n.right);
+                    let val = !rVal;
+                    steps.push({ node: n, text: `Evaluate: not ${rVal} → ${val}`, value: val });
+                    return val;
+                }
+                if (n.type === 'BINARY') {
+                    let lVal = traverse(n.left);
+                    let rVal = traverse(n.right);
+                    let val = 0;
+                    switch (n.op) {
+                        case '=':
+                        case '+=':
+                        case '-=':
+                        case '*=':
+                        case '/=':
+                        case '%=':
+                        case '+': val = lVal + rVal; break;
+                        case '-': val = lVal - rVal; break;
+                        case '*': val = lVal * rVal; break;
+                        case '/': val = lVal / rVal; break;
+                        case '//': val = Math.floor(lVal / rVal); break;
+                        case '%': val = lVal % rVal; break;
+                        case '**': val = Math.pow(lVal, rVal); break;
+                        case '==': val = lVal == rVal; break;
+                        case '!=': val = lVal != rVal; break;
+                        case '>': val = lVal > rVal; break;
+                        case '<': val = lVal < rVal; break;
+                        case '>=': val = lVal >= rVal; break;
+                        case '<=': val = lVal <= rVal; break;
+                        case 'and': val = lVal && rVal; break;
+                        case 'or': val = lVal || rVal; break;
+                    }
+                    steps.push({ node: n, text: `Evaluate: ${lVal} ${n.op} ${rVal} → ${val}`, value: val });
+                    return val;
+                }
+                if (n.type === 'CALL') {
+                    let argVals = n.args.map(arg => traverse(arg));
+                    let val = 0;
+                    switch (n.name) {
+                        case 'abs': val = Math.abs(argVals[0]); break;
+                        case 'round': val = parseFloat(argVals[0].toFixed(argVals[1] || 0)); break;
+                        case 'max': val = Math.max(...argVals); break;
+                        case 'min': val = Math.min(...argVals); break;
+                        case 'sum': val = argVals.reduce((acc, v) => acc + v, 0); break;
+                        case 'pow': val = Math.pow(argVals[0], argVals[1]); break;
+                    }
+                    steps.push({ node: n, text: `Call function: ${n.name}(${argVals.join(', ')}) → ${val}`, value: val });
+                    return val;
+                }
+                return 0;
+            }
+            traverse(node);
+            return steps;
+        }
+
+        // ==========================================
+        // LEVEL 1 ACTIVITY 1: CONSTRUCTOR LOGIC
+        // ==========================================
+        const l1a1Formulas = [
+            {
+                text: "Calculate Kinetic Energy",
+                expr: "0.5 * m * v ** 2",
+                slotsCount: 7,
+                target: 72,
+                vars: { m: 4, v: 6 },
+                desc: "Goal: Calculate kinetic energy of a drone. Formula: <code>0.5 * m * v**2</code>. Given parameters: <code>m = 4</code>, <code>v = 6</code>.",
+                pool: ["0.5", "*", "m", "*", "v", "**", "2", "+", "/"]
+            },
+            {
+                text: "Calculate Final Score with Bonus",
+                expr: "base + mult * ( hits % 5 )",
+                slotsCount: 9,
+                target: 25,
+                vars: { base: 10, mult: 5, hits: 13 },
+                desc: "Goal: Calculate player score with streak multiplier. Formula: <code>base + mult * (hits % 5)</code>. Given parameters: <code>base = 10</code>, <code>mult = 5</code>, <code>hits = 13</code>.",
+                pool: ["base", "+", "mult", "*", "(", "hits", "%", "5", ")", "10", "-", "//"]
+            }
+        ];
+
+        let l1a1Idx = 0;
+        let l1a1SlotsState = [];
+
+        function initLevel1Act1() {
+            clearTerminal();
+            l1a1SlotsState = [];
+            loadL1A1Formula();
+        }
+
+        function loadL1A1Formula() {
+            const formula = l1a1Formulas[l1a1Idx];
+            document.getElementById('l1a1-target-formula').innerHTML = `${formula.text} = ${formula.target}`;
+            document.getElementById('l1a1-instruction-text').innerHTML = formula.desc;
+            
+            // Render slots dynamically
+            const slotsContainer = document.getElementById('l1a1-slots-container');
+            slotsContainer.innerHTML = '';
+            l1a1SlotsState = [];
+            for (let i = 0; i < formula.slotsCount; i++) {
+                l1a1SlotsState.push("");
+                const slot = document.createElement('div');
+                slot.className = "drop-slot";
+                slot.id = `l1a1-slot-${i}`;
+                slot.textContent = `Slot ${i+1}`;
+                slotsContainer.appendChild(slot);
+            }
+
+            // Jumble variables inside dynamic badges pool
+            const poolContainer = document.getElementById('l1a1-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(formula.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l1a1-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            document.getElementById('l1a1-tree').innerHTML = '<span style="color:#aaa;">Build expression to visualize AST</span>';
+            l1a1UpdateLiveCode();
+            setupL1A1DragAndDrop();
+        }
+
+        function setupL1A1DragAndDrop() {
+            const badges = document.querySelectorAll('#l1a1-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l1a1-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+                
+                const index = slot.id.split('-').pop();
+                l1a1SlotsState[index] = dragged.dataset.val;
+
+                l1a1BuildTree();
+                l1a1UpdateLiveCode();
+            });
+        }
+
+        function l1a1BuildTree() {
+            const exprStr = l1a1SlotsState.filter(Boolean).join(" ");
+            if (!exprStr) return;
+            const ast = parseExpression(exprStr);
+            if (ast) {
+                document.getElementById('l1a1-tree').innerHTML = renderASTToHTML(ast);
+            }
+        }
+
+        function l1a1UpdateLiveCode() {
+            const formula = l1a1Formulas[l1a1Idx];
+            const expr = l1a1SlotsState.filter(Boolean).join(" ") || "[expression]";
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Kinetic evaluation logic</span></span>
+<span class="line">m = ${formula.vars.m || 4}</span>
+<span class="line">v = ${formula.vars.v || 6}</span>
+<span class="line">result = ${expr}</span>
+            `);
+        }
+
+        function evaluateL1A1Expression() {
+            const exprStr = l1a1SlotsState.filter(Boolean).join(" ");
+            if (l1a1SlotsState.some(s => !s)) {
+                printTerminal("SyntaxError: incomplete math expression statement.", "err");
+                return;
+            }
+
+            const formula = l1a1Formulas[l1a1Idx];
+            const ast = parseExpression(exprStr);
+            if (!ast) {
+                printTerminal("SyntaxError: invalid python expression tokens.", "err");
+                return;
+            }
+
+            printTerminal(">>> Starting Expression Tree evaluation...", "info");
+            const steps = getEvaluationSteps(ast, formula.vars);
+
+            let stepIdx = 0;
+            function runStep() {
+                if (stepIdx < steps.length) {
+                    const step = steps[stepIdx];
+                    printTerminal(`Traverse: ${step.text}`);
+                    
+                    if (step.node.domId) {
+                        const el = document.getElementById(step.node.domId);
+                        if (el) el.classList.add('evaluating-pulse');
+                    }
+
+                    stepIdx++;
+                    setTimeout(runStep, 800);
+                } else {
+                    const finalVal = steps[steps.length - 1].value;
+                    if (finalVal === formula.target) {
+                        printTerminal("🎉 Correct! Expression target matched successfully.", "ok");
+                        
+                        if (l1a1Idx < l1a1Formulas.length - 1) {
+                            showCompletionModal(
+                                "Formula Verified!",
+                                "You matched the target score! Proceed to the next formula scenario.",
+                                "Next Formula ▶",
+                                () => l1a1NextFormula()
+                            );
+                        } else {
+                            showCompletionModal(
+                                "Activity 1 Complete!",
+                                "You've successfully constructed all expressions in the Constructor Lab. Let's move to <strong>Activity 2: Expression Optimizer</strong>!",
+                                "Proceed to Activity 2 ▶",
+                                () => switchActivity(2)
+                            );
+                        }
+                    } else {
+                        printTerminal(`Verification Failed! Expected ${formula.target}, but got ${finalVal}.`, "err");
+                    }
+                }
+            }
+            runStep();
+        }
+
+        function l1a1NextFormula() {
+            l1a1Idx = (l1a1Idx + 1) % l1a1Formulas.length;
+            initLevel1Act1();
+        }
+
+        // ==========================================
+        // LEVEL 1 ACTIVITY 2: EXPRESSION OPTIMIZER
+        // ==========================================
+        const l1a2Puzzles = [
+            {
+                target: "total_score += score",
+                expr: "total_score = total_score + (score * 1)",
+                desc: "Statement: <code>total_score = total_score + (score * 1)</code><br>Goal: Simplify score calculations by utilizing in-place addition assignment operator.",
+                slotsCount: 3,
+                pool: ["total_score", "+=", "score", "=", "*="]
+            },
+            {
+                target: "value *= 8",
+                expr: "value = value * 2 * 2 * 2",
+                desc: "Statement: <code>value = value * 2 * 2 * 2</code><br>Goal: Optimize sequential multiplications into a single in-place multiplier shorthand expression.",
+                slotsCount: 3,
+                pool: ["value", "*=", "8", "=", "+=", "score"]
+            }
+        ];
+
+        let l1a2Idx = 0;
+        let l1a2SlotsState = [];
+
+        function initLevel1Act2() {
+            clearTerminal();
+            l1a2SlotsState = [];
+            loadL1A2Puzzle();
+        }
+
+        function loadL1A2Puzzle() {
+            const puzzle = l1a2Puzzles[l1a2Idx];
+            document.getElementById('l1a2-instruction-text').innerHTML = puzzle.desc;
+            
+            // Render slots dynamically
+            const slotsContainer = document.getElementById('l1a2-slots-container');
+            slotsContainer.innerHTML = '';
+            l1a2SlotsState = [];
+            for (let i = 0; i < puzzle.slotsCount; i++) {
+                l1a2SlotsState.push("");
+                const slot = document.createElement('div');
+                slot.className = "drop-slot";
+                slot.id = `l1a2-slot-${i}`;
+                slot.textContent = `Slot ${i+1}`;
+                slotsContainer.appendChild(slot);
+            }
+
+            // Jumble variables inside dynamic badges pool
+            const poolContainer = document.getElementById('l1a2-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(puzzle.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l1a2-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            document.getElementById('l1a2-tree').innerHTML = '<span style="color:#aaa;">Build expression to visualize AST</span>';
+            l1a2UpdateLiveCode();
+            setupL1A2DragAndDrop();
+        }
+
+        function setupL1A2DragAndDrop() {
+            const badges = document.querySelectorAll('#l1a2-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l1a2-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+                
+                const idx = slot.id.split('-').pop();
+                l1a2SlotsState[idx] = dragged.dataset.val;
+
+                l1a2BuildTree();
+                l1a2UpdateLiveCode();
+            });
+        }
+
+        function l1a2BuildTree() {
+            const exprStr = l1a2SlotsState.filter(Boolean).join(" ");
+            if (!exprStr) return;
+            const ast = parseExpression(exprStr);
+            if (ast) {
+                document.getElementById('l1a2-tree').innerHTML = renderASTToHTML(ast);
+            }
+        }
+
+        function l1a2UpdateLiveCode() {
+            const expr = l1a2SlotsState.filter(Boolean).join(" ") || "[expression]";
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Code optimization workbench</span></span>
+<span class="line">${expr}</span>
+            `);
+        }
+
+        function verifyL1A2Optimized() {
+            const exprStr = l1a2SlotsState.filter(Boolean).join(" ");
+            const puzzle = l1a2Puzzles[l1a2Idx];
+            
+            printTerminal(">>> Analyzing code optimization tree...", "info");
+
+            setTimeout(() => {
+                if (exprStr === puzzle.target) {
+                    printTerminal("🎉 Optimization Verified! Cleaner code constructed successfully.", "ok");
+                    
+                    if (l1a2Idx < l1a2Puzzles.length - 1) {
+                        showCompletionModal(
+                            "Optimization Clear!",
+                            "Your shorthand operator is verified! Proceed to the next optimizer scenario.",
+                            "Next Puzzle ▶",
+                            () => l1a2NextOptimizer()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Level 1 Complete!",
+                            "Outstanding! You've optimized all math pipelines in Level 1. Let's head to <strong>Level 2: Logic Engineering Center</strong>!",
+                            "Proceed to Level 2 ▶",
+                            () => switchLevel(2)
+                        );
+                    }
+                } else {
+                    printTerminal(`Optimization Failed! Expected '${puzzle.target}', but got '${exprStr}'.`, "err");
+                }
+            }, 800);
+        }
+
+        function l1a2NextOptimizer() {
+            l1a2Idx = (l1a2Idx + 1) % l1a2Puzzles.length;
+            initLevel1Act2();
+        }
+
+        // ==========================================
+        // LEVEL 2 ACTIVITY 1: SMART SYSTEM DESIGNER
+        // ==========================================
+        const l2a1Gates = [
+            {
+                title: "Airport Boarding Gate",
+                expr: "age >= 18 and boarding_pass",
+                slotsCount: 5,
+                pool: ["age", ">=", "18", "and", "boarding_pass", "or", "<", "True"],
+                desc: "Goal: Set logical validations check. Require passengers to be adults (<code>age >= 18</code>) AND hold a valid ticket coupon (<code>boarding_pass</code>).",
+                subjects: [
+                    { name: "Aisha", age: 25, boarding_pass: true, expected: true },
+                    { name: "Kofi", age: 15, boarding_pass: true, expected: false },
+                    { name: "Juan", age: 30, boarding_pass: false, expected: false }
+                ]
+            },
+            {
+                title: "Smart Home Security System",
+                expr: "motion or door_open",
+                slotsCount: 3,
+                pool: ["motion", "or", "door_open", "and", "armed", "not"],
+                desc: "Goal: Trigger alarm checks if motion detectors trip (<code>motion == True</code>) OR front entry opens (<code>door_open == True</code>).",
+                subjects: [
+                    { name: "Hallway Motion", motion: true, door_open: false, expected: true },
+                    { name: "Front Door Open", motion: false, door_open: true, expected: true },
+                    { name: "Quiet House", motion: false, door_open: false, expected: false }
+                ]
+            }
+        ];
+
+        let l2a1Idx = 0;
+        let l2a1SlotsState = [];
+
+        function initLevel2Act1() {
+            clearTerminal();
+            l2a1SlotsState = [];
+            loadL2A1System();
+        }
+
+        function loadL2A1System() {
+            const gate = l2a1Gates[l2a1Idx];
+            document.getElementById('l2a1-gate-title').textContent = gate.title;
+            document.getElementById('l2a1-instruction-text').innerHTML = gate.desc;
+
+            // Render slots dynamically
+            const slotsContainer = document.getElementById('l2a1-slots-container');
+            slotsContainer.innerHTML = '';
+            l2a1SlotsState = [];
+            for (let i = 0; i < gate.slotsCount; i++) {
+                l2a1SlotsState.push("");
+                const slot = document.createElement('div');
+                slot.className = "drop-slot";
+                slot.id = `l2a1-slot-${i}`;
+                slot.textContent = `Slot ${i+1}`;
+                slotsContainer.appendChild(slot);
+            }
+
+            // Jumble variables inside dynamic badges pool
+            const poolContainer = document.getElementById('l2a1-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(gate.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l2a1-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            // Draw subjects track
+            const track = document.getElementById('l2a1-subjects');
+            track.innerHTML = '';
+            gate.subjects.forEach((subj, index) => {
+                const card = document.createElement('div');
+                card.className = "subject-card";
+                card.id = `subject-card-${index}`;
+                card.innerHTML = `
+                    <strong>${subj.name}</strong><br>
+                    ${subj.age ? `age: ${subj.age}<br>` : ''}
+                    ${subj.boarding_pass !== undefined ? `pass: ${subj.boarding_pass}<br>` : ''}
+                    ${subj.motion !== undefined ? `motion: ${subj.motion}<br>` : ''}
+                    ${subj.door_open !== undefined ? `door: ${subj.door_open}` : ''}
+                    <span class="badge-status" style="background:#bbb;" id="subject-status-${index}">PENDING</span>
+                `;
+                track.appendChild(card);
+            });
+
+            l2a1UpdateLiveCode();
+            setupL2A1DragAndDrop();
+        }
+
+        function setupL2A1DragAndDrop() {
+            const badges = document.querySelectorAll('#l2a1-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l2a1-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l2a1SlotsState[idx] = dragged.dataset.val;
+
+                l2a1UpdateLiveCode();
+            });
+        }
+
+        function l2a1UpdateLiveCode() {
+            const expr = l2a1SlotsState.filter(Boolean).join(" ") || "[logic expression]";
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Smart gate logic check</span></span>
+<span class="line">authorized = ${expr}</span>
+            `);
+        }
+
+        function runL2A1SystemSimulation() {
+            const exprStr = l2a1SlotsState.filter(Boolean).join(" ");
+            if (l2a1SlotsState.some(s => !s)) {
+                printTerminal("SyntaxError: incomplete logical statement.", "err");
+                return;
+            }
+
+            const gate = l2a1Gates[l2a1Idx];
+            printTerminal(">>> Initiating validation simulation across test database...", "info");
+
+            let matchesAll = true;
+
+            gate.subjects.forEach((subj, index) => {
+                setTimeout(() => {
+                    let result = false;
+                    try {
+                        const parsed = parseExpression(exprStr);
+                        const vars = {
+                            age: subj.age,
+                            boarding_pass: subj.boarding_pass,
+                            motion: subj.motion,
+                            door_open: subj.door_open
+                        };
+                        const steps = getEvaluationSteps(parsed, vars);
+                        result = steps.length > 0 ? steps[steps.length - 1].value : false;
+                    } catch (e) {
+                        result = false;
+                    }
+
+                    const card = document.getElementById(`subject-card-${index}`);
+                    const badge = document.getElementById(`subject-status-${index}`);
+
+                    if (result === subj.expected) {
+                        card.className = "subject-card approved";
+                        badge.textContent = "VERIFIED";
+                        badge.style.background = "var(--correct)";
+                        printTerminal(`Subject '${subj.name}' validation matching expected state.`, "ok");
+                    } else {
+                        card.className = "subject-card denied";
+                        badge.textContent = "FAILED Check";
+                        badge.style.background = "var(--wrong)";
+                        printTerminal(`Subject '${subj.name}' security alarm triggered! Expected ${subj.expected}, got ${result}`, "err");
+                        matchesAll = false;
+                    }
+                }, index * 800);
+            });
+
+            setTimeout(() => {
+                if (matchesAll) {
+                    printTerminal("🎉 Smart System authorized! All verification conditions satisfied.", "ok");
+                    
+                    if (l2a1Idx < l2a1Gates.length - 1) {
+                        showCompletionModal(
+                            "Gate System Verified!",
+                            "All passengers and test subjects matched the gate requirements. Proceed to the next system.",
+                            "Next System ▶",
+                            () => l2a1NextSystem()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Activity 1 Complete!",
+                            "Airport and home security logic gates verified! Proceed to <strong>Activity 2: Operator Debug Studio</strong>.",
+                            "Proceed to Activity 2 ▶",
+                            () => switchActivity(2)
+                        );
+                    }
+                } else {
+                    printTerminal("💥 Verification failed! Gate configuration triggered false negatives.", "err");
+                }
+            }, gate.subjects.length * 850);
+        }
+
+        function l2a1NextSystem() {
+            l2a1Idx = (l2a1Idx + 1) % l2a1Gates.length;
+            initLevel2Act1();
+        }
+
+        // ==========================================
+        // LEVEL 2 ACTIVITY 2: DEBUG STUDIO
+        // ==========================================
+        const l2a2Puzzles = [
+            {
+                title: "Game Over Status Code",
+                expected: "or",
+                vars: { health: 0, lives: 3 },
+                desc: "Goal: Correct logical operators so that 'game_over' is triggered when EITHER health is 0 or less, OR lives are 0."
+            },
+            {
+                title: "Online Boarding Ticket Check",
+                expected: "and",
+                vars: { active_account: true, age: 14 },
+                desc: "Goal: Correct logical operators so passenger coupon triggers only if active_account is True AND passenger age is under 16."
+            }
+        ];
+
+        let l2a2Idx = 0;
+
+        function initLevel2Act2() {
+            clearTerminal();
+            loadL2A2Puzzle();
+        }
+
+        function loadL2A2Puzzle() {
+            const puzzle = l2a2Puzzles[l2a2Idx];
+            document.getElementById('l2a2-bug-title').textContent = puzzle.title;
+            document.getElementById('l2a2-instruction-text').innerHTML = puzzle.desc;
+            
+            const inspect = document.getElementById('l2a2-vars-inspect');
+            inspect.innerHTML = '<span style="font-size:0.75rem; text-transform:uppercase; font-weight:bold;">Inspector variables:</span>';
+            for (let k in puzzle.vars) {
+                const cell = document.createElement('div');
+                cell.className = "memory-grid-cell";
+                cell.innerHTML = `
+                    <span class="cell-address">0x2D</span>
+                    <span class="cell-var-name">${k}</span>
+                    <div class="cell-value-box">${puzzle.vars[k]}</div>
+                `;
+                inspect.appendChild(cell);
+            }
+
+            l2a2UpdateVisualizer();
+        }
+
+        function l2a2UpdateVisualizer() {
+            const op = document.getElementById('l2a2-bug-op-selector').value;
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Debugger code panel</span></span>
+<span class="line">game_over = health <= 0 ${op} lives == 0</span>
+            `);
+        }
+
+        function verifyL2A2Debug() {
+            const op = document.getElementById('l2a2-bug-op-selector').value;
+            const puzzle = l2a2Puzzles[l2a2Idx];
+
+            printTerminal(">>> Running verification suite...", "info");
+
+            setTimeout(() => {
+                if (op === puzzle.expected) {
+                    printTerminal("🎉 Fix Verified! Logical operator corrected successfully.", "ok");
+                    
+                    if (l2a2Idx < l2a2Puzzles.length - 1) {
+                        showCompletionModal(
+                            "Bug Cleared!",
+                            "The comparison check yields the correct status. Proceed to the next bug scenario.",
+                            "Next Bug ▶",
+                            () => l2a2NextDebug()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "Level 2 Complete!",
+                            "Incredible debugging skills! You solved all comparison/logical errors. Proceed to <strong>Level 3: Python Expression Architect</strong>!",
+                            "Proceed to Level 3 ▶",
+                            () => switchLevel(3)
+                        );
+                    }
+                } else {
+                    printTerminal(`Verification Failed! Operation evaluated to incorrect states under active variables.`, "err");
+                }
+            }, 800);
+        }
+
+        function l2a2NextDebug() {
+            l2a2Idx = (l2a2Idx + 1) % l2a2Puzzles.length;
+            initLevel2Act2();
+        }
+
+        // ==========================================
+        // LEVEL 3 ACTIVITY 1: ESCAPE ROOM CHALLENGE
+        // ==========================================
+        const l3a1Rooms = [
+            {
+                title: "Chamber 1 key",
+                target: 225,
+                vars: { target: 100, input: 85 },
+                slotsCount: 6,
+                pool: ["pow", "abs", "target", "-", "input", "2", "sum", "min"],
+                desc: "Goal: Nest built-ins abs() and pow() to calculate target minus input squared: pow(abs(target - input), 2).",
+                layoutType: "nested-call"
+            },
+            {
+                title: "Chamber 2 key",
+                target: 180,
+                vars: { x: 180, y: 220 },
+                slotsCount: 3,
+                pool: ["min", "x", "y", "max", "sum", "abs"],
+                desc: "Goal: Route minimum weight variables boundary by using comparison min(x, y).",
+                layoutType: "simple-call"
+            }
+        ];
+
+        let l3a1Idx = 0;
+        let l3a1SlotsState = [];
+
+        function initLevel3Act1() {
+            clearTerminal();
+            l3a1SlotsState = [];
+            loadL3A1Room();
+        }
+
+        function loadL3A1Room() {
+            const room = l3a1Rooms[l3a1Idx];
+            document.getElementById('l3a1-room-title').textContent = room.title;
+            document.getElementById('l3a1-room-target').textContent = room.target;
+            document.getElementById('l3a1-instruction-text').innerHTML = room.desc;
+
+            // Update status icons
+            for (let i = 0; i < 3; i++) {
+                const cell = document.getElementById(`escape-cell-${i}`);
+                cell.className = `escape-room-cell ${i === l3a1Idx ? 'current-room' : ''}`;
+                cell.querySelector('.status-icon').textContent = i < l3a1Idx ? "✓" : (i === l3a1Idx ? "🤖" : "🔒");
+            }
+
+            // Render slots dynamically based on layoutType
+            const slotsContainer = document.getElementById('l3a1-slots-container');
+            slotsContainer.innerHTML = '';
+            l3a1SlotsState = [];
+
+            if (room.layoutType === "nested-call") {
+                l3a1SlotsState = ["", "", "", "", "", ""];
+                
+                const s1 = createSlot('l3a1', 0);
+                const s2 = createSlot('l3a1', 1);
+                const s3 = createSlot('l3a1', 2);
+                const s4 = createSlot('l3a1', 3);
+                const s5 = createSlot('l3a1', 4);
+                const s6 = createSlot('l3a1', 5);
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(document.createTextNode(" ( "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(document.createTextNode(" ( "));
+                slotsContainer.appendChild(s3);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s4);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s5);
+                slotsContainer.appendChild(document.createTextNode(" ) , "));
+                slotsContainer.appendChild(s6);
+                slotsContainer.appendChild(document.createTextNode(" )"));
+            } else {
+                l3a1SlotsState = ["", "", ""];
+                
+                const s1 = createSlot('l3a1', 0);
+                const s2 = createSlot('l3a1', 1);
+                const s3 = createSlot('l3a1', 2);
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(document.createTextNode(" ( "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(document.createTextNode(" , "));
+                slotsContainer.appendChild(s3);
+                slotsContainer.appendChild(document.createTextNode(" )"));
+            }
+
+            // Jumble variables inside dynamic badges pool
+            const poolContainer = document.getElementById('l3a1-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(room.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l3a1-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            l3a1UpdateLiveCode();
+            setupL3A1DragAndDrop();
+        }
+
+        function createSlot(prefix, idx) {
+            const slot = document.createElement('div');
+            slot.className = "drop-slot";
+            slot.id = `${prefix}-slot-${idx}`;
+            slot.textContent = `Slot ${idx+1}`;
+            return slot;
+        }
+
+        function setupL3A1DragAndDrop() {
+            const badges = document.querySelectorAll('#l3a1-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l3a1-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l3a1SlotsState[idx] = dragged.dataset.val;
+
+                l3a1UpdateLiveCode();
+            });
+        }
+
+        function l3a1UpdateLiveCode() {
+            const room = l3a1Rooms[l3a1Idx];
+            if (!room) return;
+            const tokens = [...l3a1SlotsState];
+            let expr = "";
+            if (room.layoutType === "nested-call") {
+                const s0 = tokens[0] || "[fn]";
+                const s1 = tokens[1] || "[fn]";
+                const s2 = tokens[2] || "[var]";
+                const s3 = tokens[3] || "[op]";
+                const s4 = tokens[4] || "[var]";
+                const s5 = tokens[5] || "[val]";
+                expr = `${s0}(${s1}(${s2} ${s3} ${s4}), ${s5})`;
+            } else {
+                const s0 = tokens[0] || "[fn]";
+                const s1 = tokens[1] || "[var]";
+                const s2 = tokens[2] || "[var]";
+                expr = `${s0}(${s1}, ${s2})`;
+            }
+
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Chamber code verification</span></span>
+<span class="line">result = ${expr}</span>
+            `);
+        }
+
+        function verifyL3A1Keypad() {
+            const tokens = [...l3a1SlotsState];
+            const room = l3a1Rooms[l3a1Idx];
+            if (tokens.some(t => !t)) {
+                printTerminal("SyntaxError: incomplete key expression.", "err");
+                return;
+            }
+
+            let expr = "";
+            if (room.layoutType === "nested-call") {
+                expr = `${tokens[0]}(${tokens[1]}(${tokens[2]} ${tokens[3]} ${tokens[4]}), ${tokens[5]})`;
+            } else {
+                expr = `${tokens[0]}(${tokens[1]}, ${tokens[2]})`;
+            }
+            const ast = parseExpression(expr);
+
+            if (!ast) {
+                printTerminal("SyntaxError: parser failed resolving tokens.", "err");
+                return;
+            }
+
+            printTerminal(">>> Evaluating decrypter key logic...", "info");
+            const steps = getEvaluationSteps(ast, room.vars);
+
+            let stepIdx = 0;
+            function runStep() {
+                if (stepIdx < steps.length) {
+                    printTerminal(`Traverse: ${steps[stepIdx].text}`);
+                    stepIdx++;
+                    setTimeout(runStep, 800);
+                } else {
+                    const finalVal = steps[steps.length - 1].value;
+                    if (finalVal === room.target) {
+                        printTerminal("🎉 Key verified! Decryption matching target signature.", "ok");
+                        l3a1Idx++;
+                        
+                        if (l3a1Idx < l3a1Rooms.length) {
+                            showCompletionModal(
+                                "Chamber Unlocked!",
+                                "Robot advances! Proceed to the next cryptographic lock key.",
+                                "Unlock Next Chamber ▶",
+                                () => loadL3A1Room()
+                            );
+                        } else {
+                            document.getElementById('escape-cell-2').className = "escape-room-cell unlocked";
+                            document.getElementById('escape-cell-2').querySelector('.status-icon').textContent = "🎉";
+                            showCompletionModal(
+                                "Escape Room Complete!",
+                                "Excellent! The robot escaped the chambers. Move to <strong>Activity 2: Programming Mission Builder</strong>!",
+                                "Proceed to Activity 2 ▶",
+                                () => switchActivity(2)
+                            );
+                        }
+                    } else {
+                        printTerminal(`Key Decryption Failed! Computed signature ${finalVal} does not match target.`, "err");
+                    }
+                }
+            }
+            runStep();
+        }
+
+        // ==========================================
+        // LEVEL 3 ACTIVITY 2: MISSION BUILDER
+        // ==========================================
+        const l3a2Missions = [
+            {
+                title: "Calculate Employee Bonus",
+                vars: { base: 3000, rating: 5 },
+                target: 4000,
+                pool: ["base", "+", "max", "0", "rating", "-", "3", "*", "500", "min", "sum"],
+                layoutType: "bonus-calc",
+                desc: "Goal: Calculate final employee salary. Formula: base + max(0, rating - 3) * 500."
+            },
+            {
+                title: "Absolute Temperature Variance Check",
+                vars: { target_temp: 22, actual_temp: 18 },
+                target: 4,
+                pool: ["abs", "target_temp", "-", "actual_temp", "+", "min", "max"],
+                layoutType: "abs-diff",
+                desc: "Goal: Calculate positive temperature variance using abs() built-in function."
+            }
+        ];
+
+        let l3a2Idx = 0;
+        let l3a2SlotsState = [];
+
+        function initLevel3Act2() {
+            clearTerminal();
+            l3a2SlotsState = [];
+            loadL3A2Mission();
+        }
+
+        function loadL3A2Mission() {
+            const mission = l3a2Missions[l3a2Idx];
+            document.getElementById('l3a2-mission-title').textContent = mission.title;
+            document.getElementById('l3a2-instruction-text').innerHTML = mission.desc;
+
+            // Render slots dynamically
+            const slotsContainer = document.getElementById('l3a2-slots-container');
+            slotsContainer.innerHTML = '';
+            l3a2SlotsState = [];
+
+            if (mission.layoutType === "bonus-calc") {
+                l3a2SlotsState = ["", "", "", "", "", "", "", "", ""];
+                
+                const s1 = createSlot('l3a2', 0);
+                const s2 = createSlot('l3a2', 1);
+                const s3 = createSlot('l3a2', 2);
+                const s4 = createSlot('l3a2', 3);
+                const s5 = createSlot('l3a2', 4);
+                const s6 = createSlot('l3a2', 5);
+                const s7 = createSlot('l3a2', 6);
+                const s8 = createSlot('l3a2', 7);
+                const s9 = createSlot('l3a2', 8);
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s3);
+                slotsContainer.appendChild(document.createTextNode(" ( "));
+                slotsContainer.appendChild(s4);
+                slotsContainer.appendChild(document.createTextNode(" , "));
+                slotsContainer.appendChild(s5);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s6);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s7);
+                slotsContainer.appendChild(document.createTextNode(" ) "));
+                slotsContainer.appendChild(s8);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s9);
+            } else {
+                l3a2SlotsState = ["", "", "", ""];
+                
+                const s1 = createSlot('l3a2', 0);
+                const s2 = createSlot('l3a2', 1);
+                const s3 = createSlot('l3a2', 2);
+                const s4 = createSlot('l3a2', 3);
+
+                slotsContainer.appendChild(s1);
+                slotsContainer.appendChild(document.createTextNode(" ( "));
+                slotsContainer.appendChild(s2);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s3);
+                slotsContainer.appendChild(document.createTextNode(" "));
+                slotsContainer.appendChild(s4);
+                slotsContainer.appendChild(document.createTextNode(" )"));
+            }
+
+            // Jumble variables inside dynamic badges pool
+            const poolContainer = document.getElementById('l3a2-pool');
+            poolContainer.innerHTML = '';
+            const jumbledPool = shuffleArray(mission.pool);
+            jumbledPool.forEach((val, idx) => {
+                const badge = document.createElement('div');
+                badge.className = "draggable-badge";
+                badge.id = `l3a2-badge-${idx}`;
+                badge.dataset.val = val;
+                badge.textContent = val;
+                poolContainer.appendChild(badge);
+            });
+
+            l3a2UpdateLiveCode();
+            setupL3A2DragAndDrop();
+        }
+
+        function setupL3A2DragAndDrop() {
+            const badges = document.querySelectorAll('#l3a2-pool .draggable-badge');
+            const slots = document.querySelectorAll('#l3a2-slots-container .drop-slot');
+
+            setupDragEvents(badges, slots, (dragged, slot) => {
+                slot.textContent = dragged.dataset.val;
+                slot.className = "drop-slot active-occupied";
+
+                const idx = slot.id.split('-').pop();
+                l3a2SlotsState[idx] = dragged.dataset.val;
+
+                l3a2UpdateLiveCode();
+            });
+        }
+
+        function l3a2UpdateLiveCode() {
+            const mission = l3a2Missions[l3a2Idx];
+            if (!mission) return;
+            const tokens = [...l3a2SlotsState];
+            let expr = "";
+            if (mission.layoutType === "bonus-calc") {
+                const s0 = tokens[0] || "[var]";
+                const s1 = tokens[1] || "[op]";
+                const s2 = tokens[2] || "[fn]";
+                const s3 = tokens[3] || "[val]";
+                const s4 = tokens[4] || "[var]";
+                const s5 = tokens[5] || "[op]";
+                const s6 = tokens[6] || "[val]";
+                const s7 = tokens[7] || "[op]";
+                const s8 = tokens[8] || "[val]";
+                expr = `${s0} ${s1} ${s2}(${s3}, ${s4} ${s5} ${s6}) ${s7} ${s8}`;
+            } else {
+                const s0 = tokens[0] || "[fn]";
+                const s1 = tokens[1] || "[var]";
+                const s2 = tokens[2] || "[op]";
+                const s3 = tokens[3] || "[var]";
+                expr = `${s0}(${s1} ${s2} ${s3})`;
+            }
+
+            updateLiveCodeView(`
+<span class="line"><span class="comment"># Programming mission compiler</span></span>
+${mission.layoutType === 'bonus-calc' ? `
+<span class="line">base = ${mission.vars.base}</span>
+<span class="line">rating = ${mission.vars.rating}</span>
+` : `
+<span class="line">target_temp = ${mission.vars.target_temp}</span>
+<span class="line">actual_temp = ${mission.vars.actual_temp}</span>
+`}
+<span class="line">total = ${expr}</span>
+            `);
+        }
+
+        function verifyL3A2Mission() {
+            const tokens = [...l3a2SlotsState];
+            if (tokens.some(t => !t)) {
+                printTerminal("SyntaxError: incomplete calculation mission.", "err");
+                return;
+            }
+
+            const mission = l3a2Missions[l3a2Idx];
+            let expr = "";
+            if (mission.layoutType === "bonus-calc") {
+                expr = `${tokens[0]} ${tokens[1]} ${tokens[2]}(${tokens[3]}, ${tokens[4]} [op] ${tokens[6]}) ${tokens[7]} ${tokens[8]}`;
+                // Wait! Replace target bracket formatting
+                expr = `${tokens[0]} ${tokens[1]} ${tokens[2]}(${tokens[3]}, ${tokens[4]} ${tokens[5]} ${tokens[6]}) ${tokens[7]} ${tokens[8]}`;
+            } else {
+                expr = `${tokens[0]}(${tokens[1]} ${tokens[2]} ${tokens[3]})`;
+            }
+            const ast = parseExpression(expr);
+
+            if (!ast) {
+                printTerminal("SyntaxError: parsing failed on mission constructor.", "err");
+                return;
+            }
+
+            printTerminal(">>> Launching compiled code on client database...", "info");
+            const steps = getEvaluationSteps(ast, mission.vars);
+
+            setTimeout(() => {
+                const finalVal = steps[steps.length - 1].value;
+                if (finalVal === mission.target) {
+                    printTerminal(`🎉 Mission Accomplished! Output matched target: ${finalVal}`, "ok");
+                    
+                    if (l3a2Idx < l3a2Missions.length - 1) {
+                        showCompletionModal(
+                            "Database Mission Verified!",
+                            "The expression compiles correctly. Proceed to the final database mission.",
+                            "Next Mission ▶",
+                            () => l3a2NextMission()
+                        );
+                    } else {
+                        showCompletionModal(
+                            "All Levels Complete! 🏆",
+                            "Congratulations! You've mastered Python operators, precedence, logic systems, and built-in math functions in Python Module 1.2!",
+                            "Restart Module 1.2 🔄",
+                            () => switchLevel(1)
+                        );
+                    }
+                } else {
+                    printTerminal("Mission Failed! Output calculation is incorrect.", "err");
+                }
+            }, 800);
+        }
+
+        function l3a2NextMission() {
+            l3a2Idx = (l3a2Idx + 1) % l3a2Missions.length;
+            initLevel3Act2();
+        }
+
+        // ==========================================
+        // GLOBAL LEVEL CONTROLLER
+        // ==========================================
+        function initActivityState(level, activity) {
+            clearTerminal();
+
+            if (level === 1) {
+                if (activity === 1) initLevel1Act1();
+                if (activity === 2) initLevel1Act2();
+            } else if (level === 2) {
+                if (activity === 1) initLevel2Act1();
+                if (activity === 2) initLevel2Act2();
+            } else if (level === 3) {
+                if (activity === 1) initLevel3Act1();
+                if (activity === 2) initLevel3Act2();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            switchLevel(1);
+        });
+    </script>
+</body>
+</html>
