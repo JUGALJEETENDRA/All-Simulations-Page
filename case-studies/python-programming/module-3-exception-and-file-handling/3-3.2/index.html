@@ -1,2923 +1,521 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python File Handling OS Simulator</title>
+    <title>File I/O: Hospital Patient Records</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
 
         :root {
-            --primary: #cc0000;
-            --primary-glow: rgba(204, 0, 0, 0.15);
-            --bg: #ffffff;
-            --bg-dark: #f8f9fa;
-            --text: #000000;
-            --text-muted: #555555;
-            --border: #e0e0e0;
-            --border-primary: #cc0000;
-            --code-bg: #000000;
-            --code-text: #ffffff;
-            --hl-keyword: #ff4d4d;
-            --hl-string: #ffcc00;
-            --hl-builtin: #33ccff;
-            --hl-number: #33ff33;
-            --hl-comment: #777777;
-            --font-ui: 'Outfit', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg-canvas: #f8f7f4;
+            --tech-blue: #2c5282;
+            --alert-orange: #c05621;
+            --text-main: #1a202c;
+            --file-amber: #d97706;
+            --file-green: #059669;
         }
 
         body {
-            font-family: var(--font-ui);
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            font-family: 'IBM+Plex+Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            line-height: 1.6;
         }
 
-        /* HEADER HUD */
-        header {
+        .serif {
+            font-family: 'IBM+Plex+Serif', serif;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .technical-image-container {
+            border: 1px solid #e2e8f0;
             background: #ffffff;
-            border-bottom: 2px solid var(--border-primary);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-
-        .header-title-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-badge {
-            background: var(--primary);
-            color: #ffffff;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .header-title {
-            font-weight: 800;
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-        }
-
-        .header-nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        .level-btn {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-        }
-
-        .level-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: rgba(204,0,0,0.02);
-        }
-
-        .level-btn.active {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-        }
-
-        /* MAIN WORKSPACE */
-        .workspace {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
+            border-radius: 12px;
             padding: 24px;
-            gap: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
         }
 
-        .activity-tabs {
+        /* Python Syntax Highlighting */
+        .kw {
+            color: #c05621;
+            font-weight: bold;
+        }
+
+        .str {
+            color: #2c5282;
+        }
+
+        .cmt {
+            color: #718096;
+            font-style: italic;
+        }
+
+        .func {
+            color: #805ad5;
+        }
+
+        .obj {
+            color: #3182ce;
+        }
+
+        /* File Animation Styles */
+        .disk-drive {
+            border: 4px solid #4a5568;
+            border-radius: 8px;
+            background: #2d3748;
+            position: relative;
+            overflow: hidden;
+            height: 180px;
+        }
+
+        .platter {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #a0aec0, #cbd5e1, #a0aec0);
+            border: 2px solid #718096;
+            position: absolute;
+            top: 30px;
+            left: 20px;
             display: flex;
-            gap: 8px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s linear;
         }
 
-        .activity-tab {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 6px 16px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
+        .platter::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #1a202c;
         }
 
-        .activity-tab:hover {
-            color: var(--primary);
-            background: rgba(204,0,0,0.05);
+        .platter.spinning {
+            animation: spin 1s linear infinite;
         }
 
-        .activity-tab.active {
-            color: var(--primary);
-            background: rgba(204,0,0,0.08);
-        }
-
-        /* SCREEN SPLIT */
-        .case-panel {
-            display: none;
-            animation: paneFadeIn 0.3s ease forwards;
-        }
-
-        .case-panel.active {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .case-panel.active {
-                grid-template-columns: 1fr;
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
             }
         }
 
-        @keyframes paneFadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .ram-block {
+            border: 2px solid #38a169;
+            background: #f0fff4;
+            border-radius: 4px;
+            padding: 8px;
+            min-height: 100px;
         }
 
-        /* GLASS CARDS */
-        .glass-card {
-            background: #ffffff;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.02);
-            position: relative;
-        }
-
-        .glass-card.interactive-panel {
-            border-color: var(--text);
-            min-height: 480px;
-        }
-
-        .card-header-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
-        }
-
-        .card-title {
-            font-weight: 800;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: -0.2px;
-        }
-
-        .card-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* DYNAMIC TERMINAL */
-        .terminal-box {
-            background: var(--code-bg);
-            color: var(--code-text);
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            border-radius: 8px;
-            padding: 16px;
-            height: 150px;
-            overflow-y: auto;
-            border: 2px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
-        }
-
-        .terminal-line {
-            line-height: 1.4;
-        }
-
-        .terminal-prompt {
-            color: var(--hl-keyword);
-            font-weight: bold;
-        }
-
-        .terminal-error {
-            color: #ff3333;
-            font-weight: bold;
-        }
-
-        .terminal-success {
-            color: #33ff33;
-            font-weight: bold;
-        }
-
-        /* CODE VIEWER */
-        .code-box {
-            background: var(--code-bg);
-            color: var(--code-text);
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            border-radius: 8px;
-            padding: 16px;
-            border: 2px solid var(--border);
-            min-height: 120px;
-            white-space: pre-wrap;
-            position: relative;
-        }
-
-        .code-box::before {
-            content: "PYTHON GENERATED CODE";
+        /* Data Packet Animation */
+        .data-packet {
             position: absolute;
-            top: 4px;
-            right: 12px;
-            font-size: 0.65rem;
-            font-family: var(--font-ui);
-            color: var(--hl-comment);
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            background: #fbbf24;
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 1s ease-in-out;
         }
 
-        .hl-keyword { color: var(--hl-keyword); font-weight: bold; }
-        .hl-string { color: var(--hl-string); }
-        .hl-builtin { color: var(--hl-builtin); }
-        .hl-number { color: var(--hl-number); }
-        .hl-comment { color: var(--hl-comment); font-style: italic; }
-
-        /* BUTTON DESIGN */
-        .btn-primary {
-            background: var(--primary);
-            color: #ffffff;
-            border: 2px solid var(--primary);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            background: #990000;
-            border-color: #990000;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: #ffffff;
-            border: 2px solid var(--text);
-            color: var(--text);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
-        /* HINT SYSTEM CARD */
-        .hint-accordion {
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            overflow: hidden;
-            background: rgba(204, 0, 0, 0.03);
-            margin-top: 12px;
-        }
-
-        .hint-summary {
-            background: var(--primary);
-            color: #ffffff;
-            padding: 12px 16px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-transform: uppercase;
-            user-select: none;
-        }
-
-        .hint-summary::after {
-            content: "▼";
-            font-size: 0.75rem;
-            transition: transform 0.2s ease;
-        }
-
-        details[open] .hint-summary::after {
-            transform: rotate(180deg);
-        }
-
-        .hint-body-content {
-            padding: 16px;
-            background: #ffffff;
-            border-top: 2px solid var(--primary);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .hint-text {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: var(--text);
-        }
-
-        .hint-stage-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .hint-stage-dots {
-            display: flex;
-            gap: 6px;
-        }
-
-        .hint-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--border);
-        }
-
-        .hint-dot.active {
-            background: var(--primary);
-        }
-
-        /* LEVEL 1: DESKTOP SIMULATION */
-        .desktop-area {
-            background: var(--bg-dark);
-            border: 2px dashed var(--border);
-            border-radius: 8px;
-            flex: 1;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 16px;
-            position: relative;
-        }
-
-        .file-icon-card {
-            background: #ffffff;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            user-select: none;
-        }
-
-        .file-icon-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .file-icon-card.selected {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .file-glyph {
-            font-size: 2.2rem;
-        }
-
-        .file-label {
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-align: center;
-            word-break: break-all;
-        }
-
-        .file-badge-mode {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: var(--primary);
-            color: #ffffff;
-            font-family: var(--font-mono);
-            font-size: 0.65rem;
+        .file-pointer {
+            background: #ef4444;
+            color: white;
             padding: 2px 4px;
-            border-radius: 3px;
-            display: none;
-        }
-
-        .drop-mode-placeholder {
-            border: 2px dashed var(--primary);
-            background: rgba(204, 0, 0, 0.05);
-            border-radius: 6px;
-            height: 36px;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--primary);
-        }
-
-        .modes-pool {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-dark);
-        }
-
-        .mode-drag-tag {
-            background: #ffffff;
-            border: 2px solid var(--text);
-            border-radius: 6px;
-            padding: 6px 14px;
-            font-family: var(--font-mono);
-            font-weight: 700;
-            cursor: grab;
-            user-select: none;
-            transition: all 0.15s ease;
-        }
-
-        .mode-drag-tag:active {
-            cursor: grabbing;
-            transform: scale(0.95);
-        }
-
-        .mode-drag-tag.dragged {
-            opacity: 0.5;
-        }
-
-        /* LEVEL 2: CODE SIMULATOR AND EDITOR */
-        .code-editor-panel {
-            background: #ffffff;
-            border: 2px solid var(--text);
-            border-radius: 8px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            min-height: 280px;
-        }
-
-        .editor-tab-bar {
-            background: var(--bg-dark);
-            border-bottom: 2px solid var(--text);
-            padding: 0 12px;
-            display: flex;
-        }
-
-        .editor-tab {
-            padding: 8px 16px;
-            border-right: 2px solid var(--text);
-            font-weight: bold;
-            font-size: 0.8rem;
-            background: #ffffff;
-            margin-top: 4px;
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
-            border-bottom: 2px solid #ffffff;
-            margin-bottom: -2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .editor-content-area {
-            flex: 1;
-            padding: 20px;
-            position: relative;
-            line-height: 1.6;
-            color: #000000;
-            outline: none;
-        }
-
-        .editor-line-highlight {
-            background: rgba(204, 0, 0, 0.08);
-            border-left: 3px solid var(--primary);
-            padding-left: 6px;
-        }
-
-        .cursor-pointer {
-            background: var(--primary);
-            color: #ffffff;
+            border-radius: 2px;
             display: inline-block;
-            width: 8px;
-            height: 1.2em;
-            vertical-align: middle;
-            animation: cursorBlink 1s infinite steps(2, start);
-            margin-left: 2px;
+            transition: all 0.3s;
         }
 
-        @keyframes cursorBlink {
-            to { visibility: hidden; }
-        }
+        /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+        @media print {
 
-        /* VISUAL FLUSH PIPELINE */
-        .pipeline-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            gap: 12px;
-            padding: 16px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-dark);
-        }
+            /* Reset body/html defaults for clean printing */
+            html,
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
 
-        .pipeline-block {
-            background: #ffffff;
-            border: 2px solid var(--text);
-            border-radius: 8px;
-            padding: 16px;
-            width: 140px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 0.8rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-        }
+            /* Keep overflow visible to prevent multi-page cropping/clipping */
+            html,
+            body,
+            main,
+            section,
+            div,
+            pre,
+            code,
+            table,
+            tr,
+            td,
+            canvas,
+            .technical-image-container,
+            .chart-container {
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+                position: static !important;
+            }
 
-        .pipeline-arrow {
-            font-size: 1.5rem;
-            color: var(--primary);
-            animation: arrowPulse 1.2s infinite ease-in-out;
-        }
+            /* Ensure structural blocks break elegantly across pages */
+            pre,
+            blockquote,
+            table,
+            tr,
+            img,
+            canvas,
+            .technical-image-container,
+            .chart-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
 
-        @keyframes arrowPulse {
-            0%, 100% { transform: translateX(0); opacity: 0.5; }
-            50% { transform: translateX(6px); opacity: 1; }
-        }
+            /* Avoid orphaned headers at the bottom of a page */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
 
-        .pipeline-data-chunk {
-            background: var(--primary);
-            color: #ffffff;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-top: 4px;
-            display: none;
-            animation: chunkMove 0.8s ease forwards;
-        }
-
-        /* LEVEL 3: BYTE GRID EXPLORER */
-        .byte-explorer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
-            gap: 6px;
-            background: var(--bg-dark);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            max-height: 240px;
-            overflow-y: auto;
-        }
-
-        .byte-box {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .byte-box:hover {
-            border-color: var(--primary);
-            background: rgba(204,0,0,0.02);
-        }
-
-        .byte-box.pointer-active {
-            border-color: var(--primary);
-            background: rgba(204, 0, 0, 0.08);
-            box-shadow: 0 0 8px var(--primary-glow);
-        }
-
-        .byte-box.pointer-active::after {
-            content: "▲";
-            position: absolute;
-            bottom: -12px;
-            font-size: 0.6rem;
-            color: var(--primary);
-        }
-
-        .byte-char {
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-
-        .byte-idx {
-            font-family: var(--font-mono);
-            font-size: 0.55rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .pointer-info-bar {
-            background: #ffffff;
-            border: 2px solid var(--text);
-            border-radius: 8px;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-around;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-        }
-
-        .pointer-info-val {
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        /* TOAST FLOATING BANNER */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .toast-banner {
-            background: #ffffff;
-            border: 2px solid var(--text);
-            border-left: 6px solid var(--primary);
-            border-radius: 8px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            transform: translateX(120%);
-            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: var(--font-ui);
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .toast-banner.show {
-            transform: translateX(0);
-        }
-
-        /* PARTICLE CANVAS OVERLAY */
-        #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 999;
-        }
-
-        /* NAVIGATION ROW */
-        .activity-nav-row {
-            margin-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            background: #ffffff;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        }
-
-        .activity-nav-row span {
-            font-family: var(--font-ui);
-            font-weight: 700;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* CUSTOM STYLES FOR NEW L2A2 LOG PARSER */
-        .editor-tab-btn {
-            padding: 8px 16px;
-            border-right: 2px solid var(--text);
-            border-left: none;
-            border-top: none;
-            font-family: var(--font-ui);
-            font-weight: bold;
-            font-size: 0.85rem;
-            background: var(--bg-dark);
-            cursor: pointer;
-            margin-top: 4px;
-            border-top-left-radius: 4px;
-            border-top-right-radius: 4px;
-            border-bottom: 2px solid var(--text);
-            margin-bottom: -2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.15s ease;
-        }
-
-        .editor-tab-btn:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
-        .editor-tab-btn.active {
-            background: #ffffff;
-            border-bottom: 2px solid #ffffff;
-        }
-
-        .code-box select {
-            background: #222;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 4px;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            padding: 4px 8px;
-            margin: 0 4px;
-            outline: none;
-            cursor: pointer;
-        }
-        .code-box select:focus {
-            border-color: var(--primary);
+            /* Hide interactive/non-printable UI elements */
+            nav,
+            footer,
+            button,
+            .no-print,
+            [class*="sticky"],
+            [class*="fixed"] {
+                display: none !important;
+            }
         }
     </style>
 </head>
-<body>
 
-    <canvas id="particle-canvas"></canvas>
+<body class="antialiased">
 
-    <header>
-        <div class="header-title-group">
-            <span class="header-badge">MODULE 3.2</span>
-            <h1 class="header-title">File Handling OS Simulator</h1>
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-amber-600 flex items-center justify-center text-white font-bold rounded">I/O
+                </div>
+                <span class="font-bold tracking-tighter uppercase">Engineering Dossier</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+                <a href="#theory" class="hover:text-black transition">Foundations</a>
+                <a href="#modes" class="hover:text-black transition">I/O Modes</a>
+                <a href="#case" class="hover:text-black transition">Case Study: EMR</a>
+                <a href="#context" class="hover:text-black transition">Context Managers</a>
+                <a href="#lab" class="text-amber-700 font-bold">I/O Simulator</a>
+            </div>
         </div>
-        <nav class="header-nav">
-            <button class="level-btn active" id="btn-lvl1" onclick="switchLevel(1)">Level 1: Explorer</button>
-            <button class="level-btn" id="btn-lvl2" onclick="switchLevel(2)">Level 2: File Lab</button>
-            <button class="level-btn" id="btn-lvl3" onclick="switchLevel(3)">Level 3: Pointer Challenge</button>
-        </nav>
+    </nav>
+
+    <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+        <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Persistent Storage: File I/O Architecture
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            An engineering report bridging volatile memory (RAM) and persistent disk storage through Python's file
+            handling mechanisms.
+        </p>
+        <div class="mt-8 flex justify-center space-x-4">
+            <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ref: Module
+                3-3.2</span>
+            <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ver: 2026.Q3</span>
+        </div>
     </header>
 
-    <main class="workspace">
+    <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
 
-        <!-- LEVEL 1 PANELS -->
-        <div class="level-wrapper" id="lvl-1-wrapper">
-            <div class="activity-tabs">
-                <button class="activity-tab active" id="btn-l1-a1" onclick="switchActivity(1, 1)">Activity 1: File Mode Mission</button>
-                <button class="activity-tab" id="btn-l1-a2" onclick="switchActivity(1, 2)">Activity 2: File Rescue Challenge</button>
+        <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <div class="space-y-6">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">01. Theoretical Foundations</h2>
+                <h3 class="serif text-4xl leading-snug">Volatile vs. Persistent State</h3>
+                <p>
+                    Data structures like Lists and Dictionaries exist only in <strong>RAM (Volatile Memory)</strong>.
+                    When a Python script terminates, the memory is purged. To preserve state—such as saving a patient's
+                    medical history—the system must perform an <strong>I/O (Input/Output) operation</strong> to write
+                    that data to a hard drive or SSD (Persistent Storage).
+                </p>
+                <p>
+                    A File in Python is treated as a stream of bytes. Opening a file creates a <strong>File Object (or
+                        File Pointer)</strong> that acts as a bridge between the RAM running the script and the
+                    operating system managing the disk.
+                </p>
+                <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-gray-800">
+                    <p class="text-sm font-bold uppercase mb-2">Core Maxim:</p>
+                    <p class="italic text-gray-700">"Always close what you open. Memory leaks sink ships."</p>
+                </div>
+            </div>
+            <div class="technical-image-container">
+                <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-gray-500">I/O Data Pipeline</h4>
+                <div class="flex flex-col items-center justify-center space-y-2 font-mono text-sm">
+                    <div class="w-full bg-green-100 border border-green-500 p-4 rounded text-center">
+                        <strong>Python App (RAM)</strong><br>
+                        <span class="text-xs text-gray-600">patient_data = "Heart Rate: 80"</span>
+                    </div>
+                    <div class="text-xl text-gray-400">↓ write() / ↑ read()</div>
+                    <div class="w-3/4 bg-blue-100 border border-blue-500 p-2 rounded text-center text-xs">
+                        <strong>OS File Buffer</strong><br>
+                        (Data Queue)
+                    </div>
+                    <div class="text-xl text-gray-400">↓ flush()</div>
+                    <div class="w-full bg-gray-200 border border-gray-500 p-4 rounded text-center">
+                        <strong>Disk Storage (SSD/HDD)</strong><br>
+                        <span class="text-xs text-gray-600">patient_001.txt</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="modes" class="space-y-12">
+            <div class="max-w-3xl">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-amber-700">02. File Opening Modes</h2>
+                <h3 class="serif text-4xl mb-6">The Access Contract</h3>
+                <p class="mb-4">When opening a file via <code>open(filename, mode)</code>, the developer establishes a
+                    strict contract with the Operating System regarding intent. The mode dictates where the <strong>File
+                        Pointer</strong> begins and whether data can be overwritten.</p>
             </div>
 
-            <!-- Level 1 Activity 1: File Mode Mission -->
-            <div class="case-panel active" id="pane-l1a1" style="margin-top:20px;">
-                <div class="glass-card interactive-panel">
-                    <div class="card-header-group">
-                        <div class="card-title">Virtual OS Desktop</div>
-                        <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-muted);" id="l1a1-size-label">Size: 0 B</span>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px; margin-bottom:12px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary); margin-bottom:6px;">🕵️ Detective's Briefing: File Mode Mission</h4>
-                        <ol style="padding-left:16px; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
-                            <li>Select a target file card from the simulated Desktop explorer.</li>
-                            <li>Drag the correct opening mode tag (<code>r</code>, <code>w</code>, <code>a</code>, or <code>x</code>) from the pool and drop it onto the drag target block below.</li>
-                            <li>Observe the generate. d Python code matching your configuration block.</li>
-                            <li>Click <strong>Open and Run Code</strong> to test the operation and view animations of modifications or data wipes.</li>
-                        </ol>
-                    </div>
-                    
-                    <div class="desktop-area" id="l1a1-desktop"></div>
-
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-                        <label>Drag Mode Slot Target:</label>
-                        <div class="drop-mode-placeholder" id="l1a1-drop" ondragover="allowDrop(event)" ondrop="handleDropMode(event)">
-                            [ DRAG OPEN MODE HERE ]
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="technical-image-container border-t-4 border-t-blue-500">
+                    <h4 class="font-bold text-lg mb-2">'r' (Read)</h4>
+                    <p class="text-sm text-gray-600 mb-4">Default mode. Opens for reading. Raises
+                        <code>FileNotFoundError</code> if the file doesn't exist.
+                    </p>
+                    <div class="bg-gray-100 p-3 rounded font-mono text-xs text-gray-800">
+                        File Pointer: <span class="file-pointer">Beginning</span><br>
+                        Data Intact: Yes
                     </div>
                 </div>
 
-                <div class="glass-card">
-                    <div class="card-header-group">
-                        <div class="card-title">Mission Command</div>
+                <div class="technical-image-container border-t-4 border-t-red-500">
+                    <h4 class="font-bold text-lg mb-2">'w' (Write)</h4>
+                    <p class="text-sm text-gray-600 mb-4">Opens for writing. <strong>Creates file</strong> if missing.
+                        <strong>TRUNCATES (Deletes)</strong> existing data.
+                    </p>
+                    <div class="bg-gray-100 p-3 rounded font-mono text-xs text-gray-800">
+                        File Pointer: <span class="file-pointer">Beginning</span><br>
+                        Data Intact: <span class="text-red-600 font-bold">NO (Overwritten)</span>
                     </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary);" id="l1a1-mission-title">Mission: Loading...</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;" id="l1a1-mission-desc"></p>
+                </div>
+
+                <div class="technical-image-container border-t-4 border-t-green-500">
+                    <h4 class="font-bold text-lg mb-2">'a' (Append)</h4>
+                    <p class="text-sm text-gray-600 mb-4">Opens for appending. Creates file if missing. Safely adds new
+                        data without deleting history.</p>
+                    <div class="bg-gray-100 p-3 rounded font-mono text-xs text-gray-800">
+                        File Pointer: <span class="file-pointer">End (EOF)</span><br>
+                        Data Intact: Yes
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="case" class="space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="space-y-6">
+                    <h2 class="text-sm font-black uppercase tracking-[0.3em] text-red-700">03. Case Study: Healthcare
+                    </h2>
+                    <h3 class="serif text-4xl">Electronic Medical Records (EMR)</h3>
+                    <p>
+                        A hospital's EMR system requires rigorous file handling. When a nurse creates a new patient
+                        profile, the system must write the initial demographic data to a new file.
+                    </p>
+                    <p>
+                        However, when a doctor adds daily visit notes, the system <strong>must use Append ('a')
+                            mode</strong>. If the system accidentally uses Write ('w') mode, it will completely
+                        overwrite and erase the patient's entire medical history, creating a catastrophic liability.
+                    </p>
+                </div>
+
+                <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+                    <h4 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-slate-400">Visual Layout 3.1:
+                        EMR Append Workflow</h4>
+
+                    <div class="font-mono text-sm space-y-2">
+                        <span class="cmt"># Wrong: 'w' mode deletes medical history</span><br>
+                        <span class="text-gray-500 line-through">file = open("patient_99.txt", "w")</span><br><br>
+
+                        <span class="cmt"># Correct: 'a' mode appends to end of file</span><br>
+                        <span class="obj">file</span> = <span class="func">open</span>(<span
+                            class="str">"patient_99.txt"</span>, <span class="str">"a"</span>)<br>
+                        <br>
+                        <span class="cmt"># Write the new diagnosis string</span><br>
+                        <span class="obj">file</span>.<span class="func">write</span>(<span class="str">"Date: Oct 14 -
+                            Blood Pressure Normal\n"</span>)<br>
+                        <br>
+                        <span class="cmt"># Crucial: Release the OS resource</span><br>
+                        <span class="obj">file</span>.<span class="func">close</span>()<br>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="context" class="space-y-12">
+            <div class="max-w-3xl">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-green-700">04. Engineering Standard</h2>
+                <h3 class="serif text-4xl mb-6">The Context Manager (with keyword)</h3>
+                <p class="mb-4">
+                    In the case study above, if an error occurs <em>after</em> the file is opened but <em>before</em>
+                    <code>file.close()</code> is called, the file remains locked in memory. This leads to resource
+                    exhaustion (a Memory Leak).
+                </p>
+                <p>
+                    The industry standard is to use a <strong>Context Manager</strong> via the <code>with</code>
+                    statement. It automatically sets up and tears down the I/O connection, ensuring the file is safely
+                    closed regardless of whether the process succeeds or crashes.
+                </p>
+            </div>
+
+            <div class="technical-image-container">
+                <div
+                    class="font-mono text-sm bg-slate-900 p-6 rounded text-gray-300 shadow-inner max-w-2xl mx-auto border-l-4 border-green-500 relative">
+                    <span
+                        class="absolute top-2 right-2 bg-green-900 text-green-400 text-[10px] px-2 py-1 rounded">Industry
+                        Standard</span>
+                    <span class="cmt"># The 'with' block automatically handles the .close() method</span><br>
+                    <span class="kw">with</span> <span class="func">open</span>(<span
+                        class="str">"patient_log.txt"</span>, <span class="str">"r"</span>) <span class="kw">as</span>
+                    <span class="obj">emr_file</span>:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;history = <span class="obj">emr_file</span>.<span
+                        class="func">read</span>()<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="func">print</span>(history)<br>
+                    <br>
+                    <span class="cmt"># Once execution leaves the indentation block,</span><br>
+                    <span class="cmt"># the file is automatically and safely closed.</span><br>
+                </div>
+            </div>
+        </section>
+
+        <section id="lab" class="bg-black text-white p-12 rounded-3xl">
+            <h3 class="serif text-4xl mb-8 text-center">Interactive Engineering Lab</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-amber-500">I/O Mode Simulator</h4>
+                    <p class="text-sm text-gray-400 italic">Observe how different modes treat the File Pointer and
+                        existing data.</p>
+
+                    <div class="flex flex-col gap-3 font-mono text-sm">
+                        <div class="bg-gray-800 p-4 rounded">
+                            <label class="block text-gray-400 text-xs mb-2">Patient Data to Write:</label>
+                            <input type="text" id="dataInput" value="Temp: 98.6F"
+                                class="w-full bg-black border border-gray-600 rounded p-2 text-green-400 focus:border-amber-500 outline-none">
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="simulateIO('w')"
+                                class="flex-1 py-2 bg-red-900 hover:bg-red-800 border border-red-600 rounded font-bold transition">open(...,
+                                'w')</button>
+                            <button onclick="simulateIO('a')"
+                                class="flex-1 py-2 bg-green-900 hover:bg-green-800 border border-green-600 rounded font-bold transition">open(...,
+                                'a')</button>
+                        </div>
                     </div>
 
-                    <div class="modes-pool" id="l1a1-pool"></div>
-
-                    <div class="code-box" id="l1a1-code"># Syncing blocks...</div>
-
-                    <div class="terminal-box" id="l1a1-terminal">
-                        <div class="terminal-line"><span class="terminal-prompt">detective@filesystem:~$</span> Select a file to evaluate...</div>
+                    <div class="text-xs text-gray-400 mt-4 p-4 bg-white/5 rounded border-l-2 border-amber-500"
+                        id="statusLog">
+                        System ready. Disk is idle.
                     </div>
+                </div>
 
-                    <button class="btn-primary" onclick="l1a1.executeMission()">▶ Open and Run Code</button>
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-blue-500">Hardware Layer Representation
+                    </h4>
 
-                    <details class="hint-accordion">
-                        <summary class="hint-summary">Direct Case Solution Hints</summary>
-                        <div class="hint-body-content">
-                            <p class="hint-text" id="l1a1-hint-text">Select a mission or drag a tag to see progressive hint details.</p>
-                            <div class="hint-stage-nav">
-                                <div class="hint-stage-dots" id="l1a1-hint-dots"></div>
-                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l1a1.nextHint()">Reveal Next Hint</button>
+                    <div class="disk-drive p-4 flex justify-between relative" id="hardwareContainer">
+                        <div class="platter" id="diskPlatter"></div>
+
+                        <div
+                            class="absolute right-4 top-4 bottom-4 w-48 bg-black/80 border border-gray-600 rounded p-2 font-mono text-[10px] overflow-hidden flex flex-col">
+                            <div class="text-gray-500 border-b border-gray-700 pb-1 mb-1">patient_log.txt</div>
+                            <div id="fileContent" class="text-green-400 flex-1 flex flex-col items-start gap-1">
+                                <span class="bg-gray-800 px-1 rounded block w-full mb-1">DOB: 1990</span>
                             </div>
                         </div>
-                    </details>
-                </div>
-            </div>
 
-            <!-- Level 1 Activity 2: File Rescue Challenge -->
-            <div class="case-panel" id="pane-l1a2" style="margin-top:20px;">
-                <div class="glass-card interactive-panel">
-                    <div class="card-header-group">
-                        <div class="card-title">Rescue Operation Simulator</div>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px; margin-bottom:12px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary); margin-bottom:6px;">🕵️ Detective's Briefing: File Rescue Challenge</h4>
-                        <ol style="padding-left:16px; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
-                            <li>Review the critical backup / config scenario details on the card.</li>
-                            <li>Select the target opening mode dropdown option (<code>r</code>, <code>w</code>, <code>a</code>, or <code>x</code>).</li>
-                            <li>Observe the live Python file-handling code generation.</li>
-                            <li>Click <strong>Test Setup Execution</strong> to run trace validation. Save target files without losing previous logs!</li>
-                        </ol>
-                    </div>
-
-                    <div style="background:#ffffff; border:2px solid var(--text); border-radius:8px; padding:20px; flex:1; display:flex; flex-direction:column; gap:16px;">
-                        <h4 style="font-weight:800; font-size:1rem; color:var(--primary);" id="l1a2-scenario-title">Scenario Loading...</h4>
-                        <p style="font-size:0.9rem; line-height:1.5;" id="l1a2-scenario-desc"></p>
-                        
-                        <div style="border-top:1px solid var(--border); padding-top:16px; display:flex; flex-direction:column; gap:12px; margin-top:auto;">
-                            <label>File Target Path:</label>
-                            <input type="text" id="l1a2-path-val" style="font-weight:bold;" readonly>
-
-                            <label>Open Mode Select:</label>
-                            <select id="l1a2-mode-select" style="font-weight:bold;">
-                                <option value="r">r - Read Only</option>
-                                <option value="w">w - Write (Overwrite!)</option>
-                                <option value="a">a - Append</option>
-                                <option value="x">x - Exclusive Create</option>
-                            </select>
-                        </div>
+                        <div id="packet" class="data-packet left-[10px] top-[140px]">Data</div>
                     </div>
                 </div>
 
-                <div class="glass-card">
-                    <div class="card-header-group">
-                        <div class="card-title">Console Output logs</div>
-                    </div>
-                    
-                    <div class="code-box" id="l1a2-code"># Syncing rescue parameters...</div>
-
-                    <div class="terminal-box" id="l1a2-terminal">
-                        <div class="terminal-line"><span class="terminal-prompt">detective@rescuetool:~$</span> Configure target modes, then run test...</div>
-                    </div>
-
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-primary" style="flex:1;" onclick="l1a2.executeChallenge()">▶ Test Setup Execution</button>
-                        <button class="btn-secondary" onclick="l1a2.loadScenario()">Next Scenario</button>
-                    </div>
-
-                    <details class="hint-accordion">
-                        <summary class="hint-summary">Direct Case Solution Hints</summary>
-                        <div class="hint-body-content">
-                            <p class="hint-text" id="l1a2-hint-text">Loading instructions...</p>
-                            <div class="hint-stage-nav">
-                                <div class="hint-stage-dots" id="l1a2-hint-dots"></div>
-                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l1a2.nextHint()">Reveal Next Hint</button>
-                            </div>
-                        </div>
-                    </details>
-                </div>
             </div>
-            <!-- Navigation Row -->
-            <div class="activity-nav-row">
-                <button class="btn-secondary" id="btn-prev-l1" onclick="prevActivity()">← Previous Activity</button>
-                <span id="nav-status-l1">Activity 1 of 6</span>
-                <button class="btn-primary" id="btn-next-l1" onclick="nextActivity()">Next Activity →</button>
-            </div>
-        </div>
-
-        <!-- LEVEL 2 PANELS -->
-        <div class="level-wrapper" id="lvl-2-wrapper" style="display:none;">
-            <div class="activity-tabs">
-                <button class="activity-tab active" id="btn-l2-a1" onclick="switchActivity(2, 1)">Activity 1: Interactive File Reader</button>
-                <button class="activity-tab" id="btn-l2-a2" onclick="switchActivity(2, 2)">Activity 2: Live File Editor</button>
-            </div>
-
-            <!-- Level 2 Activity 1: Interactive File Reader -->
-            <div class="case-panel active" id="pane-l2a1" style="margin-top:20px;">
-                <div class="glass-card interactive-panel">
-                    <div class="card-header-group">
-                        <div class="card-title">Simulated Text Editor</div>
-                        <span style="font-size:0.8rem; font-family:var(--font-mono); color:var(--text-muted);" id="l2a1-pointer-tracker">Offset: 0</span>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px; margin-bottom:12px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary); margin-bottom:6px;">🕵️ Detective's Briefing: Interactive File Reader</h4>
-                        <ol style="padding-left:16px; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
-                            <li>Inspect the file content in the simulated editor. Note the red blinking cursor representing the file pointer.</li>
-                            <li>Click the read buttons:
-                                <ul style="padding-left:14px; margin-top:4px;">
-                                    <li><code>read()</code>: Highlights the whole file and moves the pointer to EOF.</li>
-                                    <li><code>readline()</code>: Highlights and reads the next single line, moving pointer.</li>
-                                    <li><code>readlines()</code>: Compiles and highlights each line item in a parsed list.</li>
-                                </ul>
-                            </li>
-                            <li>Click <strong>Reset File Pointer</strong> to return the byte offset cursor to 0 at any time.</li>
-                        </ol>
-                    </div>
-                    
-                    <div class="code-editor-panel">
-                        <div class="editor-tab-bar">
-                            <div class="editor-tab">📄 data_list.txt</div>
-                        </div>
-                        <div class="editor-content-area" id="l2a1-editor"></div>
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="card-header-group">
-                        <div class="card-title">Reader Controller</div>
-                    </div>
-                    <div style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;">
-                        <label for="l2a1-scenario-select" style="font-weight: 700; font-size: 0.85rem; color: var(--primary);">Select Scenario File:</label>
-                        <select id="l2a1-scenario-select" style="font-weight: bold; width: 100%; border: 2px solid var(--border); border-radius: 8px; padding: 8px;" onchange="l2a1.changeScenario(this.value)">
-                            <option value="0">Scenario 1: Grades Database (students_grades.txt)</option>
-                            <option value="1">Scenario 2: Server Security Logs (security_logs.txt)</option>
-                            <option value="2">Scenario 3: Device Telemetry Readings (sensor_data.csv)</option>
-                        </select>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <button class="btn-secondary" onclick="l2a1.runRead('read')">read()</button>
-                        <button class="btn-secondary" onclick="l2a1.runRead('readline')">readline()</button>
-                        <button class="btn-secondary" style="grid-column: span 2;" onclick="l2a1.runRead('readlines')">readlines()</button>
-                    </div>
-
-                    <div class="code-box" id="l2a1-code"># Syncing file operations...</div>
-
-                    <div class="terminal-box" id="l2a1-terminal">
-                        <div class="terminal-line"><span class="terminal-prompt">detective@reader:~$</span> Select a read method...</div>
-                    </div>
-
-                    <button class="btn-primary" onclick="l2a1.resetFile()">Reset File Pointer</button>
-
-                    <details class="hint-accordion">
-                        <summary class="hint-summary">Direct Case Solution Hints</summary>
-                        <div class="hint-body-content">
-                            <p class="hint-text" id="l2a1-hint-text">Loading instructions...</p>
-                            <div class="hint-stage-nav">
-                                <div class="hint-stage-dots" id="l2a1-hint-dots"></div>
-                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l2a1.nextHint()">Reveal Next Hint</button>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- Level 2 Activity 2: Log File Filter & Exporter -->
-            <div class="case-panel" id="pane-l2a2" style="margin-top:20px;">
-                <div class="glass-card interactive-panel">
-                    <div class="card-header-group">
-                        <div class="card-title">Simulated File Explorer</div>
-                        <span style="font-size:0.8rem; font-family:var(--font-mono); color:var(--text-muted);" id="l2a2-file-size-label">Input Size: 184 B</span>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px; margin-bottom:12px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary); margin-bottom:6px;">🕵️ Detective's Briefing: Log File Filter & Exporter</h4>
-                        <ol style="padding-left:16px; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
-                            <li>Select a log auditing task from the Scenario dropdown in the controller panel.</li>
-                            <li>Look at the Python code builder. Configure the correct file modes and handles so it reads <code>raw_logs.txt</code>, checks for the target log level, and writes matches to <code>filtered_output.txt</code>.</li>
-                            <li>Click <strong>Run Log Parser Script</strong>. Watch the processor read and filter the lines!</li>
-                        </ol>
-                    </div>
-
-                    <div class="code-editor-panel" style="min-height:300px;">
-                        <div class="editor-tab-bar">
-                            <button class="editor-tab-btn active" id="btn-l2a2-tab-in" onclick="l2a2.switchTab('in')">📄 raw_logs.txt</button>
-                            <button class="editor-tab-btn" id="btn-l2a2-tab-out" onclick="l2a2.switchTab('out')">📄 filtered_output.txt</button>
-                        </div>
-                        <div class="editor-content-area" id="l2a2-editor" style="white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.85rem;"></div>
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="card-header-group">
-                        <div class="card-title">Log Parser Controller</div>
-                    </div>
-                    
-                    <div style="margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px;">
-                        <label for="l2a2-scenario-select" style="font-weight: 700; font-size: 0.85rem; color: var(--primary);">Select Mission Audit Scenario:</label>
-                        <select id="l2a2-scenario-select" style="font-weight: bold; width: 100%; border: 2px solid var(--border); border-radius: 8px; padding: 8px;" onchange="l2a2.changeScenario(parseInt(this.value))">
-                            <option value="0">Scenario 1: Extract Critical System Errors</option>
-                            <option value="1">Scenario 2: Isolate Security Warnings</option>
-                            <option value="2">Scenario 3: Audit User Activity Logs</option>
-                        </select>
-                    </div>
-
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:12px; border-radius:8px; margin-bottom:12px;">
-                        <strong style="font-size:0.85rem; color:var(--primary);" id="l2a2-mission-title">Mission Target: Error Extract</strong>
-                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;" id="l2a2-mission-desc">Filter lines containing [ERROR] from raw_logs.txt and save to filtered_output.txt.</p>
-                    </div>
-
-                    <p class="card-desc" style="margin-bottom: 6px; font-weight: 700;">Complete the Python script below:</p>
-                    <div class="code-box" id="l2a2-code-builder" style="font-size:0.8rem; line-height: 1.8; margin-bottom: 12px; text-transform: none; text-align: left;">
-                        <span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"raw_logs.txt"</span>, <select id="l2a2-sel-mode-in"><option value="" selected disabled>--</option><option value="w">"w"</option><option value="a">"a"</option><option value="r">"r"</option><option value="x">"x"</option></select>) <span class="hl-keyword">as</span> f_in, <span class="hl-builtin">open</span>(<span class="hl-string">"filtered_output.txt"</span>, <select id="l2a2-sel-mode-out"><option value="" selected disabled>--</option><option value="r">"r"</option><option value="x">"x"</option><option value="a">"a"</option><option value="w">"w"</option></select>) <span class="hl-keyword">as</span> f_out:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-keyword">for</span> line <span class="hl-keyword">in</span> <select id="l2a2-sel-loop-obj"><option value="" selected disabled>--</option><option value="line">line</option><option value="f_out">f_out</option><option value="f_in">f_in</option></select>:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hl-keyword">if</span> <select id="l2a2-sel-filter-str"><option value="" selected disabled>--</option><option value="[WARNING]">"[WARNING]"</option><option value="[ERROR]">"[ERROR]"</option><option value="[AUDIT]">"[AUDIT]"</option></select> <span class="hl-keyword">in</span> line:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<select id="l2a2-sel-write-obj"><option value="" selected disabled>--</option><option value="line">line</option><option value="f_in">f_in</option><option value="f_out">f_out</option></select>.write(line)
-                    </div>
-
-                    <div class="terminal-box" id="l2a2-terminal">
-                        <div class="terminal-line"><span class="terminal-prompt">detective@logparser:~$</span> Select options, then click Run Log Parser...</div>
-                    </div>
-
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-primary" style="flex:1;" onclick="l2a2.executeScript()">▶ Run Log Parser Script</button>
-                        <button class="btn-secondary" onclick="l2a2.resetSimulator()">Reset</button>
-                    </div>
-
-                    <details class="hint-accordion">
-                        <summary class="hint-summary">Direct Case Solution Hints</summary>
-                        <div class="hint-body-content">
-                            <p class="hint-text" id="l2a2-hint-text">Loading instructions...</p>
-                            <div class="hint-stage-nav">
-                                <div class="hint-stage-dots" id="l2a2-hint-dots"></div>
-                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l2a2.nextHint()">Reveal Next Hint</button>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-            <!-- Navigation Row -->
-            <div class="activity-nav-row">
-                <button class="btn-secondary" id="btn-prev-l2" onclick="prevActivity()">← Previous Activity</button>
-                <span id="nav-status-l2">Activity 3 of 6</span>
-                <button class="btn-primary" id="btn-next-l2" onclick="nextActivity()">Next Activity →</button>
-            </div>
-        </div>
-
-        <!-- LEVEL 3 PANELS -->
-        <div class="level-wrapper" id="lvl-3-wrapper" style="display:none;">
-            <div class="activity-tabs">
-                <button class="activity-tab active" id="btn-l3-a1" onclick="switchActivity(3, 1)">Activity 1: File Pointer Explorer</button>
-                <button class="activity-tab" id="btn-l3-a2" onclick="switchActivity(3, 2)">Activity 2: File Operations Challenge</button>
-            </div>
-
-            <!-- Level 3 Activity 1: File Pointer Explorer -->
-            <div class="case-panel active" id="pane-l3a1" style="margin-top:20px;">
-                <div class="glass-card interactive-panel">
-                    <div class="card-header-group">
-                        <div class="card-title">Visual Byte Grid Map</div>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px; margin-bottom:12px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary); margin-bottom:6px;">🕵️ Detective's Briefing: File Pointer Explorer</h4>
-                        <ol style="padding-left:16px; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
-                            <li>Check your target **Diagnostic Mission** parameters.</li>
-                            <li>Click grid byte boxes or slide the seek offset regulator to shift the red triangle cursor pointer.</li>
-                            <li>Observe the live updates to byte index, character symbols, line numbers, and seek syntax.</li>
-                            <li>Click <strong>Run seek() Verification</strong> once your cursor pointer matches the target offset!</li>
-                        </ol>
-                    </div>
-
-                    <div class="byte-explorer-grid" id="l3a1-grid"></div>
-
-                    <div class="pointer-info-bar">
-                        <div>Position offset: <span class="pointer-info-val" id="l3a1-val-offset">0</span></div>
-                        <div>Character: <span class="pointer-info-val" id="l3a1-val-char">H</span></div>
-                        <div>Line: <span class="pointer-info-val" id="l3a1-val-line">1</span></div>
-                    </div>
-
-                    <div style="display:flex; flex-direction:column; gap:8px;">
-                        <label>seek() index Offset Slider:</label>
-                        <input type="range" id="l3a1-slider" min="0" max="30" value="0" style="width:100%; accent-color:var(--primary);" oninput="l3a1.sliderSeek(this.value)">
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="card-header-group">
-                        <div class="card-title">Diagnostic Missions</div>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border:2px solid var(--border); padding:16px; border-radius:8px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary);" id="l3a1-mission-title">Mission Loading...</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;" id="l3a1-mission-desc"></p>
-                    </div>
-
-                    <div class="code-box" id="l3a1-code"># Syncing pointers...</div>
-
-                    <div class="terminal-box" id="l3a1-terminal">
-                        <div class="terminal-line"><span class="terminal-prompt">detective@pointer:~$</span> Move slider index...</div>
-                    </div>
-
-                    <button class="btn-primary" onclick="l3a1.runSeekVerify()">▶ Run seek() Verification</button>
-
-                    <details class="hint-accordion">
-                        <summary class="hint-summary">Direct Case Solution Hints</summary>
-                        <div class="hint-body-content">
-                            <p class="hint-text" id="l3a1-hint-text">Loading instructions...</p>
-                            <div class="hint-stage-nav">
-                                <div class="hint-stage-dots" id="l3a1-hint-dots"></div>
-                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l3a1.nextHint()">Reveal Next Hint</button>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-            <!-- Level 3 Activity 2: File Operations Challenge -->
-            <div class="case-panel" id="pane-l3a2" style="margin-top:20px;">
-                <div class="glass-card interactive-panel">
-                    <div class="card-header-group">
-                        <div class="card-title">Virtual OS Desktop terminal</div>
-                    </div>
-                    <div class="instruction-box" style="background:var(--bg-dark); border: 2px solid var(--border); padding:16px; border-radius:8px; margin-bottom:12px;">
-                        <h4 style="font-weight:700; font-size:0.9rem; color:var(--primary); margin-bottom:6px;">🕵️ Detective's Briefing: File Operations Challenge</h4>
-                        <ol style="padding-left:16px; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:4px;">
-                            <li>Review the randomized challenge problem on the card.</li>
-                            <li>Input your target configurations: set the target file mode (<code>r</code>, <code>w</code>, <code>a</code>, <code>x</code>) and seek byte offset number.</li>
-                            <li>Click <strong>Test Setup Execution</strong> to lock down the server sector and advance to the next challenge!</li>
-                        </ol>
-                    </div>
-
-                    <div style="background:#ffffff; border:2px solid var(--text); border-radius:8px; padding:20px; flex:1; display:flex; flex-direction:column; gap:16px;">
-                        <h4 style="font-weight:800; font-size:1rem; color:var(--primary);" id="l3a2-mission-title">Loading Challenge...</h4>
-                        <p style="font-size:0.9rem; line-height:1.5;" id="l3a2-mission-desc"></p>
-                        
-                        <div style="border-top:1px solid var(--border); padding-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:auto;">
-                            <div>
-                                <label>Target File:</label>
-                                <input type="text" id="l3a2-target-file" style="font-weight:bold;" readonly>
-                            </div>
-                            <div>
-                                <label>Select Mode:</label>
-                                <select id="l3a2-target-mode" style="font-weight:bold;">
-                                    <option value="r">r</option>
-                                    <option value="w">w</option>
-                                    <option value="a">a</option>
-                                    <option value="x">x</option>
-                                </select>
-                            </div>
-                            <div style="grid-column: span 2;">
-                                <label>seek() Byte Offset:</label>
-                                <input type="number" id="l3a2-target-offset" value="0" min="0" max="100" style="font-weight:bold;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="card-header-group">
-                        <div class="card-title">Logs & code</div>
-                    </div>
-
-                    <div class="code-box" id="l3a2-code"># Syncing challenges...</div>
-
-                    <div class="terminal-box" id="l3a2-terminal">
-                        <div class="terminal-line"><span class="terminal-prompt">detective@osconsole:~$</span> Configure target modes, then run test...</div>
-                    </div>
-
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-primary" style="flex:1;" onclick="l3a2.executeChallenge()">▶ Test Setup Execution</button>
-                        <button class="btn-secondary" onclick="l3a2.loadChallenge()">Next Challenge</button>
-                    </div>
-
-                    <details class="hint-accordion">
-                        <summary class="hint-summary">Direct Case Solution Hints</summary>
-                        <div class="hint-body-content">
-                            <p class="hint-text" id="l3a2-hint-text">Loading instructions...</p>
-                            <div class="hint-stage-nav">
-                                <div class="hint-stage-dots" id="l3a2-hint-dots"></div>
-                                <button class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="l3a2.nextHint()">Reveal Next Hint</button>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </div>
-            <!-- Navigation Row -->
-            <div class="activity-nav-row">
-                <button class="btn-secondary" id="btn-prev-l3" onclick="prevActivity()">← Previous Activity</button>
-                <span id="nav-status-l3">Activity 5 of 6</span>
-                <button class="btn-primary" id="btn-next-l3" onclick="nextActivity()">Next Activity →</button>
-            </div>
-        </div>
+        </section>
 
     </main>
 
-    <div class="toast-container" id="toast-container"></div>
-
     <script>
-        /* ==========================================================================
-           1. PROCEDURAL SOUND SYNTHESIS (Web Audio API)
-           ========================================================================== */
-        class SoundController {
-            constructor() {
-                this.ctx = null;
-            }
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            }
-            playBlip() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.1);
-            }
-            playSuccess() {
-                this.init();
-                if (!this.ctx) return;
-                const osc1 = this.ctx.createOscillator();
-                const osc2 = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc1.connect(gain);
-                osc2.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc1.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
-                osc2.frequency.setValueAtTime(659.25, this.ctx.currentTime); // E5
-                gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
-                osc1.start();
-                osc2.start();
-                osc1.stop(this.ctx.currentTime + 0.3);
-                osc2.stop(this.ctx.currentTime + 0.3);
-            }
-            playCrash() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.4);
-                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.4);
-            }
-            playLaser() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.frequency.setValueAtTime(1000, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.35);
-                gain.gain.setValueAtTime(0.07, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.35);
-            }
-            playWrite() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(1200 + Math.random() * 200, this.ctx.currentTime);
-                gain.gain.setValueAtTime(0.02, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.04);
-            }
-            playFlush() {
-                this.init();
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.4);
-                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.4);
-            }
-        }
-        const sound = new SoundController();
+        function simulateIO(mode) {
+            const input = document.getElementById('dataInput').value;
+            const contentBox = document.getElementById('fileContent');
+            const platter = document.getElementById('diskPlatter');
+            const packet = document.getElementById('packet');
+            const log = document.getElementById('statusLog');
 
-        /* ==========================================================================
-           2. PARTICLE ENGINE (Canvas Overlay)
-           ========================================================================== */
-        class ParticleEngine {
-            constructor() {
-                this.canvas = document.getElementById('particle-canvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.particles = [];
-                window.addEventListener('resize', () => this.resize());
-                this.resize();
-                this.animate();
-            }
-            resize() {
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
-            }
-            triggerSparks(x, y, color = '#cc0000') {
-                for (let i = 0; i < 20; i++) {
-                    this.particles.push({
-                        x, y,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: (Math.random() - 0.5) * 8,
-                        radius: Math.random() * 3 + 2,
-                        alpha: 1,
-                        decay: Math.random() * 0.03 + 0.02,
-                        color
-                    });
-                }
-            }
-            triggerConfetti() {
-                for (let i = 0; i < 60; i++) {
-                    this.particles.push({
-                        x: Math.random() * window.innerWidth,
-                        y: 0,
-                        vx: (Math.random() - 0.5) * 4,
-                        vy: Math.random() * 4 + 2,
-                        radius: Math.random() * 4 + 3,
-                        alpha: 1,
-                        decay: Math.random() * 0.01 + 0.01,
-                        color: Math.random() > 0.5 ? '#cc0000' : '#ffffff'
-                    });
-                }
-            }
-            animate() {
-                requestAnimationFrame(() => this.animate());
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                this.particles.forEach((p, idx) => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.alpha -= p.decay;
-                    
-                    if (p.alpha <= 0) {
-                        this.particles.splice(idx, 1);
-                        return;
-                    }
-                    
-                    this.ctx.save();
-                    this.ctx.globalAlpha = p.alpha;
-                    this.ctx.fillStyle = p.color;
-                    this.ctx.strokeStyle = '#000000';
-                    this.ctx.lineWidth = 1;
-                    this.ctx.beginPath();
-                    this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    this.ctx.fill();
-                    this.ctx.stroke();
-                    this.ctx.restore();
-                });
-            }
-        }
-        let particles;
+            if (!input) return;
 
-        /* ==========================================================================
-           3. TOAST FLOATING BANNER SYSTEM
-           ========================================================================== */
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const banner = document.createElement('div');
-            banner.className = 'toast-banner';
-            banner.innerHTML = `<span>📢</span> <span>${message}</span>`;
-            container.appendChild(banner);
+            // 1. Spin Disk
+            platter.classList.add('spinning');
 
-            setTimeout(() => banner.classList.add('show'), 50);
+            // 2. Animate Data Packet moving from RAM (imaginary bottom left) to Disk
+            packet.innerText = input.substring(0, 10) + '...';
+            packet.style.opacity = '1';
+            packet.style.transform = 'translate(140px, -80px)'; // Move towards file box
+
+            // Logic based on mode
+            if (mode === 'w') {
+                log.innerHTML = `<span class="text-red-400 font-bold">[WRITE MODE]</span> File pointer at 0. <br>Truncating (deleting) old history... <br>Writing new data.`;
+                // W mode deletes first
+                setTimeout(() => {
+                    contentBox.innerHTML = '';
+                }, 400);
+            } else if (mode === 'a') {
+                log.innerHTML = `<span class="text-green-400 font-bold">[APPEND MODE]</span> File pointer at EOF. <br>Preserving history... <br>Writing new data at end.`;
+            }
+
+            // 3. Finalize Write
             setTimeout(() => {
-                banner.classList.remove('show');
-                setTimeout(() => banner.remove(), 400);
-            }, 3000);
+                const newRow = document.createElement('span');
+                newRow.className = "bg-gray-800 px-1 rounded block w-full text-white";
+                newRow.innerText = input;
+
+                // Add blinking cursor effect temporarily to show pointer
+                const ptr = document.createElement('span');
+                ptr.className = "inline-block w-1 h-3 bg-red-500 ml-1 animate-pulse";
+                newRow.appendChild(ptr);
+
+                contentBox.appendChild(newRow);
+
+                // Cleanup animation
+                packet.style.opacity = '0';
+                packet.style.transform = 'translate(0px, 0px)';
+
+                setTimeout(() => {
+                    ptr.remove();
+                    platter.classList.remove('spinning');
+                    log.innerHTML += "<br>File closed via Context Manager.";
+                }, 1000);
+
+            }, 1000);
         }
-
-        /* ==========================================================================
-           4. GLOBAL LEVEL TRANSITION STATE
-           ========================================================================== */
-        let activeLevel = 1;
-        let currentLevel = 1;
-        let currentActivity = 1;
-
-        function switchLevel(lvl) {
-            sound.playBlip();
-            activeLevel = lvl;
-            currentLevel = lvl;
-            document.querySelectorAll('.level-btn').forEach((b, idx) => {
-                b.classList.toggle('active', (idx + 1) === lvl);
-            });
-            document.getElementById('lvl-1-wrapper').style.display = lvl === 1 ? 'block' : 'none';
-            document.getElementById('lvl-2-wrapper').style.display = lvl === 2 ? 'block' : 'none';
-            document.getElementById('lvl-3-wrapper').style.display = lvl === 3 ? 'block' : 'none';
-            
-            if (lvl === 1) switchActivity(1, 1);
-            if (lvl === 2) switchActivity(2, 1);
-            if (lvl === 3) switchActivity(3, 1);
-        }
-
-        function switchActivity(lvl, act) {
-            sound.playBlip();
-            currentLevel = lvl;
-            currentActivity = act;
-            
-            // Toggle active tabs
-            document.querySelectorAll(`#lvl-${lvl}-wrapper .activity-tab`).forEach((tab, idx) => {
-                tab.classList.toggle('active', (idx + 1) === act);
-            });
-
-            // Toggle target case panels
-            if (lvl === 1) {
-                document.getElementById('pane-l1a1').style.display = act === 1 ? 'grid' : 'none';
-                document.getElementById('pane-l1a2').style.display = act === 2 ? 'grid' : 'none';
-                if (act === 1) l1a1.init();
-                if (act === 2) l1a2.init();
-            } else if (lvl === 2) {
-                document.getElementById('pane-l2a1').style.display = act === 1 ? 'grid' : 'none';
-                document.getElementById('pane-l2a2').style.display = act === 2 ? 'grid' : 'none';
-                if (act === 1) l2a1.init();
-                if (act === 2) l2a2.init();
-            } else if (lvl === 3) {
-                document.getElementById('pane-l3a1').style.display = act === 1 ? 'grid' : 'none';
-                document.getElementById('pane-l3a2').style.display = act === 2 ? 'grid' : 'none';
-                if (act === 1) l3a1.init();
-                if (act === 2) l3a2.init();
-            }
-
-            updateNavigationButtons();
-        }
-
-        function updateNavigationButtons() {
-            // For level 1:
-            const prevBtn1 = document.getElementById('btn-prev-l1');
-            const nextBtn1 = document.getElementById('btn-next-l1');
-            const statusLabel1 = document.getElementById('nav-status-l1');
-            
-            // For level 2:
-            const prevBtn2 = document.getElementById('btn-prev-l2');
-            const nextBtn2 = document.getElementById('btn-next-l2');
-            const statusLabel2 = document.getElementById('nav-status-l2');
-            
-            // For level 3:
-            const prevBtn3 = document.getElementById('btn-prev-l3');
-            const nextBtn3 = document.getElementById('btn-next-l3');
-            const statusLabel3 = document.getElementById('nav-status-l3');
-
-            // Apply correct values based on currentLevel and currentActivity
-            if (currentLevel === 1) {
-                if (currentActivity === 1) {
-                    prevBtn1.disabled = true;
-                    prevBtn1.style.opacity = '0.5';
-                    prevBtn1.style.cursor = 'not-allowed';
-                    
-                    nextBtn1.disabled = false;
-                    nextBtn1.style.opacity = '1';
-                    nextBtn1.style.cursor = 'pointer';
-                    statusLabel1.textContent = "Activity 1 of 6: File Mode Mission";
-                } else {
-                    prevBtn1.disabled = false;
-                    prevBtn1.style.opacity = '1';
-                    prevBtn1.style.cursor = 'pointer';
-                    
-                    nextBtn1.disabled = false;
-                    nextBtn1.style.opacity = '1';
-                    nextBtn1.style.cursor = 'pointer';
-                    statusLabel1.textContent = "Activity 2 of 6: File Rescue Challenge";
-                }
-            } else if (currentLevel === 2) {
-                prevBtn2.disabled = false;
-                prevBtn2.style.opacity = '1';
-                prevBtn2.style.cursor = 'pointer';
-                
-                nextBtn2.disabled = false;
-                nextBtn2.style.opacity = '1';
-                nextBtn2.style.cursor = 'pointer';
-                
-                if (currentActivity === 1) {
-                    statusLabel2.textContent = "Activity 3 of 6: Interactive File Reader";
-                } else {
-                    statusLabel2.textContent = "Activity 4 of 6: Log File Filter & Exporter";
-                }
-            } else if (currentLevel === 3) {
-                prevBtn3.disabled = false;
-                prevBtn3.style.opacity = '1';
-                prevBtn3.style.cursor = 'pointer';
-                
-                if (currentActivity === 1) {
-                    nextBtn3.disabled = false;
-                    nextBtn3.style.opacity = '1';
-                    nextBtn3.style.cursor = 'pointer';
-                    statusLabel3.textContent = "Activity 5 of 6: File Pointer Explorer";
-                } else {
-                    nextBtn3.disabled = true;
-                    nextBtn3.style.opacity = '0.5';
-                    nextBtn3.style.cursor = 'not-allowed';
-                    statusLabel3.textContent = "Activity 6 of 6: File Operations Challenge";
-                }
-            }
-        }
-
-        function nextActivity() {
-            if (currentLevel === 1 && currentActivity === 1) {
-                switchActivity(1, 2);
-            } else if (currentLevel === 1 && currentActivity === 2) {
-                switchLevel(2);
-            } else if (currentLevel === 2 && currentActivity === 1) {
-                switchActivity(2, 2);
-            } else if (currentLevel === 2 && currentActivity === 2) {
-                switchLevel(3);
-            } else if (currentLevel === 3 && currentActivity === 1) {
-                switchActivity(3, 2);
-            }
-        }
-
-        function prevActivity() {
-            if (currentLevel === 1 && currentActivity === 2) {
-                switchActivity(1, 1);
-            } else if (currentLevel === 2 && currentActivity === 1) {
-                activeLevel = 1;
-                document.querySelectorAll('.level-btn').forEach((b, idx) => {
-                    b.classList.toggle('active', (idx + 1) === 1);
-                });
-                document.getElementById('lvl-1-wrapper').style.display = 'block';
-                document.getElementById('lvl-2-wrapper').style.display = 'none';
-                document.getElementById('lvl-3-wrapper').style.display = 'none';
-                switchActivity(1, 2);
-            } else if (currentLevel === 2 && currentActivity === 2) {
-                switchActivity(2, 1);
-            } else if (currentLevel === 3 && currentActivity === 1) {
-                activeLevel = 2;
-                document.querySelectorAll('.level-btn').forEach((b, idx) => {
-                    b.classList.toggle('active', (idx + 1) === 2);
-                });
-                document.getElementById('lvl-1-wrapper').style.display = 'none';
-                document.getElementById('lvl-2-wrapper').style.display = 'block';
-                document.getElementById('lvl-3-wrapper').style.display = 'none';
-                switchActivity(2, 2);
-            } else if (currentLevel === 3 && currentActivity === 2) {
-                switchActivity(3, 1);
-            }
-        }
-
-        /* ==========================================================================
-           5. LEVEL 1 ACTIVITY 1: FILE MODE MISSION
-           ========================================================================== */
-        class FileModeMission {
-            constructor() {
-                this.files = {
-                    'students.txt': { content: "Alice, 92\nBob, 78\nCharlie, 85", size: 32 },
-                    'logs.txt': { content: "[08:00] Initialized\n[09:30] Running\n", size: 38 },
-                    'config.json': { content: "{\n  \"debug\": true,\n  \"port\": 8080\n}", size: 36 },
-                    'report.txt': { content: "Q1 Sales = 15k\nQ2 Sales = 21k", size: 29 }
-                };
-
-                this.missions = [
-                    {
-                        title: "Read Grades List",
-                        desc: "Load and inspect student grades inside `students.txt` without causing data mutations.",
-                        target: "students.txt",
-                        correctMode: "r",
-                        hints: [
-                            "Clue: We need a mode that allows inspecting files without editing anything.",
-                            "Concept: Mode 'r' is for reading. It starts the pointer at the beginning of the file.",
-                            "Action: Drag the 'r' mode tag onto the students.txt file block.",
-                            "Solution: Using mode 'r' creates code: open('students.txt', 'r')."
-                        ]
-                    },
-                    {
-                        title: "Write New report Header",
-                        desc: "Wipe all current metrics in `report.txt` and prepare a completely fresh file output.",
-                        target: "report.txt",
-                        correctMode: "w",
-                        hints: [
-                            "Clue: Look for a mode that wipes out existing content to start fresh.",
-                            "Concept: Mode 'w' overwrites existing data immediately when opened.",
-                            "Action: Drag the 'w' mode tag onto the report.txt file block.",
-                            "Solution: Mode 'w' erases previous file content, starting from byte 0."
-                        ]
-                    },
-                    {
-                        title: "Append Server entry Log",
-                        desc: "Add a new log message to the absolute end of `logs.txt` without deleting historical lines.",
-                        target: "logs.txt",
-                        correctMode: "a",
-                        hints: [
-                            "Clue: Wiping log files is disastrous. We must write new rows at the end.",
-                            "Concept: Mode 'a' opens files for appending, positioning the pointer at EOF (end of file).",
-                            "Action: Drag the 'a' mode tag onto logs.txt.",
-                            "Solution: Mode 'a' lets you write new rows safely preserving history."
-                        ]
-                    },
-                    {
-                        title: "Exclusive Create File",
-                        desc: "Create a brand new system file named `config.json`. Do not open it if it already exists, to avoid damage.",
-                        target: "config.json",
-                        correctMode: "x",
-                        hints: [
-                            "Clue: We need an exclusive write mode that fails if the target file is present.",
-                            "Concept: Mode 'x' handles exclusive creation, raising FileExistsError if it already exists.",
-                            "Action: Drag the 'x' mode tag onto config.json.",
-                            "Solution: Mode 'x' protects against overwriting files that exist."
-                        ]
-                    },
-                    {
-                        title: "Inspect System Configuration",
-                        desc: "Read settings from `config.json` to verify active configurations without modifying files.",
-                        target: "config.json",
-                        correctMode: "r",
-                        hints: [
-                            "Clue: Read config parameters safely without modifying files.",
-                            "Concept: Mode 'r' opens files for read-only access.",
-                            "Action: Drag the 'r' mode tag onto config.json.",
-                            "Solution: Using mode 'r' guarantees no modifications can occur."
-                        ]
-                    },
-                    {
-                        title: "Clear Transaction Logs",
-                        desc: "Purge and reset `logs.txt` completely for the start of a new business day.",
-                        target: "logs.txt",
-                        correctMode: "w",
-                        hints: [
-                            "Clue: Overwrite existing entries and reset logs to empty.",
-                            "Concept: Mode 'w' wipes content and opens file for fresh write.",
-                            "Action: Drag the 'w' mode tag onto logs.txt.",
-                            "Solution: Mode 'w' truncates the file size back to 0 bytes."
-                        ]
-                    },
-                    {
-                        title: "Append Student Grade",
-                        desc: "Inject a new student record to the end of `students.txt` while keeping current names intact.",
-                        target: "students.txt",
-                        correctMode: "a",
-                        hints: [
-                            "Clue: Append new grade records at the end of the text file.",
-                            "Concept: Mode 'a' targets the EOF offset automatically for writing.",
-                            "Action: Drag the 'a' mode tag onto students.txt.",
-                            "Solution: Mode 'a' appends without touching existing rows."
-                        ]
-                    },
-                    {
-                        title: "Create Exclusive Report",
-                        desc: "Initialize a brand new `report.txt`. Ensure that we fail immediately if `report.txt` already exists to prevent accidental override.",
-                        target: "report.txt",
-                        correctMode: "x",
-                        hints: [
-                            "Clue: Create a new file exclusively, raising an error if it's already there.",
-                            "Concept: Mode 'x' is exclusive creation mode.",
-                            "Action: Drag the 'x' mode tag onto report.txt.",
-                            "Solution: Mode 'x' fails if the file already exists, protecting data."
-                        ]
-                    }
-                ];
-
-                this.currentMissionIdx = 0;
-                this.selectedFile = null;
-                this.droppedMode = null;
-                this.hintStage = 0;
-            }
-
-            init() {
-                this.selectedFile = null;
-                this.droppedMode = null;
-                this.hintStage = 0;
-                
-                const desktop = document.getElementById('l1a1-desktop');
-                desktop.innerHTML = '';
-                
-                Object.entries(this.files).forEach(([name, data]) => {
-                    const card = document.createElement('div');
-                    card.className = 'file-icon-card';
-                    card.id = `l1a1-file-${name}`;
-                    card.innerHTML = `
-                        <span class="file-glyph">📄</span>
-                        <span class="file-label">${name}</span>
-                        <span class="file-badge-mode" id="badge-l1a1-${name}"></span>
-                    `;
-                    card.addEventListener('click', () => this.selectFile(name));
-                    desktop.appendChild(card);
-                });
-
-                const pool = document.getElementById('l1a1-pool');
-                pool.innerHTML = '';
-                ['r', 'w', 'a', 'x'].forEach(m => {
-                    const tag = document.createElement('div');
-                    tag.className = 'mode-drag-tag';
-                    tag.draggable = true;
-                    tag.textContent = m;
-                    tag.id = `drag-tag-${m}`;
-                    tag.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.setData('text/plain', m);
-                        tag.classList.add('dragged');
-                    });
-                    tag.addEventListener('dragend', () => tag.classList.remove('dragged'));
-                    pool.appendChild(tag);
-                });
-
-                document.getElementById('l1a1-drop').textContent = "[ DRAG OPEN MODE HERE ]";
-                
-                this.loadMission(this.currentMissionIdx);
-            }
-
-            loadMission(idx) {
-                this.currentMissionIdx = idx;
-                this.hintStage = 0;
-                const m = this.missions[idx];
-                document.getElementById('l1a1-mission-title').textContent = `Mission: ${m.title}`;
-                document.getElementById('l1a1-mission-desc').textContent = m.desc;
-                this.updateHintUI();
-                this.updateCodeBox();
-            }
-
-            selectFile(name) {
-                sound.playBlip();
-                this.selectedFile = name;
-                document.querySelectorAll('#l1a1-desktop .file-icon-card').forEach(c => {
-                    c.classList.toggle('selected', c.id === `l1a1-file-${name}`);
-                });
-                
-                const fData = this.files[name];
-                document.getElementById('l1a1-size-label').textContent = `Size: ${fData.size} B`;
-                
-                const term = document.getElementById('l1a1-terminal');
-                term.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@filesystem:~$</span> Selected file <strong>${name}</strong>. Inspecting bytes...</div>`;
-                this.updateCodeBox();
-            }
-
-            setDroppedMode(mode) {
-                this.droppedMode = mode;
-                const dropZone = document.getElementById('l1a1-drop');
-                dropZone.innerHTML = `Mode Selected: <span style="font-family:var(--font-mono); font-weight:bold;">"${mode}"</span>`;
-                this.updateCodeBox();
-            }
-
-            updateCodeBox() {
-                const f = this.selectedFile || "_____";
-                const m = this.droppedMode || "_";
-                const code = document.getElementById('l1a1-code');
-                code.innerHTML = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${f}"</span>, <span class="hl-string">"${m}"</span>) <span class="hl-keyword">as</span> file_object:
-    <span class="hl-comment"># Perform file operations here</span>`;
-            }
-
-            executeMission() {
-                const m = this.missions[this.currentMissionIdx];
-                const term = document.getElementById('l1a1-terminal');
-                
-                if (!this.selectedFile) {
-                    sound.playCrash();
-                    showToast("⚠️ Select a file card on the desktop first.");
-                    return;
-                }
-                
-                if (!this.droppedMode) {
-                    sound.playCrash();
-                    showToast("⚠️ Drag and drop an open mode tag first.");
-                    return;
-                }
-
-                sound.playLaser();
-                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@filesystem:~$</span> Executing open command...</div>`;
-
-                if (this.selectedFile === m.target && this.droppedMode === m.correctMode) {
-                    sound.playSuccess();
-                    particles.triggerSparks(window.innerWidth / 2, window.innerHeight / 2, '#33ff33');
-                    
-                    let actMsg = "";
-                    if (this.droppedMode === 'r') {
-                        actMsg = `<span class="terminal-success">[READ SUCCESS] Read content: "${this.files[this.selectedFile].content.replace(/\n/g, '\\n')}"</span>`;
-                    } else if (this.droppedMode === 'w') {
-                        this.files[this.selectedFile].content = "Header lines added.\n";
-                        this.files[this.selectedFile].size = this.files[this.selectedFile].content.length;
-                        actMsg = `<span class="terminal-success">[WRITE OVERWRITE SUCCESS] File cleared. New size: ${this.files[this.selectedFile].size} B</span>`;
-                        // Animate overwrite data fade
-                        const card = document.getElementById(`l1a1-file-${this.selectedFile}`);
-                        card.style.opacity = 0.3;
-                        setTimeout(() => card.style.opacity = 1, 600);
-                    } else if (this.droppedMode === 'a') {
-                        this.files[this.selectedFile].content += "[NEW LOG ENTRY]\n";
-                        this.files[this.selectedFile].size = this.files[this.selectedFile].content.length;
-                        actMsg = `<span class="terminal-success">[APPEND SUCCESS] Line injected at EOF. New size: ${this.files[this.selectedFile].size} B</span>`;
-                    } else if (this.droppedMode === 'x') {
-                        actMsg = `<span class="terminal-success">[CREATE EXCLUSIVE SUCCESS] New blank file instantiated safely.</span>`;
-                    }
-
-                    term.innerHTML += `<div class="terminal-line">${actMsg}</div>`;
-                    document.getElementById('l1a1-size-label').textContent = `Size: ${this.files[this.selectedFile].size} B`;
-
-                    showToast("🏆 Mission Objective Succeeded!");
-
-                    setTimeout(() => {
-                        const nextIdx = (this.currentMissionIdx + 1) % this.missions.length;
-                        this.loadMission(nextIdx);
-                        this.init();
-                    }, 2000);
-
-                } else {
-                    sound.playCrash();
-                    let errMsg = "[ERROR] Mode validation failed. ";
-                    if (this.selectedFile !== m.target) {
-                        errMsg += "Target file path does not match mission targets.";
-                    } else if (this.droppedMode === 'w') {
-                        // Data loss warning
-                        errMsg += "Wiping data error! Wrote to existing logs/records in mode 'w' erasing all entries!";
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-error">⚠️ WARNING: OVERWRITE WIPED OUT THE FILE! Content lost.</span></div>`;
-                        
-                        const card = document.getElementById(`l1a1-file-${this.selectedFile}`);
-                        card.style.background = 'rgba(255, 0, 0, 0.15)';
-                        setTimeout(() => card.style.background = '#ffffff', 1000);
-                    } else {
-                        errMsg += "Opening file in incompatible mode for the required objective.";
-                    }
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">${errMsg}</span></div>`;
-                    showToast("❌ Command crash. Review hint details.");
-                }
-            }
-
-            nextHint() {
-                sound.playBlip();
-                this.hintStage = (this.hintStage + 1) % 4;
-                this.updateHintUI();
-            }
-
-            updateHintUI() {
-                const m = this.missions[this.currentMissionIdx];
-                const hintText = document.getElementById('l1a1-hint-text');
-                hintText.innerHTML = m.hints[this.hintStage];
-                
-                const dots = document.getElementById('l1a1-hint-dots');
-                dots.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
-                    dots.appendChild(dot);
-                }
-            }
-        }
-        const l1a1 = new FileModeMission();
-
-        function allowDrop(e) {
-            e.preventDefault();
-        }
-
-        function handleDropMode(e) {
-            e.preventDefault();
-            const mode = e.dataTransfer.getData('text/plain');
-            if (['r', 'w', 'a', 'x'].includes(mode)) {
-                l1a1.setDroppedMode(mode);
-                sound.playBlip();
-            }
-        }
-
-        /* ==========================================================================
-           6. LEVEL 1 ACTIVITY 2: FILE RESCUE CHALLENGE
-           ========================================================================== */
-        class FileRescueChallenge {
-            constructor() {
-                this.scenarios = [
-                    {
-                        title: "Case 1: Rescue Database Backup Log",
-                        desc: "Inject today's transaction timestamp into the bottom of `backup_log.txt`. You must NOT delete or mutate the preceding weeks of log values already present in the backup files.",
-                        path: "backup_log.txt",
-                        correctMode: "a",
-                        hints: [
-                            "Clue: Look for the open mode that preserves files and appends to the end.",
-                            "Concept: Opening with mode 'w' immediately zeroes the file. Mode 'a' jumps to EOF.",
-                            "Action: Select mode 'a' from the dropdown to safely append data.",
-                            "Solution: Use with open('backup_log.txt', 'a') to complete the logs injection."
-                        ]
-                    },
-                    {
-                        title: "Case 2: Safe Initialization Manifest",
-                        desc: "Generate a new configuration manifest file named `config.json`. If a manifest is already present on the system, raise a crash notification rather than overwriting it.",
-                        path: "config.json",
-                        correctMode: "x",
-                        hints: [
-                            "Clue: We need a mode that creates new files exclusively and throws an error if it exists.",
-                            "Concept: Mode 'x' handles exclusive file creation and fails immediately if files exist.",
-                            "Action: Select the mode 'x' dropdown item to prevent collision overwriting.",
-                            "Solution: Mode 'x' triggers FileExistsError on existing paths, safe-checking writes."
-                        ]
-                    },
-                    {
-                        title: "Case 3: Restore Mission Objectives",
-                        desc: "Read-only access is required to read `objectives.txt` to display on the detective's HUD. Make sure no code changes or overwriting can occur.",
-                        path: "objectives.txt",
-                        correctMode: "r",
-                        hints: [
-                            "Clue: Look for the mode flag that allows reading without modification capability.",
-                            "Concept: Mode 'r' opens the file for reading only. Any writes will fail.",
-                            "Action: Select 'r' mode from the dropdown.",
-                            "Solution: open('objectives.txt', 'r') is read-only and safe."
-                        ]
-                    },
-                    {
-                        title: "Case 4: Emergency Override Script",
-                        desc: "A lock screen config file `lockscreen.cfg` must be immediately created. If it already exists, overwrite it entirely with our new config bytes to bypass the lock.",
-                        path: "lockscreen.cfg",
-                        correctMode: "w",
-                        hints: [
-                            "Clue: Choose the mode that resets or overwrites file data, creating it if it is missing.",
-                            "Concept: Mode 'w' wipes existing file data or instantiates it if not present.",
-                            "Action: Select mode 'w' from the dropdown.",
-                            "Solution: Mode 'w' overwrites any old config keys with our fresh config payload."
-                        ]
-                    }
-                ];
-                this.currentIdx = 0;
-                this.hintStage = 0;
-            }
-
-            init() {
-                this.hintStage = 0;
-                this.loadScenario(this.currentIdx);
-            }
-
-            loadScenario(idx = null) {
-                sound.playBlip();
-                if (idx === null) {
-                    this.currentIdx = (this.currentIdx + 1) % this.scenarios.length;
-                } else {
-                    this.currentIdx = idx;
-                }
-                
-                const sc = this.scenarios[this.currentIdx];
-                document.getElementById('l1a2-scenario-title').textContent = sc.title;
-                document.getElementById('l1a2-scenario-desc').textContent = sc.desc;
-                document.getElementById('l1a2-path-val').value = sc.path;
-                
-                this.updateHintUI();
-                this.updateCodeBox();
-            }
-
-            updateCodeBox() {
-                const sc = this.scenarios[this.currentIdx];
-                const mode = document.getElementById('l1a2-mode-select').value;
-                const code = document.getElementById('l1a2-code');
-                code.innerHTML = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${sc.path}"</span>, <span class="hl-string">"${mode}"</span>) <span class="hl-keyword">as</span> file:
-    file.write(<span class="hl-string">"System Log Update"</span>)`;
-            }
-
-            executeChallenge() {
-                sound.playLaser();
-                const sc = this.scenarios[this.currentIdx];
-                const selectedMode = document.getElementById('l1a2-mode-select').value;
-                const term = document.getElementById('l1a2-terminal');
-
-                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@rescuetool:~$</span> Testing mode "${selectedMode}" execution...</div>`;
-
-                if (selectedMode === sc.correctMode) {
-                    sound.playSuccess();
-                    particles.triggerConfetti();
-                    
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] Rescue completed correctly. Path ${sc.path} processed.</span></div>`;
-                    showToast("🏆 Operation Complete!");
-                } else {
-                    sound.playCrash();
-                    let feedback = "[CRASH] Output logs: ";
-                    if (selectedMode === 'w') {
-                        feedback += "Data loss traceback! Overwrite mode 'w' cleared the historical records.";
-                    } else if (selectedMode === 'r') {
-                        feedback += "UnsupportedOperation: write() called on read-only pointer handler.";
-                    } else if (selectedMode === 'x') {
-                        feedback += "FileExistsError: Cannot exclusively instantiate configuration. Path config.json already exists.";
-                    } else {
-                        feedback += "Opening file failed. Check execution arguments.";
-                    }
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">${feedback}</span></div>`;
-                    showToast("❌ Setup failed validation.");
-                }
-            }
-
-            nextHint() {
-                sound.playBlip();
-                this.hintStage = (this.hintStage + 1) % 4;
-                this.updateHintUI();
-            }
-
-            updateHintUI() {
-                const sc = this.scenarios[this.currentIdx];
-                const hintText = document.getElementById('l1a2-hint-text');
-                hintText.innerHTML = sc.hints[this.hintStage];
-                
-                const dots = document.getElementById('l1a2-hint-dots');
-                dots.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
-                    dots.appendChild(dot);
-                }
-            }
-        }
-        const l1a2 = new FileRescueChallenge();
-        document.getElementById('l1a2-mode-select').addEventListener('change', () => l1a2.updateCodeBox());
-
-        /* ==========================================================================
-           7. LEVEL 2 ACTIVITY 1: INTERACTIVE FILE READER
-           ========================================================================== */
-        class InteractiveFileReader {
-            constructor() {
-                this.scenarios = [
-                    {
-                        name: "students_grades.txt",
-                        content: "Alice, 92\nBob, 78\nCharlie, 85\nDiana, 91\nEve, 67\n",
-                        hints: [
-                            "Clue: Choose read() to grab all text at once, readline() to go line-by-line, and readlines() to compile a list.",
-                            "Concept: Every read advances the file pointer cursor to the index immediately following the read chunk.",
-                            "Action: Try clicking readline() multiple times to watch the pointer advance sequentially.",
-                            "Solution: Call f.read() to read everything and move the pointer directly to EOF."
-                        ]
-                    },
-                    {
-                        name: "security_logs.txt",
-                        content: "[12:00] INIT OK\n[12:05] LOGIN FAIL 'root'\n[12:06] IP BLOCKED 10.0.0.4\n[12:15] LOGOUT 'admin'\n",
-                        hints: [
-                            "Clue: Look at how readline() stops at each newline character '↵'.",
-                            "Concept: Reading log files line-by-line using readline() is memory-efficient.",
-                            "Action: Use readlines() to compile all logs into a single Python list array.",
-                            "Solution: Call readlines() to parse all lines at once."
-                        ]
-                    },
-                    {
-                        name: "sensor_data.csv",
-                        content: "id,temp,status\n1,22.4,OK\n2,29.8,WARN\n3,34.1,ERROR\n",
-                        hints: [
-                            "Clue: CSV data starts with a header line. Read it first!",
-                            "Concept: Calling readline() once extracts the headers 'id,temp,status'.",
-                            "Action: Call readline() twice to get the first telemetry row data.",
-                            "Solution: Use readline() to step past the header line."
-                        ]
-                    }
-                ];
-                this.currentScenarioIdx = 0;
-                this.content = "";
-                this.pointer = 0;
-                this.hintStage = 0;
-                this.hints = [];
-            }
-
-            init() {
-                this.pointer = 0;
-                this.hintStage = 0;
-                
-                const sel = document.getElementById('l2a1-scenario-select');
-                if (sel) {
-                    sel.value = this.currentScenarioIdx.toString();
-                }
-                
-                this.content = this.scenarios[this.currentScenarioIdx].content;
-                this.hints = this.scenarios[this.currentScenarioIdx].hints;
-                
-                const tab = document.querySelector('#pane-l2a1 .editor-tab');
-                if (tab) {
-                    tab.textContent = `📄 ${this.scenarios[this.currentScenarioIdx].name}`;
-                }
-                
-                this.renderEditor();
-                this.updateHintUI();
-                this.updateCodeBox("pass");
-            }
-
-            changeScenario(idx) {
-                sound.playBlip();
-                this.currentScenarioIdx = parseInt(idx);
-                this.pointer = 0;
-                this.init();
-                document.getElementById('l2a1-terminal').innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@reader:~$</span> Loaded file <strong>${this.scenarios[idx].name}</strong>. Choose a read method...</div>`;
-            }
-
-            renderEditor() {
-                const editor = document.getElementById('l2a1-editor');
-                editor.innerHTML = '';
-                
-                let currentPos = 0;
-                const chars = Array.from(this.content);
-                
-                chars.forEach((c, idx) => {
-                    const charSpan = document.createElement('span');
-                    charSpan.textContent = c === '\n' ? '↵\n' : c;
-                    if (c === '\n') {
-                        charSpan.style.color = 'var(--text-muted)';
-                    }
-                    
-                    if (idx === this.pointer) {
-                        const cur = document.createElement('span');
-                        cur.className = 'cursor-pointer';
-                        editor.appendChild(cur);
-                    }
-                    
-                    editor.appendChild(charSpan);
-                });
-                
-                if (this.pointer >= this.content.length) {
-                    const cur = document.createElement('span');
-                    cur.className = 'cursor-pointer';
-                    editor.appendChild(cur);
-                }
-
-                document.getElementById('l2a1-pointer-tracker').textContent = `Offset: ${this.pointer}`;
-            }
-
-            updateCodeBox(methodName) {
-                const code = document.getElementById('l2a1-code');
-                const filename = this.scenarios[this.currentScenarioIdx].name;
-                let displayCode = "";
-                if (methodName === 'read') {
-                    displayCode = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${filename}"</span>, <span class="hl-string">"r"</span>) <span class="hl-keyword">as</span> f:
-    text = f.read()  <span class="hl-comment"># Pointer shifts to EOF</span>`;
-                } else if (methodName === 'readline') {
-                    displayCode = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${filename}"</span>, <span class="hl-string">"r"</span>) <span class="hl-keyword">as</span> f:
-    line = f.readline()  <span class="hl-comment"># Shift pointer past next newline</span>`;
-                } else if (methodName === 'readlines') {
-                    displayCode = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${filename}"</span>, <span class="hl-string">"r"</span>) <span class="hl-keyword">as</span> f:
-    lines = f.readlines()  <span class="hl-comment"># Parse all lines into a list</span>`;
-                } else {
-                    displayCode = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${filename}"</span>, <span class="hl-string">"r"</span>) <span class="hl-keyword">as</span> f:
-    <span class="hl-comment"># Pointer at position 0</span>`;
-                }
-                code.innerHTML = displayCode;
-            }
-
-            runRead(method) {
-                sound.playBlip();
-                const term = document.getElementById('l2a1-terminal');
-                this.updateCodeBox(method);
-
-                if (this.pointer >= this.content.length) {
-                    sound.playCrash();
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[EOF] Pointer at end of file. f.read() returns empty string "". Reset pointer.</span></div>`;
-                    showToast("⚠️ Pointer is at end of file. Click Reset.");
-                    return;
-                }
-
-                if (method === 'read') {
-                    sound.playLaser();
-                    const text = this.content.substring(this.pointer);
-                    this.pointer = this.content.length;
-                    this.renderEditor();
-                    
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@reader:~$</span> f.read() returned:<br><span class="terminal-success">"${text.replace(/\n/g, '\\n')}"</span></div>`;
-                } else if (method === 'readline') {
-                    sound.playWrite();
-                    const nextNewLine = this.content.indexOf('\n', this.pointer);
-                    let line = "";
-                    if (nextNewLine !== -1) {
-                        line = this.content.substring(this.pointer, nextNewLine + 1);
-                        this.pointer = nextNewLine + 1;
-                    } else {
-                        line = this.content.substring(this.pointer);
-                        this.pointer = this.content.length;
-                    }
-                    this.renderEditor();
-                    
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@reader:~$</span> f.readline() returned:<br><span class="terminal-success">"${line.replace(/\n/g, '\\n')}"</span></div>`;
-                } else if (method === 'readlines') {
-                    sound.playLaser();
-                    const linesArr = [];
-                    let tempPos = this.pointer;
-                    while (tempPos < this.content.length) {
-                        const nextNL = this.content.indexOf('\n', tempPos);
-                        if (nextNL !== -1) {
-                            linesArr.push(this.content.substring(tempPos, nextNL + 1));
-                            tempPos = nextNL + 1;
-                        } else {
-                            linesArr.push(this.content.substring(tempPos));
-                            tempPos = this.content.length;
-                        }
-                    }
-                    this.pointer = this.content.length;
-                    this.renderEditor();
-                    
-                    const formatList = linesArr.map(l => `"${l.replace(/\n/g, '\\n')}"`).join(', ');
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@reader:~$</span> f.readlines() compiled:<br><span class="terminal-success">[ ${formatList} ]</span></div>`;
-                }
-                
-                term.scrollTop = term.scrollHeight;
-            }
-
-            resetFile() {
-                sound.playBlip();
-                this.pointer = 0;
-                this.renderEditor();
-                document.getElementById('l2a1-terminal').innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@reader:~$</span> File pointer reset to byte offset 0.</div>`;
-                this.updateCodeBox("pass");
-            }
-
-            nextHint() {
-                sound.playBlip();
-                this.hintStage = (this.hintStage + 1) % 4;
-                this.updateHintUI();
-            }
-
-            updateHintUI() {
-                const hintText = document.getElementById('l2a1-hint-text');
-                hintText.innerHTML = this.hints[this.hintStage];
-                
-                const dots = document.getElementById('l2a1-hint-dots');
-                dots.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
-                    dots.appendChild(dot);
-                }
-            }
-        }
-        const l2a1 = new InteractiveFileReader();
-
-        /* ==========================================================================
-           8. LEVEL 2 ACTIVITY 2: LIVE FILE EDITOR
-           ========================================================================== */
-        class LogFileFilterExporter {
-            constructor() {
-                this.rawLogs = [
-                    "[10:15:20] [INFO] Connection established from IP 192.168.1.5",
-                    "[10:16:45] [WARNING] Port scan detected on interface eth0",
-                    "[10:18:12] [ERROR] Database write failure (ErrorCode: 1045)",
-                    "[10:20:00] [INFO] Scheduled daily backup cleanup task running",
-                    "[10:21:05] [AUDIT] Administrator role access granted to session user 'sysadm'",
-                    "[10:22:30] [ERROR] API Route /v1/checkout failed - latency 4.5s",
-                    "[10:25:12] [WARNING] High thermal CPU threshold reached (78°C)",
-                    "[10:26:00] [AUDIT] Configuration manifest.json edited by user 'sysadm'",
-                    "[10:28:40] [INFO] Webserver reload command received. Graceful restart complete."
-                ];
-                
-                this.scenarios = [
-                    {
-                        title: "Extract Critical System Errors",
-                        desc: "Isolate all log entries containing `[ERROR]` from raw_logs.txt and output them to filtered_output.txt.",
-                        filterKey: "[ERROR]",
-                        expectedLines: [
-                            "[10:18:12] [ERROR] Database write failure (ErrorCode: 1045)",
-                            "[10:22:30] [ERROR] API Route /v1/checkout failed - latency 4.5s"
-                        ],
-                        hints: [
-                            "Clue: To read raw_logs.txt, open it in read mode ('r'). To write filtered_output.txt, open it in write mode ('w').",
-                            "Concept: Loop through the input file object f_in so we check lines sequentially.",
-                            "Action: Verify if '[ERROR]' is inside the line, then call f_out.write(line) to save it.",
-                            "Solution: Set modes: 'r' and 'w', loop: f_in, filter: '[ERROR]', write: f_out."
-                        ]
-                    },
-                    {
-                        title: "Isolate Security Warnings",
-                        desc: "Extract all warning events (`[WARNING]`) from raw_logs.txt and store them into filtered_output.txt.",
-                        filterKey: "[WARNING]",
-                        expectedLines: [
-                            "[10:16:45] [WARNING] Port scan detected on interface eth0",
-                            "[10:25:12] [WARNING] High thermal CPU threshold reached (78°C)"
-                        ],
-                        hints: [
-                            "Clue: Open raw_logs.txt in read ('r') mode, and filtered_output.txt in write ('w') mode.",
-                            "Concept: Iterate over f_in line-by-line and inspect logs for '[WARNING]'.",
-                            "Action: Write matching items to the output file f_out.",
-                            "Solution: Modes: 'r' and 'w', loop: f_in, filter: '[WARNING]', write: f_out."
-                        ]
-                    },
-                    {
-                        title: "Audit User Activity Logs",
-                        desc: "Filter all auditor records (`[AUDIT]`) from raw_logs.txt to output them to filtered_output.txt.",
-                        filterKey: "[AUDIT]",
-                        expectedLines: [
-                            "[10:21:05] [AUDIT] Administrator role access granted to session user 'sysadm'",
-                            "[10:26:00] [AUDIT] Configuration manifest.json edited by user 'sysadm'"
-                        ],
-                        hints: [
-                            "Clue: Open raw_logs.txt with 'r', filtered_output.txt with 'w' or 'a'.",
-                            "Concept: Use 'f_in' as the iterable loop target to process inputs.",
-                            "Action: Select '[AUDIT]' inside the if-statement select box, and call f_out.write(line).",
-                            "Solution: Modes: 'r' and 'w', loop: f_in, filter: '[AUDIT]', write: f_out."
-                        ]
-                    }
-                ];
-
-                this.currentIdx = 0;
-                this.hintStage = 0;
-                this.activeTab = 'in'; // 'in' or 'out'
-                this.filteredLogs = [];
-                this.isProcessing = false;
-            }
-
-            init() {
-                this.hintStage = 0;
-                this.activeTab = 'in';
-                this.filteredLogs = [];
-                this.isProcessing = false;
-                
-                // reset selects to empty placeholder
-                const modeIn = document.getElementById('l2a2-sel-mode-in');
-                if (modeIn) modeIn.value = '';
-                const modeOut = document.getElementById('l2a2-sel-mode-out');
-                if (modeOut) modeOut.value = '';
-                const loopObj = document.getElementById('l2a2-sel-loop-obj');
-                if (loopObj) loopObj.value = '';
-                const filterStr = document.getElementById('l2a2-sel-filter-str');
-                if (filterStr) filterStr.value = '';
-                const writeObj = document.getElementById('l2a2-sel-write-obj');
-                if (writeObj) writeObj.value = '';
-                
-                const selectEl = document.getElementById('l2a2-scenario-select');
-                if (selectEl) {
-                    selectEl.value = this.currentIdx.toString();
-                }
-
-                this.loadScenario(this.currentIdx);
-            }
-
-            loadScenario(idx) {
-                this.currentIdx = idx;
-                const sc = this.scenarios[idx];
-                document.getElementById('l2a2-mission-title').textContent = `Mission Target: ${sc.title}`;
-                document.getElementById('l2a2-mission-desc').textContent = sc.desc;
-                
-                // Reset select dropdowns to empty placeholder
-                const modeIn = document.getElementById('l2a2-sel-mode-in');
-                if (modeIn) modeIn.value = '';
-                const modeOut = document.getElementById('l2a2-sel-mode-out');
-                if (modeOut) modeOut.value = '';
-                const loopObj = document.getElementById('l2a2-sel-loop-obj');
-                if (loopObj) loopObj.value = '';
-                const filterSel = document.getElementById('l2a2-sel-filter-str');
-                if (filterSel) filterSel.value = '';
-                const writeObj = document.getElementById('l2a2-sel-write-obj');
-                if (writeObj) writeObj.value = '';
-
-                this.filteredLogs = [];
-                this.switchTab('in');
-                this.updateHintUI();
-                
-                document.getElementById('l2a2-terminal').innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@logparser:~$</span> Loaded scenario: ${sc.title}. Complete the script options, then click Run...</div>`;
-            }
-
-            changeScenario(idx) {
-                sound.playBlip();
-                this.loadScenario(idx);
-            }
-
-            switchTab(tab) {
-                sound.playBlip();
-                this.activeTab = tab;
-                document.getElementById('btn-l2a2-tab-in').classList.toggle('active', tab === 'in');
-                document.getElementById('btn-l2a2-tab-out').classList.toggle('active', tab === 'out');
-                
-                this.renderEditor();
-            }
-
-            renderEditor() {
-                const editor = document.getElementById('l2a2-editor');
-                if (this.activeTab === 'in') {
-                    editor.innerHTML = this.rawLogs.join('\n');
-                    document.getElementById('l2a2-file-size-label').textContent = `Input Size: ${this.rawLogs.join('\n').length} B`;
-                } else {
-                    if (this.filteredLogs.length === 0) {
-                        editor.innerHTML = `<span style="color: var(--text-muted); font-style: italic;"># No logs filtered yet. Run the log parser to write data.</span>`;
-                        document.getElementById('l2a2-file-size-label').textContent = `Output Size: 0 B`;
-                    } else {
-                        editor.innerHTML = this.filteredLogs.join('\n');
-                        document.getElementById('l2a2-file-size-label').textContent = `Output Size: ${this.filteredLogs.join('\n').length} B`;
-                    }
-                }
-            }
-
-            resetSimulator() {
-                sound.playBlip();
-                this.init();
-            }
-
-            clearBlocks() {
-                this.resetSimulator();
-            }
-
-            executeScript() {
-                if (this.isProcessing) return;
-                
-                const modeIn = document.getElementById('l2a2-sel-mode-in').value;
-                const modeOut = document.getElementById('l2a2-sel-mode-out').value;
-                const loopObj = document.getElementById('l2a2-sel-loop-obj').value;
-                const filterStr = document.getElementById('l2a2-sel-filter-str').value;
-                const writeObj = document.getElementById('l2a2-sel-write-obj').value;
-                
-                const term = document.getElementById('l2a2-terminal');
-                
-                // Validate if anything is unselected
-                if (!modeIn || !modeOut || !loopObj || !filterStr || !writeObj) {
-                    sound.playCrash();
-                    term.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@logparser:~$</span> <span class="terminal-error">SyntaxError: Incomplete statement configuration. All dropdown slots must be configured.</span></div>`;
-                    showToast("⚠️ Complete all dropdown selections.");
-                    return;
-                }
-                
-                term.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">detective@logparser:~$</span> Executing log filter script...</div>`;
-                
-                // Validate inputs
-                if (modeIn !== 'r') {
-                    sound.playCrash();
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">io.UnsupportedOperation: not readable. Tried to read from file in write mode '${modeIn}'.</span></div>`;
-                    showToast("❌ Script crashed.");
-                    return;
-                }
-                
-                if (modeOut === 'r') {
-                    sound.playCrash();
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">io.UnsupportedOperation: not writable. Tried to write payload into read-only handler mode 'r'.</span></div>`;
-                    showToast("❌ Script crashed.");
-                    return;
-                }
-                
-                if (loopObj !== 'f_in') {
-                    sound.playCrash();
-                    if (loopObj === 'f_out') {
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-error">io.UnsupportedOperation: not readable. Cannot iterate over output handle f_out (mode '${modeOut}' is write-only).</span></div>`;
-                    } else {
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-error">NameError: name 'line' is not defined in loop iterator scope.</span></div>`;
-                    }
-                    showToast("❌ Script crashed.");
-                    return;
-                }
-                
-                if (writeObj !== 'f_out') {
-                    sound.playCrash();
-                    if (writeObj === 'f_in') {
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-error">io.UnsupportedOperation: not writable. Cannot write to input file object opened with mode 'r'.</span></div>`;
-                    } else {
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-error">AttributeError: 'str' object has no attribute 'write' at line.write() context.</span></div>`;
-                    }
-                    showToast("❌ Script crashed.");
-                    return;
-                }
-
-                // Check scenario key mismatch
-                const sc = this.scenarios[this.currentIdx];
-                if (filterStr !== sc.filterKey) {
-                    sound.playCrash();
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] Logic check mismatch. The script looked for "${filterStr}" but the current audit requires scanning for "${sc.filterKey}". No matching logs parsed.</span></div>`;
-                    showToast("❌ Objective logic error.");
-                    return;
-                }
-
-                // Success execution path - animate step-by-step
-                this.isProcessing = true;
-                sound.playWrite();
-                this.filteredLogs = [];
-                
-                let lineIdx = 0;
-                const processLine = () => {
-                    if (lineIdx >= this.rawLogs.length) {
-                        // Finished
-                        this.isProcessing = false;
-                        sound.playSuccess();
-                        particles.triggerConfetti();
-                        
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] Parsing completed. Found ${this.filteredLogs.length} matching rows. output.txt flushed to disk.</span></div>`;
-                        showToast("🏆 Log export succeeded!");
-                        
-                        this.switchTab('out');
-                        return;
-                    }
-                    
-                    const line = this.rawLogs[lineIdx];
-                    const hasMatch = line.includes(filterStr);
-                    
-                    // Highlight current line in the editor
-                    const editor = document.getElementById('l2a2-editor');
-                    if (this.activeTab === 'in') {
-                        const highlightedLines = this.rawLogs.map((l, idx) => {
-                            if (idx === lineIdx) {
-                                return `<span class="editor-line-highlight">${l}</span>`;
-                            }
-                            return l;
-                        });
-                        editor.innerHTML = highlightedLines.join('\n');
-                    }
-                    
-                    if (hasMatch) {
-                        sound.playWrite();
-                        this.filteredLogs.push(line);
-                        term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[WRITE] Match: line ${lineIdx + 1} written.</span></div>`;
-                        particles.triggerSparks(window.innerWidth / 2, window.innerHeight / 2, '#33ff33');
-                    } else {
-                        term.innerHTML += `<div class="terminal-line" style="color:var(--text-muted)">[SKIP] line ${lineIdx + 1} does not match filter.</div>`;
-                    }
-                    
-                    term.scrollTop = term.scrollHeight;
-                    lineIdx++;
-                    setTimeout(processLine, 300);
-                };
-                
-                processLine();
-            }
-
-            nextHint() {
-                sound.playBlip();
-                this.hintStage = (this.hintStage + 1) % 4;
-                this.updateHintUI();
-            }
-
-            updateHintUI() {
-                const sc = this.scenarios[this.currentIdx];
-                const hintText = document.getElementById('l2a2-hint-text');
-                hintText.innerHTML = sc.hints[this.hintStage];
-                
-                const dots = document.getElementById('l2a2-hint-dots');
-                dots.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
-                    dots.appendChild(dot);
-                }
-            }
-        }
-        const l2a2 = new LogFileFilterExporter();
-
-        /* ==========================================================================
-           9. LEVEL 3 ACTIVITY 1: FILE POINTER EXPLORER
-           ========================================================================== */
-        class FilePointerExplorer {
-            constructor() {
-                this.content = "Hello, Python World!\nLine two here.";
-                this.offset = 0;
-                
-                this.missions = [
-                    {
-                        title: "Mission 1: Position start of word 'Python'",
-                        desc: "Use seek() offset to position the cursor directly at the start index of character 'P' (byte index 7).",
-                        targetOffset: 7,
-                        hints: [
-                            "Clue: Word 'Python' starts after the comma and space in the byte grid map.",
-                            "Concept: Offset index starts at 0. 'H' is 0, 'e' is 1, etc.",
-                            "Action: Drag the slider until the offset pointer index shows byte 7.",
-                            "Solution: Call seek(7) to locate position offset 7."
-                        ]
-                    },
-                    {
-                        title: "Mission 2: Start of Line 2",
-                        desc: "Position the cursor pointer at the beginning of line 2 (directly on byte index 21, character 'L').",
-                        targetOffset: 21,
-                        hints: [
-                            "Clue: Line 2 follows the newline marker. Check index 21.",
-                            "Concept: Newline symbol '↵' takes exactly 1 byte space at index 20.",
-                            "Action: Shift the index slider offset to 21.",
-                            "Solution: seek(21) relocates cursor past the line break."
-                        ]
-                    },
-                    {
-                        title: "Mission 3: Position start of word 'World'",
-                        desc: "Use seek() offset to position the cursor directly at the start index of character 'W' in 'World' (byte index 14).",
-                        targetOffset: 14,
-                        hints: [
-                            "Clue: Word 'World' starts after the space at index 13.",
-                            "Concept: The character 'W' is at absolute offset 14.",
-                            "Action: Drag the slider to position index 14.",
-                            "Solution: seek(14) moves pointer directly onto word 'World'."
-                        ]
-                    }
-                ];
-                
-                this.currentMissionIdx = 0;
-                this.hintStage = 0;
-            }
-
-            init() {
-                this.offset = 0;
-                this.hintStage = 0;
-                
-                this.renderGrid();
-                this.loadMission(this.currentMissionIdx);
-            }
-
-            loadMission(idx) {
-                this.currentMissionIdx = idx;
-                this.hintStage = 0;
-                const m = this.missions[idx];
-                document.getElementById('l3a1-mission-title').textContent = m.title;
-                document.getElementById('l3a1-mission-desc').textContent = m.desc;
-                
-                this.updateHintUI();
-                this.updateCodeBox();
-            }
-
-            renderGrid() {
-                const grid = document.getElementById('l3a1-grid');
-                grid.innerHTML = '';
-                
-                const chars = Array.from(this.content);
-                chars.forEach((c, idx) => {
-                    const cell = document.createElement('div');
-                    cell.className = 'byte-box' + (idx === this.offset ? ' pointer-active' : '');
-                    cell.innerHTML = `
-                        <span class="byte-char">${c === '\n' ? '↵' : c}</span>
-                        <span class="byte-idx">${idx}</span>
-                    `;
-                    cell.addEventListener('click', () => {
-                        this.offset = idx;
-                        document.getElementById('l3a1-slider').value = idx;
-                        this.updatePointerDetails();
-                        this.renderGrid();
-                    });
-                    grid.appendChild(cell);
-                });
-
-                this.updatePointerDetails();
-            }
-
-            sliderSeek(val) {
-                this.offset = parseInt(val);
-                this.updatePointerDetails();
-                this.renderGrid();
-            }
-
-            updatePointerDetails() {
-                const char = this.content[this.offset];
-                document.getElementById('l3a1-val-offset').textContent = this.offset;
-                document.getElementById('l3a1-val-char').textContent = char === '\n' ? 'Newline' : (char || 'EOF');
-                
-                // line check
-                const precedingText = this.content.substring(0, this.offset);
-                const lineNum = precedingText.split('\n').length;
-                document.getElementById('l3a1-val-line').textContent = lineNum;
-                
-                this.updateCodeBox();
-            }
-
-            updateCodeBox() {
-                const code = document.getElementById('l3a1-code');
-                code.innerHTML = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"data.txt"</span>, <span class="hl-string">"r"</span>) <span class="hl-keyword">as</span> f:
-    f.seek(${this.offset})  <span class="hl-comment"># Move pointer to byte ${this.offset}</span>
-    pos = f.tell()   <span class="hl-comment"># Returns position offset ${this.offset}</span>`;
-            }
-
-            runSeekVerify() {
-                sound.playLaser();
-                const m = this.missions[this.currentMissionIdx];
-                const term = document.getElementById('l3a1-terminal');
-
-                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@pointer:~$</span> Testing pointer validation at offset ${this.offset}...</div>`;
-
-                if (this.offset === m.targetOffset) {
-                    sound.playSuccess();
-                    particles.triggerConfetti();
-                    
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] Pointer verify accepts position offset ${this.offset}. Mission accomplished.</span></div>`;
-                    showToast("🏆 Pointer Target Met!");
-
-                    setTimeout(() => {
-                        const nextIdx = (this.currentMissionIdx + 1) % this.missions.length;
-                        this.loadMission(nextIdx);
-                        this.init();
-                    }, 2000);
-                } else {
-                    sound.playCrash();
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">[ERROR] Pointer verify mismatch. Target offset is byte index ${m.targetOffset}. You are at index ${this.offset}. Adjust seek parameters.</span></div>`;
-                    showToast("❌ Pointer mismatch. Try again.");
-                }
-            }
-
-            nextHint() {
-                sound.playBlip();
-                this.hintStage = (this.hintStage + 1) % 4;
-                this.updateHintUI();
-            }
-
-            updateHintUI() {
-                const m = this.missions[this.currentMissionIdx];
-                const hintText = document.getElementById('l3a1-hint-text');
-                hintText.innerHTML = m.hints[this.hintStage];
-                
-                const dots = document.getElementById('l3a1-hint-dots');
-                dots.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
-                    dots.appendChild(dot);
-                }
-            }
-        }
-        const l3a1 = new FilePointerExplorer();
-
-        /* ==========================================================================
-           10. LEVEL 3 ACTIVITY 2: FILE OPERATIONS CHALLENGE
-           ========================================================================== */
-        class FileOperationsChallenge {
-            constructor() {
-                this.challenges = [
-                    {
-                        title: "Log Append Operation",
-                        desc: "Modify database file log `transactions.log` by opening it correctly to add rows at the EOF offset. Select correct configuration target mode and offset index 0.",
-                        file: "transactions.log",
-                        correctMode: "a",
-                        correctOffset: 0,
-                        hints: [
-                            "Clue: Addition of logs at EOF demands the append mode flag.",
-                            "Concept: Mode 'a' automatically targets the end offset sector.",
-                            "Action: Select mode 'a' and offset value 0.",
-                            "Solution: with open('transactions.log', 'a') + f.seek(0) ensures logs are saved."
-                        ]
-                    },
-                    {
-                        title: "Restore Backup Headers",
-                        desc: "Overwrite corrupted manifest log headers. Relocate the seek pointer offset to index 15 to scan files safely without data loss issues.",
-                        file: "manifest.json",
-                        correctMode: "r",
-                        correctOffset: 15,
-                        hints: [
-                            "Clue: Scanning/reading files without mutations calls for mode 'r'.",
-                            "Concept: Moving past damaged headers is managed by seeking past offset byte index 15.",
-                            "Action: Choose mode 'r' and offset index index parameter 15.",
-                            "Solution: seek(15) inside mode 'r' satisfies criteria."
-                        ]
-                    },
-                    {
-                        title: "Scan System Metadata",
-                        desc: "Read the settings in `system_metadata.db` starting from byte offset 24 to skip the binary magic header without modifying it. Choose the correct mode for safe reading and offset 24.",
-                        file: "system_metadata.db",
-                        correctMode: "r",
-                        correctOffset: 24,
-                        hints: [
-                            "Clue: Scan files safely without mutating -> mode 'r'.",
-                            "Concept: Skip 24 bytes -> offset 24.",
-                            "Action: Choose mode 'r' and offset index 24.",
-                            "Solution: seek(24) inside mode 'r' satisfies criteria."
-                        ]
-                    },
-                    {
-                        title: "Initialize Setup Registry",
-                        desc: "Wipe all old registry configurations inside `registry.sys` and prepare to write fresh startup scripts. Select the correct mode that clears old data and offset 0.",
-                        file: "registry.sys",
-                        correctMode: "w",
-                        correctOffset: 0,
-                        hints: [
-                            "Clue: Clearing existing bytes and starting fresh -> mode 'w'.",
-                            "Concept: Write pointer at byte offset 0 resets data.",
-                            "Action: Choose mode 'w' and offset 0.",
-                            "Solution: seek(0) inside mode 'w' satisfy criteria."
-                        ]
-                    }
-                ];
-
-                this.currentIdx = 0;
-                this.hintStage = 0;
-            }
-
-            init() {
-                this.hintStage = 0;
-                this.loadChallenge(this.currentIdx);
-            }
-
-            loadChallenge(idx = null) {
-                sound.playBlip();
-                if (idx === null) {
-                    this.currentIdx = (this.currentIdx + 1) % this.challenges.length;
-                } else {
-                    this.currentIdx = idx;
-                }
-                
-                const c = this.challenges[this.currentIdx];
-                document.getElementById('l3a2-mission-title').textContent = c.title;
-                document.getElementById('l3a2-mission-desc').textContent = c.desc;
-                document.getElementById('l3a2-target-file').value = c.file;
-                
-                this.updateHintUI();
-                this.updateCodeBox();
-            }
-
-            updateCodeBox() {
-                const c = this.challenges[this.currentIdx];
-                const mode = document.getElementById('l3a2-target-mode').value;
-                const offset = document.getElementById('l3a2-target-offset').value || 0;
-                
-                const code = document.getElementById('l3a2-code');
-                code.innerHTML = `<span class="hl-keyword">with</span> <span class="hl-builtin">open</span>(<span class="hl-string">"${c.file}"</span>, <span class="hl-string">"${mode}"</span>) <span class="hl-keyword">as</span> f:
-    f.seek(${offset})
-    f.write(<span class="hl-string">"Fixed payload"</span>)`;
-            }
-
-            executeChallenge() {
-                sound.playLaser();
-                const c = this.challenges[this.currentIdx];
-                const selectedMode = document.getElementById('l3a2-target-mode').value;
-                const selectedOffset = parseInt(document.getElementById('l3a2-target-offset').value) || 0;
-                const term = document.getElementById('l3a2-terminal');
-
-                term.innerHTML += `<div class="terminal-line"><span class="terminal-prompt">detective@osconsole:~$</span> Compiling script logic...</div>`;
-
-                if (selectedMode === c.correctMode && selectedOffset === c.correctOffset) {
-                    sound.playSuccess();
-                    particles.triggerConfetti();
-                    
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-success">[SUCCESS] OS sectors verified. Operations execution successful. Data recovered.</span></div>`;
-                    showToast("🏆 System logs repaired successfully!");
-
-                    setTimeout(() => {
-                        this.loadChallenge();
-                    }, 2000);
-                } else {
-                    sound.playCrash();
-                    let feedback = "[CRASH ERROR] ";
-                    if (selectedMode !== c.correctMode) {
-                        feedback += `Incompatible open mode file flag for recovery logic. `;
-                    }
-                    if (selectedOffset !== c.correctOffset) {
-                        feedback += `Offset cursor mismatch. Expected seek target is offset index ${c.correctOffset}. `;
-                    }
-                    term.innerHTML += `<div class="terminal-line"><span class="terminal-error">${feedback}</span></div>`;
-                    showToast("❌ Crash detected. Check hints.");
-                }
-            }
-
-            nextHint() {
-                sound.playBlip();
-                this.hintStage = (this.hintStage + 1) % 4;
-                this.updateHintUI();
-            }
-
-            updateHintUI() {
-                const c = this.challenges[this.currentIdx];
-                const hintText = document.getElementById('l3a2-hint-text');
-                hintText.innerHTML = c.hints[this.hintStage];
-                
-                const dots = document.getElementById('l3a2-hint-dots');
-                dots.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
-                    const dot = document.createElement('span');
-                    dot.className = 'hint-dot' + (i === this.hintStage ? ' active' : '');
-                    dots.appendChild(dot);
-                }
-            }
-        }
-        const l3a2 = new FileOperationsChallenge();
-        document.getElementById('l3a2-target-mode').addEventListener('change', () => l3a2.updateCodeBox());
-        document.getElementById('l3a2-target-offset').addEventListener('input', () => l3a2.updateCodeBox());
-
-        /* ==========================================================================
-           11. INITIALIZATION ON DOM LOADED
-           ========================================================================== */
-        window.addEventListener('DOMContentLoaded', () => {
-            particles = new ParticleEngine();
-            switchLevel(1);
-        });
     </script>
 </body>
+
 </html>

@@ -4,2393 +4,829 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyScope Lab — Variables, Namespaces & Closures</title>
-
-    <!-- Modern Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
-
+    <title>Case Study: Scope, Nested Functions & Execution Context</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
         :root {
-            --primary-accent: #e10600;
-            --primary-accent-hover: #b30500;
-            --primary-glow: rgba(225, 6, 0, 0.08);
-            --bg-main: #fffcfc;
-            --bg-card: #ffffff;
-            --bg-card-hover: #fffefe;
-            --border-color: #ffd1d5;
-            --ink: #1a0808;
-            --text-secondary: #5a4b4b;
-
-            --font-display: 'Outfit', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-
-            --code-bg: #0b0f19;
-            --code-keyword: #f43f5e;
-            --code-string: #10b981;
-            --code-number: #f472b6;
-            --code-comment: #64748b;
-            --code-builtin: #3b82f6;
-
-            --border-radius-lg: 16px;
-            --border-radius-md: 10px;
-            --border-radius-sm: 6px;
-
-            --success-green: #2e7d32;
-            --success-bg: rgba(46, 125, 50, 0.06);
-            --error-red: #b71c1c;
-            --error-bg: rgba(183, 28, 28, 0.06);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg-canvas: #f8f7f4;
+            --tech-blue: #2c5282;
+            --alert-orange: #c05621;
+            --text-main: #1a202c;
+            --code-bg: #ffffff;
         }
 
         body {
-            font-family: var(--font-body);
-            background-color: var(--bg-main);
-            color: var(--ink);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(225, 6, 0, 0.02) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(225, 6, 0, 0.02) 0%, transparent 40%);
-            background-attachment: fixed;
+            font-family: 'IBM+Plex+Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
         }
 
-        /* HEADER & LEVEL SELECTOR */
-        .app-header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 30px rgba(225, 6, 0, 0.02);
+        .serif {
+            font-family: 'IBM+Plex+Serif', serif;
         }
 
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .brand-logo {
-            background: var(--primary-accent);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            box-shadow: 0 4px 10px var(--primary-glow);
-        }
-
-        .brand-title h1 {
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        .brand-title p {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .level-tabs {
-            display: flex;
-            gap: 0.5rem;
-            background: rgba(225, 6, 0, 0.03);
-            padding: 0.25rem;
-            border-radius: var(--border-radius-md);
-            border: 1px solid rgba(225, 6, 0, 0.05);
-        }
-
-        .level-tab {
-            background: none;
-            border: none;
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding: 0.5rem 1.25rem;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .level-tab:hover {
-            color: var(--primary-accent);
-            background: rgba(225, 6, 0, 0.02);
-        }
-
-        .level-tab.active {
-            background: var(--primary-accent);
-            color: white;
-            box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        /* MAIN CONTAINER */
-        .main-container {
-            flex: 1;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .split-container {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 2.2rem;
-            width: 100%;
-            align-items: start;
-        }
-
-        @media (max-width: 1024px) {
-            .split-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .workspace-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .sidebar-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* GLASS CARDS */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: var(--border-radius-lg);
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(225, 6, 0, 0.02);
-            transition: border-color 0.3s ease;
-        }
-
-        .glass-card:hover {
-            border-color: var(--border-color);
-        }
-
-        /* BUTTONS */
-        .btn {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.6rem 1.25rem;
-            border-radius: var(--border-radius-md);
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: var(--primary-accent);
-            color: white;
-            box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--primary-accent);
-            border: 1px solid rgba(225, 6, 0, 0.08);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(225, 6, 0, 0.08);
-        }
-
-        .btn-ghost {
-            background: none;
-            color: var(--text-secondary);
-        }
-
-        .btn-ghost:hover {
-            color: var(--primary-accent);
-            background: rgba(225, 6, 0, 0.02);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* ACTIVITY SELECTOR BAR */
-        .activity-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 0.75rem 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
-        }
-
-        .activity-pills {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .activity-pill {
-            background: none;
-            border: none;
-            font-family: var(--font-display);
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding: 0.4rem 1rem;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .activity-pill.active {
-            background: rgba(225, 6, 0, 0.08);
-            color: var(--primary-accent);
-        }
-
-        /* SIMULATOR CORE CONTAINER */
-        .simulator-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 1.5rem;
-            min-height: 380px;
-            display: flex;
-            flex-direction: column;
+        .chart-container {
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(225, 6, 0, 0.03);
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            height: 300px;
+            max-height: 400px;
         }
 
-        .simulator-header {
-            margin-bottom: 1.25rem;
-            border-bottom: 1px dashed rgba(225, 6, 0, 0.08);
-            padding-bottom: 0.75rem;
+        .technical-image-container {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
         }
 
-        .simulator-title h2 {
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--ink);
+        /* Architectural Diagram Styling */
+        .flow-node {
+            border: 2px solid var(--tech-blue);
+            padding: 12px;
+            border-radius: 6px;
+            background: #ebf8ff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
-        .simulator-title p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
+        .scope-box {
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            background: rgba(241, 245, 249, 0.5);
+            margin: 16px;
         }
 
-        .simulator-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* LOOP CONTROL BAR */
-        .loop-control-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 0.75rem 1.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .control-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .speed-select {
-            font-family: var(--font-display);
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.4rem 0.75rem;
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--border-color);
-            outline: none;
-            background: white;
-            cursor: pointer;
-        }
-
-        /* NAVIGATION FOOTER */
-        .nav-footer-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-            backdrop-filter: blur(10px);
-        }
-
-        #nav-footer-status {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        /* SIDEBAR SECTIONS */
-        .sidebar-section-title {
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            font-weight: 700;
+        .scope-label {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #ffffff;
+            padding: 0 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #475569;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Light Theme Syntax Highlighting */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .code-header {
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 8px;
         }
 
-        /* HINT STAGE DOTS */
-        .hint-stages {
-            display: flex;
-            gap: 4px;
-        }
-
-        .hint-dot {
-            width: 8px;
-            height: 8px;
+        .mac-dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.08);
-            transition: background 0.3s ease;
         }
 
-        .hint-dot.active {
-            background: var(--primary-accent);
+        .dot-red {
+            background: #ff5f56;
         }
 
-        .hint-box {
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px dashed var(--border-color);
-            border-radius: var(--border-radius-md);
-            padding: 0.75rem 1rem;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            color: var(--text-secondary);
-            margin-top: 0.75rem;
-            min-height: 50px;
+        .dot-yellow {
+            background: #ffbd2e;
         }
 
-        /* VARIABLE INSPECTOR */
-        .variable-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .dot-green {
+            background: #27c93f;
         }
 
-        .var-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px solid rgba(225, 6, 0, 0.05);
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius-md);
-        }
-
-        .var-card.pulsing {
-            animation: varPulse 0.4s ease;
-        }
-
-        @keyframes varPulse {
-            0% {
-                background-color: rgba(225, 6, 0, 0.2);
-            }
-
-            100% {
-                background-color: rgba(225, 6, 0, 0.02);
-            }
-        }
-
-        .var-name {
-            font-family: var(--font-code);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-accent);
-        }
-
-        .var-val {
-            font-family: var(--font-code);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        /* SYNTAX HIGHLIGHT CODE PANEL */
-        .code-panel {
-            background-color: var(--code-bg);
-            border-radius: var(--border-radius-md);
-            padding: 1rem;
+        pre {
+            padding: 16px;
             overflow-x: auto;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .code-line {
-            font-family: var(--font-code);
+            color: #24292e;
             font-size: 0.85rem;
             line-height: 1.5;
-            color: #9cdcfe;
-            display: flex;
-            padding: 0.1rem 0.25rem;
-            border-radius: 4px;
-            transition: background 0.2s ease;
         }
 
-        .code-line.active-exec {
-            background: rgba(244, 63, 94, 0.25);
-            border-left: 3px solid var(--code-keyword);
+        .kw {
+            color: #d73a49;
+            font-weight: bold;
         }
 
-        .code-line-num {
-            color: #565656;
-            width: 24px;
-            user-select: none;
-            text-align: right;
-            margin-right: 12px;
+        /* Keyword */
+        .fn {
+            color: #6f42c1;
         }
 
-        .code-keyword {
-            color: var(--code-keyword);
-            font-weight: 700;
+        /* Function */
+        .str {
+            color: #032f62;
         }
 
-        .code-string {
-            color: var(--code-string);
+        /* String */
+        .num {
+            color: #005cc5;
         }
 
-        .code-number {
-            color: var(--code-number);
-        }
-
-        .code-comment {
-            color: var(--code-comment);
+        /* Number */
+        .cm {
+            color: #6a737d;
             font-style: italic;
         }
 
-        .code-builtin {
-            color: var(--code-builtin);
+        /* Comment */
+        .op {
+            color: #d73a49;
         }
 
-        /* MOCK TERMINAL */
-        .terminal-console {
-            background: #090d16;
-            border-radius: var(--border-radius-md);
-            padding: 0.75rem 1rem;
-            font-family: var(--font-code);
-            font-size: 0.8rem;
-            color: #e2e8f0;
-            height: 120px;
-            overflow-y: auto;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
+        /* Operator */
+        .arg {
+            color: #e36209;
         }
 
-        .terminal-line {
-            line-height: 1.4;
-        }
+        /* Arguments */
 
-        .terminal-prompt {
-            color: var(--primary-accent);
-            margin-right: 0.5rem;
-            user-select: none;
-        }
-
-        .terminal-success {
-            color: #10b981;
-        }
-
-        .terminal-warning {
-            color: #f59e0b;
-        }
-
-        /* POPUP WARNINGS / ALERTS */
-        .popup-alert {
-            position: absolute;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(225, 6, 0, 0.08);
-            z-index: 10;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .popup-alert.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .popup-alert.success {
-            border-color: #10b981;
-            color: #047857;
-            background: #ecfdf5;
-        }
-
-        .popup-alert.error {
-            border-color: #ef4444;
-            color: #b91c1c;
-            background: #fef2f2;
-        }
-
-        .popup-alert.info {
-            border-color: #3b82f6;
-            color: #1d4ed8;
-            background: #eff6ff;
-        }
-
-        /* DRAG CHIPS AND SLOTS */
-        .chips-bank {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            background: rgba(225, 6, 0, 0.02);
-            padding: 0.75rem;
-            border-radius: var(--border-radius-md);
-            border: 1px dashed rgba(225, 6, 0, 0.1);
-        }
-
-        .chip {
-            background: white;
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 0.85rem;
-            border-radius: var(--border-radius-sm);
-            font-family: var(--font-code);
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: grab;
-            user-select: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(225, 6, 0, 0.02);
-        }
-
-        .chip:hover {
-            border-color: var(--primary-accent);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px var(--primary-glow);
-        }
-
-        .chip.selected {
-            background: var(--primary-accent);
-            color: white;
-            border-color: var(--primary-accent);
-        }
-
-        .slot {
-            border: 2px dashed rgba(225, 6, 0, 0.25);
-            border-radius: var(--border-radius-sm);
-            background: rgba(225, 6, 0, 0.01);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-code);
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            vertical-align: middle;
-            text-align: center;
-        }
-
-        .slot.hovered {
-            background: rgba(225, 6, 0, 0.08);
-            border-color: var(--primary-accent);
-        }
-
-        .slot.filled {
-            background: var(--primary-accent);
-            color: white;
-            border-style: solid;
-            border-color: var(--primary-accent);
-            font-weight: 700;
-        }
-
-        /* LEVEL 1: VARIABLE CITY */
-        .city-grid {
-            width: 100%;
-            height: 220px;
-            background: #f8fafc;
-            border-radius: var(--border-radius-lg);
-            border: 2px solid #e2e8f0;
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-        }
-
-        .scope-building {
-            width: 80px;
-            height: 120px;
-            background: white;
-            border: 3px solid #94a3b8;
-            border-radius: 8px;
-            position: absolute;
-            bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .scope-building.active {
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        .detective-avatar {
-            position: absolute;
-            bottom: 25px;
-            left: 20px;
-            transition: all 0.8s ease-in-out;
-            z-index: 20;
-        }
-
-        /* BUCKETS FOR NAMESPACES */
-        .namespace-buckets {
-            display: flex;
-            gap: 1rem;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .ns-bucket {
-            flex: 1;
-            min-height: 120px;
-            background: #f8fafc;
-            border: 2px dashed #cbd5e1;
-            border-radius: var(--border-radius-md);
-            padding: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
+        /* Lab Section Specific Styles */
+        .sim-line {
+            padding-left: 12px;
+            border-left: 3px solid transparent;
             transition: all 0.2s ease;
         }
 
-        .ns-bucket.hovered {
-            background: rgba(225, 6, 0, 0.03);
-            border-color: var(--primary-accent);
+        .sim-line.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid #60a5fa;
+            color: #ffffff;
         }
 
-        .ns-bucket-title {
-            font-family: var(--font-display);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-        }
-
-        /* LEVEL 2: DETECTIVE LAYERS */
-        .legb-layer {
-            width: 100%;
-            height: 40px;
-            background: #f1f5f9;
-            border: 2px solid #e2e8f0;
-            border-radius: var(--border-radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1rem;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .legb-layer.searching {
-            background: rgba(225, 6, 0, 0.08);
-            border-color: var(--primary-accent);
-        }
-
-        .legb-layer.found {
-            background: var(--success-bg);
-            border-color: var(--success-green);
-        }
-
-        .legb-layer-label {
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        .legb-layer-vars {
-            font-family: var(--font-code);
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        /* LEVEL 3: CLOSURE FACTORY PERSISTENCE */
-        .factory-belt {
-            width: 100%;
-            height: 140px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: var(--border-radius-lg);
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-        }
-
-        .memory-box-glowing {
-            width: 100px;
-            height: 80px;
-            border-radius: 8px;
-            border: 2px solid var(--primary-accent);
-            background: rgba(225, 6, 0, 0.05);
-            box-shadow: 0 0 20px var(--primary-glow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary-accent);
-            transition: opacity 0.5s ease;
-        }
-
-        .memory-box-glowing.faded {
-            opacity: 0.2;
-        }
-
-        /* LEVEL 3: ESCAPE PANELS */
-        .escape-panels-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            width: 100%;
-            margin-bottom: 1.5rem;
-        }
-
-        .escape-panel-card {
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .escape-panel-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--primary-accent);
-        }
-
-        .escape-panel-card.active {
-            background: rgba(225, 6, 0, 0.08);
-            border-color: var(--primary-accent);
-            box-shadow: 0 4px 15px var(--primary-glow);
-        }
-
-        .escape-status-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
+        .mem-var {
             display: inline-block;
-            margin-bottom: 0.5rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin: 4px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .mem-var.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .var-global {
             background: #fee2e2;
             color: #991b1b;
+            border: 1px solid #f87171;
         }
 
-        .escape-status-badge.solved {
-            background: #d1fae5;
-            color: #065f46;
+        .var-enclosing {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fbbf24;
         }
 
-        .challenge-card {
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px dashed var(--border-color);
-            padding: 1rem;
-            border-radius: var(--border-radius-lg);
-            width: 100%;
-            text-align: left;
-            margin-bottom: 1rem;
+        .var-local {
+            background: #dbeafe;
+            color: #1e3a8a;
+            border: 1px solid #60a5fa;
         }
 
-        .challenge-card h4 {
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            color: var(--primary-accent);
-            font-weight: 700;
+        .scope-container {
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+            background: #111827;
+            margin-top: 24px;
+            min-height: 80px;
+        }
+
+        .dark-scope-label {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: #1f2937;
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #9ca3af;
             text-transform: uppercase;
-            margin-bottom: 0.25rem;
+            border: 1px solid #4b5563;
+            border-radius: 4px;
         }
 
-        .challenge-card p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
+        /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+        @media print {
+
+            /* Reset body/html defaults for clean printing */
+            html,
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Keep overflow visible to prevent multi-page cropping/clipping */
+            html,
+            body,
+            main,
+            section,
+            div,
+            pre,
+            code,
+            table,
+            tr,
+            td,
+            canvas,
+            .technical-image-container,
+            .chart-container {
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+                position: static !important;
+            }
+
+            /* Ensure structural blocks break elegantly across pages */
+            pre,
+            blockquote,
+            table,
+            tr,
+            img,
+            canvas,
+            .technical-image-container,
+            .chart-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Avoid orphaned headers at the bottom of a page */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Hide interactive/non-printable UI elements */
+            nav,
+            footer,
+            button,
+            .no-print,
+            [class*="sticky"],
+            [class*="fixed"] {
+                display: none !important;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="antialiased">
 
-    <!-- TOP APP HEADER -->
-    <header class="app-header">
-        <div class="brand-section">
-            <div class="brand-logo">🕵️</div>
-            <div class="brand-title">
-                <h1>PyScope Lab</h1>
-                <p>Interactive Variable Scopes &amp; Namespace Navigator</p>
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-900 flex items-center justify-center text-white font-bold rounded">PY</div>
+                <span class="font-bold tracking-tighter uppercase text-sm">Engineering Dossier</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+                <a href="#theory" class="hover:text-black transition">Foundations</a>
+                <a href="#case" class="hover:text-black transition">Case Study</a>
+                <a href="#architecture" class="hover:text-black transition">Architecture</a>
+                <a href="#code" class="hover:text-black transition">Implementations</a>
+                <a href="#lab" class="text-orange-700">Scope Visualizer</a>
             </div>
         </div>
+    </nav>
 
-        <!-- Level tabs -->
-        <div class="level-tabs">
-            <button class="level-tab active" onclick="switchLevel(1)">Level 1: Variable City</button>
-            <button class="level-tab" onclick="switchLevel(2)">Level 2: LEGB Detective</button>
-            <button class="level-tab" onclick="switchLevel(3)">Level 3: Closures</button>
+    <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+        <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Execution Context & Memory Encapsulation
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            An engineering report on variable scope, the LEGB rule, nested functional architecture, and operational
+            stubs.
+        </p>
+        <div class="mt-8 flex justify-center space-x-4">
+            <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase bg-gray-50">Module
+                2</span>
+            <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase bg-gray-50">Unit
+                2.4</span>
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
-    <main class="main-container">
+    <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
 
-        <!-- TOP NAVIGATION BAR -->
-        <div class="nav-footer-bar">
-            <button class="btn btn-secondary" onclick="navigatePrev()">&larr; Previous</button>
-            <span id="nav-footer-status">Level 1 - Activity 1</span>
-            <button class="btn btn-secondary" onclick="navigateNext()">Next &rarr;</button>
-        </div>
-
-        <!-- HINT SYSTEM & VARIABLE INSPECTOR ROW -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%;">
-            <!-- HINT SYSTEM -->
-            <div class="glass-card" style="margin: 0; padding: 1rem;">
-                <div class="sidebar-section-title" style="margin-bottom: 0.5rem;">
-                    <span>Logical Clues</span>
-                    <div class="hint-stages" id="hint-dots-wrapper">
-                        <span class="hint-dot"></span>
-                        <span class="hint-dot"></span>
-                        <span class="hint-dot"></span>
-                        <span class="hint-dot"></span>
-                    </div>
-                </div>
-                <button class="btn btn-secondary"
-                    style="width: 100%; justify-content: center; padding: 0.4rem 1rem; font-size: 0.75rem;"
-                    onclick="revealNextHint()">
-                    Get Nudge Hint
-                </button>
-                <div class="hint-box" id="hint-feedback-box"
-                    style="margin-top: 0.5rem; min-height: 45px; font-size: 0.75rem; padding: 0.5rem 0.75rem;">
-                    Click the button above to request progressive clues without giving away the full logic!
-                </div>
-            </div>
-
-            <!-- VARIABLE INSPECTOR -->
-            <div class="glass-card" style="margin: 0; padding: 1rem;">
-                <div class="sidebar-section-title" style="margin-bottom: 0.5rem;">
-                    <span>Variable Inspector</span>
-                    <span
-                        style="font-size: 0.7rem; color: var(--primary-accent); font-family: var(--font-code);">[live]</span>
-                </div>
-                <div class="variable-grid" id="var-inspector-grid" style="font-size: 0.75rem;">
-                    <!-- Variables updated here -->
+        <!-- SECTION: THEORETICAL FOUNDATIONS -->
+        <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <div class="space-y-6">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-orange-700">01. Theoretical Foundations
+                </h2>
+                <h3 class="serif text-4xl leading-snug">The LEGB Rule & Functional Privacy</h3>
+                <p>
+                    In software engineering, <strong>Scope</strong> defines the region of code where a variable is
+                    accessible. Without scope, every variable would reside in global memory, leading to catastrophic
+                    namespace collisions and profound security vulnerabilities.
+                </p>
+                <p>
+                    Python resolves variable names using the strict <strong>LEGB Rule</strong>:
+                </p>
+                <ul class="text-sm text-gray-700 space-y-2 list-disc pl-5">
+                    <li><strong>L</strong>ocal: Variables defined within the current function.</li>
+                    <li><strong>E</strong>nclosing: Variables in the local scope of enclosing (nested) functions.</li>
+                    <li><strong>G</strong>lobal: Variables defined at the top-level of the script.</li>
+                    <li><strong>B</strong>uilt-in: Pre-assigned names in Python (e.g., <code
+                            class="mono text-xs">len</code>, <code class="mono text-xs">print</code>).</li>
+                </ul>
+                <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-blue-800 mt-4">
+                    <p class="text-sm font-bold uppercase mb-2">The Pass Statement:</p>
+                    <p class="text-sm text-gray-700">
+                        When architecting complex nested systems, developers often design the skeleton of the code
+                        before writing the logic. The <code class="mono text-xs bg-white px-1">pass</code> statement
+                        acts as a syntactic placeholder, preventing <code
+                            class="mono text-xs text-red-600">IndentationError</code> for empty functions.
+                    </p>
                 </div>
             </div>
-        </div>
+            <div>
+                <div class="chart-container">
+                    <canvas id="scopeChart"></canvas>
+                </div>
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 mt-4 text-center">Fig 1.1: Variable
+                    Lifespan & Security Risk by Scope Level</p>
+            </div>
+        </section>
 
-        <!-- SPLIT LAYOUT: SIMULATOR & CODEBOXES SIDE-BY-SIDE -->
-        <div class="split-container">
+        <!-- CASE STUDY -->
+        <section id="case" class="space-y-12">
+            <div class="max-w-3xl">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">02. Industry Context</h2>
+                <h3 class="serif text-4xl mb-6">Online Banking & Transaction Processing</h3>
+                <p class="mb-4">
+                    <strong>SecureBank FinTech</strong> processes millions of financial transactions daily. Security is
+                    the paramount architectural concern. A core vulnerability in legacy systems is exposing internal
+                    validation mechanisms and transaction modifiers (like fraud scoring) to the global scope, making
+                    them susceptible to injection or accidental modification.
+                </p>
+                <p>
+                    By utilizing <strong>Nested Functions</strong> (functions defined inside other functions),
+                    SecureBank encapsulates the authentication and fraud-check logic entirely within the execution
+                    context of the main transfer function. These inner functions and their variables are fundamentally
+                    invisible to the rest of the application.
+                </p>
+            </div>
 
-            <!-- LEFT SIDE: DYNAMIC WORKSPACE -->
-            <div class="workspace-wrapper">
+            <!-- VISUAL LAYOUT 1: SYSTEM ARCHITECTURE DIAGRAM -->
+            <div id="architecture" class="technical-image-container bg-white">
+                <h4 class="text-[10px] font-bold uppercase tracking-widest mb-8 text-gray-500 text-center">Visual Layout
+                    2.1: Hierarchical Scope Architecture</h4>
 
-                <!-- SUB-ACTIVITIES pills -->
-                <div class="activity-bar">
-                    <div class="activity-pills" id="activity-pills-container">
-                        <!-- pills loaded dynamically -->
+                <div class="scope-box border-red-300 bg-red-50/30">
+                    <span class="scope-label text-red-700 border-red-300">Global Scope (Module Level)</span>
+                    <div class="mb-4 text-xs font-mono text-red-800">
+                        bank_name = "SecureBank"<br>
+                        exchange_rate = 1.05
                     </div>
 
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-secondary" onclick="replaySimulation()">
-                            🔄 Replay
-                        </button>
-                        <button class="btn btn-primary" id="run-btn" onclick="runExecution()">
-                            ▶ Run Code
-                        </button>
+                    <div class="scope-box border-yellow-400 bg-yellow-50/50">
+                        <span class="scope-label text-yellow-700 border-yellow-400">Enclosing Scope (Outer
+                            Function)</span>
+                        <div class="mb-4 text-xs font-mono text-yellow-800">
+                            def process_transfer(amount):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;base_fee = 2.50
+                        </div>
+
+                        <div class="scope-box border-blue-400 bg-blue-50/50">
+                            <span class="scope-label text-blue-700 border-blue-400">Local Scope (Inner Function)</span>
+                            <div class="text-xs font-mono text-blue-800">
+                                def validate_and_deduct():<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;total_deduction = amount + base_fee<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;return total_deduction
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 italic text-center">Inner function has read access to
+                            Enclosing and Global variables.</p>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- MAIN SIMULATOR CARD -->
-                <div class="simulator-card">
-                    <div class="popup-alert" id="sim-alert">Warning Message</div>
+        <!-- PYTHON IMPLEMENTATIONS -->
+        <section id="code" class="space-y-12">
+            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-700 mb-8 text-center">03. Syntax &
+                Implementations</h2>
 
-                    <div class="simulator-header">
-                        <div class="simulator-title">
-                            <h2 id="sim-title">Activity Title</h2>
-                            <p id="sim-subtitle">Short description of parameters</p>
+            <div class="space-y-12 max-w-4xl mx-auto">
+
+                <!-- PASS STATEMENT & BUILT IN -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="serif text-xl mb-2 flex items-center"><span
+                                class="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">1</span>
+                            The <code class="mono text-blue-700 text-sm ml-1">pass</code> Statement</h3>
+                        <p class="text-sm text-gray-600 mb-4">Used in test-driven development and system architecture
+                            design. It allows the definition of the API endpoints before the underlying database logic
+                            is implemented.</p>
+                        <div class="code-block m-0">
+                            <div class="code-header">
+                                <div class="mac-dot dot-red"></div>
+                                <div class="mac-dot dot-yellow"></div>
+                                <div class="mac-dot dot-green"></div>
+                                <span class="text-[10px] text-gray-400 font-mono ml-2">api_v2_stubs.py</span>
+                            </div>
+                            <pre class="mono"><code><span class="kw">def</span> <span class="fn">verify_2fa_token</span>(<span class="arg">user_id</span>, <span class="arg">token</span>):
+    <span class="cm"># TODO: Integrate Twilio API (Sprint 4)</span>
+    <span class="cm"># Pass prevents IndentationError</span>
+    <span class="kw">pass</span>
+
+<span class="kw">def</span> <span class="fn">flag_account_fraud</span>(<span class="arg">account_id</span>):
+    <span class="cm"># To be implemented by Security Team</span>
+    <span class="kw">pass</span></code></pre>
                         </div>
                     </div>
 
-                    <div class="simulator-content" id="sim-content-area">
-                        <!-- Injected dynamically -->
+                    <div>
+                        <h3 class="serif text-xl mb-2 flex items-center"><span
+                                class="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">2</span>
+                            Global vs Local Scope</h3>
+                        <p class="text-sm text-gray-600 mb-4">Variables defined inside a function exist strictly within
+                            that function's lifecycle. Modifying a global variable inside a local scope requires the
+                            <code class="mono text-xs">global</code> keyword.
+                        </p>
+                        <div class="code-block m-0">
+                            <div class="code-header">
+                                <div class="mac-dot dot-red"></div>
+                                <div class="mac-dot dot-yellow"></div>
+                                <div class="mac-dot dot-green"></div>
+                                <span class="text-[10px] text-gray-400 font-mono ml-2">balance_manager.py</span>
+                            </div>
+                            <pre class="mono"><code>vault_balance = <span class="num">1000000</span>  <span class="cm"># Global</span>
+
+<span class="kw">def</span> <span class="fn">withdraw</span>(<span class="arg">amount</span>):
+    <span class="kw">global</span> vault_balance
+    <span class="cm"># Without 'global', Python treats this</span>
+    <span class="cm"># as creating a NEW local variable.</span>
+    vault_balance -= amount
+    
+    receipt_id = <span class="str">"TX991"</span> <span class="cm"># Local</span>
+    <span class="kw">return</span> receipt_id
+
+<span class="cm"># print(receipt_id) -> Raises NameError</span></code></pre>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SPEED CONTROLLER -->
-                <div class="loop-control-bar">
-                    <div class="control-actions">
-                        <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">EXECUTION
-                            FLOW:</span>
+                <!-- NESTED FUNCTIONS -->
+                <div>
+                    <h3 class="serif text-2xl mb-2">3. Nested Functions (Closures & Enclosures)</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        By defining a function <em>inside</em> another function, we restrict its execution strictly to
+                        the outer function. The inner function automatically inherits read access to the outer
+                        function's variables (Enclosing Scope).
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="mac-dot dot-red"></div>
+                            <div class="mac-dot dot-yellow"></div>
+                            <div class="mac-dot dot-green"></div>
+                            <span class="text-[10px] text-gray-400 font-mono ml-2">secure_transaction.py</span>
+                        </div>
+                        <pre class="mono"><code><span class="kw">def</span> <span class="fn">process_secure_wire</span>(<span class="arg">sender</span>, <span class="arg">receiver</span>, <span class="arg">amount</span>):
+    <span class="cm"># ENCLOSING SCOPE</span>
+    wire_fee = <span class="num">15.00</span>
+    compliance_flag = <span class="kw">False</span>
+    
+    <span class="cm"># INNER FUNCTION (Hidden from global scope)</span>
+    <span class="kw">def</span> <span class="fn">_run_compliance_check</span>():
+        <span class="cm"># LOCAL SCOPE</span>
+        <span class="kw">nonlocal</span> compliance_flag <span class="cm"># Allows modifying enclosing var</span>
+        
+        <span class="cm"># Can read 'amount' from enclosing scope</span>
+        <span class="kw">if</span> amount &gt; <span class="num">10000</span>:
+            compliance_flag = <span class="kw">True</span>
+            <span class="kw">print</span>(<span class="str">"IRS Reporting Triggered."</span>)
+            
+        <span class="kw">return</span> amount + wire_fee
+        
+    <span class="cm"># Execution of the nested logic</span>
+    total_deduction = <span class="fn">_run_compliance_check</span>()
+    <span class="kw">print</span>(<span class="str">f"Wire successful. Total debited: ${total_deduction}"</span>)
+
+<span class="cm"># _run_compliance_check() -> Cannot be called here (NameError)</span></code></pre>
                     </div>
-                    <div class="control-actions">
-                        <label
-                            style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin:0;">SPEED:</label>
-                        <select class="speed-select" id="speed-selector" onchange="updateSpeed()">
-                            <option value="1000">1x Normal</option>
-                            <option value="1800">0.5x Slow</option>
-                            <option value="400">2x Fast</option>
-                        </select>
-                        <button class="btn btn-ghost" id="pause-btn" onclick="togglePause()"
-                            style="padding: 0.4rem 0.75rem;">
-                            ⏸ Pause
-                        </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LAB SECTION -->
+        <section id="lab" class="bg-black text-white p-8 md:p-12 rounded-3xl shadow-2xl relative overflow-hidden">
+            <h3 class="serif text-4xl mb-2 text-center">Interactive Scope Visualizer</h3>
+            <p class="text-sm text-gray-400 text-center mb-10 max-w-2xl mx-auto">
+                Step through the execution of a nested function to observe the LEGB rule in action. Watch how memory is
+                allocated into Global, Enclosing, and Local scopes.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                <!-- Code Execution (Left) -->
+                <div
+                    class="lg:col-span-6 bg-[#0d1117] rounded-xl border border-gray-800 font-mono text-[11px] leading-loose text-gray-400 shadow-inner">
+                    <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
+                        <span class="text-xs text-gray-400">transaction.py</span>
+                        <button id="stepBtn" onclick="nextStep()"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold transition-colors">Step
+                            Forward >></button>
+                    </div>
+                    <div class="p-4">
+                        <div id="l1" class="sim-line">bank_rate = <span class="text-[#005cc5]">1.05</span> <span
+                                class="text-[#6a737d]"># Global</span></div>
+                        <div id="l2" class="sim-line mt-2"><span class="text-[#d73a49]">def</span> <span
+                                class="text-[#6f42c1]">process_transfer</span>(amount):</div>
+                        <div id="l3" class="sim-line pl-8">fee = <span class="text-[#005cc5]">5</span> <span
+                                class="text-[#6a737d]"># Enclosing</span></div>
+                        <div id="l4" class="sim-line pl-8 mt-2"><span class="text-[#d73a49]">def</span> <span
+                                class="text-[#6f42c1]">apply_fee</span>():</div>
+                        <div id="l5" class="sim-line pl-12">total = amount + fee <span class="text-[#6a737d]">#
+                                Local</span></div>
+                        <div id="l6" class="sim-line pl-12"><span class="text-[#d73a49]">return</span> total * bank_rate
+                        </div>
+                        <div id="l7" class="sim-line pl-8 mt-2"><span class="text-[#d73a49]">return</span> apply_fee()
+                        </div>
+                        <div id="l8" class="sim-line mt-2">final_cost = process_transfer(<span
+                                class="text-[#005cc5]">100</span>)</div>
                     </div>
                 </div>
 
+                <!-- Memory Visualizer (Right) -->
+                <div class="lg:col-span-6 space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-blue-400 border-b border-gray-800 pb-2">
+                        Python Memory Environment</h4>
+
+                    <div class="scope-container border-red-900/50 mt-6">
+                        <span class="dark-scope-label text-red-400 border-red-900/50">Global Scope</span>
+                        <div id="mem-global" class="flex flex-wrap gap-2 pt-2">
+                            <!-- Vars go here -->
+                        </div>
+                    </div>
+
+                    <div class="scope-container border-yellow-700/50">
+                        <span class="dark-scope-label text-yellow-400 border-yellow-700/50">Enclosing Scope
+                            (process_transfer)</span>
+                        <div id="mem-enclosing" class="flex flex-wrap gap-2 pt-2">
+                            <!-- Vars go here -->
+                        </div>
+                    </div>
+
+                    <div class="scope-container border-blue-800/50">
+                        <span class="dark-scope-label text-blue-400 border-blue-800/50">Local Scope (apply_fee)</span>
+                        <div id="mem-local" class="flex flex-wrap gap-2 pt-2">
+                            <!-- Vars go here -->
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-gray-900 rounded-lg border border-gray-800">
+                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1">Terminal Output
+                        </p>
+                        <div id="term-out" class="font-mono text-xs text-green-400 h-4"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ASSESSMENT & BEST PRACTICES -->
+        <section class="border-t border-gray-200 pt-12">
+            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-500 text-center mb-8">04. Quality
+                Assurance & Evaluation</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Data Table -->
+                <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="p-4 font-bold text-gray-800 uppercase tracking-wider text-[10px]">Keyword
+                                </th>
+                                <th class="p-4 font-bold text-gray-800 uppercase tracking-wider text-[10px]">Usage
+                                    Context & Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr>
+                                <td class="p-4 font-mono text-red-600 font-bold">global</td>
+                                <td class="p-4 text-gray-700">Used inside a local function to declare that a variable
+                                    points to the module-level global namespace. Allows modification of global state.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-mono text-yellow-600 font-bold">nonlocal</td>
+                                <td class="p-4 text-gray-700">Used strictly inside nested functions to modify variables
+                                    defined in the nearest enclosing scope (excluding the global scope).</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-mono text-gray-500 font-bold">pass</td>
+                                <td class="p-4 text-gray-700">A null operation. When executed, nothing happens. Used
+                                    syntactically where code is required (like an empty nested function).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Interview Qs -->
+                <div class="space-y-6">
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm">Q1: Explain the LEGB rule and how Python resolves
+                            variable names.</p>
+                        <p class="text-gray-600 text-sm mt-1"><strong>A:</strong> Python searches for variables
+                            hierarchically: Local (inside current function), then Enclosing (any parent functions), then
+                            Global (module level), and finally Built-in (pre-defined Python names). If not found in any,
+                            it raises a <code class="mono text-xs">NameError</code>.</p>
+                    </div>
+                    <hr class="border-gray-200">
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm">Q2: Why is modifying global variables generally
+                            considered a bad engineering practice?</p>
+                        <p class="text-gray-600 text-sm mt-1"><strong>A:</strong> It creates hidden dependencies and
+                            "side effects." If a global variable is modified by multiple nested functions, tracking its
+                            state becomes impossible, leading to unpredictable bugs and compromised thread safety.</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- RIGHT SIDE: CODE & TERMINAL PANELS -->
-            <div class="sidebar-wrapper">
-
-                <!-- CODE SYNC PANEL -->
-                <div class="glass-card">
-                    <div class="sidebar-section-title">Python Code Synchronizer</div>
-                    <div class="code-panel" id="code-synced-panel">
-                        <!-- code segments updated here -->
-                    </div>
-                </div>
-
-                <!-- CONSOLE LOG -->
-                <div class="glass-card">
-                    <div class="sidebar-section-title">Execution Console Output</div>
-                    <div class="terminal-console" id="terminal-console-log">
-                        <div class="terminal-line"><span class="terminal-prompt">>>></span> System ready. Propose a
-                            scope simulation to run.</div>
-                    </div>
-                </div>
-
+            <!-- References -->
+            <div class="bg-gray-50 p-6 rounded-xl text-center">
+                <h4 class="text-xs font-bold uppercase tracking-widest mb-4 text-gray-500">Academic References</h4>
+                <p class="text-[11px] text-gray-500">
+                    Python Software Foundation. (2026). <em>Execution Model & Naming and Binding</em>. Retrieved from
+                    python.org.<br>
+                    Syllabus Topic: 2.4 - Pass statement in function, Nested Functions, Scope of variables.<br>
+                    SecureBank DevSecOps Manual. (2025). <em>Encapsulating Logic to Prevent State Injection</em>.
+                </p>
             </div>
-
-        </div>
+        </section>
 
     </main>
 
     <script>
-        // State management
-        const state = {
-            level: 1,
-            activity: 1,
-            hintIndex: 0,
-            isExecuting: false,
-            isPaused: false,
-            speedMs: 1000,
-
-            // Level 1 Act 1 target variable click
-            l1a1_target: null,
-
-            // Level 1 Act 2 drag placements
-            l1a2_slots: ["", "", ""], // Global, Function, Nested
-
-            // Level 2 Act 1 lookup variable
-            l2a1_target: "x",
-
-            // Level 2 Act 2 slots
-            l2a2_scenario: 0, // 0: global override, 1: nonlocal override
-            l2a2_slots: [""], // keyword override target
-
-            // Level 3 Act 1 closure type
-            l3a1_type: "counter", // counter, multiplier, greeting
-            l3a1_step: 0, // outer factory vs inner call
-
-            // Level 3 Act 2 escape panels
-            activeEscapePanel: 0,
-            escapePanelsSolved: [false, false, false],
-            l3a2_slots: ["", ""]
-        };
-
-        const levelsData = {
-            1: {
-                title: "Level 1: Variable City",
-                activities: [
-                    { id: 1, title: "Variable City Explorer", desc: "Click variables to watch a walking detective locate them across nested scope buildings." },
-                    { id: 2, title: "Namespace Builder", desc: "Drag variables into correct scope boundaries to align memory registers." }
+        // Chart.js: Scope Chart
+        const scopeCtx = document.getElementById('scopeChart').getContext('2d');
+        new Chart(scopeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Local', 'Enclosing', 'Global'],
+                datasets: [
+                    {
+                        label: 'Variable Lifespan (Memory Duration)',
+                        data: [1, 5, 100],
+                        backgroundColor: 'rgba(44, 82, 130, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Security Vulnerability Index',
+                        data: [5, 20, 95],
+                        backgroundColor: 'rgba(192, 86, 33, 0.8)',
+                        borderRadius: 4
+                    }
                 ]
             },
-            2: {
-                title: "Level 2: LEGB Detective Lab",
-                activities: [
-                    { id: 1, title: "Variable Search Adventure", desc: "Observe LEGB rule order: Python sweeps Local, Enclosing, Global, and Built-in to locate values." },
-                    { id: 2, title: "Scope Override Mission", desc: "Use global and nonlocal keywords to repair programs trying to modify variables in outer scopes." }
-                ]
-            },
-            3: {
-                title: "Level 3: Closure Factory",
-                activities: [
-                    { id: 1, title: "Memory Box Factory", desc: "Construct stateful factories. Watch outer frames resolve while capturing inner variables inside persistent Memory Boxes." },
-                    { id: 2, title: "Scope Escape Room", desc: "Examine broken scope structures, resolve shadowing conflicts, and escape!" }
-                ]
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'IBM Plex Sans', size: 10 } } } },
+                scales: {
+                    y: {
+                        type: 'logarithmic',
+                        title: { display: true, text: 'Relative Scale (Log)' }
+                    },
+                    x: { grid: { display: false } }
+                }
             }
-        };
+        });
 
-        // Hint database
-        const hintsDB = {
-            "1-1": [
-                "Variables declared outside functions live in the Global Building.",
-                "Variables inside functions are isolated within the Function Building.",
-                "Nested rooms can access variable parameters in their outer parent house.",
-                "Click the variable in the Nested Room to watch Python resolve the scopes."
-            ],
-            "1-2": [
-                "Global variables are defined at the root level of the module.",
-                "Local variables are defined inside function def blocks.",
-                "Drag: x to Global, count to Function, and name to Nested namespaces."
-            ],
-            "2-1": [
-                "The LEGB rule searches L (Local) first, then E (Enclosing), G (Global), and B (Built-in).",
-                "If a variable is defined locally, Python retrieves it immediately without searching outer scopes.",
-                "Click print(x) or print(y) to trace how Python halts search at the first matching layer."
-            ],
-            "2-2": [
-                "To modify a global variable inside a function scope, declare it using the `global` keyword.",
-                "To modify a variable inside an enclosing function, use the `nonlocal` keyword.",
-                "Positional assignment inside a nested function will trigger UnboundLocalError without these override keywords."
-            ],
-            "3-1": [
-                "Closures trap enclosing namespaces inside persistent Memory Boxes.",
-                "Even when the outer function completes, the inner function retains access to the variables stored in the Memory Box.",
-                "Run the Counter or Multiplier simulation to observe the Memory Box glowing after the outer block resolves."
-            ],
-            "3-2": [
-                "Panel 1: Check if Enclosing variables are modified without the `nonlocal` modifier.",
-                "Panel 2: Verify if Global variables are modified without the `global` modifier.",
-                "Panel 3: Verify the nested function return statement - functions must return the inner function reference to preserve states."
-            ]
-        };
+        // Lab Simulation Logic
+        let currentStep = 0;
+        const totalSteps = 8;
 
-        // Escape room panel configurations (Safe combinations)
-        const escapePanelsData = [
-            {
-                title: "Safe 1: The Golden Vault",
-                desc: "Trace how the balance variable is preserved and modified in memory across calls. Enter the combination (values of res1, res2, res3) to unlock the vault.",
-                inputs: [
-                    { label: "res1 (wrong passcode, amount=20)", default: 0, target: 50, step: 10, type: "number" },
-                    { label: "res2 (correct passcode, amount=30)", default: 0, target: 80, step: 10, type: "number" },
-                    { label: "res3 (correct passcode, amount=20)", default: 0, target: 100, step: 10, type: "number" }
-                ],
-                code: `def make_vault(passcode):
-    gold = 50
-    def deposit(attempt, amount):
-        nonlocal gold
-        if attempt == passcode:
-            gold += amount
-        return gold
-    return deposit
-
-vault = make_vault("secure")
-res1 = vault("wrong", 20)  # Dial 1
-res2 = vault("secure", 30) # Dial 2
-res3 = vault("secure", 20) # Dial 3`
-            },
-            {
-                title: "Safe 2: The Enclosing Shadow",
-                desc: "Determine if the shadow limit variable resolves to the Enclosing or Global scope value. Select True or False for res1 and res2.",
-                inputs: [
-                    { label: "res1 = limiter(40) (value > 50?)", default: "None", target: "False", type: "boolean" },
-                    { label: "res2 = limiter(60) (value > 50?)", default: "None", target: "True", type: "boolean" }
-                ],
-                code: `limit = 100 # Global limit
-
-def create_limiter():
-    limit = 50 # Enclosing limit (Shadows global)
-    def check(val):
-        return val > limit
-    return check
-
-limiter = create_limiter()
-res1 = limiter(40) # Dial 1
-res2 = limiter(60) # Dial 2`
-            },
-            {
-                title: "Safe 3: Persistent Multiplier",
-                desc: "Trace outer multiplier factory states. Enter the outputs of the double and triple closure environments.",
-                inputs: [
-                    { label: "res1 = double(5)", default: 0, target: 10, step: 5, type: "number" },
-                    { label: "res2 = triple(5)", default: 0, target: 15, step: 5, type: "number" },
-                    { label: "res3 = double(10)", default: 0, target: 20, step: 5, type: "number" }
-                ],
-                code: `def make_multiplier(x):
-    def multiply(y):
-        return x * y
-    return multiply
-
-double = make_multiplier(2)
-triple = make_multiplier(3)
-res1 = double(5)  # Dial 1
-res2 = triple(5)  # Dial 2
-res3 = double(10) # Dial 3`
-            }
+        const lines = [
+            document.getElementById('l1'),
+            document.getElementById('l8'), // Calls process_transfer
+            document.getElementById('l2'), // Def process_transfer
+            document.getElementById('l3'), // fee = 5
+            document.getElementById('l4'), // Def apply_fee
+            document.getElementById('l7'), // return apply_fee()
+            document.getElementById('l5'), // total = amount + fee
+            document.getElementById('l6')  // return total * bank_rate
         ];
 
-        // Notification alerts
-        function triggerAlert(msg, type = "info") {
-            const alertBox = document.getElementById("sim-alert");
-            alertBox.textContent = msg;
-            alertBox.className = `popup-alert show ${type}`;
-            setTimeout(() => {
-                alertBox.classList.remove("show");
-            }, 3000);
+        const memGlobal = document.getElementById('mem-global');
+        const memEnclosing = document.getElementById('mem-enclosing');
+        const memLocal = document.getElementById('mem-local');
+        const termOut = document.getElementById('term-out');
+        const stepBtn = document.getElementById('stepBtn');
+
+        function createVarEl(name, val, typeClass) {
+            const el = document.createElement('div');
+            el.className = `mem-var ${typeClass}`;
+            el.innerHTML = `${name}: <strong>${val}</strong>`;
+            return el;
         }
 
-        // Terminal Logger
-        function appendTerminal(msg, status = null) {
-            const log = document.getElementById("terminal-console-log");
-            const line = document.createElement("div");
-            line.className = "terminal-line";
-            let prefix = `<span class="terminal-prompt">>>></span>`;
-            let textClass = "";
-            if (status === true) textClass = "terminal-success";
-            else if (status === false) textClass = "terminal-warning";
-            line.innerHTML = `${prefix}<span class="${textClass}">${msg}</span>`;
-            log.appendChild(line);
-            log.scrollTop = log.scrollHeight;
+        function clearSim() {
+            lines.forEach(l => l.classList.remove('active', 'text-white'));
+            memGlobal.innerHTML = '';
+            memEnclosing.innerHTML = '';
+            memLocal.innerHTML = '';
+            termOut.innerText = '';
         }
 
-        function clearTerminal() {
-            const log = document.getElementById("terminal-console-log");
-            log.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">>>></span> Workspace active. Propose a scope simulation to run.</div>`;
-        }
-
-        // Variable Inspector updates
-        function updateInspector(vars) {
-            const grid = document.getElementById("var-inspector-grid");
-            grid.innerHTML = "";
-            if (Object.keys(vars).length === 0) {
-                grid.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:0.5rem;">No local scope variables active.</div>`;
-                return;
-            }
-            for (const [key, value] of Object.entries(vars)) {
-                const card = document.createElement("div");
-                card.className = "var-card pulsing";
-                card.innerHTML = `<span class="var-name">${key}</span><span class="var-val">${value}</span>`;
-                grid.appendChild(card);
-            }
-        }
-
-        // Hint management
-        function revealNextHint() {
-            const hintKey = `${state.level}-${state.activity}`;
-            const hints = hintsDB[hintKey];
-            if (!hints) return;
-
-            const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
-            if (state.hintIndex < hints.length) {
-                document.getElementById("hint-feedback-box").textContent = hints[state.hintIndex];
-                dots[state.hintIndex].classList.add("active");
-                state.hintIndex++;
-            } else {
-                triggerAlert("All clues revealed! Experiment with variables positioning.", "info");
-            }
-        }
-
-        function resetHints() {
-            state.hintIndex = 0;
-            document.getElementById("hint-feedback-box").textContent = "Click the button above to request progressive clues without giving away the full logic!";
-            const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
-            dots.forEach(dot => dot.classList.remove("active"));
-        }
-
-        // Speed modifiers
-        function updateSpeed() {
-            const val = document.getElementById("speed-selector").value;
-            state.speedMs = parseInt(val);
-            appendTerminal(`Speed modifier set to ${val}ms.`);
-        }
-
-        function togglePause() {
-            state.isPaused = !state.isPaused;
-            const btn = document.getElementById("pause-btn");
-            if (state.isPaused) {
-                btn.textContent = "▶ Resume";
-                appendTerminal("Execution scope resolution paused.");
-            } else {
-                btn.textContent = "⏸ Pause";
-                appendTerminal("Execution scope resolution resumed.");
-            }
-        }
-
-        // Drag-and-Drop handlers
-        let selectedDragVal = null;
-        let clickedChipElement = null;
-
-        function handleDragStart(e, value) {
-            e.dataTransfer.setData("text/plain", value);
-            selectedDragVal = value;
-            e.currentTarget.style.opacity = "0.5";
-        }
-
-        function handleDragEnd(e) {
-            e.currentTarget.style.opacity = "1";
-            selectedDragVal = null;
-        }
-
-        function allowDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add("hovered");
-        }
-
-        function dragLeaveSlot(e) {
-            e.currentTarget.classList.remove("hovered");
-        }
-
-        function selectChipForPlacement(element) {
-            document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
-            clickedChipElement = element;
-            element.classList.add("selected");
-            selectedDragVal = element.textContent.trim();
-            triggerAlert("Chip selected. Click a target slot to place it!", "info");
-        }
-
-        function handleSlotClick(e) {
-            if (selectedDragVal) {
-                const slotEl = e.currentTarget;
-                slotEl.textContent = selectedDragVal;
-                slotEl.classList.add("filled");
-
-                const idx = slotEl.getAttribute("data-index");
-                if (state.level === 1 && state.activity === 2) {
-                    state.l1a2_slots[idx] = selectedDragVal;
-                    updateL1A2CodeSync();
-                } else if (state.level === 2 && state.activity === 2) {
-                    state.l2a2_slots[idx] = selectedDragVal;
-                    updateL2A2CodeSync();
-                } else if (state.level === 3 && state.activity === 2) {
-                    state.l3a2_slots[idx] = selectedDragVal;
-                    updateL3A2CodeSync();
-                }
-
-                if (clickedChipElement) {
-                    clickedChipElement.classList.remove("selected");
-                    clickedChipElement = null;
-                }
-                selectedDragVal = null;
-                slotEl.classList.remove("hovered");
-            }
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const slotEl = e.currentTarget;
-            slotEl.classList.remove("hovered");
-
-            const val = e.dataTransfer.getData("text/plain") || selectedDragVal;
-            if (val) {
-                slotEl.textContent = val;
-                slotEl.classList.add("filled");
-
-                const idx = slotEl.getAttribute("data-index");
-                if (state.level === 1 && state.activity === 2) {
-                    state.l1a2_slots[idx] = val;
-                    updateL1A2CodeSync();
-                } else if (state.level === 2 && state.activity === 2) {
-                    state.l2a2_slots[idx] = val;
-                    updateL2A2CodeSync();
-                } else if (state.level === 3 && state.activity === 2) {
-                    state.l3a2_slots[idx] = val;
-                    updateL3A2CodeSync();
-                }
-            }
-        }
-
-        // LEVEL NAVIGATION
-        function switchLevel(lvlNum) {
-            if (state.isExecuting) return;
-            state.level = lvlNum;
-            state.activity = 1;
-
-            document.querySelectorAll(".level-tab").forEach((tab, idx) => {
-                if (idx + 1 === lvlNum) tab.classList.add("active");
-                else tab.classList.remove("active");
-            });
-
-            renderActivityPills();
-            loadActivity();
-            updateNavFooterStatus();
-        }
-
-        function renderActivityPills() {
-            const container = document.getElementById("activity-pills-container");
-            container.innerHTML = "";
-            const acts = levelsData[state.level].activities;
-            acts.forEach(act => {
-                const pill = document.createElement("button");
-                pill.className = `activity-pill ${state.activity === act.id ? 'active' : ''}`;
-                pill.textContent = act.title;
-                pill.onclick = () => {
-                    if (state.isExecuting) return;
-                    state.activity = act.id;
-                    document.querySelectorAll(".activity-pill").forEach(p => p.classList.remove("active"));
-                    pill.classList.add("active");
-                    loadActivity();
-                    updateNavFooterStatus();
-                };
-                container.appendChild(pill);
-            });
-        }
-
-        function updateNavFooterStatus() {
-            const footerStatus = document.getElementById("nav-footer-status");
-            footerStatus.textContent = `Level ${state.level} - Activity ${state.activity}`;
-        }
-
-        function navigatePrev() {
-            if (state.isExecuting) return;
-            if (state.activity === 2) {
-                state.activity = 1;
-            } else {
-                if (state.level > 1) {
-                    state.level--;
-                    state.activity = 2;
-                } else {
-                    triggerAlert("You are at the start of Level 1!", "info");
-                    return;
-                }
-            }
-            syncPillsAndLoad();
-        }
-
-        function navigateNext() {
-            if (state.isExecuting) return;
-            if (state.activity === 1) {
-                state.activity = 2;
-            } else {
-                if (state.level < 3) {
-                    state.level++;
-                    state.activity = 1;
-                } else {
-                    triggerAlert("You completed all Variable Scope modules! Spectacular job.", "success");
-                    return;
-                }
-            }
-            syncPillsAndLoad();
-        }
-
-        function syncPillsAndLoad() {
-            document.querySelectorAll(".level-tab").forEach((tab, idx) => {
-                if (idx + 1 === state.level) tab.classList.add("active");
-                else tab.classList.remove("active");
-            });
-            renderActivityPills();
-            loadActivity();
-            updateNavFooterStatus();
-        }
-
-        function loadActivity() {
-            state.isExecuting = false;
-            state.isPaused = false;
-            document.getElementById("pause-btn").textContent = "⏸ Pause";
-            resetHints();
-            clearTerminal();
-            updateInspector({});
-
-            const contentArea = document.getElementById("sim-content-area");
-            contentArea.innerHTML = "";
-
-            const actInfo = levelsData[state.level].activities[state.activity - 1];
-            document.getElementById("sim-title").textContent = actInfo.title;
-            document.getElementById("sim-subtitle").textContent = actInfo.desc;
-
-            if (state.level === 1 && state.activity === 1) {
-                loadL1A1(contentArea);
-            } else if (state.level === 1 && state.activity === 2) {
-                loadL1A2(contentArea);
-            } else if (state.level === 2 && state.activity === 1) {
-                loadL2A1(contentArea);
-            } else if (state.level === 2 && state.activity === 2) {
-                loadL2A2(contentArea);
-            } else if (state.level === 3 && state.activity === 1) {
-                loadL3A1(contentArea);
-            } else if (state.level === 3 && state.activity === 2) {
-                loadL3A2(contentArea);
-            }
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 1 ACTIVITY 1: Variable City Explorer
-        // -------------------------------------------------------------
-        function loadL1A1(container) {
-            // 1. Selector variables buttons
-            const variablesGrid = document.createElement("div");
-            variablesGrid.className = "escape-panels-grid";
-
-            const vars = [
-                { name: "Global x", value: "10", location: "Global" },
-                { name: "Enclosing count", value: "5", location: "Enclosing" },
-                { name: "Local name", value: '"PyScope"', location: "Local" }
-            ];
-
-            vars.forEach(v => {
-                variablesGrid.innerHTML += `
-          <div class="escape-panel-card" onclick="setL1A1Target('${v.location}', '${v.name}', '${v.value}')">
-            <span style="font-size:1.25rem;">🔍</span>
-            <div style="font-weight:700; font-size:0.8rem; margin-top:4px;">${v.name}</div>
-          </div>
-        `;
-            });
-            container.appendChild(variablesGrid);
-
-            // 2. City buildings visual layout (Centered dynamically)
-            const cityLayout = document.createElement("div");
-            cityLayout.className = "city-grid";
-            cityLayout.innerHTML = `
-        <!-- Buildings -->
-        <div class="scope-building" id="build-local" style="left: 10%;">Local</div>
-        <div class="scope-building" id="build-enclosing" style="left: 45%;">Enclosing</div>
-        <div class="scope-building" id="build-global" style="left: 80%;">Global</div>
-        
-        <!-- Animated Detective -->
-        <div class="detective-avatar" id="detective" style="bottom:25px; left: calc(10% + 20px);">
-          <svg viewBox="0 0 100 100" width="36" height="36">
-            <circle cx="50" cy="50" r="30" fill="#e10600" />
-            <!-- Hat -->
-            <rect x="25" y="15" width="50" height="8" fill="#1e293b" />
-            <rect x="35" y="5" width="30" height="12" fill="#1e293b" />
-            <!-- Magnifying glass -->
-            <circle cx="70" cy="65" r="10" stroke="#cbd5e1" stroke-width="3" fill="none" />
-            <line x1="77" y1="72" x2="85" y2="80" stroke="#cbd5e1" stroke-width="4" />
-          </svg>
-        </div>
-      `;
-            container.appendChild(cityLayout);
-
-            updateL1A1CodeSync();
-        }
-
-        function setL1A1Target(location, name, val) {
-            if (state.isExecuting) return;
-            state.l1a1_target = { location, name, val };
-            triggerAlert(`Detective target set to locate: ${name}`, "info");
-        }
-
-        function updateL1A1CodeSync() {
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line" id="l1a1-line1"><span class="code-line-num">1</span>x = 10 <span class="code-comment"># Global scope</span></div>
-        <div class="code-line" id="l1a1-line2"><span class="code-line-num">2</span><span class="code-keyword">def</span> outer():</div>
-        <div class="code-line" id="l1a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;count = 5 <span class="code-comment"># Enclosing scope</span></div>
-        <div class="code-line" id="l1a1-line4"><span class="code-line-num">4</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> inner():</div>
-        <div class="code-line" id="l1a1-line5"><span class="code-line-num">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = "PyScope" <span class="code-comment"># Local scope</span></div>
-        <div class="code-line" id="l1a1-line6"><span class="code-line-num">6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(x, count, name)</div>
-      `;
-        }
-
-        function runL1A1Execution() {
-            if (!state.l1a1_target) {
-                triggerAlert("Select a target variable scope first!", "error");
+        function nextStep() {
+            if (currentStep >= totalSteps) {
+                currentStep = 0;
+                stepBtn.innerText = "Start Simulation";
+                clearSim();
                 return;
             }
 
-            state.isExecuting = true;
-            appendTerminal(`>>> Scope resolution started for: ${state.l1a1_target.name}`);
+            stepBtn.innerText = "Step Forward >>";
+            lines.forEach(l => l.classList.remove('active', 'text-white'));
 
-            const detective = document.getElementById("detective");
-            const targetLoc = state.l1a1_target.location;
+            const activeLine = lines[currentStep];
+            activeLine.classList.add('active');
 
-            const buildL = document.getElementById("build-local");
-            const buildE = document.getElementById("build-enclosing");
-            const buildG = document.getElementById("build-global");
+            // Memory Logic
+            if (currentStep === 0) {
+                // Line 1: Global
+                const v = createVarEl('bank_rate', '1.05', 'var-global');
+                memGlobal.appendChild(v);
+                setTimeout(() => v.classList.add('visible'), 50);
+            }
+            else if (currentStep === 1) {
+                // Line 8: Call function -> Args go to enclosing
+                const v = createVarEl('amount', '100', 'var-enclosing');
+                memEnclosing.appendChild(v);
+                setTimeout(() => v.classList.add('visible'), 50);
+            }
+            else if (currentStep === 3) {
+                // Line 3: Enclosing fee
+                const v = createVarEl('fee', '5', 'var-enclosing');
+                memEnclosing.appendChild(v);
+                setTimeout(() => v.classList.add('visible'), 50);
+            }
+            else if (currentStep === 6) {
+                // Line 5: Local total
+                const v = createVarEl('total', '105', 'var-local');
+                memLocal.appendChild(v);
+                setTimeout(() => v.classList.add('visible'), 50);
+            }
+            else if (currentStep === 7) {
+                // Line 6: Return resolution
+                const v = createVarEl('final_cost', '110.25', 'var-global');
+                memGlobal.appendChild(v);
+                setTimeout(() => v.classList.add('visible'), 50);
 
-            // Reset positions & glows
-            detective.style.left = `calc(10% + 20px)`;
-            buildL.classList.remove("active");
-            buildE.classList.remove("active");
-            buildG.classList.remove("active");
-
-            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
-            document.getElementById("l1a1-line6").classList.add("active-exec");
-
-            // Phase 1: Local
-            setTimeout(() => {
-                buildL.classList.add("active");
-                appendTerminal("Searching inside local scope: inner()...");
-
-                if (targetLoc === "Local") {
-                    appendTerminal(`Variable name found locally! Value: ${state.l1a1_target.val}`, true);
-                    updateInspector({ "name": '"PyScope"' });
-                    triggerAlert("Variable located!", "success");
-                    state.isExecuting = false;
-                    return;
-                }
-
-                // Phase 2: Enclosing
                 setTimeout(() => {
-                    const targetX_E = buildE.offsetLeft + (buildE.offsetWidth - 40) / 2;
-                    detective.style.left = targetX_E + "px";
-                    buildE.classList.add("active");
-                    appendTerminal("Not found locally. Stepping out to Enclosing scope: outer()...");
-
-                    if (targetLoc === "Enclosing") {
-                        appendTerminal(`Variable count found in Enclosing! Value: ${state.l1a1_target.val}`, true);
-                        updateInspector({ "count": 5 });
-                        triggerAlert("Variable located!", "success");
-                        state.isExecuting = false;
-                        return;
-                    }
-
-                    // Phase 3: Global
-                    setTimeout(() => {
-                        const targetX_G = buildG.offsetLeft + (buildG.offsetWidth - 40) / 2;
-                        detective.style.left = targetX_G + "px";
-                        buildG.classList.add("active");
-                        appendTerminal("Not found in enclosing. Searching Global module scope...");
-
-                        if (targetLoc === "Global") {
-                            appendTerminal(`Variable x found in Global scope! Value: ${state.l1a1_target.val}`, true);
-                            updateInspector({ "x": 10 });
-                            triggerAlert("Variable located!", "success");
-                            state.isExecuting = false;
-                            return;
-                        }
-
-                    }, state.speedMs);
-
-                }, state.speedMs);
-
-            }, state.speedMs);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 1 ACTIVITY 2: Namespace Builder
-        // -------------------------------------------------------------
-        function loadL1A2(container) {
-            // 1. Prompt challenge
-            const challengeCard = document.createElement("div");
-            challengeCard.className = "challenge-card";
-            challengeCard.innerHTML = `
-        <h4>NAMESPACE ASSIGNMENT</h4>
-        <p>Drag each variable to the correct namespace block to build the scope tree structure.</p>
-      `;
-            container.appendChild(challengeCard);
-
-            // 2. Drag targets (Namespace Buckets)
-            const buckets = document.createElement("div");
-            buckets.className = "namespace-buckets";
-
-            const s0 = state.l1a2_slots[0] || "Global Target";
-            const s1 = state.l1a2_slots[1] || "Function Target";
-            const s2 = state.l1a2_slots[2] || "Nested Target";
-
-            buckets.innerHTML = `
-        <div class="ns-bucket" id="ns-0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" data-index="0">
-          <span class="ns-bucket-title">Global Namespace</span>
-          <div class="slot ${state.l1a2_slots[0] ? 'filled' : ''}" style="width:100%; height:40px;">${s0}</div>
-        </div>
-        <div class="ns-bucket" id="ns-1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" data-index="1">
-          <span class="ns-bucket-title">Function Namespace</span>
-          <div class="slot ${state.l1a2_slots[1] ? 'filled' : ''}" style="width:100%; height:40px;">${s1}</div>
-        </div>
-        <div class="ns-bucket" id="ns-2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" data-index="2">
-          <span class="ns-bucket-title">Nested Namespace</span>
-          <div class="slot ${state.l1a2_slots[2] ? 'filled' : ''}" style="width:100%; height:40px;">${s2}</div>
-        </div>
-      `;
-            container.appendChild(buckets);
-
-            // 3. Draggable chips bank
-            const bank = document.createElement("div");
-            bank.className = "chips-bank";
-
-            const chips = ["x", "count", "name", "price", "marks"];
-            chips.forEach((cVal, idx) => {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.draggable = true;
-                chip.textContent = cVal;
-                chip.id = `chip-l1a2-${idx}`;
-                chip.ondragstart = (e) => handleDragStart(e, cVal);
-                chip.ondragend = handleDragEnd;
-                chip.onclick = () => selectChipForPlacement(chip);
-                bank.appendChild(chip);
-            });
-            container.appendChild(bank);
-
-            updateL1A2CodeSync();
-        }
-
-        function updateL1A2CodeSync() {
-            const s0 = state.l1a2_slots[0] || "___";
-            const s1 = state.l1a2_slots[1] || "___";
-            const s2 = state.l1a2_slots[2] || "___";
-
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line"><span class="code-line-num">1</span>${s0} = 100</div>
-        <div class="code-line"><span class="code-line-num">2</span><span class="code-keyword">def</span> process():</div>
-        <div class="code-line"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;${s1} = 42</div>
-        <div class="code-line"><span class="code-line-num">4</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> save():</div>
-        <div class="code-line"><span class="code-line-num">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${s2} = "Saved"</div>
-      `;
-        }
-
-        function runL1A2Execution() {
-            const targets = ["x", "count", "name"];
-            let correct = true;
-            state.l1a2_slots.forEach((val, idx) => {
-                if (val !== targets[idx]) correct = false;
-            });
-
-            if (!correct) {
-                triggerAlert("Namespace verification failed! Shadowing conflict.", "error");
-                appendTerminal(">>> ScopeError: Undefined variable namespace mapping.", false);
-                return;
+                    termOut.innerText = "> Transaction complete. Final: $110.25";
+                    memLocal.style.opacity = '0.3'; // Simulate garbage collection
+                    memEnclosing.style.opacity = '0.3';
+                    stepBtn.innerText = "Reset Simulator";
+                }, 800);
             }
 
-            state.isExecuting = true;
-            appendTerminal(">>> Namespace verification success! Aligning scopes...", true);
-
-            setTimeout(() => {
-                triggerAlert("Namespaces created correctly!", "success");
-                state.isExecuting = false;
-            }, 1000);
+            currentStep++;
         }
-
-        // -------------------------------------------------------------
-        // LEVEL 2 ACTIVITY 1: Variable Search Adventure
-        // -------------------------------------------------------------
-        function loadL2A1(container) {
-            // 1. Interactive print selectors
-            const selector = document.createElement("div");
-            selector.className = "escape-panels-grid";
-
-            const lookups = ["x", "y", "z"];
-            lookups.forEach(lk => {
-                selector.innerHTML += `
-          <div class="escape-panel-card ${state.l2a1_target === lk ? 'active' : ''}" onclick="setL2A1Target('${lk}')">
-            <span style="font-size:1.1rem; font-family:var(--font-code);">print(${lk})</span>
-          </div>
-        `;
-            });
-            container.appendChild(selector);
-
-            // 2. LEGB layers visuals
-            const legbWrapper = document.createElement("div");
-            legbWrapper.style.width = "100%";
-            legbWrapper.style.marginTop = "1rem";
-
-            legbWrapper.innerHTML = `
-        <div class="legb-layer" id="layer-L">
-          <span class="legb-layer-label">Local (inner)</span>
-          <span class="legb-layer-vars">z = 30</span>
-        </div>
-        <div class="legb-layer" id="layer-E">
-          <span class="legb-layer-label">Enclosing (outer)</span>
-          <span class="legb-layer-vars">y = 20</span>
-        </div>
-        <div class="legb-layer" id="layer-G">
-          <span class="legb-layer-label">Global</span>
-          <span class="legb-layer-vars">x = 10</span>
-        </div>
-        <div class="legb-layer" id="layer-B">
-          <span class="legb-layer-label">Built-in</span>
-          <span class="legb-layer-vars">len, print, sum</span>
-        </div>
-      `;
-            container.appendChild(legbWrapper);
-
-            updateL2A1CodeSync();
-        }
-
-        function setL2A1Target(lk) {
-            if (state.isExecuting) return;
-            state.l2a1_target = lk;
-            loadActivity();
-        }
-
-        function updateL2A1CodeSync() {
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line" id="l2a1-line1"><span class="code-line-num">1</span>x = 10 <span class="code-comment"># Global</span></div>
-        <div class="code-line" id="l2a1-line2"><span class="code-line-num">2</span><span class="code-keyword">def</span> outer():</div>
-        <div class="code-line" id="l2a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;y = 20 <span class="code-comment"># Enclosing</span></div>
-        <div class="code-line" id="l2a1-line4"><span class="code-line-num">4</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> inner():</div>
-        <div class="code-line" id="l2a1-line5"><span class="code-line-num">5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z = 30 <span class="code-comment"># Local</span></div>
-        <div class="code-line" id="l2a1-line6"><span class="code-line-num">6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(${state.l2a1_target})</div>
-      `;
-        }
-
-        function runL2A1Execution() {
-            state.isExecuting = true;
-            appendTerminal(`>>> LEGB Lookup started for print(${state.l2a1_target})...`);
-
-            const layerL = document.getElementById("layer-L");
-            const layerE = document.getElementById("layer-E");
-            const layerG = document.getElementById("layer-G");
-            const layerB = document.getElementById("layer-B");
-
-            layerL.className = "legb-layer";
-            layerE.className = "legb-layer";
-            layerG.className = "legb-layer";
-            layerB.className = "legb-layer";
-
-            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
-            document.getElementById("l2a1-line6").classList.add("active-exec");
-
-            // Phase 1: Local
-            setTimeout(() => {
-                layerL.classList.add("searching");
-                appendTerminal("Searching layer L (Local)...");
-
-                if (state.l2a1_target === "z") {
-                    layerL.className = "legb-layer found";
-                    appendTerminal("Found variable 'z' in Local scope! Value: 30", true);
-                    updateInspector({ "z": 30 });
-                    state.isExecuting = false;
-                    return;
-                }
-
-                // Phase 2: Enclosing
-                setTimeout(() => {
-                    layerL.className = "legb-layer";
-                    layerE.classList.add("searching");
-                    appendTerminal("Not found in Local. Searching layer E (Enclosing)...");
-
-                    if (state.l2a1_target === "y") {
-                        layerE.className = "legb-layer found";
-                        appendTerminal("Found variable 'y' in Enclosing scope! Value: 20", true);
-                        updateInspector({ "y": 20 });
-                        state.isExecuting = false;
-                        return;
-                    }
-
-                    // Phase 3: Global
-                    setTimeout(() => {
-                        layerE.className = "legb-layer";
-                        layerG.classList.add("searching");
-                        appendTerminal("Not found in Enclosing. Searching layer G (Global)...");
-
-                        if (state.l2a1_target === "x") {
-                            layerG.className = "legb-layer found";
-                            appendTerminal("Found variable 'x' in Global scope! Value: 10", true);
-                            updateInspector({ "x": 10 });
-                            state.isExecuting = false;
-                            return;
-                        }
-
-                    }, state.speedMs);
-
-                }, state.speedMs);
-
-            }, state.speedMs);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 2 ACTIVITY 2: Scope Override Mission
-        // -------------------------------------------------------------
-        const overrideScenarios = [
-            {
-                desc: "Declare the counter variable as nonlocal inside the counter nested function to modify enclosing state.",
-                target: "nonlocal",
-                code: (s0) => `def make_counter():\n    count = 0\n    def counter():\n        ${s0} count\n        count += 1\n        return count\n    return counter`
-            },
-            {
-                desc: "Declare the score variable as global inside the add_score function to update module-level state.",
-                target: "global",
-                code: (s0) => `score = 100\n\ndef add_score(points):\n    ${s0} score\n    score += points`
-            }
-        ];
-
-        function loadL2A2(container) {
-            const sc = overrideScenarios[state.l2a2_scenario];
-
-            // 1. Selector scenario tabs
-            const selector = document.createElement("div");
-            selector.style.display = "flex";
-            selector.style.gap = "0.5rem";
-            selector.style.marginBottom = "1rem";
-            overrideScenarios.forEach((s, idx) => {
-                selector.innerHTML += `
-          <button class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="setL2A2Scenario(${idx})">Override Case ${idx + 1}</button>
-        `;
-            });
-            container.appendChild(selector);
-
-            // 2. Prompt Briefing
-            const challengeCard = document.createElement("div");
-            challengeCard.className = "challenge-card";
-            challengeCard.innerHTML = `
-        <h4>OVERRIDE INSTRUCTION</h4>
-        <p>${sc.desc}</p>
-      `;
-            container.appendChild(challengeCard);
-
-            // 3. Indented code slots
-            const editor = document.createElement("div");
-            editor.style.width = "100%";
-            editor.style.margin = "1rem 0";
-
-            const s0 = state.l2a2_slots[0] || "override_keyword";
-
-            if (state.l2a2_scenario === 0) {
-                editor.innerHTML = `
-          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left; line-height: 1.8;">
-            <div>def make_counter():</div>
-            <div style="padding-left:20px;">count = 0</div>
-            <div style="padding-left:20px;">def counter():</div>
-            <div style="padding-left:40px; display:flex; align-items:center; gap:0.5rem;">
-              <div class="slot ${state.l2a2_slots[0] ? 'filled' : ''}" data-slot-type="kw" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s0}</div>
-              count
-            </div>
-            <div style="padding-left:40px;">count += 1</div>
-          </div>
-        `;
-            } else {
-                editor.innerHTML = `
-          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left; line-height: 1.8;">
-            <div>score = 100</div>
-            <div>def add_score(points):</div>
-            <div style="padding-left:20px; display:flex; align-items:center; gap:0.5rem;">
-              <div class="slot ${state.l2a2_slots[0] ? 'filled' : ''}" data-slot-type="kw" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s0}</div>
-              score
-            </div>
-            <div style="padding-left:20px;">score += points</div>
-          </div>
-        `;
-            }
-            container.appendChild(editor);
-
-            // 4. Draggable chips bank
-            const bank = document.createElement("div");
-            bank.className = "chips-bank";
-
-            const chips = ["global", "nonlocal", "local", "pass", "return"];
-            chips.forEach((cVal, idx) => {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.draggable = true;
-                chip.textContent = cVal;
-                chip.id = `chip-l2a2-${idx}`;
-                chip.ondragstart = (e) => handleDragStart(e, cVal);
-                chip.ondragend = handleDragEnd;
-                chip.onclick = () => selectChipForPlacement(chip);
-                bank.appendChild(chip);
-            });
-            container.appendChild(bank);
-
-            updateL2A2CodeSync();
-        }
-
-        function setL2A2Scenario(idx) {
-            if (state.isExecuting) return;
-            state.l2a2_scenario = idx;
-            state.l2a2_slots = [""];
-            loadActivity();
-        }
-
-        function updateL2A2CodeSync() {
-            const sc = overrideScenarios[state.l2a2_scenario];
-            const s0 = state.l2a2_slots[0] || "___";
-
-            const codePanel = document.getElementById("code-synced-panel");
-            const rawLines = sc.code(s0).split("\n");
-            let html = "";
-            rawLines.forEach((line, idx) => {
-                html += `<div class="code-line"><span class="code-line-num">${idx + 1}</span><span>${line}</span></div>`;
-            });
-            codePanel.innerHTML = html;
-        }
-
-        function runL2A2Execution() {
-            const sc = overrideScenarios[state.l2a2_scenario];
-            const keyword = state.l2a2_slots[0];
-
-            if (!keyword) {
-                triggerAlert("Fill in the missing override keyword first!", "error");
-                return;
-            }
-
-            state.isExecuting = true;
-            appendTerminal(">>> Scope validation override execution initiated...");
-
-            if (keyword === sc.target) {
-                setTimeout(() => {
-                    triggerAlert("Scope override validated successfully!", "success");
-                    appendTerminal(">>> Success! Target outer variable updated correctly.", true);
-                    state.isExecuting = false;
-                }, 1000);
-            } else {
-                setTimeout(() => {
-                    triggerAlert("Variable resolution failed!", "error");
-                    appendTerminal(">>> UnboundLocalError: local variable referenced before assignment", false);
-                    state.isExecuting = false;
-                }, 1000);
-            }
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 3 ACTIVITY 1: Memory Box Factory
-        // -------------------------------------------------------------
-        const closureFactories = [
-            {
-                name: "Counter Factory",
-                outerDef: 'def make_counter(start=0):',
-                innerDef: '    count = start\n    def counter():\n        nonlocal count\n        count += 1\n        return count\n    return counter',
-                outerCall: 'my_counter = make_counter(start=10)',
-                innerCall: 'my_counter()',
-                run: (step, prevVars) => {
-                    if (step === 1) {
-                        return {
-                            vars: { "count (Memory Box)": 10 },
-                            msg: "make_counter(10) runs. Outer frame finishes. Variable count is trapped inside the Memory Box!"
-                        };
-                    } else {
-                        const nextVal = (prevVars["count (Memory Box)"] || 10) + 1;
-                        return {
-                            vars: { "count (Memory Box)": nextVal },
-                            msg: `my_counter() invoked. Inner scope reads and updates count inside Memory Box to: ${nextVal}`
-                        };
-                    }
-                }
-            },
-            {
-                name: "Multiplier Factory",
-                outerDef: 'def make_multiplier(factor):',
-                innerDef: '    def multiply(x):\n        return x * factor\n    return multiply',
-                outerCall: 'triple = make_multiplier(3)',
-                innerCall: 'triple(7)',
-                run: (step, prevVars) => {
-                    if (step === 1) {
-                        return {
-                            vars: { "factor (Memory Box)": 3 },
-                            msg: "make_multiplier(3) runs. Outer frame finishes. Variable factor=3 is locked in Memory Box!"
-                        };
-                    } else {
-                        return {
-                            vars: { "factor (Memory Box)": 3, "x": 7, "res": 21 },
-                            msg: "triple(7) invoked. Reads factor=3 from Memory Box. Returns 21."
-                        };
-                    }
-                }
-            }
-        ];
-
-        function loadL3A1(container) {
-            const cls = closureFactories[state.l3a1_type === "counter" ? 0 : 1];
-
-            // 1. Selector scenarios
-            const selector = document.createElement("div");
-            selector.className = "escape-panels-grid";
-            closureFactories.forEach((c, idx) => {
-                selector.innerHTML += `
-          <div class="escape-panel-card ${((state.l3a1_type === "counter" && idx === 0) || (state.l3a1_type === "multiplier" && idx === 1)) ? 'active' : ''}" onclick="setL3A1Type('${idx === 0 ? "counter" : "multiplier"}')">
-            <span style="font-size:1.25rem;">📦</span>
-            <div style="font-weight:700; font-size:0.8rem; margin-top:4px;">${c.name}</div>
-          </div>
-        `;
-            });
-            container.appendChild(selector);
-
-            // 2. Closure Machine visuals (Conveyor and glowing Memory Box)
-            const machine = document.createElement("div");
-            machine.className = "factory-belt";
-            machine.innerHTML = `
-        <div class="pipeline-chamber" id="ch-outer" style="z-index: 10;">Outer Scope</div>
-        <div class="memory-box-glowing ${state.l3a1_step === 0 ? 'faded' : ''}" id="mem-box">
-          <span>Memory Box</span>
-          <strong id="mem-box-val">?</strong>
-        </div>
-        <div class="pipeline-chamber" id="ch-inner" style="z-index: 10;">Inner Scope</div>
-      `;
-            container.appendChild(machine);
-
-            // 3. Execution controller buttons inside workspace
-            const actions = document.createElement("div");
-            actions.style.display = "flex";
-            actions.style.gap = "0.5rem";
-            actions.style.marginTop = "1rem";
-
-            actions.innerHTML = `
-        <button class="btn btn-secondary" onclick="runL3A1Outer()">${cls.outerCall}</button>
-        <button class="btn btn-secondary" onclick="runL3A1Inner()">${cls.innerCall}</button>
-      `;
-            container.appendChild(actions);
-
-            updateL3A1CodeSync();
-        }
-
-        function setL3A1Type(type) {
-            if (state.isExecuting) return;
-            state.l3a1_type = type;
-            state.l3a1_step = 0;
-            loadActivity();
-        }
-
-        function updateL3A1CodeSync() {
-            const cls = closureFactories[state.l3a1_type === "counter" ? 0 : 1];
-            const codePanel = document.getElementById("code-synced-panel");
-
-            const outerLines = cls.outerDef.split("\n");
-            const innerLines = cls.innerDef.split("\n");
-
-            let html = "";
-            outerLines.forEach((line, idx) => {
-                html += `<div class="code-line" id="l3a1-line-outer"><span class="code-line-num">${idx + 1}</span><span>${line}</span></div>`;
-            });
-            innerLines.forEach((line, idx) => {
-                html += `<div class="code-line" id="l3a1-line-inner"><span class="code-line-num">${outerLines.length + idx + 1}</span><span>${line}</span></div>`;
-            });
-            codePanel.innerHTML = html;
-        }
-
-        let activeL3Vars = {};
-
-        function runL3A1Outer() {
-            if (state.isExecuting) return;
-            state.isExecuting = true;
-            state.l3a1_step = 1;
-
-            const cls = closureFactories[state.l3a1_type === "counter" ? 0 : 1];
-            const chOuter = document.getElementById("ch-outer");
-            const memBox = document.getElementById("mem-box");
-            const memVal = document.getElementById("mem-box-val");
-
-            chOuter.classList.add("active");
-            appendTerminal("Executing outer closure factory...");
-
-            setTimeout(() => {
-                const res = cls.run(1, {});
-                activeL3Vars = res.vars;
-                updateInspector(activeL3Vars);
-
-                chOuter.classList.remove("active");
-                memBox.classList.remove("faded");
-
-                if (state.l3a1_type === "counter") {
-                    memVal.textContent = "count: 10";
-                } else {
-                    memVal.textContent = "factor: 3";
-                }
-
-                appendTerminal(res.msg, true);
-                triggerAlert("Memory Box constructed!", "success");
-                state.isExecuting = false;
-            }, state.speedMs);
-        }
-
-        function runL3A1Inner() {
-            if (state.isExecuting) return;
-            if (state.l3a1_step === 0) {
-                triggerAlert("Create the closure first using the outer constructor!", "error");
-                return;
-            }
-            state.isExecuting = true;
-
-            const cls = closureFactories[state.l3a1_type === "counter" ? 0 : 1];
-            const chInner = document.getElementById("ch-inner");
-            const memVal = document.getElementById("mem-box-val");
-
-            chInner.classList.add("active");
-            appendTerminal("Invoking inner closure call...");
-
-            setTimeout(() => {
-                const res = cls.run(2, activeL3Vars);
-                activeL3Vars = res.vars;
-                updateInspector(activeL3Vars);
-
-                if (state.l3a1_type === "counter") {
-                    memVal.textContent = `count: ${activeL3Vars["count (Memory Box)"]}`;
-                }
-
-                chInner.classList.remove("active");
-                appendTerminal(res.msg, true);
-                triggerAlert("Closure execution complete!", "success");
-                state.isExecuting = false;
-            }, state.speedMs);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 3 ACTIVITY 2: Scope Escape Room
-        // -------------------------------------------------------------
-        function loadL3A2(container) {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            if (state.l3a2_slots === undefined || state.l3a2_slots.length !== panel.inputs.length) {
-                state.l3a2_slots = panel.inputs.map(inp => inp.default);
-            }
-
-            // 1. Selector panels
-            const grid = document.createElement("div");
-            grid.className = "escape-panels-grid";
-
-            escapePanelsData.forEach((p, idx) => {
-                const solved = state.escapePanelsSolved[idx];
-                grid.innerHTML += `
-          <div class="escape-panel-card ${solved ? 'solved' : ''} ${state.activeEscapePanel === idx ? 'active' : ''}" onclick="selectEscapePanel(${idx})">
-            <div class="escape-status-badge ${solved ? 'solved' : ''}">${solved ? 'Solved' : 'Safe ' + (idx + 1)}</div>
-            <div style="font-weight:700; font-size:0.8rem; color:var(--text-secondary);">${p.title}</div>
-          </div>
-        `;
-            });
-            container.appendChild(grid);
-
-            // 2. Active editor sandbox
-            const sandbox = document.createElement("div");
-            sandbox.className = "challenge-card";
-            sandbox.style.marginTop = "1rem";
-            sandbox.id = "escape-sandbox";
-            container.appendChild(sandbox);
-
-            loadEscapeRoomPanel();
-        }
-
-        function selectEscapePanel(idx) {
-            if (state.isExecuting) return;
-            state.activeEscapePanel = idx;
-            const panel = escapePanelsData[idx];
-            state.l3a2_slots = panel.inputs.map(inp => inp.default);
-            loadL3A2(document.getElementById("sim-content-area"));
-        }
-
-        function loadEscapeRoomPanel() {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            const box = document.getElementById("escape-sandbox");
-            const solved = state.escapePanelsSolved[state.activeEscapePanel];
-
-            let inputHTML = '';
-            panel.inputs.forEach((input, idx) => {
-                if (input.type === "number") {
-                    inputHTML += `
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.02); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); margin-bottom: 0.5rem;">
-              <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">${input.label}</span>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" onclick="adjustDialVal(${idx}, -${input.step})">-</button>
-                <span style="font-family: var(--font-code); font-size: 0.85rem; font-weight: 700; min-width: 36px; text-align: center;" id="dial-val-${idx}">${state.l3a2_slots[idx]}</span>
-                <button class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.8rem; border-radius: 4px;" onclick="adjustDialVal(${idx}, ${input.step})">+</button>
-              </div>
-            </div>
-          `;
-                } else if (input.type === "boolean") {
-                    const currentVal = state.l3a2_slots[idx];
-                    inputHTML += `
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.02); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); margin-bottom: 0.5rem;">
-              <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">${input.label}</span>
-              <div style="display: flex; gap: 6px;">
-                <button class="btn ${currentVal === 'True' ? 'btn-primary' : 'btn-secondary'}" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px;" onclick="setDialBool(${idx}, 'True')">True</button>
-                <button class="btn ${currentVal === 'False' ? 'btn-primary' : 'btn-secondary'}" style="padding: 2px 8px; font-size: 0.75rem; border-radius: 4px;" onclick="setDialBool(${idx}, 'False')">False</button>
-              </div>
-            </div>
-          `;
-                }
-            });
-
-            box.innerHTML = `
-        <div style="background:rgba(225, 6, 0, 0.02); padding:0.75rem; border-radius:6px; margin-bottom:1rem; border:1px solid rgba(225, 6, 0, 0.05);">
-          <strong style="font-size:0.8rem; text-transform:uppercase; color:var(--primary-accent);">Safe Combination Clue:</strong>
-          <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.25rem;">${panel.desc}</p>
-        </div>
-
-        <div style="display: flex; gap: 1.5rem; width: 100%; align-items: center; justify-content: center; flex-wrap: wrap; margin: 1rem 0;">
-          <!-- Safe SVG visualizer -->
-          <div style="position: relative; width: 140px; height: 140px; background: #cbd5e1; border: 4px solid #475569; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);">
-            <!-- Safe Dial Wheel -->
-            <div id="safe-wheel" style="width: 70px; height: 70px; border-radius: 50%; border: 4px solid #1e293b; background: #64748b; display: flex; align-items: center; justify-content: center; transition: transform 1s ease-in-out;">
-              <div style="width: 8px; height: 35px; background: #1e293b; position: absolute; top: 15px; transform-origin: bottom center; border-radius: 4px;"></div>
-            </div>
-            <!-- Safe Status Light -->
-            <div id="safe-status-light" style="position: absolute; top: 10px; right: 10px; width: 14px; height: 14px; border-radius: 50%; background: ${solved ? '#10b981' : '#ef4444'}; border: 2px solid white; box-shadow: 0 0 6px rgba(0,0,0,0.2);"></div>
-          </div>
-          
-          <!-- Safe Input Dials Form -->
-          <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 0.25rem;">
-            ${inputHTML}
-          </div>
-        </div>
-      `;
-
-            updateL3A2CodeSync();
-        }
-
-        function adjustDialVal(idx, delta) {
-            if (state.isExecuting) return;
-            let val = parseInt(state.l3a2_slots[idx]) || 0;
-            val += delta;
-            if (val < 0) val = 0;
-            state.l3a2_slots[idx] = val;
-            document.getElementById(`dial-val-${idx}`).textContent = val;
-        }
-
-        function setDialBool(idx, val) {
-            if (state.isExecuting) return;
-            state.l3a2_slots[idx] = val;
-            loadEscapeRoomPanel();
-        }
-
-        function updateL3A2CodeSync() {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            const codePanel = document.getElementById("code-synced-panel");
-
-            const rawLines = panel.code.split("\n");
-            let html = "";
-            rawLines.forEach((line, idx) => {
-                html += `<div class="code-line"><span class="code-line-num">${idx + 1}</span><span>${line}</span></div>`;
-            });
-            codePanel.innerHTML = html;
-        }
-
-        function runL3A2Execution() {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            const safeWheel = document.getElementById("safe-wheel");
-            const statusLight = document.getElementById("safe-status-light");
-
-            let correct = true;
-            panel.inputs.forEach((input, idx) => {
-                let userVal = state.l3a2_slots[idx];
-                if (input.type === "number") {
-                    userVal = parseInt(userVal);
-                }
-                if (userVal !== input.target) {
-                    correct = false;
-                }
-            });
-
-            state.isExecuting = true;
-            appendTerminal(`Rotating combination dial on panel ${state.activeEscapePanel + 1}...`);
-
-            safeWheel.style.transform = "rotate(180deg)";
-
-            setTimeout(() => {
-                if (correct) {
-                    state.escapePanelsSolved[state.activeEscapePanel] = true;
-                    statusLight.style.background = "#10b981";
-                    safeWheel.style.transform = "rotate(360deg)";
-
-                    appendTerminal(`Panel ${state.activeEscapePanel + 1} unlocked successfully!`, true);
-                    triggerAlert(`Safe ${state.activeEscapePanel + 1} Combination Lock Restored!`, "success");
-
-                    const allSolved = state.escapePanelsSolved.every(r => r === true);
-                    if (allSolved) {
-                        appendTerminal(">>> Success! All combination locks restored. Closure vault is open.", true);
-                        triggerAlert("Escape room solved successfully!", "success");
-                    }
-
-                    state.isExecuting = false;
-                    setTimeout(() => {
-                        loadL3A2(document.getElementById("sim-content-area"));
-                    }, 1200);
-                } else {
-                    statusLight.style.background = "#ef4444";
-                    safeWheel.style.transform = "rotate(0deg)";
-                    appendTerminal(`Combination code failed. Output returns unexpected scope parameters.`, false);
-                    triggerAlert("Vault lock failed! Check variable calculations.", "error");
-                    state.isExecuting = false;
-                }
-            }, 1000);
-        }
-
-        // MAIN RUN DISPATCHER
-        function runExecution() {
-            if (state.isExecuting) return;
-
-            if (state.level === 1 && state.activity === 1) {
-                runL1A1Execution();
-            } else if (state.level === 1 && state.activity === 2) {
-                runL1A2Execution();
-            } else if (state.level === 2 && state.activity === 1) {
-                runL2A1Execution();
-            } else if (state.level === 2 && state.activity === 2) {
-                runL2A2Execution();
-            } else if (state.level === 3 && state.activity === 1) {
-                // No explicit run for factory, user clicks dynamic outer/inner calls
-                state.isExecuting = false;
-            } else if (state.level === 3 && state.activity === 2) {
-                runL3A2Execution();
-            }
-        }
-
-        function replaySimulation() {
-            if (state.isExecuting) return;
-            loadActivity();
-        }
-
-        window.onload = () => {
-            switchLevel(1);
-        };
     </script>
 </body>
 

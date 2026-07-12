@@ -4,2538 +4,844 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyFunc Lab — Parameters & Return Values</title>
-
-    <!-- Modern Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
-        rel="stylesheet">
-
+    <title>Case Study: Modular Architecture & Function Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
         :root {
-            --primary-accent: #e10600;
-            --primary-accent-hover: #b30500;
-            --primary-glow: rgba(225, 6, 0, 0.08);
-            --bg-main: #fffcfc;
-            --bg-card: #ffffff;
-            --bg-card-hover: #fffefe;
-            --border-color: #ffd1d5;
-            --ink: #1a0808;
-            --text-secondary: #5a4b4b;
-
-            --font-display: 'Outfit', sans-serif;
-            --font-body: 'Inter', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-
-            --code-bg: #0b0f19;
-            --code-keyword: #f43f5e;
-            --code-string: #10b981;
-            --code-number: #f472b6;
-            --code-comment: #64748b;
-            --code-builtin: #3b82f6;
-
-            --border-radius-lg: 16px;
-            --border-radius-md: 10px;
-            --border-radius-sm: 6px;
-
-            --success-green: #2e7d32;
-            --success-bg: rgba(46, 125, 50, 0.06);
-            --error-red: #b71c1c;
-            --error-bg: rgba(183, 28, 28, 0.06);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg-canvas: #f8f7f4;
+            --tech-blue: #2c5282;
+            --alert-orange: #c05621;
+            --text-main: #1a202c;
+            --code-bg: #ffffff;
         }
 
         body {
-            font-family: var(--font-body);
-            background-color: var(--bg-main);
-            color: var(--ink);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(225, 6, 0, 0.02) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(225, 6, 0, 0.02) 0%, transparent 40%);
-            background-attachment: fixed;
+            font-family: 'IBM+Plex+Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            line-height: 1.6;
+            scroll-behavior: smooth;
         }
 
-        /* HEADER & LEVEL SELECTOR */
-        .app-header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 30px rgba(225, 6, 0, 0.02);
+        .serif {
+            font-family: 'IBM+Plex+Serif', serif;
         }
 
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        .brand-logo {
-            background: var(--primary-accent);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            box-shadow: 0 4px 10px var(--primary-glow);
-        }
-
-        .brand-title h1 {
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        .brand-title p {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .level-tabs {
-            display: flex;
-            gap: 0.5rem;
-            background: rgba(225, 6, 0, 0.03);
-            padding: 0.25rem;
-            border-radius: var(--border-radius-md);
-            border: 1px solid rgba(225, 6, 0, 0.05);
-        }
-
-        .level-tab {
-            background: none;
-            border: none;
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding: 0.5rem 1.25rem;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .level-tab:hover {
-            color: var(--primary-accent);
-            background: rgba(225, 6, 0, 0.02);
-        }
-
-        .level-tab.active {
-            background: var(--primary-accent);
-            color: white;
-            box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        /* MAIN CONTAINER */
-        .main-container {
-            flex: 1;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .main-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .workspace-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .sidebar-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* GLASS CARDS */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: var(--border-radius-lg);
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(225, 6, 0, 0.02);
-            transition: border-color 0.3s ease;
-        }
-
-        .glass-card:hover {
-            border-color: var(--border-color);
-        }
-
-        /* BUTTONS */
-        .btn {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.6rem 1.25rem;
-            border-radius: var(--border-radius-md);
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: var(--primary-accent);
-            color: white;
-            box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: rgba(225, 6, 0, 0.04);
-            color: var(--primary-accent);
-            border: 1px solid rgba(225, 6, 0, 0.08);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(225, 6, 0, 0.08);
-        }
-
-        .btn-ghost {
-            background: none;
-            color: var(--text-secondary);
-        }
-
-        .btn-ghost:hover {
-            color: var(--primary-accent);
-            background: rgba(225, 6, 0, 0.02);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* ACTIVITY SELECTOR BAR */
-        .activity-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 0.75rem 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
-        }
-
-        .activity-pills {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .activity-pill {
-            background: none;
-            border: none;
-            font-family: var(--font-display);
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding: 0.4rem 1rem;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .activity-pill.active {
-            background: rgba(225, 6, 0, 0.08);
-            color: var(--primary-accent);
-        }
-
-        /* SIMULATOR CORE CONTAINER */
-        .simulator-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 1.5rem;
-            min-height: 380px;
-            display: flex;
-            flex-direction: column;
+        .chart-container {
             position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        .technical-image-container {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        /* Architectural Diagram Styling (Pure CSS) */
+        .flow-node {
+            border: 2px solid var(--tech-blue);
+            padding: 12px;
+            border-radius: 6px;
+            background: #ebf8ff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flow-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.15);
+        }
+
+        .flow-arrow::after {
+            content: '→';
+            color: var(--tech-blue);
+            font-size: 24px;
+            margin: 0 10px;
+        }
+
+        .flow-arrow-down::after {
+            content: '↓';
+            color: var(--tech-blue);
+            font-size: 24px;
+            display: block;
+            text-align: center;
+            margin: 8px 0;
+        }
+
+        /* Light Theme Syntax Highlighting */
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(225, 6, 0, 0.03);
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        .simulator-header {
-            margin-bottom: 1.25rem;
-            border-bottom: 1px dashed rgba(225, 6, 0, 0.08);
-            padding-bottom: 0.75rem;
-        }
-
-        .simulator-title h2 {
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        .simulator-title p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        .simulator-content {
-            flex: 1;
+        .code-header {
+            background: #f1f5f9;
+            padding: 8px 16px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
         }
 
-        /* LOOP CONTROL BAR */
-        .loop-control-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 0.75rem 1.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .control-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .speed-select {
-            font-family: var(--font-display);
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.4rem 0.75rem;
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--border-color);
-            outline: none;
-            background: white;
-            cursor: pointer;
-        }
-
-        /* NAVIGATION FOOTER */
-        .nav-footer-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-            backdrop-filter: blur(10px);
-        }
-
-        #nav-footer-status {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        /* SIDEBAR SECTIONS */
-        .sidebar-section-title {
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* HINT STAGE DOTS */
-        .hint-stages {
-            display: flex;
-            gap: 4px;
-        }
-
-        .hint-dot {
-            width: 8px;
-            height: 8px;
+        .mac-dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.08);
-            transition: background 0.3s ease;
         }
 
-        .hint-dot.active {
-            background: var(--primary-accent);
+        .dot-red {
+            background: #ff5f56;
         }
 
-        .hint-box {
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px dashed var(--border-color);
-            border-radius: var(--border-radius-md);
-            padding: 0.75rem 1rem;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            color: var(--text-secondary);
-            margin-top: 0.75rem;
-            min-height: 50px;
+        .dot-yellow {
+            background: #ffbd2e;
         }
 
-        /* VARIABLE INSPECTOR */
-        .variable-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .dot-green {
+            background: #27c93f;
         }
 
-        .var-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px solid rgba(225, 6, 0, 0.05);
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius-md);
-        }
-
-        .var-card.pulsing {
-            animation: varPulse 0.4s ease;
-        }
-
-        @keyframes varPulse {
-            0% {
-                background-color: rgba(225, 6, 0, 0.2);
-            }
-
-            100% {
-                background-color: rgba(225, 6, 0, 0.02);
-            }
-        }
-
-        .var-name {
-            font-family: var(--font-code);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-accent);
-        }
-
-        .var-val {
-            font-family: var(--font-code);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--ink);
-        }
-
-        /* SYNTAX HIGHLIGHT CODE PANEL */
-        .code-panel {
-            background-color: var(--code-bg);
-            border-radius: var(--border-radius-md);
-            padding: 1rem;
+        pre {
+            padding: 16px;
             overflow-x: auto;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .code-line {
-            font-family: var(--font-code);
+            color: #24292e;
             font-size: 0.85rem;
             line-height: 1.5;
-            color: #9cdcfe;
-            display: flex;
-            padding: 0.1rem 0.25rem;
-            border-radius: 4px;
-            transition: background 0.2s ease;
         }
 
-        .code-line.active-exec {
-            background: rgba(244, 63, 94, 0.25);
-            border-left: 3px solid var(--code-keyword);
+        .kw {
+            color: #d73a49;
+            font-weight: bold;
         }
 
-        .code-line-num {
-            color: #565656;
-            width: 24px;
-            user-select: none;
-            text-align: right;
-            margin-right: 12px;
+        /* Keyword */
+        .fn {
+            color: #6f42c1;
         }
 
-        .code-keyword {
-            color: var(--code-keyword);
-            font-weight: 700;
+        /* Function */
+        .str {
+            color: #032f62;
         }
 
-        .code-string {
-            color: var(--code-string);
+        /* String */
+        .num {
+            color: #005cc5;
         }
 
-        .code-number {
-            color: var(--code-number);
-        }
-
-        .code-comment {
-            color: var(--code-comment);
+        /* Number */
+        .cm {
+            color: #6a737d;
             font-style: italic;
         }
 
-        .code-builtin {
-            color: var(--code-builtin);
+        /* Comment */
+        .op {
+            color: #d73a49;
         }
 
-        /* MOCK TERMINAL */
-        .terminal-console {
-            background: #090d16;
-            border-radius: var(--border-radius-md);
-            padding: 0.75rem 1rem;
-            font-family: var(--font-code);
-            font-size: 0.8rem;
-            color: #e2e8f0;
-            height: 120px;
-            overflow-y: auto;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
+        /* Operator */
+        .arg {
+            color: #e36209;
         }
 
-        .terminal-line {
-            line-height: 1.4;
+        /* Arguments */
+
+        /* Lab Section Specific Styles */
+        .memory-block {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
         }
 
-        .terminal-prompt {
-            color: var(--primary-accent);
-            margin-right: 0.5rem;
-            user-select: none;
+        .memory-block.active {
+            background: rgba(44, 82, 130, 0.3);
+            border-color: #60a5fa;
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.2);
         }
 
-        .terminal-success {
-            color: #10b981;
-        }
-
-        .terminal-warning {
-            color: #f59e0b;
-        }
-
-        /* POPUP WARNINGS / ALERTS */
-        .popup-alert {
-            position: absolute;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(225, 6, 0, 0.08);
-            z-index: 10;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .popup-alert.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .popup-alert.success {
-            border-color: #10b981;
-            color: #047857;
-            background: #ecfdf5;
-        }
-
-        .popup-alert.error {
-            border-color: #ef4444;
-            color: #b91c1c;
-            background: #fef2f2;
-        }
-
-        .popup-alert.info {
-            border-color: #3b82f6;
-            color: #1d4ed8;
-            background: #eff6ff;
-        }
-
-        /* DRAG CHIPS AND SLOTS */
-        .chips-bank {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            background: rgba(225, 6, 0, 0.02);
-            padding: 0.75rem;
-            border-radius: var(--border-radius-md);
-            border: 1px dashed rgba(225, 6, 0, 0.1);
-        }
-
-        .chip {
-            background: white;
-            border: 1px solid var(--border-color);
-            padding: 0.4rem 0.85rem;
-            border-radius: var(--border-radius-sm);
-            font-family: var(--font-code);
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: grab;
-            user-select: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(225, 6, 0, 0.02);
-        }
-
-        .chip:hover {
-            border-color: var(--primary-accent);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px var(--primary-glow);
-        }
-
-        .chip.selected {
-            background: var(--primary-accent);
-            color: white;
-            border-color: var(--primary-accent);
-        }
-
-        .slot {
-            border: 2px dashed rgba(225, 6, 0, 0.25);
-            border-radius: var(--border-radius-sm);
-            background: rgba(225, 6, 0, 0.01);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-code);
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            vertical-align: middle;
-            text-align: center;
-        }
-
-        .slot.hovered {
-            background: rgba(225, 6, 0, 0.08);
-            border-color: var(--primary-accent);
-        }
-
-        .slot.filled {
-            background: var(--primary-accent);
-            color: white;
-            border-style: solid;
-            border-color: var(--primary-accent);
-            font-weight: 700;
-        }
-
-        /* LEVEL 1: PIPELINE ANIMATIONS */
-        .pipeline-visualizer {
-            width: 100%;
-            height: 140px;
-            background: #f1f5f9;
-            border-radius: var(--border-radius-lg);
-            border: 1px solid #cbd5e1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-            position: relative;
-            overflow: hidden;
-            margin-top: 1rem;
-        }
-
-        .pipeline-chamber {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: white;
-            border: 3px solid #cbd5e1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            z-index: 10;
-            position: relative;
-        }
-
-        .pipeline-chamber.active {
-            border-color: var(--primary-accent);
-            color: var(--primary-accent);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        .pipeline-pathway {
-            flex: 1;
-            height: 12px;
-            background: #cbd5e1;
-            position: relative;
-        }
-
-        .pipeline-pathway.active {
-            background: var(--primary-accent);
-        }
-
-        .pipeline-ball {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--primary-accent);
-            position: absolute;
-            top: -6px;
-            left: 0;
-            transition: left 1s linear;
-            z-index: 15;
-            display: none;
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        /* LEVEL 2: CONVEYOR BELT */
-        .conveyor-belt-wrapper {
-            width: 100%;
-            background: #f8fafc;
-            border-radius: var(--border-radius-lg);
-            border: 1px solid #cbd5e1;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            align-items: center;
-            margin-top: 1rem;
-        }
-
-        .argument-conveyor {
-            width: 100%;
-            height: 60px;
-            background: #475569;
-            border-bottom: 4px solid #1e293b;
-            border-radius: var(--border-radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 1rem;
-        }
-
-        .argument-package {
-            background: #e2e8f0;
-            border: 1px solid #cbd5e1;
-            padding: 0.4rem 0.75rem;
-            border-radius: 4px;
-            font-family: var(--font-code);
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .argument-package.processing {
-            background: var(--primary-accent);
-            color: white;
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        /* LEVEL 2: WAREHOUSE ROUTING */
-        .warehouse-bay {
-            width: 100%;
-            height: 180px;
-            background: #cbd5e1;
-            border-radius: var(--border-radius-lg);
-            position: relative;
-            margin-top: 1rem;
-            border: 2px solid #94a3b8;
-        }
-
-        .bay-zone {
-            width: 70px;
-            height: 44px;
-            background: white;
-            border-radius: 4px;
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 700;
-            border: 2px solid #64748b;
-        }
-
-        .bay-zone.active {
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .delivery-robot-svg {
-            position: absolute;
-            top: 75px;
-            left: 10px;
-            transition: all 0.8s ease-in-out;
-            z-index: 10;
-        }
-
-        /* LEVEL 3: ESCAPE PANEL CARDS */
-        .escape-panels-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            width: 100%;
-            margin-bottom: 1.5rem;
-        }
-
-        .escape-panel-card {
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .escape-panel-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--primary-accent);
-        }
-
-        .escape-panel-card.active {
-            background: rgba(225, 6, 0, 0.08);
-            border-color: var(--primary-accent);
-            box-shadow: 0 4px 15px var(--primary-glow);
-        }
-
-        .escape-status-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
+        .data-pill {
             display: inline-block;
-            margin-bottom: 0.5rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin: 2px;
+        }
+
+        .pill-req {
             background: #fee2e2;
             color: #991b1b;
+            border: 1px solid #f87171;
         }
 
-        .escape-status-badge.solved {
-            background: #d1fae5;
-            color: #065f46;
+        .pill-def {
+            background: #dbeafe;
+            color: #1e3a8a;
+            border: 1px solid #60a5fa;
         }
 
-        .challenge-card {
-            background: rgba(225, 6, 0, 0.02);
-            border: 1px dashed var(--border-color);
-            padding: 1rem;
-            border-radius: var(--border-radius-lg);
+        .pill-args {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fbbf24;
+        }
+
+        .pill-kwargs {
+            background: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #818cf8;
+        }
+
+        /* Custom Inputs for Lab */
+        .lab-input {
             width: 100%;
-            text-align: left;
-            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .challenge-card h4 {
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            color: var(--primary-accent);
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
+        .lab-input:focus {
+            border-color: #60a5fa;
         }
 
-        .challenge-card p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
+        /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+        @media print {
+
+            /* Reset body/html defaults for clean printing */
+            html,
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Keep overflow visible to prevent multi-page cropping/clipping */
+            html,
+            body,
+            main,
+            section,
+            div,
+            pre,
+            code,
+            table,
+            tr,
+            td,
+            canvas,
+            .technical-image-container,
+            .chart-container {
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+                position: static !important;
+            }
+
+            /* Ensure structural blocks break elegantly across pages */
+            pre,
+            blockquote,
+            table,
+            tr,
+            img,
+            canvas,
+            .technical-image-container,
+            .chart-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Avoid orphaned headers at the bottom of a page */
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
+            /* Hide interactive/non-printable UI elements */
+            nav,
+            footer,
+            button,
+            .no-print,
+            [class*="sticky"],
+            [class*="fixed"] {
+                display: none !important;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="antialiased">
 
-    <!-- TOP APP HEADER -->
-    <header class="app-header">
-        <div class="brand-section">
-            <div class="brand-logo">⚙️</div>
-            <div class="brand-title">
-                <h1>PyFunc Lab</h1>
-                <p>Interactive Python Functions Simulator</p>
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-900 flex items-center justify-center text-white font-bold rounded">PY</div>
+                <span class="font-bold tracking-tighter uppercase text-sm">Engineering Dossier</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+                <a href="#theory" class="hover:text-black transition">Foundations</a>
+                <a href="#case" class="hover:text-black transition">Case Study</a>
+                <a href="#architecture" class="hover:text-black transition">Architecture</a>
+                <a href="#code" class="hover:text-black transition">Implementations</a>
+                <a href="#lab" class="text-orange-700">Function Lab</a>
             </div>
         </div>
+    </nav>
 
-        <!-- Level switching tabs -->
-        <div class="level-tabs">
-            <button class="level-tab active" onclick="switchLevel(1)">Level 1: Workshop</button>
-            <button class="level-tab" onclick="switchLevel(2)">Level 2: Parameters</button>
-            <button class="level-tab" onclick="switchLevel(3)">Level 3: Architect</button>
+    <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+        <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Modular Architecture & Function Design</h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            An engineering report on subroutine encapsulation, parameter checking, and dynamic argument parsing in
+            Python.
+        </p>
+        <div class="mt-8 flex justify-center space-x-4">
+            <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase bg-gray-50">Module
+                2</span>
+            <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase bg-gray-50">Unit
+                2.3</span>
         </div>
     </header>
 
-    <!-- MAIN WORKSPACE -->
-    <main class="main-container">
+    <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
 
-        <!-- LEFT SIDE: DYNAMIC WORKSPACE -->
-        <div class="workspace-wrapper">
-
-            <!-- SUB-ACTIVITIES pills -->
-            <div class="activity-bar">
-                <div class="activity-pills" id="activity-pills-container">
-                    <!-- pills loaded dynamically -->
-                </div>
-
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-secondary" onclick="replaySimulation()">
-                        🔄 Replay
-                    </button>
-                    <button class="btn btn-primary" id="run-btn" onclick="runExecution()">
-                        ▶ Run Code
-                    </button>
+        <!-- SECTION: THEORETICAL FOUNDATIONS -->
+        <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            <div class="space-y-6">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-orange-700">01. Theoretical Foundations
+                </h2>
+                <h3 class="serif text-4xl leading-snug">The Imperative of Encapsulation</h3>
+                <p>
+                    As software systems scale, linear procedural code becomes unsustainable. The introduction of
+                    <strong>Functions</strong> (or subroutines) allows engineers to encapsulate complex logic into
+                    isolated, reusable blocks. This enforces the <strong>DRY (Don't Repeat Yourself)</strong> principle
+                    and drastically reduces cyclomatic complexity.
+                </p>
+                <p>
+                    A function acts as a black box: it receives inputs (<strong>Parameters/Arguments</strong>),
+                    processes them, and returns an output. Python's dynamic nature offers unparalleled flexibility in
+                    how these arguments are passed, verified, and parsed at runtime.
+                </p>
+                <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-blue-800">
+                    <p class="text-sm font-bold uppercase mb-2">Lexical Distinction:</p>
+                    <ul class="text-sm text-gray-700 space-y-3">
+                        <li><strong>Parameters:</strong> The variables defined in the function signature (e.g., <code
+                                class="mono text-xs bg-white px-1 border border-gray-200">def calc(x):</code>). They
+                            represent the <em>expected</em> data.</li>
+                        <li><strong>Arguments:</strong> The actual data values passed to the function during execution
+                            (e.g., <code class="mono text-xs bg-white px-1 border border-gray-200">calc(5)</code>).</li>
+                    </ul>
                 </div>
             </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <h4 class="text-[10px] uppercase tracking-widest text-gray-500 mb-4 text-center">Maintenance Cost:
+                    Monolithic vs Modular</h4>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="complexityChart"></canvas>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-4 text-center">Modular architecture (using functions) scales
+                    linearly, whereas monolithic code scales exponentially in maintenance complexity.</p>
+            </div>
+        </section>
 
-            <!-- MAIN SIMULATOR CARD -->
-            <div class="simulator-card">
-                <div class="popup-alert" id="sim-alert">Warning Message</div>
+        <!-- CASE STUDY -->
+        <section id="case" class="space-y-12">
+            <div class="max-w-3xl">
+                <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">02. Industry Context</h2>
+                <h3 class="serif text-4xl mb-6">Food Delivery Management Platform</h3>
+                <p class="mb-4">
+                    Consider <strong>SwiftBite</strong>, a modern food delivery backend processing millions of
+                    transactions daily. A single user action—"Checkout"—triggers a cascade of backend processes:
+                    calculating totals, applying promo codes, dispatching drivers, and updating ETA.
+                </p>
+                <p>
+                    Writing this as a single script is impossible. Instead, SwiftBite relies on a highly modular
+                    architecture. Functions are designed with strict parameter checks and utilize flexible argument
+                    structures to handle edge cases (like a user ordering 1 item vs 50 items, or applying multiple
+                    custom dietary requests).
+                </p>
+            </div>
 
-                <div class="simulator-header">
-                    <div class="simulator-title">
-                        <h2 id="sim-title">Activity Title</h2>
-                        <p id="sim-subtitle">Short description of parameters</p>
+            <!-- VISUAL LAYOUT 1: SYSTEM ARCHITECTURE DIAGRAM -->
+            <div id="architecture" class="technical-image-container bg-slate-50">
+                <h4 class="text-[10px] font-bold uppercase tracking-widest mb-8 text-gray-500 text-center">Visual Layout
+                    2.1: Function Call Stack & Parameter Routing</h4>
+
+                <div class="flex flex-col items-center max-w-4xl mx-auto">
+
+                    <!-- Main Controller -->
+                    <div
+                        class="w-full max-w-md border-2 border-blue-800 bg-blue-50 p-4 rounded-lg text-center shadow-md relative z-10">
+                        <span
+                            class="absolute -top-3 left-4 bg-blue-800 text-white text-[9px] font-bold px-2 py-1 rounded">MAIN
+                            THREAD</span>
+                        <p class="mono text-blue-900 font-bold text-sm">process_checkout(order_id="A1", user="Bob")</p>
                     </div>
-                </div>
 
-                <div class="simulator-content" id="sim-content-area">
-                    <!-- Simulator content injected dynamically -->
-                </div>
-            </div>
+                    <div class="flex justify-between w-full max-w-2xl relative mt-8">
+                        <!-- Connecting lines -->
+                        <div class="absolute top-0 left-1/2 w-0.5 h-full bg-blue-200 -z-10 -translate-y-8"></div>
+                        <div class="absolute top-0 left-1/4 right-1/4 h-0.5 bg-blue-200 -z-10 -translate-y-4"></div>
+                        <div class="absolute top-0 left-1/4 w-0.5 h-8 bg-blue-200 -z-10 -translate-y-4"></div>
+                        <div class="absolute top-0 right-1/4 w-0.5 h-8 bg-blue-200 -z-10 -translate-y-4"></div>
 
-            <!-- HINT SYSTEM & VARIABLE INSPECTOR ROW -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <!-- HINT SYSTEM -->
-                <div class="glass-card" style="margin: 0; padding: 1rem;">
-                    <div class="sidebar-section-title" style="margin-bottom: 0.5rem;">
-                        <span>Logical Clues</span>
-                        <div class="hint-stages" id="hint-dots-wrapper">
-                            <span class="hint-dot"></span>
-                            <span class="hint-dot"></span>
-                            <span class="hint-dot"></span>
-                            <span class="hint-dot"></span>
+                        <!-- Function 1 -->
+                        <div class="flex flex-col items-center w-1/3">
+                            <div class="flow-node w-full bg-white">
+                                <span class="mono text-gray-700 text-[10px] block mb-2 border-b pb-1">Required + Default
+                                    Args</span>
+                                <span class="text-blue-700 text-xs">calc_total()</span>
+                                <div class="mt-2 text-[9px] text-gray-500 flex flex-col gap-1">
+                                    <span class="pill-req">items</span>
+                                    <span class="pill-def">tax=0.08</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Function 2 -->
+                        <div class="flex flex-col items-center w-1/3 pt-4">
+                            <div class="flow-node w-full bg-white">
+                                <span class="mono text-gray-700 text-[10px] block mb-2 border-b pb-1">Variable Length
+                                    Args</span>
+                                <span class="text-blue-700 text-xs">apply_promos()</span>
+                                <div class="mt-2 text-[9px] text-gray-500 flex flex-col gap-1">
+                                    <span class="pill-req">base_total</span>
+                                    <span class="pill-args">*promo_codes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Function 3 -->
+                        <div class="flex flex-col items-center w-1/3">
+                            <div class="flow-node w-full bg-white">
+                                <span class="mono text-gray-700 text-[10px] block mb-2 border-b pb-1">Keyword
+                                    Arguments</span>
+                                <span class="text-blue-700 text-xs">assign_driver()</span>
+                                <div class="mt-2 text-[9px] text-gray-500 flex flex-col gap-1">
+                                    <span class="pill-req">order_id</span>
+                                    <span class="pill-kwargs">**vehicle_reqs</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.4rem 1rem; font-size: 0.75rem;" onclick="revealNextHint()">
-                        Get Nudge Hint
+                </div>
+            </div>
+        </section>
+
+        <!-- PYTHON IMPLEMENTATIONS -->
+        <section id="code" class="space-y-12">
+            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-700 mb-8 text-center">03. Syntax &
+                Implementations</h2>
+
+            <div class="space-y-12 max-w-4xl mx-auto">
+
+                <!-- REQUIRED & KEYWORD -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="serif text-xl mb-2 flex items-center"><span
+                                class="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">1</span>
+                            Required Arguments</h3>
+                        <p class="text-sm text-gray-600 mb-4">The most basic parameter type. The number of arguments
+                            passed must exactly match the function signature, and order matters (Positional).</p>
+                        <div class="code-block m-0">
+                            <div class="code-header">
+                                <div class="mac-dot dot-red"></div>
+                                <div class="mac-dot dot-yellow"></div>
+                                <div class="mac-dot dot-green"></div>
+                                <span class="text-[10px] text-gray-400 font-mono ml-2">auth.py</span>
+                            </div>
+                            <pre class="mono"><code><span class="kw">def</span> <span class="fn">verify_user</span>(<span class="arg">user_id</span>, <span class="arg">token</span>):
+    <span class="kw">if not</span> user_id <span class="kw">or not</span> token:
+        <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="str">"Missing params"</span>)
+    <span class="kw">return True</span>
+
+<span class="cm"># Exact match required</span>
+verify_user(<span class="num">1042</span>, <span class="str">"x8f9a"</span>)</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="serif text-xl mb-2 flex items-center"><span
+                                class="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-xs mr-2">2</span>
+                            Keyword Arguments</h3>
+                        <p class="text-sm text-gray-600 mb-4">When calling functions, you can explicitly name the
+                            parameters. This allows you to ignore positional order, greatly enhancing code readability.
+                        </p>
+                        <div class="code-block m-0">
+                            <div class="code-header">
+                                <div class="mac-dot dot-red"></div>
+                                <div class="mac-dot dot-yellow"></div>
+                                <div class="mac-dot dot-green"></div>
+                                <span class="text-[10px] text-gray-400 font-mono ml-2">dispatch.py</span>
+                            </div>
+                            <pre class="mono"><code><span class="kw">def</span> <span class="fn">dispatch</span>(<span class="arg">driver</span>, <span class="arg">restaurant</span>, <span class="arg">priority</span>):
+    <span class="kw">print</span>(<span class="str">f"Dispatching {driver} to {restaurant}"</span>)
+
+<span class="cm"># Order does not matter with kwargs</span>
+dispatch(
+    priority=<span class="str">"HIGH"</span>,
+    driver=<span class="str">"Dave_88"</span>,
+    restaurant=<span class="str">"Burger_King"</span>
+)</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEFAULT & VARIABLE -->
+                <div>
+                    <h3 class="serif text-2xl mb-2">3. Default & Variable-Length Arguments</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        <strong>Default parameters</strong> allow functions to assume standard values if none are
+                        provided.
+                        <strong>Variable-length arguments</strong> (<code class="mono text-xs">*args</code> and <code
+                            class="mono text-xs">**kwargs</code>) allow functions to accept an arbitrary number of
+                        inputs, making them highly scalable for unknown data sizes.
+                    </p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="mac-dot dot-red"></div>
+                            <div class="mac-dot dot-yellow"></div>
+                            <div class="mac-dot dot-green"></div>
+                            <span class="text-[10px] text-gray-400 font-mono ml-2">order_processor.py</span>
+                        </div>
+                        <pre class="mono"><code><span class="kw">def</span> <span class="fn">process_cart</span>(<span class="arg">user_id</span>, <span class="arg">*items</span>, <span class="arg">discount</span>=<span class="num">0.0</span>, <span class="arg">**instructions</span>):
+    <span class="cm"># user_id     -> Required (String/Int)</span>
+    <span class="cm"># *items      -> Variable Positional (Tuple of items)</span>
+    <span class="cm"># discount    -> Default (Float, defaults to 0.0)</span>
+    <span class="cm"># **instructions -> Variable Keyword (Dictionary of custom requests)</span>
+    
+    <span class="kw">print</span>(<span class="str">f"Processing order for User: {user_id}"</span>)
+    
+    total = <span class="num">0</span>
+    <span class="kw">for</span> item <span class="kw">in</span> items:
+        total += item.price
+        
+    <span class="kw">if</span> <span class="str">'allergy'</span> <span class="kw">in</span> instructions:
+        <span class="kw">print</span>(<span class="str">f"ALERT KITCHEN: Allergy to {instructions['allergy']}"</span>)
+        
+    <span class="kw">return</span> total * (<span class="num">1</span> - discount)
+
+<span class="cm"># Execution with all parameter types utilized</span>
+final_price = process_cart(
+    <span class="num">991</span>,                   <span class="cm"># Required: user_id</span>
+    burger, fries, soda,   <span class="cm"># *args: packed into a tuple (items)</span>
+    discount=<span class="num">0.15</span>,         <span class="cm"># Default overridden</span>
+    allergy=<span class="str">"Peanuts"</span>,     <span class="cm"># **kwargs: packed into dict</span>
+    napkins=<span class="kw">True</span>           <span class="cm"># **kwargs: packed into dict</span>
+)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- LAB SECTION -->
+        <section id="lab" class="bg-black text-white p-8 md:p-12 rounded-3xl shadow-2xl relative overflow-hidden">
+            <!-- Decorative blur -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -z-10"></div>
+
+            <h3 class="serif text-4xl mb-2 text-center">Interactive Engineering Lab</h3>
+            <p class="text-sm text-gray-400 text-center mb-10 max-w-2xl mx-auto">
+                Simulate the Python interpreter's Memory Stack. Enter parameters into the Order Form, execute the
+                function, and observe how Python dynamically routes inputs into <code
+                    class="mono text-xs text-blue-400">*args</code> (Tuples) and <code
+                    class="mono text-xs text-blue-400">**kwargs</code> (Dictionaries).
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                <!-- Inputs (Left) -->
+                <div class="lg:col-span-5 space-y-6 bg-slate-900/50 p-6 rounded-xl border border-gray-800">
+                    <div class="border-b border-gray-800 pb-2 mb-4">
+                        <span class="mono text-xs text-blue-400">process_order() Form</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">User ID <span
+                                class="text-red-500">*</span> (Required)</label>
+                        <input type="text" id="inp-user" value="USR_774" class="lab-input" placeholder="e.g. USR_123">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Cart Items
+                            (*args)</label>
+                        <input type="text" id="inp-args" value="Pizza, Wings, Cola" class="lab-input"
+                            placeholder="Comma separated items">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Discount (Default:
+                            0.0)</label>
+                        <select id="inp-def" class="lab-input bg-slate-900">
+                            <option value="0.0">None (0.0)</option>
+                            <option value="0.10">10% Promo (0.10)</option>
+                            <option value="0.25">25% Promo (0.25)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Instructions
+                            (**kwargs)</label>
+                        <input type="text" id="inp-kwargs" value="extra_sauce=True, utensils=False" class="lab-input"
+                            placeholder="key=value, key=value">
+                    </div>
+
+                    <button onclick="executeLab()"
+                        class="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(37,99,235,0.4)]">
+                        Execute Function Call
                     </button>
-                    <div class="hint-box" id="hint-feedback-box" style="margin-top: 0.5rem; min-height: 45px; font-size: 0.75rem; padding: 0.5rem 0.75rem;">
-                        Click the button above to request progressive clues without giving away the full logic!
+                </div>
+
+                <!-- Visual Stack (Right) -->
+                <div class="lg:col-span-7 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-blue-400 border-b border-gray-800 pb-2">
+                        Function Memory Stack</h4>
+
+                    <div
+                        class="bg-[#0d1117] p-6 rounded-xl border border-gray-800 font-mono text-sm shadow-inner min-h-[300px]">
+                        <div class="text-gray-500 mb-6">Waiting for execution...</div>
+
+                        <!-- Memory Blocks (Hidden initially) -->
+                        <div id="mem-blocks" class="space-y-3 hidden">
+                            <div class="text-blue-400 text-xs mb-2 border-b border-gray-800 pb-1">def
+                                process_order(user_id, *items, discount=0.0, **instructions):</div>
+
+                            <div class="memory-block" id="block-req">
+                                <span class="text-gray-400 text-[10px] uppercase block mb-1">Local Var (Required):
+                                    user_id</span>
+                                <span class="text-white" id="out-user"></span>
+                            </div>
+
+                            <div class="memory-block" id="block-args">
+                                <span class="text-gray-400 text-[10px] uppercase block mb-1">Local Tuple (*args):
+                                    items</span>
+                                <span class="text-white" id="out-args"></span>
+                            </div>
+
+                            <div class="memory-block" id="block-def">
+                                <span class="text-gray-400 text-[10px] uppercase block mb-1">Local Var (Default):
+                                    discount</span>
+                                <span class="text-white" id="out-def"></span>
+                            </div>
+
+                            <div class="memory-block" id="block-kwargs">
+                                <span class="text-gray-400 text-[10px] uppercase block mb-1">Local Dictionary
+                                    (**kwargs): instructions</span>
+                                <span class="text-white" id="out-kwargs"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- VARIABLE INSPECTOR -->
-                <div class="glass-card" style="margin: 0; padding: 1rem;">
-                    <div class="sidebar-section-title" style="margin-bottom: 0.5rem;">
-                        <span>Variable Inspector</span>
-                        <span style="font-size: 0.7rem; color: var(--primary-accent); font-family: var(--font-code);">[live]</span>
+        <!-- ASSESSMENT & BEST PRACTICES -->
+        <section class="border-t border-gray-200 pt-12">
+            <h2 class="text-sm font-black uppercase tracking-[0.3em] text-gray-500 text-center mb-8">04. Quality
+                Assurance & Evaluation</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Common Mistake -->
+                <div class="bg-red-50 border-l-4 border-red-600 p-6 rounded-r-xl">
+                    <h3 class="font-bold text-red-800 mb-2 text-sm uppercase tracking-wider">Critical Anti-Pattern</h3>
+                    <p class="font-bold text-gray-800 mb-2">Mutable Default Arguments</p>
+                    <div class="bg-white p-3 rounded border border-red-200 font-mono text-xs mb-3 text-red-600">
+                        def add_item(item, cart=[]):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;cart.append(item)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;return cart
                     </div>
-                    <div class="variable-grid" id="var-inspector-grid" style="font-size: 0.75rem;">
-                        <!-- Variables updated here -->
+                    <p class="text-sm text-gray-700"><strong>The Problem:</strong> Default arguments are evaluated
+                        <em>only once</em> when the function is defined, not every time it is called. Using a mutable
+                        object like a list means the <em>same</em> list is shared across all function calls, leading to
+                        data leakage between unrelated users.
+                    </p>
+                    <p class="text-sm text-gray-700 mt-2"><strong>The Fix:</strong> Use <code
+                            class="mono text-xs bg-white px-1">cart=None</code> and instantiate the list inside the
+                        function.</p>
+                </div>
+
+                <!-- Interview Qs -->
+                <div class="space-y-6">
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm">Q1: What is the mandatory order of parameters in a
+                            Python function signature?</p>
+                        <p class="text-gray-600 text-sm mt-1"><strong>A:</strong> The strict order is: 1.
+                            Positional/Required arguments, 2. <code class="mono text-xs">*args</code> (Variable
+                            positional), 3. Default arguments, 4. <code class="mono text-xs">**kwargs</code> (Variable
+                            keyword). Violating this order raises a <code class="mono text-xs">SyntaxError</code>.</p>
+                    </div>
+                    <hr class="border-gray-200">
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm">Q2: How does Python internally handle <code
+                                class="mono text-xs">*args</code> and <code class="mono text-xs">**kwargs</code>?</p>
+                        <p class="text-gray-600 text-sm mt-1"><strong>A:</strong> Python packs <code
+                                class="mono text-xs">*args</code> into a <strong>Tuple</strong>, rendering it immutable
+                            during execution. It packs <code class="mono text-xs">**kwargs</code> into a
+                            <strong>Dictionary</strong>, allowing key-value pair access via standard dict methods.
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <!-- SPEED CONTROLLER -->
-            <div class="loop-control-bar">
-                <div class="control-actions">
-                    <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">EXECUTION FLOW:</span>
-                </div>
-                <div class="control-actions">
-                    <label
-                        style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin:0;">SPEED:</label>
-                    <select class="speed-select" id="speed-selector" onchange="updateSpeed()">
-                        <option value="1000">1x Normal</option>
-                        <option value="1800">0.5x Slow</option>
-                        <option value="400">2x Fast</option>
-                    </select>
-                    <button class="btn btn-ghost" id="pause-btn" onclick="togglePause()"
-                        style="padding: 0.4rem 0.75rem;">
-                        ⏸ Pause
-                    </button>
-                </div>
+            <!-- References -->
+            <div class="bg-gray-50 p-6 rounded-xl text-center">
+                <h4 class="text-xs font-bold uppercase tracking-widest mb-4 text-gray-500">Academic References</h4>
+                <p class="text-[11px] text-gray-500">
+                    Python Software Foundation. (2026). <em>Defining Functions</em>. Retrieved from python.org.<br>
+                    Syllabus Topic: 2.3 - Defining a Function, Checking & Setting Parameters, Types of arguments.<br>
+                    Martin, R. C. (2008). <em>Clean Code</em>. (Chapter 3: Functions - "Functions should do one thing").
+                </p>
             </div>
-
-            <!-- NAVIGATION FOOTER -->
-            <div class="nav-footer-bar">
-                <button class="btn btn-secondary" onclick="navigatePrev()">&larr; Previous</button>
-                <span id="nav-footer-status">Level 1 - Activity 1</span>
-                <button class="btn btn-secondary" onclick="navigateNext()">Next &rarr;</button>
-            </div>
-
-        </div>
-
-        <!-- RIGHT SIDE: CODE & TERMINAL PANELS -->
-        <div class="sidebar-wrapper">
-
-            <!-- CODE SYNC PANEL -->
-            <div class="glass-card">
-                <div class="sidebar-section-title">Python Code Synchronizer</div>
-                <div class="code-panel" id="code-synced-panel">
-                    <!-- code segments updated here -->
-                </div>
-            </div>
-
-            <!-- CONSOLE LOG -->
-            <div class="glass-card">
-                <div class="sidebar-section-title">Execution Console Output</div>
-                <div class="terminal-console" id="terminal-console-log">
-                    <div class="terminal-line"><span class="terminal-prompt">>>></span> System ready. Propose a function
-                        block to execute.</div>
-                </div>
-            </div>
-
-        </div>
+        </section>
 
     </main>
 
     <script>
-        // State management
-        const state = {
-            level: 1,
-            activity: 1,
-            hintIndex: 0,
-            isExecuting: false,
-            isPaused: false,
-            speedMs: 1000,
-
-            // Level 1 Act 1 slots
-            l1a1_slots: ["", "", "", "", "", ""],
-            // Level 1 Act 2 scenario index
-            l1a2_scenario: 0, // 0: Square, 1: Area, 2: Greet, 3: Temp
-
-            // Level 2 Act 1 slots
-            l2a1_slots: ["", "", "", ""], // item, qty, currency, price args
-
-            // Level 2 Act 2 scenario index
-            l2a2_scenario: 0, // 0: Required, 1: Default, 2: Keyword
-            l2a2_answer: "",
-
-            // Level 3 Act 1 scenario index
-            l3a1_scenario: 0, // 0: BMI, 1: Salary, 2: Discount
-            l3a1_slots: ["", "", "", "", ""], // def, name, params, body, return
-
-            // Level 3 Act 2 scenario index
-            activeEscapePanel: 0,
-            escapePanelsSolved: [false, false, false],
-            l3a2_slots: ["", ""] // parameters / return debug triggers
-        };
-
-        const levelsData = {
-            1: {
-                title: "Level 1: Function Workshop",
-                activities: [
-                    { id: 1, title: "Function Builder Studio", desc: "Drag blocks to assemble a complete Python function definition and watch inputs convert to output." },
-                    { id: 2, title: "Function Machine Simulator", desc: "Select custom parameter inputs and watch variables update inside visual function processors." }
+        // Chart.js: Complexity Chart
+        const compCtx = document.getElementById('complexityChart').getContext('2d');
+        new Chart(compCtx, {
+            type: 'line',
+            data: {
+                labels: ['1K LOC', '10K LOC', '50K LOC', '100K LOC', '500K LOC'],
+                datasets: [
+                    {
+                        label: 'Monolithic Architecture',
+                        data: [1, 5, 25, 60, 150],
+                        borderColor: '#c05621',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Modular (Function-Based)',
+                        data: [1, 2, 4, 7, 12],
+                        borderColor: '#2c5282',
+                        backgroundColor: 'rgba(44, 82, 130, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
                 ]
             },
-            2: {
-                title: "Level 2: Parameter Laboratory",
-                activities: [
-                    { id: 1, title: "Parameter Matching", desc: "Align positional, required, and default values to ensure function argument calls resolve." },
-                    { id: 2, title: "Delivery Robot", desc: "Deliver parameters to target machines using PyBot deliveries." }
-                ]
-            },
-            3: {
-                title: "Level 3: Function Architect",
-                activities: [
-                    { id: 1, title: "Smart Function Designer", desc: "Assemble complete computational structures for real-world mathematical calculators." },
-                    { id: 2, title: "Function Escape Room", desc: "Investigate broken panels, repair incorrect calls or missing returns, and escape." }
-                ]
-            }
-        };
-
-        // Hints database
-        const hintsDB = {
-            "1-1": [
-                "A function definition must start with the `def` keyword, followed by the function name.",
-                "Parameters go inside parenthesis in the function header, followed by a colon.",
-                "The indented body processes values, and the `return` statement exits and sends a result back.",
-                "Place: 1.`def`, 2.`square`, 3.`(x):`, 4.`result = x * x`, 5.`return result`, and 6.`square(4)` to complete the call."
-            ],
-            "1-2": [
-                "Select any of the 4 machines (Square, Area, Greet, Temp) and type custom input parameters.",
-                "The input values are bound to the function parameter variables when the call is made.",
-                "Inside the machine body, processing statements compute values and load them to local variables.",
-                "The `return` statement sends the final result back out of the function. Watch the visual flow!"
-            ],
-            "2-1": [
-                "Required arguments must be supplied and must appear before any default arguments.",
-                "Default arguments (like `tax=18`) use their default fallback value if they are omitted in the call.",
-                "Positional arguments cannot follow keyword arguments in a function call! Watch argument ordering.",
-                "Match: price = 150 (required), item = 'coffee' (required). Supply these first before configuring default modifiers."
-            ],
-            "2-2": [
-                "Required arguments have no default values in the definition and must be supplied.",
-                "Default arguments have default values (e.g. `currency='INR'`) and are optional.",
-                "Keyword arguments are specified by name (e.g. `price=150`) during function execution calls.",
-                "Determine the category of the package shown, select the corresponding bay, and run the robot to deliver."
-            ],
-            "3-1": [
-                "Read the real-world prompt. Identify the calculation logic needed for the calculators.",
-                "Arrange: def header, parameter variables inside brackets, computing body, and return keyword.",
-                "Ensure variable names inside the body match the parameters defined in the header.",
-                "For BMI: header `def calculate_bmi(w, h):`, body `bmi = w / (h * h)`, and statement `return bmi`."
-            ],
-            "3-2": [
-                "Panel 1 has a Syntax Error. Check if the function definition header or calls are missing key symbols.",
-                "Panel 2 has a Parameter mismatch. Check if the call specifies all required arguments correctly.",
-                "Panel 3 has a Return mismatch. A function returns None if it lacks a return statement! Add the return chip."
-            ]
-        };
-
-        // Escape room panel configurations
-        const escapePanelsData = [
-            {
-                title: "Panel 1: Syntax Repair",
-                desc: "The function definition is missing the defining keyword or call colon. Drag chips to fix it.",
-                slots: ["def_slot", "colon_slot"],
-                chips: ["def", ":", "return", "pass", "()"],
-                targets: ["def", ":"],
-                code: (arr) => `${arr[0]} multiply(a, b)${arr[1]}\n    return a * b\n\nval = multiply(3, 4)`
-            },
-            {
-                title: "Panel 2: Required Arguments Check",
-                desc: "The function calculate_bill requires two positional arguments. Add missing values to the call.",
-                slots: ["arg1", "arg2"],
-                chips: ["price", "tax", "150", "18", "0"],
-                targets: ["150", "18"],
-                code: (arr) => `def calculate_bill(price, tax):\n    return price + (price * tax / 100)\n\ntotal = calculate_bill(${arr[0]}, ${arr[1]})`
-            },
-            {
-                title: "Panel 3: Return Value Injection",
-                desc: "The function computes total score but returns None! Insert the return keyword and variable name.",
-                slots: ["ret_kw", "ret_var"],
-                chips: ["return", "score", "pass", "def", "total"],
-                targets: ["return", "score"],
-                code: (arr) => `def get_score(correct, penalty):\n    score = (correct * 4) - penalty\n    ${arr[0]} ${arr[1]}\n\nres = get_score(10, 2)`
-            }
-        ];
-
-        // Notification Alerts
-        function triggerAlert(msg, type = "info") {
-            const alertBox = document.getElementById("sim-alert");
-            alertBox.textContent = msg;
-            alertBox.className = `popup-alert show ${type}`;
-
-            setTimeout(() => {
-                alertBox.classList.remove("show");
-            }, 3000);
-        }
-
-        // Terminal Logger
-        function appendTerminal(msg, status = null) {
-            const log = document.getElementById("terminal-console-log");
-            const line = document.createElement("div");
-            line.className = "terminal-line";
-
-            let prefix = `<span class="terminal-prompt">>>></span>`;
-            let textClass = "";
-            if (status === true) textClass = "terminal-success";
-            else if (status === false) textClass = "terminal-warning";
-
-            line.innerHTML = `${prefix}<span class="${textClass}">${msg}</span>`;
-            log.appendChild(line);
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function clearTerminal() {
-            const log = document.getElementById("terminal-console-log");
-            log.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">>>></span> Workspace active. Propose a functional sequence.</div>`;
-        }
-
-        // Variable updates
-        function updateInspector(vars) {
-            const grid = document.getElementById("var-inspector-grid");
-            grid.innerHTML = "";
-            if (Object.keys(vars).length === 0) {
-                grid.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:0.5rem;">No local variables active.</div>`;
-                return;
-            }
-            for (const [key, value] of Object.entries(vars)) {
-                const card = document.createElement("div");
-                card.className = "var-card pulsing";
-                card.innerHTML = `<span class="var-name">${key}</span><span class="var-val">${value}</span>`;
-                grid.appendChild(card);
-            }
-        }
-
-        // HINTS DISPATCHER
-        function revealNextHint() {
-            const hintKey = `${state.level}-${state.activity}`;
-            const hints = hintsDB[hintKey];
-            if (!hints) return;
-
-            const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
-            if (state.hintIndex < hints.length) {
-                document.getElementById("hint-feedback-box").textContent = hints[state.hintIndex];
-                dots[state.hintIndex].classList.add("active");
-                state.hintIndex++;
-            } else {
-                triggerAlert("All clues revealed! Experiment with parameter placements.", "info");
-            }
-        }
-
-        function resetHints() {
-            state.hintIndex = 0;
-            document.getElementById("hint-feedback-box").textContent = "Click the button above to request progressive clues without giving away the full logic!";
-            const dots = document.querySelectorAll("#hint-dots-wrapper .hint-dot");
-            dots.forEach(dot => dot.classList.remove("active"));
-        }
-
-        // SPEED CONTROLLER
-        function updateSpeed() {
-            const val = document.getElementById("speed-selector").value;
-            state.speedMs = parseInt(val);
-            appendTerminal(`Speed modifier set to ${val}ms.`);
-        }
-
-        function togglePause() {
-            state.isPaused = !state.isPaused;
-            const btn = document.getElementById("pause-btn");
-            if (state.isPaused) {
-                btn.textContent = "▶ Resume";
-                appendTerminal("Function execution suspended.");
-            } else {
-                btn.textContent = "⏸ Pause";
-                appendTerminal("Function execution resumed.");
-            }
-        }
-
-        // DRAG AND DROP HANDLERS
-        let selectedDragVal = null;
-        let clickedChipElement = null;
-
-        function handleDragStart(e, value) {
-            e.dataTransfer.setData("text/plain", value);
-            selectedDragVal = value;
-            e.currentTarget.style.opacity = "0.5";
-        }
-
-        function handleDragEnd(e) {
-            e.currentTarget.style.opacity = "1";
-            selectedDragVal = null;
-        }
-
-        function allowDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add("hovered");
-        }
-
-        function dragLeaveSlot(e) {
-            e.currentTarget.classList.remove("hovered");
-        }
-
-        function selectChipForPlacement(element) {
-            document.querySelectorAll(".chip").forEach(c => c.classList.remove("selected"));
-            clickedChipElement = element;
-            element.classList.add("selected");
-            selectedDragVal = element.textContent.trim();
-            triggerAlert("Chip selected. Click a target slot to place it!", "info");
-        }
-
-        function handleSlotClick(e) {
-            if (selectedDragVal) {
-                const slotEl = e.currentTarget;
-                slotEl.textContent = selectedDragVal;
-                slotEl.classList.add("filled");
-
-                const idx = slotEl.getAttribute("data-index");
-
-                if (state.level === 1 && state.activity === 1) {
-                    state.l1a1_slots[idx] = selectedDragVal;
-                    updateL1A1CodeSync();
-                } else if (state.level === 2 && state.activity === 1) {
-                    state.l2a1_slots[idx] = selectedDragVal;
-                    updateL2A1CodeSync();
-                } else if (state.level === 3 && state.activity === 1) {
-                    state.l3a1_slots[idx] = selectedDragVal;
-                    updateL3A1CodeSync();
-                } else if (state.level === 3 && state.activity === 2) {
-                    state.l3a2_slots[idx] = selectedDragVal;
-                    updateL3A2CodeSync();
-                }
-
-                if (clickedChipElement) {
-                    clickedChipElement.classList.remove("selected");
-                    clickedChipElement = null;
-                }
-                selectedDragVal = null;
-                slotEl.classList.remove("hovered");
-            }
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            const slotEl = e.currentTarget;
-            slotEl.classList.remove("hovered");
-
-            const val = e.dataTransfer.getData("text/plain") || selectedDragVal;
-            if (val) {
-                slotEl.textContent = val;
-                slotEl.classList.add("filled");
-
-                const idx = slotEl.getAttribute("data-index");
-                if (state.level === 1 && state.activity === 1) {
-                    state.l1a1_slots[idx] = val;
-                    updateL1A1CodeSync();
-                } else if (state.level === 2 && state.activity === 1) {
-                    state.l2a1_slots[idx] = val;
-                    updateL2A1CodeSync();
-                } else if (state.level === 3 && state.activity === 1) {
-                    state.l3a1_slots[idx] = val;
-                    updateL3A1CodeSync();
-                } else if (state.level === 3 && state.activity === 2) {
-                    state.l3a2_slots[idx] = val;
-                    updateL3A2CodeSync();
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'IBM Plex Sans', size: 10 } } } },
+                scales: {
+                    y: { display: false },
+                    x: { grid: { display: false } }
                 }
             }
-        }
+        });
 
-        // LEVEL ROUTING
-        function switchLevel(lvlNum) {
-            if (state.isExecuting) return;
-            state.level = lvlNum;
-            state.activity = 1;
+        // Lab Simulation Logic
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-            document.querySelectorAll(".level-tab").forEach((tab, idx) => {
-                if (idx + 1 === lvlNum) tab.classList.add("active");
-                else tab.classList.remove("active");
+        async function executeLab() {
+            // Get inputs
+            const userInp = document.getElementById('inp-user').value || 'None';
+            const argsInp = document.getElementById('inp-args').value;
+            const defInp = document.getElementById('inp-def').value;
+            const kwargsInp = document.getElementById('inp-kwargs').value;
+
+            // UI Elements
+            const blocksWrap = document.getElementById('mem-blocks');
+            const reqBlock = document.getElementById('block-req');
+            const argsBlock = document.getElementById('block-args');
+            const defBlock = document.getElementById('block-def');
+            const kwargsBlock = document.getElementById('block-kwargs');
+
+            const outUser = document.getElementById('out-user');
+            const outArgs = document.getElementById('out-args');
+            const outDef = document.getElementById('out-def');
+            const outKwargs = document.getElementById('out-kwargs');
+
+            // Reset UI
+            blocksWrap.classList.remove('hidden');
+            blocksWrap.previousElementSibling.classList.add('hidden'); // Hide waiting text
+
+            [reqBlock, argsBlock, defBlock, kwargsBlock].forEach(b => {
+                b.classList.remove('active');
+                b.style.opacity = '0.3';
             });
+            outUser.innerText = '';
+            outArgs.innerText = '';
+            outDef.innerText = '';
+            outKwargs.innerText = '';
 
-            renderActivityPills();
-            loadActivity();
-            updateNavFooterStatus();
+            // 1. Process Required
+            reqBlock.style.opacity = '1';
+            reqBlock.classList.add('active');
+            outUser.innerHTML = `<span class="text-orange-400">"${userInp}"</span>`;
+            await sleep(800);
+            reqBlock.classList.remove('active');
+
+            // 2. Process *args (Tuple)
+            argsBlock.style.opacity = '1';
+            argsBlock.classList.add('active');
+            let tupleStr = argsInp.split(',').map(s => `"${s.trim()}"`).filter(s => s !== '""').join(', ');
+            outArgs.innerHTML = `<span class="text-blue-300">(${tupleStr})</span>`;
+            await sleep(800);
+            argsBlock.classList.remove('active');
+
+            // 3. Process Default
+            defBlock.style.opacity = '1';
+            defBlock.classList.add('active');
+            outDef.innerHTML = `<span class="text-green-400">${defInp}</span>`;
+            await sleep(800);
+            defBlock.classList.remove('active');
+
+            // 4. Process **kwargs (Dict)
+            kwargsBlock.style.opacity = '1';
+            kwargsBlock.classList.add('active');
+            let dictParts = kwargsInp.split(',').map(s => {
+                let kv = s.split('=');
+                if (kv.length === 2) return `"${kv[0].trim()}": ${kv[1].trim()}`;
+                return '';
+            }).filter(s => s !== '');
+            outKwargs.innerHTML = `<span class="text-purple-300">{ ${dictParts.join(', ')} }</span>`;
+            await sleep(800);
+            kwargsBlock.classList.remove('active');
+
+            // Final state
+            [reqBlock, argsBlock, defBlock, kwargsBlock].forEach(b => b.style.opacity = '1');
         }
-
-        function renderActivityPills() {
-            const container = document.getElementById("activity-pills-container");
-            container.innerHTML = "";
-
-            const acts = levelsData[state.level].activities;
-            acts.forEach(act => {
-                const pill = document.createElement("button");
-                pill.className = `activity-pill ${state.activity === act.id ? 'active' : ''}`;
-                pill.textContent = act.title;
-                pill.onclick = () => {
-                    if (state.isExecuting) return;
-                    state.activity = act.id;
-                    document.querySelectorAll(".activity-pill").forEach(p => p.classList.remove("active"));
-                    pill.classList.add("active");
-                    loadActivity();
-                    updateNavFooterStatus();
-                };
-                container.appendChild(pill);
-            });
-        }
-
-        function updateNavFooterStatus() {
-            const footerStatus = document.getElementById("nav-footer-status");
-            footerStatus.textContent = `Level ${state.level} - Activity ${state.activity}`;
-        }
-
-        function navigatePrev() {
-            if (state.isExecuting) return;
-            if (state.activity === 2) {
-                state.activity = 1;
-            } else {
-                if (state.level > 1) {
-                    state.level--;
-                    state.activity = 2;
-                } else {
-                    triggerAlert("You are at the very beginning of Level 1!", "info");
-                    return;
-                }
-            }
-            syncPillsAndLoad();
-        }
-
-        function navigateNext() {
-            if (state.isExecuting) return;
-            if (state.activity === 1) {
-                state.activity = 2;
-            } else {
-                if (state.level < 3) {
-                    state.level++;
-                    state.activity = 1;
-                } else {
-                    triggerAlert("You reached the end of PyFunc Lab! Fantastic work.", "success");
-                    return;
-                }
-            }
-            syncPillsAndLoad();
-        }
-
-        function syncPillsAndLoad() {
-            document.querySelectorAll(".level-tab").forEach((tab, idx) => {
-                if (idx + 1 === state.level) tab.classList.add("active");
-                else tab.classList.remove("active");
-            });
-            renderActivityPills();
-            loadActivity();
-            updateNavFooterStatus();
-        }
-
-        function loadActivity() {
-            state.isExecuting = false;
-            state.isPaused = false;
-            document.getElementById("pause-btn").textContent = "⏸ Pause";
-            resetHints();
-            clearTerminal();
-            updateInspector({});
-
-            const contentArea = document.getElementById("sim-content-area");
-            contentArea.innerHTML = "";
-
-            const actInfo = levelsData[state.level].activities[state.activity - 1];
-            document.getElementById("sim-title").textContent = actInfo.title;
-            document.getElementById("sim-subtitle").textContent = actInfo.desc;
-
-            if (state.level === 1 && state.activity === 1) {
-                loadL1A1(contentArea);
-            } else if (state.level === 1 && state.activity === 2) {
-                loadL1A2(contentArea);
-            } else if (state.level === 2 && state.activity === 1) {
-                loadL2A1(contentArea);
-            } else if (state.level === 2 && state.activity === 2) {
-                loadL2A2(contentArea);
-            } else if (state.level === 3 && state.activity === 1) {
-                loadL3A1(contentArea);
-            } else if (state.level === 3 && state.activity === 2) {
-                loadL3A2(contentArea);
-            }
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 1 ACTIVITY 1: Function Builder Studio
-        // -------------------------------------------------------------
-        function loadL1A1(container) {
-            // 1. Indented drag-and-drop slots
-            const editor = document.createElement("div");
-            editor.style.width = "100%";
-            editor.style.display = "flex";
-            editor.style.flexDirection = "column";
-            editor.style.gap = "0.5rem";
-            editor.style.margin = "1rem 0";
-
-            const s0 = state.l1a1_slots[0] || "def";
-            const s1 = state.l1a1_slots[1] || "name";
-            const s2 = state.l1a1_slots[2] || "(param):";
-            const s3 = state.l1a1_slots[3] || "processing_body";
-            const s4 = state.l1a1_slots[4] || "return_statement";
-            const s5 = state.l1a1_slots[5] || "call_statement";
-
-            editor.innerHTML = `
-        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
-          <div style="display:flex; align-items:center; gap:0.5rem;">
-            <div class="slot ${state.l1a1_slots[0] ? 'filled' : ''}" data-slot-type="def" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
-            <div class="slot ${state.l1a1_slots[1] ? 'filled' : ''}" data-slot-type="name" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s1}</div>
-            <div class="slot ${state.l1a1_slots[2] ? 'filled' : ''}" data-slot-type="param" data-index="2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s2}</div>
-          </div>
-          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
-            <div class="slot ${state.l1a1_slots[3] ? 'filled' : ''}" data-slot-type="body" data-index="3" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s3}</div>
-          </div>
-          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
-            <div class="slot ${state.l1a1_slots[4] ? 'filled' : ''}" data-slot-type="return" data-index="4" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s4}</div>
-          </div>
-          <div style="margin-top: 12px; display:flex; align-items:center; gap:0.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
-            <div class="slot ${state.l1a1_slots[5] ? 'filled' : ''}" data-slot-type="call" data-index="5" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 120px; height: 28px;">${s5}</div>
-          </div>
-        </div>
-      `;
-            container.appendChild(editor);
-
-            // 2. Chip pool bank
-            const bank = document.createElement("div");
-            bank.className = "chips-bank";
-            const chips = ["def", "square", "(x):", "result = x * x", "return result", "square(4)", "return", "(4)", "x"];
-            chips.forEach((cVal, idx) => {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.draggable = true;
-                chip.textContent = cVal;
-                chip.id = `chip-l1a1-${idx}`;
-                chip.ondragstart = (e) => handleDragStart(e, cVal);
-                chip.ondragend = handleDragEnd;
-                chip.onclick = () => selectChipForPlacement(chip);
-                bank.appendChild(chip);
-            });
-            container.appendChild(bank);
-
-            // 3. Pipeline visual animation chamber
-            const pipeline = document.createElement("div");
-            pipeline.className = "pipeline-visualizer";
-            pipeline.innerHTML = `
-        <div class="pipeline-chamber" id="chamber-input"><span>Input</span><strong style="margin-top:2px;">4</strong></div>
-        <div class="pipeline-pathway" id="path-in">
-          <div class="pipeline-ball" id="path-ball"></div>
-        </div>
-        <div class="pipeline-chamber" id="chamber-core"><span>Core</span><strong style="font-size:0.65rem; margin-top:2px;">x * x</strong></div>
-        <div class="pipeline-pathway" id="path-out"></div>
-        <div class="pipeline-chamber" id="chamber-output"><span>Output</span><strong id="visual-out-val" style="margin-top:2px; color:var(--primary-accent);">?</strong></div>
-      `;
-            container.appendChild(pipeline);
-
-            updateL1A1CodeSync();
-        }
-
-        function updateL1A1CodeSync() {
-            const s0 = state.l1a1_slots[0] || "___";
-            const s1 = state.l1a1_slots[1] || "___";
-            const s2 = state.l1a1_slots[2] || "___";
-            const s3 = state.l1a1_slots[3] || "___";
-            const s4 = state.l1a1_slots[4] || "___";
-            const s5 = state.l1a1_slots[5] || "___";
-
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line" id="l1a1-line1"><span class="code-line-num">1</span><span class="code-keyword">${s0}</span> ${s1}${s2}</div>
-        <div class="code-line" id="l1a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;${s3}</div>
-        <div class="code-line" id="l1a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;${s4}</div>
-        <div class="code-line" id="l1a1-line4"><span class="code-line-num">4</span>${s5}</div>
-      `;
-        }
-
-        function runL1A1Execution() {
-            const t = ["def", "square", "(x):", "result = x * x", "return result", "square(4)"];
-            let correct = true;
-            state.l1a1_slots.forEach((val, idx) => {
-                if (val !== t[idx]) correct = false;
-            });
-
-            if (!correct) {
-                triggerAlert("Assembly incorrect! Check syntax ordering.", "error");
-                appendTerminal(">>> SyntaxError: Invalid syntax header/body layout.", false);
-                return;
-            }
-
-            state.isExecuting = true;
-            appendTerminal(">>> Call stack created. Executing square(4)...");
-
-            const ball = document.getElementById("path-ball");
-            const pathIn = document.getElementById("path-in");
-            const pathOut = document.getElementById("path-out");
-            const chInput = document.getElementById("chamber-input");
-            const chCore = document.getElementById("chamber-core");
-            const chOutput = document.getElementById("chamber-output");
-            const visVal = document.getElementById("visual-out-val");
-
-            // Reset
-            ball.style.display = "none";
-            ball.style.left = "0px";
-            chInput.classList.remove("active");
-            chCore.classList.remove("active");
-            chOutput.classList.remove("active");
-            visVal.textContent = "?";
-
-            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
-
-            // Line 4: Call
-            document.getElementById("l1a1-line4").classList.add("active-exec");
-            chInput.classList.add("active");
-            appendTerminal("Calling function square() with parameter x = 4.");
-            updateInspector({ "x": 4 });
-
-            setTimeout(() => {
-                if (state.isPaused) return; // simple pause check
-
-                document.getElementById("l1a1-line4").classList.remove("active-exec");
-                document.getElementById("l1a1-line1").classList.add("active-exec");
-                appendTerminal("Header matches definition. Binding argument 4 to parameter x.");
-
-                // Animate input package entering core
-                ball.style.display = "block";
-                ball.style.left = `${pathIn.offsetWidth - 24}px`;
-
-                setTimeout(() => {
-                    document.getElementById("l1a1-line1").classList.remove("active-exec");
-                    document.getElementById("l1a1-line2").classList.add("active-exec");
-                    chCore.classList.add("active");
-
-                    appendTerminal("Processing: result = 4 * 4");
-                    updateInspector({ "x": 4, "result": 16 });
-
-                    setTimeout(() => {
-                        document.getElementById("l1a1-line2").classList.remove("active-exec");
-                        document.getElementById("l1a1-line3").classList.add("active-exec");
-
-                        appendTerminal("Exiting function. Returning result = 16 to stack.");
-
-                        // Animate package to return output
-                        ball.style.display = "none";
-                        pathOut.appendChild(ball);
-                        ball.style.display = "block";
-                        ball.style.left = `${pathOut.offsetWidth - 24}px`;
-
-                        setTimeout(() => {
-                            document.getElementById("l1a1-line3").classList.remove("active-exec");
-                            chOutput.classList.add("active");
-                            visVal.textContent = "16";
-                            appendTerminal("Function execution completed. Return value: 16", true);
-                            triggerAlert("Success! Function output matched.", "success");
-                            state.isExecuting = false;
-                        }, state.speedMs);
-
-                    }, state.speedMs);
-
-                }, state.speedMs);
-
-            }, state.speedMs);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 1 ACTIVITY 2: Function Machine Simulator
-        // -------------------------------------------------------------
-        const machinesData = [
-            { name: "Square Machine", formula: "x * x", desc: "Computes square of a number.", inputs: ["x"], defs: [5], run: (v) => v[0] * v[0] },
-            { name: "Area Calculator", formula: "w * h", desc: "Computes area of a rectangle.", inputs: ["width", "height"], defs: [10, 5], run: (v) => v[0] * v[1] },
-            { name: "Greeting Generator", formula: "'Hello, ' + name", desc: "Prints custom welcome messages.", inputs: ["name"], defs: ["Alice"], run: (v) => `Hello, ${v[0]}` },
-            { name: "Temperature Converter", formula: "(c * 9/5) + 32", desc: "Converts Celsius to Fahrenheit.", inputs: ["celsius"], defs: [25], run: (v) => (v[0] * 9 / 5) + 32 }
-        ];
-
-        function loadL1A2(container) {
-            const mac = machinesData[state.l1a2_scenario];
-
-            // 1. Selectors
-            const selector = document.createElement("div");
-            selector.className = "escape-panels-grid";
-            machinesData.forEach((m, idx) => {
-                selector.innerHTML += `
-          <div class="escape-panel-card ${state.l1a2_scenario === idx ? 'active' : ''}" onclick="setL1A2Scenario(${idx})">
-            <span style="font-size:1.25rem;">🖥️</span>
-            <div style="font-weight:700; font-size:0.8rem; margin-top:4px;">${m.name}</div>
-          </div>
-        `;
-            });
-            container.appendChild(selector);
-
-            // 2. Input parameter boxes
-            const inputsWrapper = document.createElement("div");
-            inputsWrapper.style.width = "100%";
-            inputsWrapper.style.display = "flex";
-            inputsWrapper.style.flexDirection = "column";
-            inputsWrapper.style.gap = "0.75rem";
-            inputsWrapper.style.margin = "1rem 0";
-
-            let inputsHTML = '';
-            mac.inputs.forEach((inp, idx) => {
-                const val = mac.defs[idx];
-                inputsHTML += `
-          <div class="slider-group">
-            <label>${inp} (Input Parameter)</label>
-            <input type="text" class="slider-control" id="mac-input-${idx}" value="${val}" style="padding: 0.5rem; border:1px solid var(--border-color); border-radius:6px; font-family:var(--font-code);">
-          </div>
-        `;
-            });
-            inputsWrapper.innerHTML = inputsHTML;
-            container.appendChild(inputsWrapper);
-
-            // 3. Animated machine diagram
-            const pipeline = document.createElement("div");
-            pipeline.className = "pipeline-visualizer";
-            pipeline.innerHTML = `
-        <div class="pipeline-chamber" id="ch-input"><span>Inputs</span></div>
-        <div class="pipeline-pathway" id="pa-in">
-          <div class="pipeline-ball" id="pa-ball"></div>
-        </div>
-        <div class="pipeline-chamber" id="ch-core" style="width:90px; height:90px;"><span>${mac.formula}</span></div>
-        <div class="pipeline-pathway" id="pa-out"></div>
-        <div class="pipeline-chamber" id="ch-output"><span>Return</span><strong id="pa-out-val" style="margin-top:2px; color:var(--primary-accent);">?</strong></div>
-      `;
-            container.appendChild(pipeline);
-
-            updateL1A2CodeSync();
-        }
-
-        function setL1A2Scenario(idx) {
-            if (state.isExecuting) return;
-            state.l1a2_scenario = idx;
-            loadActivity();
-        }
-
-        function updateL1A2CodeSync() {
-            const mac = machinesData[state.l1a2_scenario];
-            const params = mac.inputs.join(", ");
-
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line" id="l1a2-line1"><span class="code-line-num">1</span><span class="code-keyword">def</span> compute(${params}):</div>
-        <div class="code-line" id="l1a2-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;res = ${mac.formula}</div>
-        <div class="code-line" id="l1a2-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> res</div>
-      `;
-        }
-
-        function runL1A2Execution() {
-            state.isExecuting = true;
-            const mac = machinesData[state.l1a2_scenario];
-
-            let vals = [];
-            mac.inputs.forEach((_, idx) => {
-                let rawVal = document.getElementById(`mac-input-${idx}`).value.trim();
-                // try parsing float/int
-                if (!isNaN(rawVal)) rawVal = parseFloat(rawVal);
-                vals.push(rawVal);
-            });
-
-            appendTerminal(`>>> Invoking compute(${vals.join(', ')})`);
-
-            const ball = document.getElementById("pa-ball");
-            const pathIn = document.getElementById("pa-in");
-            const pathOut = document.getElementById("pa-out");
-            const chInput = document.getElementById("ch-input");
-            const chCore = document.getElementById("ch-core");
-            const chOutput = document.getElementById("ch-output");
-            const visVal = document.getElementById("pa-out-val");
-
-            // Reset
-            ball.style.display = "none";
-            ball.style.left = "0px";
-            chInput.classList.remove("active");
-            chCore.classList.remove("active");
-            chOutput.classList.remove("active");
-            visVal.textContent = "?";
-
-            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
-
-            // Line 1: Call
-            document.getElementById("l1a2-line1").classList.add("active-exec");
-            chInput.classList.add("active");
-
-            let vars = {};
-            mac.inputs.forEach((name, idx) => {
-                vars[name] = vals[idx];
-            });
-            updateInspector(vars);
-
-            setTimeout(() => {
-                document.getElementById("l1a2-line1").classList.remove("active-exec");
-                document.getElementById("l1a2-line2").classList.add("active-exec");
-                chCore.classList.add("active");
-
-                // Animate input moving
-                ball.style.display = "block";
-                ball.style.left = `${pathIn.offsetWidth - 24}px`;
-
-                const outVal = mac.run(vals);
-
-                setTimeout(() => {
-                    document.getElementById("l1a2-line2").classList.remove("active-exec");
-                    document.getElementById("l1a2-line3").classList.add("active-exec");
-
-                    vars["res"] = outVal;
-                    updateInspector(vars);
-                    appendTerminal(`Processing formula... returned: ${outVal}`);
-
-                    // Output animation
-                    ball.style.display = "none";
-                    pathOut.appendChild(ball);
-                    ball.style.display = "block";
-                    ball.style.left = `${pathOut.offsetWidth - 24}px`;
-
-                    setTimeout(() => {
-                        document.getElementById("l1a2-line3").classList.remove("active-exec");
-                        chOutput.classList.add("active");
-                        visVal.textContent = outVal;
-                        appendTerminal(`Function complete. Output: ${outVal}`, true);
-                        state.isExecuting = false;
-                    }, state.speedMs);
-
-                }, state.speedMs);
-
-            }, state.speedMs);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 2 ACTIVITY 1: Parameter Matching Challenge
-        // -------------------------------------------------------------
-        function loadL2A1(container) {
-            // 1. Prompt description
-            const challengeCard = document.createElement("div");
-            challengeCard.className = "challenge-card";
-            challengeCard.innerHTML = `
-        <h4>FUNCTION PROMPT</h4>
-        <p>Supply arguments to call <code>calculate(price, tax=18)</code>. One required price parameter and one default tax parameter.</p>;
-      `;
-            container.appendChild(challengeCard);
-
-            // 2. Conveyor layout showing parameter buckets
-            const conveyor = document.createElement("div");
-            conveyor.className = "conveyor-belt-wrapper";
-
-            const s0 = state.l2a1_slots[0] || "arg_1";
-            const s1 = state.l2a1_slots[1] || "arg_2";
-
-            conveyor.innerHTML = `
-        <div style="font-family:var(--font-code); font-size:0.8rem; font-weight:700;">FUNCTION DEFINITION: def calculate(price, tax=18):</div>
-        <div class="argument-conveyor" id="conveyor-bays">
-          <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
-            <span style="font-size:0.7rem; color:white;">price (Required)</span>
-            <div class="slot ${state.l2a1_slots[0] ? 'filled' : ''}" data-slot-type="arg1" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s0}</div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem;">
-            <span style="font-size:0.7rem; color:white;">tax (Default=18)</span>
-            <div class="slot ${state.l2a1_slots[1] ? 'filled' : ''}" data-slot-type="arg2" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s1}</div>
-          </div>
-        </div>
-      `;
-            container.appendChild(conveyor);
-
-            // 3. Chips bank
-            const bank = document.createElement("div");
-            bank.className = "chips-bank";
-            const chips = ["150", "200", "tax=5", "price=100", "18", "tax=12"];
-            chips.forEach((cVal, idx) => {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.draggable = true;
-                chip.textContent = cVal;
-                chip.id = `chip-l2a1-${idx}`;
-                chip.ondragstart = (e) => handleDragStart(e, cVal);
-                chip.ondragend = handleDragEnd;
-                chip.onclick = () => selectChipForPlacement(chip);
-                bank.appendChild(chip);
-            });
-            container.appendChild(bank);
-
-            updateL2A1CodeSync();
-        }
-
-        function updateL2A1CodeSync() {
-            const s0 = state.l2a1_slots[0] || "___";
-            const s1 = state.l2a1_slots[1] || "";
-            const comma = s1 ? ", " : "";
-
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line" id="l2a1-line1"><span class="code-line-num">1</span><span class="code-keyword">def</span> calculate(price, tax=18):</div>
-        <div class="code-line" id="l2a1-line2"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;total = price + (price * tax / 100)</div>
-        <div class="code-line" id="l2a1-line3"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> total</div>
-        <div class="code-line" id="l2a1-line4"><span class="code-line-num">4</span>res = calculate(${s0}${comma}${s1})</div>
-      `;
-        }
-
-        function runL2A1Execution() {
-            if (!state.l2a1_slots[0]) {
-                triggerAlert("Fill in the price argument slot first!", "error");
-                return;
-            }
-
-            state.isExecuting = true;
-            appendTerminal(">>> Evaluating function call matching...");
-
-            // Positional args check logic
-            let priceVal = 0;
-            let taxVal = 18; // Default value
-
-            let s0 = state.l2a1_slots[0];
-            let s1 = state.l2a1_slots[1];
-
-            // Parse argument 1
-            if (s0.startsWith("price=")) priceVal = parseFloat(s0.split("=")[1]);
-            else if (s0.startsWith("tax=")) {
-                triggerAlert("Error: Positional argument cannot follow keyword argument!", "error");
-                appendTerminal(">>> SyntaxError: positional argument follows keyword argument", false);
-                state.isExecuting = false;
-                return;
-            } else {
-                priceVal = parseFloat(s0);
-            }
-
-            // Parse argument 2
-            if (s1) {
-                if (s1.startsWith("tax=")) taxVal = parseFloat(s1.split("=")[1]);
-                else if (s1.startsWith("price=")) {
-                    // Double assign price
-                    triggerAlert("TypeError: calculate() got multiple values for argument 'price'", "error");
-                    appendTerminal(">>> TypeError: calculate() got multiple values for argument 'price'", false);
-                    state.isExecuting = false;
-                    return;
-                } else {
-                    taxVal = parseFloat(s1);
-                }
-            }
-
-            document.querySelectorAll(".code-line").forEach(l => l.classList.remove("active-exec"));
-
-            // Line 4: Call
-            document.getElementById("l2a1-line4").classList.add("active-exec");
-            appendTerminal(`Calling calculate() with price = ${priceVal}, tax = ${taxVal}`);
-            updateInspector({ "price": priceVal, "tax": taxVal });
-
-            setTimeout(() => {
-                document.getElementById("l2a1-line4").classList.remove("active-exec");
-                document.getElementById("l2a1-line2").classList.add("active-exec");
-
-                const totalVal = priceVal + (priceVal * taxVal / 100);
-
-                setTimeout(() => {
-                    document.getElementById("l2a1-line2").classList.remove("active-exec");
-                    document.getElementById("l2a1-line3").classList.add("active-exec");
-                    updateInspector({ "price": priceVal, "tax": taxVal, "total": totalVal });
-                    appendTerminal(`Returning total bill: ${totalVal}`);
-
-                    setTimeout(() => {
-                        document.getElementById("l2a1-line3").classList.remove("active-exec");
-                        appendTerminal(`Execution complete. Bill total: ${totalVal}`, true);
-                        triggerAlert("Verification success!", "success");
-                        state.isExecuting = false;
-                    }, state.speedMs);
-
-                }, state.speedMs);
-
-            }, state.speedMs);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 2 ACTIVITY 2: Delivery Robot Simulator
-        // -------------------------------------------------------------
-        const robotScenarios = [
-            {
-                order: "Fulfil Order #104: Ship package to 'Alice', weighing 10kg, marked as fragile.",
-                funcDef: 'def ship(recipient, weight, speed="Standard", fragile=False):',
-                packages: [
-                    { name: '"Alice"', type: "Required", slotIdx: 0, val: '"Alice"', syncCode: '"Alice"', label: "recipient" },
-                    { name: "10", type: "Required", slotIdx: 1, val: "10", syncCode: "10", label: "weight" },
-                    { name: "speed (Omitted)", type: "Default", slotIdx: 2, val: '"Standard"', syncCode: null, label: "speed", isOmitted: true },
-                    { name: "fragile=True", type: "Keyword", slotIdx: 3, val: "True", syncCode: "fragile=True", label: "fragile" }
-                ],
-                targetCall: 'ship("Alice", 10, fragile=True)'
-            },
-            {
-                order: "Fulfil Order #105: Ship package to 'Bob', weighing 5kg, default speed & default safety.",
-                funcDef: 'def ship(recipient, weight, speed="Standard", fragile=False):',
-                packages: [
-                    { name: 'recipient="Bob"', type: "Keyword", slotIdx: 0, val: '"Bob"', syncCode: 'recipient="Bob"', label: "recipient" },
-                    { name: "weight=5", type: "Keyword", slotIdx: 1, val: "5", syncCode: "weight=5", label: "weight" },
-                    { name: "speed (Omitted)", type: "Default", slotIdx: 2, val: '"Standard"', syncCode: null, label: "speed", isOmitted: true },
-                    { name: "fragile (Omitted)", type: "Default", slotIdx: 3, val: "False", syncCode: null, label: "fragile", isOmitted: true }
-                ],
-                targetCall: 'ship(recipient="Bob", weight=5)'
-            },
-            {
-                order: "Fulfil Order #106: Ship package to 'Charlie', weighing 12kg, Priority delivery speed.",
-                funcDef: 'def ship(recipient, weight, speed="Standard", fragile=False):',
-                packages: [
-                    { name: '"Charlie"', type: "Required", slotIdx: 0, val: '"Charlie"', syncCode: '"Charlie"', label: "recipient" },
-                    { name: "12", type: "Required", slotIdx: 1, val: "12", syncCode: "12", label: "weight" },
-                    { name: 'speed="Priority"', type: "Keyword", slotIdx: 2, val: '"Priority"', syncCode: 'speed="Priority"', label: "speed" },
-                    { name: "fragile (Omitted)", type: "Default", slotIdx: 3, val: "False", syncCode: null, label: "fragile", isOmitted: true }
-                ],
-                targetCall: 'ship("Charlie", 12, speed="Priority")'
-            }
-        ];
-
-        function loadL2A2(container) {
-            if (state.l2a2_step === undefined) {
-                state.l2a2_step = 0;
-            }
-            if (state.l2a2_placed === undefined || state.l2a2_placed.length === 0) {
-                state.l2a2_placed = ["___", "___", '"Standard"', "False"];
-            }
-
-            const sc = robotScenarios[state.l2a2_scenario];
-            const currentPkg = sc.packages[state.l2a2_step];
-
-            // 1. Order Briefing Card
-            const challengeCard = document.createElement("div");
-            challengeCard.className = "challenge-card";
-            challengeCard.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                    <h4 style="margin:0;">ORDER FULFILLMENT</h4>
-                    <span style="font-size:0.75rem; font-weight:700; background:var(--primary-accent); color:white; padding:2px 8px; border-radius:10px;">Order ${state.l2a2_scenario + 1} of 3</span>
-                </div>
-                <p><strong>${sc.order}</strong></p>
-                <div style="font-family:var(--font-code); font-size:0.75rem; margin-top:0.5rem; color:var(--text-secondary);">
-                    Function Signature: <code>${sc.funcDef}</code>
-                </div>
-            `;
-            container.appendChild(challengeCard);
-
-            // 2. Robot SVG map layout (Centered & Spaced out dynamically)
-            const bayWrapper = document.createElement("div");
-            bayWrapper.className = "warehouse-bay";
-            bayWrapper.style.height = "200px";
-            bayWrapper.style.display = "flex";
-            bayWrapper.style.flexDirection = "column";
-            bayWrapper.style.justifyContent = "space-between";
-            bayWrapper.style.padding = "10px";
-            bayWrapper.style.position = "relative";
-            bayWrapper.style.background = "#cbd5e1";
-            bayWrapper.style.borderRadius = "var(--border-radius-lg)";
-            bayWrapper.style.border = "2px solid #94a3b8";
-
-            bayWrapper.innerHTML = `
-                <!-- 4 Parameter bays at the top -->
-                <div style="display: flex; justify-content: space-around; width: 100%; gap: 6px;">
-                    <div class="bay-zone" id="bay-0" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">recipient<br><strong id="bay-val-0">${state.l2a2_placed[0]}</strong></div>
-                    <div class="bay-zone" id="bay-1" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">weight<br><strong id="bay-val-1">${state.l2a2_placed[1]}</strong></div>
-                    <div class="bay-zone" id="bay-2" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">speed<br><strong id="bay-val-2">${state.l2a2_placed[2]}</strong></div>
-                    <div class="bay-zone" id="bay-3" style="position: relative; flex: 1; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; text-align: center; border: 2px solid #64748b; border-radius: 4px; background: white; padding: 4px;">fragile<br><strong id="bay-val-3">${state.l2a2_placed[3]}</strong></div>
-                </div>
-                
-                <!-- Robot starts at pickup bay at the bottom center -->
-                <div class="delivery-robot-svg" id="py-robot" style="position: absolute; bottom: 10px; left: calc(50% - 20px); transition: all 1s ease-in-out;">
-                    <svg viewBox="0 0 100 100" width="40" height="40">
-                        <circle cx="50" cy="50" r="40" fill="#e10600" />
-                        <circle cx="35" cy="45" r="8" fill="#fff" />
-                        <circle cx="65" cy="45" r="8" fill="#fff" />
-                        <rect x="40" y="65" width="20" height="6" fill="white" />
-                        <circle cx="50" cy="15" r="10" fill="#cbd5e1" />
-                    </svg>
-                </div>
-            `;
-            container.appendChild(bayWrapper);
-
-            // 3. Package details area
-            const pkgBox = document.createElement("div");
-            pkgBox.style.width = "100%";
-            pkgBox.style.background = "rgba(0,0,0,0.02)";
-            pkgBox.style.border = "1px solid var(--border-color)";
-            pkgBox.style.borderRadius = "8px";
-            pkgBox.style.padding = "0.75rem";
-            pkgBox.style.textAlign = "center";
-            pkgBox.style.marginTop = "0.75rem";
-
-            if (currentPkg) {
-                pkgBox.innerHTML = `
-                    <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-secondary);">Active Package to Route:</div>
-                    <div style="font-family:var(--font-code); font-size:1.1rem; font-weight:800; color:var(--primary-accent); margin-top:4px; padding:4px 12px; display:inline-block; border:2px solid var(--primary-accent); border-radius:6px; background:white; box-shadow:2px 2px 0 var(--border-color);">${currentPkg.name}</div>
-                `;
-            } else {
-                pkgBox.innerHTML = `
-                    <div style="color:var(--success-green); font-weight:700; font-size:0.9rem;">🎉 All packages routed! Click [Run Code] to fulfill shipment.</div>
-                `;
-            }
-            container.appendChild(pkgBox);
-
-            // 4. Selection choices buttons (Route selectors)
-            if (currentPkg) {
-                const choices = document.createElement("div");
-                choices.style.display = "flex";
-                choices.style.gap = "0.5rem";
-                choices.style.marginTop = "0.75rem";
-                choices.style.width = "100%";
-                choices.style.justifyContent = "center";
-
-                const routes = [
-                    { name: "Required", label: "Required / Positional" },
-                    { name: "Default", label: "Default / Omit" },
-                    { name: "Keyword", label: "Keyword" }
-                ];
-                routes.forEach(r => {
-                    const btn = document.createElement("button");
-                    btn.className = `btn btn-secondary ${state.l2a2_selection === r.name ? 'btn-primary' : ''}`;
-                    btn.style.fontSize = "0.75rem";
-                    btn.style.padding = "0.4rem 0.75rem";
-                    btn.textContent = r.label;
-                    btn.onclick = () => {
-                        if (state.isExecuting) return;
-                        state.l2a2_selection = r.name;
-                        loadActivity();
-                    };
-                    choices.appendChild(btn);
-                });
-                container.appendChild(choices);
-            }
-
-            updateL2A2CodeSync();
-        }
-
-        function updateL2A2CodeSync() {
-            const sc = robotScenarios[state.l2a2_scenario];
-            let codeArgs = [];
-            sc.packages.slice(0, state.l2a2_step).forEach(pkg => {
-                if (pkg.syncCode) codeArgs.push(pkg.syncCode);
-            });
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-                <div class="code-line"><span class="code-line-num">1</span><span class="code-keyword">def</span> ship(recipient, weight, speed="Standard", fragile=False):</div>
-                <div class="code-line"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;print(f"Shipping order: {recipient}, weight={weight}, speed={speed}, fragile={fragile}")</div>
-                <div class="code-line"><span class="code-line-num">3</span>ship(${codeArgs.join(", ")})</div>
-            `;
-        }
-
-        function runL2A2Execution() {
-            const sc = robotScenarios[state.l2a2_scenario];
-            const currentPkg = sc.packages[state.l2a2_step];
-
-            if (!currentPkg) {
-                state.isExecuting = true;
-                appendTerminal(">>> Shipping label generated successfully!");
-                updateInspector({
-                    recipient: sc.packages.find(p => p.label === 'recipient').val,
-                    weight: sc.packages.find(p => p.label === 'weight').val,
-                    speed: sc.packages.find(p => p.label === 'speed').val,
-                    fragile: sc.packages.find(p => p.label === 'fragile').val
-                });
-                setTimeout(() => {
-                    triggerAlert(`Order fulfilled successfully!`, "success");
-                    appendTerminal(`>>> Order completed and dispatched.`, true);
-                    state.isExecuting = false;
-
-                    if (state.l2a2_scenario < robotScenarios.length - 1) {
-                        state.l2a2_scenario++;
-                        state.l2a2_step = 0;
-                        state.l2a2_placed = ["___", "___", '"Standard"', "False"];
-                        loadActivity();
-                    } else {
-                        triggerAlert("All warehouse shipping orders completed!", "success");
-                    }
-                }, 1000);
-                return;
-            }
-
-            if (!state.l2a2_selection) {
-                triggerAlert("Select package delivery route class first!", "error");
-                return;
-            }
-
-            state.isExecuting = true;
-            appendTerminal(`>>> Programming robot path for: ${currentPkg.name}...`);
-
-            const robot = document.getElementById("py-robot");
-            const route = state.l2a2_selection;
-            const correctRoute = currentPkg.type;
-
-            const targetBay = document.getElementById("bay-" + currentPkg.slotIdx);
-            const targetX = targetBay.offsetLeft + (targetBay.offsetWidth - 40) / 2;
-            const targetY = targetBay.offsetTop + targetBay.offsetHeight;
-
-            robot.style.top = targetY + "px";
-            robot.style.left = targetX + "px";
-
-            setTimeout(() => {
-                if (route === correctRoute) {
-                    triggerAlert(`Robot routed correctly!`, "success");
-                    appendTerminal(`>>> Package ${currentPkg.name} successfully delivered to parameter '${currentPkg.label}'.`, true);
-                    
-                    state.l2a2_placed[currentPkg.slotIdx] = currentPkg.val;
-                    state.l2a2_step++;
-                    state.l2a2_selection = "";
-
-                    setTimeout(() => {
-                        robot.style.top = "";
-                        robot.style.bottom = "10px";
-                        robot.style.left = "calc(50% - 20px)";
-                        loadActivity();
-                    }, 1000);
-                } else {
-                    triggerAlert(`Delivery crash! Route mismatch.`, "error");
-                    let errMsg = `TypeError: ship() missing required positional argument: '${currentPkg.label}'`;
-                    if (route === "Keyword" && correctRoute === "Required") {
-                        errMsg = `SyntaxError: positional argument follows keyword argument`;
-                    }
-                    appendTerminal(`>>> Mismatch. Expected route: ${correctRoute}, Routed via: ${route}. ${errMsg}`, false);
-
-                    setTimeout(() => {
-                        robot.style.top = "";
-                        robot.style.bottom = "10px";
-                        robot.style.left = "calc(50% - 20px)";
-                        state.isExecuting = false;
-                    }, 1200);
-                }
-            }, 1000);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 3 ACTIVITY 1: Smart Function Designer
-        // -------------------------------------------------------------
-        const architectScenarios = [
-            {
-                title: "BMI Calculator",
-                desc: "Assemble a function compute_bmi(w, h) that returns body mass index (w / h^2).",
-                slots: ["def", "name", "param", "body", "return"],
-                chips: ["def", "compute_bmi", "(w, h):", "bmi = w / (h * h)", "return bmi", "return", "pass", "w", "h"],
-                targets: ["def", "compute_bmi", "(w, h):", "bmi = w / (h * h)", "return bmi"]
-            },
-            {
-                title: "Discount Calculator",
-                desc: "Assemble a function get_discount(price, rate=10) that returns discounted price.",
-                slots: ["def", "name", "param", "body", "return"],
-                chips: ["def", "get_discount", "(price, rate=10):", "val = price * (rate/100)", "return val", "return", "price", "rate"],
-                targets: ["def", "get_discount", "(price, rate=10):", "val = price * (rate/100)", "return val"]
-            }
-        ];
-
-        function loadL3A1(container) {
-            const sc = architectScenarios[state.l3a1_scenario];
-
-            // 1. Selector tabs
-            const selector = document.createElement("div");
-            selector.style.display = "flex";
-            selector.style.gap = "0.5rem";
-            selector.style.marginBottom = "1rem";
-
-            architectScenarios.forEach((s, idx) => {
-                selector.innerHTML += `
-          <button class="btn btn-ghost" style="padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="setL3A1Scenario(${idx})">${s.title}</button>
-        `;
-            });
-            container.appendChild(selector);
-
-            // 2. Prompt Card
-            const challengeCard = document.createElement("div");
-            challengeCard.className = "challenge-card";
-            challengeCard.innerHTML = `
-        <h4>DESIGN MISSION</h4>
-        <p>${sc.desc}</p>
-      `;
-            container.appendChild(challengeCard);
-
-            // 3. Indented layout slots
-            const editor = document.createElement("div");
-            editor.style.width = "100%";
-            editor.style.margin = "1rem 0";
-
-            const s0 = state.l3a1_slots[0] || "def";
-            const s1 = state.l3a1_slots[1] || "name";
-            const s2 = state.l3a1_slots[2] || "(params):";
-            const s3 = state.l3a1_slots[3] || "body_expression";
-            const s4 = state.l3a1_slots[4] || "return_expression";
-
-            editor.innerHTML = `
-        <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; text-align: left;">
-          <div style="display:flex; align-items:center; gap:0.5rem;">
-            <div class="slot ${state.l3a1_slots[0] ? 'filled' : ''}" data-slot-type="def" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
-            <div class="slot ${state.l3a1_slots[1] ? 'filled' : ''}" data-slot-type="name" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 100px; height: 28px;">${s1}</div>
-            <div class="slot ${state.l3a1_slots[2] ? 'filled' : ''}" data-slot-type="param" data-index="2" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s2}</div>
-          </div>
-          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
-            <div class="slot ${state.l3a1_slots[3] ? 'filled' : ''}" data-slot-type="body" data-index="3" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s3}</div>
-          </div>
-          <div style="padding-left: 24px; margin-top: 6px; display:flex; align-items:center; gap:0.5rem;">
-            <div class="slot ${state.l3a1_slots[4] ? 'filled' : ''}" data-slot-type="return" data-index="4" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 150px; height: 28px;">${s4}</div>
-          </div>
-        </div>
-      `;
-            container.appendChild(editor);
-
-            // 4. Chip bank
-            const bank = document.createElement("div");
-            bank.className = "chips-bank";
-            sc.chips.forEach((cVal, idx) => {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.draggable = true;
-                chip.textContent = cVal;
-                chip.id = `chip-l3a1-${idx}`;
-                chip.ondragstart = (e) => handleDragStart(e, cVal);
-                chip.ondragend = handleDragEnd;
-                chip.onclick = () => selectChipForPlacement(chip);
-                bank.appendChild(chip);
-            });
-            container.appendChild(bank);
-
-            updateL3A1CodeSync();
-        }
-
-        function setL3A1Scenario(idx) {
-            if (state.isExecuting) return;
-            state.l3a1_scenario = idx;
-            state.l3a1_slots = ["", "", "", "", ""];
-            loadActivity();
-        }
-
-        function updateL3A1CodeSync() {
-            const s0 = state.l3a1_slots[0] || "___";
-            const s1 = state.l3a1_slots[1] || "___";
-            const s2 = state.l3a1_slots[2] || "___";
-            const s3 = state.l3a1_slots[3] || "___";
-            const s4 = state.l3a1_slots[4] || "___";
-
-            const codePanel = document.getElementById("code-synced-panel");
-            codePanel.innerHTML = `
-        <div class="code-line"><span class="code-line-num">1</span><span class="code-keyword">${s0}</span> ${s1}${s2}</div>
-        <div class="code-line"><span class="code-line-num">2</span>&nbsp;&nbsp;&nbsp;&nbsp;${s3}</div>
-        <div class="code-line"><span class="code-line-num">3</span>&nbsp;&nbsp;&nbsp;&nbsp;${s4}</div>
-      `;
-        }
-
-        function runL3A1Execution() {
-            const sc = architectScenarios[state.l3a1_scenario];
-            let correct = true;
-            state.l3a1_slots.forEach((val, idx) => {
-                if (val !== sc.targets[idx]) correct = false;
-            });
-
-            if (!correct) {
-                triggerAlert("Function architecture incomplete or invalid!", "error");
-                appendTerminal(">>> LogicError: parameters / return mismatch.", false);
-                return;
-            }
-
-            state.isExecuting = true;
-            appendTerminal(">>> Verifying architectural computations...");
-
-            setTimeout(() => {
-                triggerAlert("Calculation validated successfully!", "success");
-                appendTerminal(">>> Success! Function computes and returns correct outputs.", true);
-                state.isExecuting = false;
-            }, 1000);
-        }
-
-        // -------------------------------------------------------------
-        // LEVEL 3 ACTIVITY 2: Function Escape Room
-        // -------------------------------------------------------------
-        function loadL3A2(container) {
-            // 1. Selector panels
-            const grid = document.createElement("div");
-            grid.className = "escape-panels-grid";
-
-            escapePanelsData.forEach((panel, idx) => {
-                const solved = state.escapePanelsSolved[idx];
-                grid.innerHTML += `
-          <div class="escape-panel-card ${solved ? 'solved' : ''} ${state.activeEscapePanel === idx ? 'active' : ''}" onclick="selectEscapePanel(${idx})">
-            <div class="escape-status-badge ${solved ? 'solved' : ''}">${solved ? 'Solved' : 'Room ' + (idx + 1)}</div>
-            <div style="font-weight:700; font-size:0.8rem; color:var(--text-secondary);">${panel.title}</div>
-          </div>
-        `;
-            });
-            container.appendChild(grid);
-
-            // 2. Active editor sandbox
-            const sandbox = document.createElement("div");
-            sandbox.className = "challenge-card";
-            sandbox.style.marginTop = "1rem";
-            sandbox.id = "escape-sandbox";
-            container.appendChild(sandbox);
-
-            loadEscapeRoomPanel();
-        }
-
-        function selectEscapePanel(idx) {
-            if (state.isExecuting) return;
-            state.activeEscapePanel = idx;
-            state.l3a2_slots = ["", ""];
-            loadL3A2(document.getElementById("sim-content-area"));
-        }
-
-        function loadEscapeRoomPanel() {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            const box = document.getElementById("escape-sandbox");
-
-            let inlineCodeHTML = '';
-            if (state.activeEscapePanel === 0) {
-                // Syntax Repair
-                const s0 = state.l3a2_slots[0] || "keyword";
-                const s1 = state.l3a2_slots[1] || "delimiter";
-                inlineCodeHTML = `
-          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1rem; border-radius: 8px; text-align: left; line-height: 1.8;">
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-              <div class="slot ${state.l3a2_slots[0] ? 'filled' : ''}" data-slot-type="def" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
-              multiply(a, b)
-              <div class="slot ${state.l3a2_slots[1] ? 'filled' : ''}" data-slot-type="colon" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 50px; height: 28px;">${s1}</div>
-            </div>
-            <div style="padding-left:24px;">return a * b</div>
-            <div style="margin-top:10px; color:#64748b;">val = multiply(3, 4)</div>
-          </div>
-        `;
-            } else if (state.activeEscapePanel === 1) {
-                // Required Arguments
-                const s0 = state.l3a2_slots[0] || "arg1";
-                const s1 = state.l3a2_slots[1] || "arg2";
-                inlineCodeHTML = `
-          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1rem; border-radius: 8px; text-align: left; line-height: 1.8;">
-            <div><span class="code-keyword">def</span> calculate_bill(price, tax):</div>
-            <div style="padding-left:24px;">return price + (price * tax / 100)</div>
-            <div style="margin-top:10px; display:flex; align-items:center; gap:0.25rem;">
-              total = calculate_bill(
-              <div class="slot ${state.l3a2_slots[0] ? 'filled' : ''}" data-slot-type="a1" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s0}</div>
-              ,
-              <div class="slot ${state.l3a2_slots[1] ? 'filled' : ''}" data-slot-type="a2" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 60px; height: 28px;">${s1}</div>
-              )
-            </div>
-          </div>
-        `;
-            } else if (state.activeEscapePanel === 2) {
-                // Return Value
-                const s0 = state.l3a2_slots[0] || "keyword";
-                const s1 = state.l3a2_slots[1] || "variable";
-                inlineCodeHTML = `
-          <div style="font-family: var(--font-code); font-size: 0.85rem; background: #0b0f19; color: #e2e8f0; padding: 1rem; border-radius: 8px; text-align: left; line-height: 1.8;">
-            <div><span class="code-keyword">def</span> get_score(correct, penalty):</div>
-            <div style="padding-left:24px;">score = (correct * 4) - penalty</div>
-            <div style="padding-left:24px; display:flex; align-items:center; gap:0.5rem; margin-top:4px;">
-              <div class="slot ${state.l3a2_slots[0] ? 'filled' : ''}" data-slot-type="ret" data-index="0" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s0}</div>
-              <div class="slot ${state.l3a2_slots[1] ? 'filled' : ''}" data-slot-type="var" data-index="1" ondragover="allowDrop(event)" ondragleave="dragLeaveSlot(event)" ondrop="handleDrop(event)" onclick="handleSlotClick(event)" style="min-width: 80px; height: 28px;">${s1}</div>
-            </div>
-            <div style="margin-top:10px; color:#64748b;">res = get_score(10, 2)</div>
-          </div>
-        `;
-            }
-
-            box.innerHTML = `
-        <div style="background:rgba(225, 6, 0, 0.02); padding:0.75rem; border-radius:6px; margin-bottom:1rem; border:1px solid rgba(225, 6, 0, 0.05);">
-          <strong style="font-size:0.8rem; text-transform:uppercase; color:var(--primary-accent);">Task description:</strong>
-          <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.25rem;">${panel.desc}</p>
-        </div>
-        
-        <div style="margin: 1rem 0;">
-          ${inlineCodeHTML}
-        </div>
-
-        <div class="chips-bank" id="escape-chips-bank"></div>
-      `;
-
-            // Load chips
-            const chipBank = document.getElementById("escape-chips-bank");
-            panel.chips.forEach((cVal, idx) => {
-                const chip = document.createElement("div");
-                chip.className = "chip";
-                chip.draggable = true;
-                chip.textContent = cVal;
-                chip.id = `chip-escape-${idx}`;
-                chip.ondragstart = (e) => handleDragStart(e, cVal);
-                chip.ondragend = handleDragEnd;
-                chip.onclick = () => selectChipForPlacement(chip);
-                chipBank.appendChild(chip);
-            });
-
-            updateL3A2CodeSync();
-        }
-
-        function updateL3A2CodeSync() {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            const slots = document.querySelectorAll(".slot");
-            let vals = new Array(panel.slots.length).fill("___");
-
-            if (slots.length > 0) {
-                slots.forEach(slot => {
-                    let text = slot.textContent.trim();
-                    const idx = parseInt(slot.getAttribute("data-index"));
-                    if (text.startsWith("Drop") || text === "keyword" || text === "delimiter" || text === "arg1" || text === "arg2" || text === "variable") {
-                        text = "___";
-                    }
-                    vals[idx] = text;
-                });
-            }
-
-            const codePanel = document.getElementById("code-synced-panel");
-            const rawLines = panel.code(vals).split("\n");
-            let html = "";
-            rawLines.forEach((line, idx) => {
-                html += `<div class="code-line" id="esc-line${idx + 1}"><span class="code-line-num">${idx + 1}</span><span class="code-line-text">${line}</span></div>`;
-            });
-            codePanel.innerHTML = html;
-        }
-
-        function runL3A2Execution() {
-            const panel = escapePanelsData[state.activeEscapePanel];
-            const slots = document.querySelectorAll(".slot");
-            let userVals = new Array(panel.slots.length);
-            let filledAll = true;
-
-            slots.forEach(slot => {
-                const text = slot.textContent.trim();
-                const idx = parseInt(slot.getAttribute("data-index"));
-                if (text.startsWith("Drop") || text === "keyword" || text === "delimiter" || text === "arg1" || text === "arg2" || text === "variable" || text === "___") {
-                    filledAll = false;
-                }
-                userVals[idx] = text;
-            });
-
-            if (!filledAll) {
-                triggerAlert("Fill in all missing slots inside the code block first!", "error");
-                return;
-            }
-
-            state.isExecuting = true;
-            let correct = true;
-            panel.targets.forEach((val, idx) => {
-                if (userVals[idx] !== val) correct = false;
-            });
-
-            appendTerminal(`Verifying panel ${state.activeEscapePanel + 1} validation loop...`);
-
-            setTimeout(() => {
-                if (correct) {
-                    state.escapePanelsSolved[state.activeEscapePanel] = true;
-                    appendTerminal(`Panel ${state.activeEscapePanel + 1} successfully repaired!`, true);
-                    triggerAlert(`Panel ${state.activeEscapePanel + 1} solved successfully!`, "success");
-
-                    // Check if all solved
-                    const allSolved = state.escapePanelsSolved.every(r => r === true);
-                    if (allSolved) {
-                        appendTerminal(">>> Success! All escape terminal panels repaired. Room unlocked.", true);
-                        triggerAlert("Escape Complete! Room Solved.", "success");
-                    }
-
-                    state.isExecuting = false;
-                    loadL3A2(document.getElementById("sim-content-area"));
-                } else {
-                    appendTerminal("Verification Failed! Incorrect replacement tokens.", false);
-                    triggerAlert("Verification failed! Output mismatches target parameters.", "error");
-                    state.isExecuting = false;
-                }
-            }, 1000);
-        }
-
-        // MAIN RUN DISPATCHER
-        function runExecution() {
-            if (state.isExecuting) return;
-
-            if (state.level === 1 && state.activity === 1) {
-                runL1A1Execution();
-            } else if (state.level === 1 && state.activity === 2) {
-                runL1A2Execution();
-            } else if (state.level === 2 && state.activity === 1) {
-                runL2A1Execution();
-            } else if (state.level === 2 && state.activity === 2) {
-                runL2A2Execution();
-            } else if (state.level === 3 && state.activity === 1) {
-                runL3A1Execution();
-            } else if (state.level === 3 && state.activity === 2) {
-                runL3A2Execution();
-            }
-        }
-
-        function replaySimulation() {
-            if (state.isExecuting) return;
-            loadActivity();
-        }
-
-        // Start application
-        window.onload = () => {
-            switchLevel(1);
-        };
     </script>
 </body>
 
