@@ -4,529 +4,589 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Building a High-Performance Interactive Dictionary - Case Study</title>
-  <meta name="description" content="An academic case study investigating hash maps, search algorithms, and dictionary structures in Python.">
-  
-  <!-- Premium Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <title>Data Structures: Amazon Inventory Case Study</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* DESIGN SYSTEM: RED & WHITE PREMIUM ACCENTS (MATCHING HOMEPAGE) */
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+
     :root {
-      --primary: #c1121f;
-      --primary-hover: #780000;
-      --primary-light: #fdf0f0;
-      --secondary: #ffffff;
-      --bg-light: #f8f9fa;
-      --text-dark: #1d1d1f;
-      --text-muted: #6e6e73;
-      --border-light: #e5e7eb;
-      --border-focus: #c1121f;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 20px;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.06);
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      font-family: var(--font-sans);
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+      --bg-canvas: #f8f7f4;
+      --tech-blue: #2c5282;
+      --alert-orange: #c05621;
+      --text-main: #1a202c;
     }
 
     body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      font-family: 'IBM+Plex+Sans', sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      line-height: 1.6;
     }
 
-    /* Header & Navigation */
-    header {
-      background-color: var(--secondary);
-      border-bottom: 1px solid var(--border-light);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-      background-color: rgba(255, 255, 255, 0.95);
+    .serif {
+      font-family: 'IBM+Plex+Serif', serif;
     }
 
-    .navbar {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1.25rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 1.35rem;
-      color: var(--text-dark);
-      letter-spacing: -0.5px;
+    .technical-image-container {
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-top: 2rem;
     }
 
-    .nav-brand span {
-      color: var(--primary);
+    /* Python Syntax Highlighting */
+    .kw {
+      color: #c05621;
+      font-weight: bold;
     }
 
-    .nav-brand svg {
-      color: var(--primary);
-      fill: currentColor;
+    .str {
+      color: #2c5282;
     }
 
-    .nav-menu {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-      margin-left: auto;
-      margin-right: 1.5rem;
-    }
-
-    .nav-item {
-      text-decoration: none;
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.95rem;
-      transition: var(--transition);
-      padding: 0.25rem 0;
-      border-bottom: 2px solid transparent;
-    }
-
-    .nav-item:hover {
-      color: var(--primary);
-    }
-
-    .nav-item.active {
-      color: var(--primary);
-      font-weight: 600;
-      border-bottom-color: var(--primary);
-    }
-
-    .header-tag {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 0.25rem 0.75rem;
-      border-radius: 100px;
-      background-color: var(--primary-light);
-    }
-
-    /* Breadcrumbs */
-    .breadcrumbs-container {
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 1.5rem 2rem 0 2rem;
-    }
-
-    .breadcrumbs {
-      display: flex;
-      flex-wrap: wrap;
-      list-style: none;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .breadcrumbs li:not(:last-child)::after {
-      content: "/";
-      margin-left: 0.5rem;
-      color: var(--border-light);
-      font-weight: 500;
-    }
-
-    .breadcrumbs a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-
-    .breadcrumbs a:hover {
-      color: var(--primary);
-    }
-
-    .breadcrumbs li.active {
-      color: var(--text-dark);
-      font-weight: 600;
-    }
-
-    /* Back Button */
-    .back-btn-container {
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 1rem 2rem 0 2rem;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-dark);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      transition: var(--transition);
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      background-color: var(--secondary);
-      border: 1px solid var(--border-light);
-      cursor: pointer;
-    }
-
-    .back-btn:hover {
-      color: var(--primary);
-      border-color: var(--primary);
-      transform: translateX(-4px);
-    }
-
-    /* Case Study Layout */
-    .case-container {
-      max-width: 900px;
-      margin: 2rem auto 4rem auto;
-      padding: 0 2rem;
-      width: 100%;
-    }
-
-    .case-header {
-      background-color: var(--secondary);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      padding: 3rem;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 2rem;
-    }
-
-    .case-badge {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      background-color: var(--primary-light);
-      color: var(--primary);
-      padding: 0.35rem 0.85rem;
-      border-radius: 100px;
-      letter-spacing: 0.5px;
-      display: inline-block;
-      margin-bottom: 1.5rem;
-    }
-
-    .case-header h1 {
-      font-size: 2.25rem;
-      font-weight: 800;
-      letter-spacing: -0.75px;
-      line-height: 1.25;
-      color: var(--text-dark);
-      margin-bottom: 1rem;
-    }
-
-    .case-meta-bar {
-      display: flex;
-      gap: 2rem;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border-light);
-      padding-top: 1.5rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    /* Reading Content Panels */
-    .case-content {
-      background-color: var(--secondary);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      padding: 3rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .case-section {
-      margin-bottom: 2.5rem;
-    }
-
-    .case-section:last-child {
-      margin-bottom: 0;
-    }
-
-    .case-section h2 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      border-left: 4px solid var(--primary);
-      padding-left: 1rem;
-      margin-bottom: 1.25rem;
-      letter-spacing: -0.25px;
-    }
-
-    .case-section p {
-      color: #333336;
-      margin-bottom: 1rem;
-      font-size: 1.05rem;
-      line-height: 1.7;
-    }
-
-    .case-section p:last-child {
-      margin-bottom: 0;
-    }
-
-    /* Highlight Box */
-    .highlight-box {
-      background-color: var(--bg-light);
-      border-left: 4px solid var(--text-dark);
-      padding: 1.5rem;
-      border-radius: 0 var(--radius-md) var(--radius-md) 0;
-      margin: 1.5rem 0;
-    }
-
-    .highlight-box p {
+    .cmt {
+      color: #718096;
       font-style: italic;
-      font-size: 1rem;
-      color: var(--text-muted);
     }
 
-    /* Discussion block */
-    .discussion-list {
-      list-style-type: none;
-      padding-left: 0;
+    /* Array animation styles */
+    .array-container {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 10px;
     }
 
-    .discussion-list li {
-      position: relative;
-      padding-left: 2rem;
-      margin-bottom: 1rem;
-      font-size: 1.05rem;
-    }
-
-    .discussion-list li::before {
-      content: "?";
-      position: absolute;
-      left: 0;
-      top: 0.15rem;
-      width: 1.25rem;
-      height: 1.25rem;
-      border-radius: 50%;
-      background-color: var(--primary-light);
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 0.8rem;
+    .array-box {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #2c5282;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #ebf8ff;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: all 0.3s ease;
     }
 
-    /* Footer styling */
-    footer {
-      background-color: var(--secondary);
-      border-top: 1px solid var(--border-light);
-      padding: 2.5rem 2rem;
-      margin-top: auto;
+    .array-box.highlight {
+      background: #fbd38d;
+      border-color: #c05621;
+      transform: scale(1.1);
     }
 
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      font-size: 0.9rem;
-      color: var(--text-muted);
+    .array-box.inserted {
+      animation: popIn 0.5s ease forwards;
+      background: #c6f6d5;
+      border-color: #38a169;
     }
 
-    .footer-brand {
-      font-weight: 700;
-      color: var(--text-dark);
+    .array-box.deleted {
+      animation: fadeOut 0.5s ease forwards;
     }
 
-    .footer-brand span {
-      color: var(--primary);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-
-    .footer-links a:hover {
-      color: var(--primary);
-    }
-
-    @media (max-width: 768px) {
-      .navbar {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+    @keyframes popIn {
+      0% {
+        transform: scale(0);
+        opacity: 0;
       }
-      .nav-menu {
+
+      80% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        transform: scale(0);
+        opacity: 0;
+        width: 0;
         margin: 0;
-        width: 100%;
-        justify-content: center;
+        padding: 0;
+        border: none;
       }
-      .case-header, .case-content {
-        padding: 1.5rem;
+    }
+
+    /* Dictionary animation styles */
+    .dict-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .dict-row {
+      display: contents;
+    }
+
+    .dict-key {
+      background: #e2e8f0;
+      padding: 8px;
+      border-radius: 4px 0 0 4px;
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .dict-val {
+      background: #ebf8ff;
+      padding: 8px;
+      border-radius: 0 4px 4px 0;
+      transition: all 0.3s ease;
+    }
+
+    .dict-val.updated {
+      background: #fefcbf;
+      color: #b7791f;
+      font-weight: bold;
+    }
+
+    /* Print Media Query: Ensures proper layout, visibility, and page breaks on print/PDF export */
+    @media print {
+
+      /* Reset body/html defaults for clean printing */
+      html,
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-      .case-header h1 {
-        font-size: 1.75rem;
+
+      /* Keep overflow visible to prevent multi-page cropping/clipping */
+      html,
+      body,
+      main,
+      section,
+      div,
+      pre,
+      code,
+      table,
+      tr,
+      td,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        position: static !important;
       }
-      .breadcrumbs-container,
-      .back-btn-container,
-      .case-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
+
+      /* Ensure structural blocks break elegantly across pages */
+      pre,
+      blockquote,
+      table,
+      tr,
+      img,
+      canvas,
+      .technical-image-container,
+      .chart-container {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      /* Avoid orphaned headers at the bottom of a page */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      /* Hide interactive/non-printable UI elements */
+      nav,
+      footer,
+      button,
+      .no-print,
+      [class*="sticky"],
+      [class*="fixed"] {
+        display: none !important;
       }
     }
   </style>
 </head>
 
-<body class="fade-in">
+<body class="antialiased">
 
-  <!-- Header -->
-  <header>
-    <nav class="navbar" aria-label="Main Navigation">
-      <a href="../../../../index.html" class="nav-brand" id="nav-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m4 6 8-4 8 4-8 4-8-4z"></path>
-          <path d="M4 10v6c0 1.5 4 3 8 3s8-1.5 8-3v-6"></path>
-          <path d="M12 10v9"></path>
-        </svg>
-        <span>Simulation</span>Hub
-      </a>
-      <div class="nav-menu" id="main-nav-menu">
-        <a href="../../../../index.html" class="nav-item">Simulations</a>
-        <a href="../../../index.html" class="nav-item active">Case Studies</a>
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 px-8 py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 bg-black flex items-center justify-center text-white font-bold rounded">DS</div>
+        <span class="font-bold tracking-tighter uppercase">Engineering Dossier</span>
       </div>
-      <div class="header-tag"
-        style="font-size: 0.85rem; font-weight: 600; color: var(--primary); border: 1px solid var(--primary); padding: 0.25rem 0.75rem; border-radius: 100px; background-color: var(--primary-light);">
-        Academic Portal
-      </div>
-    </nav>
-  </header>
-
-  <!-- Breadcrumbs & Back Button -->
-  <div class="breadcrumbs-container">
-    <ol class="breadcrumbs" aria-label="Breadcrumb">
-      <li><a href="../../../../index.html">Home</a></li>
-      <li><a href="../../../index.html">Case Studies</a></li>
-      <li><a href="../../index.html">Python Programming</a></li>
-      <li class="active">Data Structures</li>
-    </ol>
-  </div>
-
-  <div class="back-btn-container">
-    <a href="../../index.html" class="back-btn" id="btn-back">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Back to subject module list
-    </a>
-  </div>
-
-  <!-- Case Study Container -->
-  <div class="case-container">
-    <article class="case-header">
-      <span class="case-badge">Module 1 Case Study</span>
-      <h1>Building a High-Performance Interactive Dictionary</h1>
-      
-      <div class="case-meta-bar">
-        <div class="meta-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          <span>Reading Time: 8 mins</span>
-        </div>
-        <div class="meta-item">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          <span>Level: Intermediate</span>
-        </div>
-      </div>
-    </article>
-
-    <main class="case-content">
-      <section class="case-section">
-        <h2>Executive Summary</h2>
-        <p>This case study analyses the computational complexity and dictionary lookup optimizations required to parse JSON data sets in real time. We explore collision-handling strategies in hash maps and Python's native dictionary implementation.</p>
-      </section>
-
-      <section class="case-section">
-        <h2>The Challenge</h2>
-        <p>A web analytics platform, <em>LogScale</em>, searches raw log data structured in large dictionaries (over 10,000,000 key-value pairs). During high traffic events, search queries spiked in latency. The team discovered that their algorithm was performing linear sweeps (`O(n)`) on values because the search logic was not fully utilizing hash-based key structures.</p>
-        
-        <div class="highlight-box">
-          <p>"Using the correct data structures and search parameters reduces search time from minutes to milliseconds."</p>
-        </div>
-      </section>
-
-      <section class="case-section">
-        <h2>Optimized Algorithm</h2>
-        <p>The system was refactored to use standard hash map structures (`dict`) and key indexes:</p>
-        <p><strong>1. Key-Value Mapping:</strong> Map search terms directly as dictionary keys rather than elements in nested lists, ensuring `O(1)` average lookup time.</p>
-        <p><strong>2. Memory Footprint:</strong> Leveraging Python's native implementation of compact dictionaries to minimize memory usage and avoid cache misses.</p>
-        <p><strong>3. Handling Missing Items:</strong> Replacing classic validation patterns (`if key in dict:`) with `dict.get(key, default)` or `collections.defaultdict` to eliminate double hash evaluations.</p>
-      </section>
-
-      <section class="case-section">
-        <h2>Discussion & Review Questions</h2>
-        <ul class="discussion-list">
-          <li>What is the average time complexity of a dictionary key lookup in Python under heavy loads?</li>
-          <li>Why does referencing dynamic lists as dictionary keys raise a `TypeError: unhashable type` in Python?</li>
-          <li>Explain the difference in performance between open addressing and chaining collision resolutions.</li>
-        </ul>
-      </section>
-    </main>
-  </div>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-content">
-      <div class="footer-brand" id="footer-logo">
-        <span>Simulation</span>Hub
-      </div>
-      <div>
-        &copy; 2026 Simulation Hub. All rights reserved. Built for engineering educators and students.
-      </div>
-      <div class="footer-links">
-        <a href="../../../../index.html">Home</a>
-        <a href="../../../../simulations/ui-programming/index.html">UI</a>
-        <a href="../../../../simulations/python-programming/index.html">Python</a>
-        <a href="../../../../simulations/digital-business-transformation/index.html">Digital Business</a>
+      <div class="hidden md:flex space-x-8 text-xs font-bold uppercase tracking-widest text-gray-500">
+        <a href="#theory" class="hover:text-black transition">Foundations</a>
+        <a href="#case1" class="hover:text-black transition">Case I: Dictionaries</a>
+        <a href="#case2" class="hover:text-black transition">Case II: Lists/Sets</a>
+        <a href="#case3" class="hover:text-black transition">Case III: Tuples</a>
+        <a href="#lab" class="text-orange-700">Interactive Lab</a>
       </div>
     </div>
-  </footer>
+  </nav>
 
+  <header class="max-w-4xl mx-auto py-24 px-6 text-center">
+    <h1 class="serif text-5xl md:text-7xl font-bold mb-8 leading-tight">Data Structures in High-Scale Commerce</h1>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      An engineering report on Lists, Tuples, Dictionaries, Sets, Arrays, and Conversions, mapped to a simulated
+      Amazon E-commerce architecture.
+    </p>
+    <div class="mt-8 flex justify-center space-x-4">
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ref: Module
+        1-1.4</span>
+      <span class="px-4 py-1 border border-gray-300 rounded-full text-xs font-mono uppercase">Ver: 2024.Q4</span>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 pb-32 space-y-40">
+
+    <section id="theory" class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div class="space-y-6">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">01. Theoretical Foundations</h2>
+        <h3 class="serif text-4xl leading-snug">The Right Tool for the Operation</h3>
+        <p>
+          Data structures dictate how data is organized in memory. In an e-commerce platform processing
+          thousands of operations per second, choosing a List when a Set is needed can degrade O(1) time
+          complexity to O(n), causing systemic latency.
+        </p>
+        <ul class="space-y-2 text-sm text-gray-700 mt-4 list-disc pl-5">
+          <li><strong>Lists (Dynamic Arrays):</strong> Ordered, mutable sequences. Ideal for ordered timelines
+            (e.g., order history).</li>
+          <li><strong>Dictionaries (Hash Maps):</strong> Key-value pairs. O(1) lookup. Crucial for
+            SKU-to-Product mapping.</li>
+          <li><strong>Sets (Hash Sets):</strong> Unordered, unique elements. Perfect for rapid membership
+            testing (e.g., is a coupon code valid?).</li>
+          <li><strong>Tuples:</strong> Ordered, immutable. Safe carriers for unchangeable data (e.g., GPS
+            coordinates of a fulfillment center).</li>
+        </ul>
+        <div class="bg-gray-100 p-6 rounded-lg border-l-4 border-gray-800">
+          <p class="text-sm font-bold uppercase mb-2">Core Maxim:</p>
+          <p class="italic text-gray-700">"Bad programmers worry about the code. Good programmers worry about
+            data structures and their relationships." — Linus Torvalds</p>
+        </div>
+      </div>
+      <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest mb-4 text-slate-400">Time Complexity Context
+        </h4>
+        <table class="w-full text-left text-sm font-mono">
+          <thead>
+            <tr class="border-b border-slate-700 text-slate-400">
+              <th class="py-2">Operation</th>
+              <th>List</th>
+              <th>Dictionary</th>
+              <th>Set</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-slate-800">
+              <td class="py-2 text-blue-300">Access</td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+              <td>N/A</td>
+            </tr>
+            <tr class="border-b border-slate-800">
+              <td class="py-2 text-orange-300">Search</td>
+              <td>O(n)</td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+            </tr>
+            <tr>
+              <td class="py-2 text-green-300">Insertion</td>
+              <td>O(1) (append)</td>
+              <td>O(1)</td>
+              <td>O(1)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="case1" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-orange-700">02. Dictionaries (Hash Maps)
+        </h2>
+        <h3 class="serif text-4xl mb-6">Inventory Catalog Indexing</h3>
+        <p class="mb-4">
+          When a user searches for a product using an ASIN (Amazon Standard Identification Number), the system
+          cannot afford to scan a list of millions of items. It uses a <strong>Dictionary</strong>
+          (implemented as a Hash Map in Python).
+        </p>
+        <p>
+          The ASIN is hashed, pointing directly to the memory address of the product details, achieving
+          near-instantaneous O(1) lookup time.
+        </p>
+      </div>
+
+      <div class="technical-image-container">
+        <h4 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-gray-500">Visual Layout 2.1:
+          Dictionary Insertion & Lookup</h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="font-mono text-sm bg-slate-900 p-4 rounded text-gray-300 shadow-inner">
+            <span class="cmt"># Product Catalog Dictionary</span><br>
+            inventory = {<br>
+            &nbsp;&nbsp;<span class="str">'B08N5WRWNW'</span>: {<span class="str">'name'</span>: <span
+              class="str">'MacBook'</span>, <span class="str">'stock'</span>: 14},<br>
+            &nbsp;&nbsp;<span class="str">'B09G9FPHY6'</span>: {<span class="str">'name'</span>: <span
+              class="str">'iPhone'</span>, <span class="str">'stock'</span>: 0}<br>
+            }<br><br>
+            <span class="cmt"># O(1) Lookup</span><br>
+            item = inventory[<span class="str">'B08N5WRWNW'</span>]<br>
+          </div>
+
+          <div>
+            <div class="dict-container text-sm font-mono" id="demoDict">
+              <div class="dict-row">
+                <div class="dict-key">hash('B08N...')</div>
+                <div class="dict-val">{'name': 'MacBook', 'stock': 14}</div>
+              </div>
+              <div class="dict-row">
+                <div class="dict-key">hash('B09G...')</div>
+                <div class="dict-val">{'name': 'iPhone', 'stock': 0}</div>
+              </div>
+            </div>
+            <div class="mt-4 flex gap-2">
+              <button onclick="updateDictStock()" class="px-3 py-1 bg-orange-600 text-white rounded text-xs">Simulate
+                Purchase (Update
+                Stock)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="case2" class="space-y-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div class="space-y-6">
+          <h2 class="text-sm font-black uppercase tracking-[0.3em] text-blue-700">03. Lists and Sets</h2>
+          <h3 class="serif text-4xl">Carts & Coupon Validation</h3>
+          <p>
+            <strong>Lists:</strong> A user's shopping cart is an ordered collection. Items are added
+            sequentially, and the order often matters for display. Lists allow duplicate items (e.g., adding
+            the same book twice creates two identical dictionary references in the list).
+          </p>
+          <p>
+            <strong>Sets:</strong> When a user applies a promo code (e.g., "SUMMER24"), the system checks it
+            against active promo codes. Using a list for this takes O(n) time. Converting the active codes
+            to a <strong>Set</strong> allows for O(1) membership testing using hash tables, drastically
+            speeding up checkout validation.
+          </p>
+        </div>
+
+        <div class="technical-image-container bg-slate-900 border-slate-700 text-white">
+          <h4 class="text-[10px] font-bold uppercase tracking-widest mb-6 text-slate-400">Visual Layout 3.1:
+            Set Membership vs List Search</h4>
+
+          <div class="space-y-4 font-mono text-sm">
+            <div class="p-3 bg-slate-800 rounded border border-red-500/30">
+              <span class="text-xs text-red-400 block mb-1">List Search O(n) (Scans every element)</span>
+              <span class="text-gray-400">active_promos_list = ['WINTER', 'FALL', 'SUMMER24']</span><br>
+              <span class="kw">if</span> <span class="str">'SUMMER24'</span> <span class="kw">in</span>
+              active_promos_list: ...
+            </div>
+
+            <div class="p-3 bg-slate-800 rounded border border-green-500/30">
+              <span class="text-xs text-green-400 block mb-1">Data Structure Conversion: List to
+                Set</span>
+              <span class="text-gray-300">active_promos_set = <span class="kw">set</span>(active_promos_list)</span>
+            </div>
+
+            <div class="p-3 bg-slate-800 rounded border border-green-500/30">
+              <span class="text-xs text-green-400 block mb-1">Set Lookup O(1) (Direct Hash map)</span>
+              <span class="text-gray-400">active_promos_set = {'WINTER', 'FALL', 'SUMMER24'}</span><br>
+              <span class="kw">if</span> <span class="str">'SUMMER24'</span> <span class="kw">in</span>
+              active_promos_set: ...
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="case3" class="space-y-12">
+      <div class="max-w-3xl">
+        <h2 class="text-sm font-black uppercase tracking-[0.3em] text-green-700">04. Tuples & Immutability</h2>
+        <h3 class="serif text-4xl mb-6">Securing Transit Coordinates</h3>
+        <p class="mb-4">
+          In logistics routing, a delivery truck's destination coordinates (Latitude, Longitude) must be
+          transmitted to the navigation microservice. If a List is used, a rogue script or bug could
+          accidentally modify the coordinates in transit.
+        </p>
+        <p>
+          By packing the coordinates into a <strong>Tuple</strong>, the data structure becomes immutable. It
+          cannot be altered after creation, providing structural safety for critical data. Tuples are also
+          slightly more memory-efficient than lists.
+        </p>
+      </div>
+
+      <div class="technical-image-container">
+        <div class="font-mono text-sm bg-slate-900 p-4 rounded text-gray-300 shadow-inner max-w-2xl mx-auto">
+          <span class="cmt"># Creating an immutable geographic coordinate</span><br>
+          destination = (<span class="kw">40.7128</span>, <span class="kw">-74.0060</span>)<br><br>
+
+          <span class="cmt"># Attempting to mutate a tuple raises an exception</span><br>
+          <span class="kw">try</span>:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;destination[<span class="kw">0</span>] = <span class="kw">41.0000</span><br>
+          <span class="kw">except</span> <span class="text-red-400">TypeError</span> <span class="kw">as</span> e:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;print(<span class="str">"'tuple' object does not support item
+            assignment"</span>)
+        </div>
+      </div>
+    </section>
+
+    <section id="lab" class="bg-black text-white p-12 rounded-3xl">
+      <h3 class="serif text-4xl mb-8 text-center">Interactive Engineering Lab</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+        <div class="space-y-4">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-blue-500">Array/List Manipulator (Cart)
+          </h4>
+          <p class="text-sm text-gray-400 italic">Simulating O(1) appends and O(n) search in an ordered list
+            structure.</p>
+          <div class="bg-white/5 p-6 rounded-xl space-y-4">
+            <div class="array-container bg-white/10 rounded h-20" id="arrayDemo">
+              <div class="array-box text-black">A</div>
+              <div class="array-box text-black">B</div>
+              <div class="array-box text-black">C</div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="arrayInsert()"
+                class="flex-1 py-2 bg-green-700 hover:bg-green-600 rounded text-xs font-bold transition">Append
+                Item O(1)</button>
+              <button onclick="arraySearch()"
+                class="flex-1 py-2 bg-blue-700 hover:bg-blue-600 rounded text-xs font-bold transition">Linear
+                Search O(n)</button>
+              <button onclick="arrayDelete()"
+                class="flex-1 py-2 bg-red-700 hover:bg-red-600 rounded text-xs font-bold transition">Pop
+                Item O(1)</button>
+            </div>
+            <p id="arrayLog" class="font-mono text-xs text-blue-300 h-4">Ready.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h4 class="text-xs font-bold uppercase tracking-widest text-orange-500">Data Type Converter</h4>
+          <p class="text-sm text-gray-400 italic">Converting data structures for optimal use cases.</p>
+          <div class="bg-white/5 p-6 rounded-xl space-y-4 font-mono text-sm">
+
+            <div class="flex justify-between items-center text-gray-300 bg-black/50 p-2 rounded">
+              <span>['A', 'B', 'A'] (List)</span>
+              <button onclick="convertListToSet()"
+                class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs">→</button>
+              <span id="convertSetOut" class="text-green-400 w-24 text-right">set()</span>
+            </div>
+            <div class="text-[10px] text-gray-500 mb-4">^ Eliminates duplicates, creates hash table.</div>
+
+            <div class="flex justify-between items-center text-gray-300 bg-black/50 p-2 rounded">
+              <span>[('id', 1), ('qty', 5)]</span>
+              <button onclick="convertListToDict()"
+                class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs">→</button>
+              <span id="convertDictOut" class="text-orange-400 w-24 text-right">dict()</span>
+            </div>
+            <div class="text-[10px] text-gray-500">^ Converts list of tuples to key-value map.</div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Dictionary Interactive Script
+    function updateDictStock() {
+      const valBox = document.querySelectorAll('.dict-val')[0];
+      valBox.innerHTML = "{'name': 'MacBook', 'stock': 13}";
+      valBox.classList.add('updated');
+      setTimeout(() => { valBox.classList.remove('updated'); }, 1000);
+    }
+
+    // Array Interactive Scripts
+    let arrayItems = ['A', 'B', 'C'];
+
+    function renderArray() {
+      const container = document.getElementById('arrayDemo');
+      container.innerHTML = '';
+      arrayItems.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'array-box text-black';
+        div.innerText = item;
+        div.id = `arr-${index}`;
+        container.appendChild(div);
+      });
+    }
+
+    function arrayInsert() {
+      const newItem = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random letter
+      arrayItems.push(newItem);
+      renderArray();
+      const el = document.getElementById(`arr-${arrayItems.length - 1}`);
+      el.classList.add('inserted');
+      document.getElementById('arrayLog').innerText = `Appended ${newItem} to end. Time: O(1)`;
+    }
+
+    function arrayDelete() {
+      if (arrayItems.length === 0) return;
+      const el = document.getElementById(`arr-${arrayItems.length - 1}`);
+      el.classList.add('deleted');
+
+      document.getElementById('arrayLog').innerText = `Popped item from end. Time: O(1)`;
+
+      setTimeout(() => {
+        arrayItems.pop();
+        renderArray();
+      }, 500);
+    }
+
+    function arraySearch() {
+      if (arrayItems.length === 0) return;
+      let i = 0;
+      const targetIndex = arrayItems.length - 1; // Worst case search
+
+      document.getElementById('arrayLog').innerText = `Searching... Time: O(n)`;
+
+      // Clear old highlights
+      document.querySelectorAll('.array-box').forEach(b => b.classList.remove('highlight'));
+
+      function step() {
+        if (i > 0) { document.getElementById(`arr-${i - 1}`).classList.remove('highlight'); }
+        if (i <= targetIndex) {
+          document.getElementById(`arr-${i}`).classList.add('highlight');
+          i++;
+          setTimeout(step, 300);
+        } else {
+          document.getElementById('arrayLog').innerText = `Found at index ${targetIndex}.`;
+          setTimeout(() => { document.getElementById(`arr-${targetIndex}`).classList.remove('highlight'); }, 1000);
+        }
+      }
+      step();
+    }
+
+    // Conversions
+    function convertListToSet() {
+      document.getElementById('convertSetOut').innerText = "{'A', 'B'}";
+    }
+    function convertListToDict() {
+      document.getElementById('convertDictOut').innerText = "{'id':1, 'qty':5}";
+    }
+
+  </script>
 </body>
 
 </html>
