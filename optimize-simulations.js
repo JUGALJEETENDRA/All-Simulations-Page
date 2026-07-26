@@ -15,6 +15,14 @@ const MOBILE_RESPONSIVE_STYLE = `
 /* ========================================================
    UNIVERSAL MOBILE RESPONSIVE OVERRIDES (AUTOMATICALLY INJECTED)
    ======================================================== */
+/* Hide mobile-specific drawers and elements by default on desktop viewports */
+.mobile-drawer-toggle,
+.sidebar-close-btn,
+.learning-close-btn,
+.sb-mobile-overlay {
+  display: none !important;
+}
+
 @media (max-width: 1024px) {
   /* Scroll & body structure adjustments to prevent layout lockouts and browser bar jitters */
   html, body {
@@ -83,6 +91,7 @@ const MOBILE_RESPONSIVE_STYLE = `
 
   /* Backdrop Overlay for opened drawers */
   .sb-mobile-overlay {
+    display: block !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -132,6 +141,12 @@ const MOBILE_RESPONSIVE_STYLE = `
   
   #toggle-mobile-learning {
     right: 20px !important;
+  }
+
+  /* Close buttons inside drawers */
+  .sidebar-close-btn,
+  .learning-close-btn {
+    display: flex !important;
   }
 
   /* Automatically collapse all multi-column grid layouts (stylesheets and inline styles) */
@@ -455,6 +470,32 @@ body.compact-viewport #toggle-mobile-learning {
   right: 20px !important;
 }
 
+body.compact-viewport .sidebar-close-btn,
+body.compact-viewport .learning-close-btn {
+  display: flex !important;
+}
+
+body.compact-viewport .sb-mobile-overlay {
+  display: block !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(18, 18, 18, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 9990 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 0.3s ease, visibility 0.3s !important;
+}
+
+body.compact-viewport .sb-mobile-overlay.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 body.compact-viewport .detective-container,
 body.compact-viewport .repair-layout-grid,
 body.compact-viewport .builder-layout,
@@ -553,6 +594,7 @@ body.compact-viewport .hint-popover {
   right: 16px !important;
   left: 16px !important;
   top: 70px !important;
+  z-index: 1000 !important;
 }
 
 body.compact-viewport .inspect-modal-card {
@@ -949,7 +991,7 @@ function optimizeFile(filePath) {
   content = content.replace(/onmousedown=(["'])/gi, 'onpointerdown=$1');
 
   fs.writeFileSync(filePath, content, 'utf8');
-  console.log(`Optimized: ${path.relative(__dirname, filePath)}`);
+  console.log('Optimized:', path.relative(__dirname, filePath));
 }
 
 console.log('Starting optimization of simulations...');
