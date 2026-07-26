@@ -1,84 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+const fs = require('fs');
+const path = require('path');
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    
-    <title>2.4 Dot-Com Failures Arcade</title>
-    <style>
-        :root {
-            --red: #d32f2f;
-            --dark: #b71c1c;
-            --light: #ffcdd2;
-            --bg: #f8f8f8;
-            --white: #fff;
-        }
+const SIM_DIR = path.join(__dirname, 'simulations');
 
-        body {
-            font-family: Arial, sans-serif;
-            background: var(--bg);
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+// Viewport tag to ensure correct scaling on mobile devices
+const MOBILE_VIEWPORT = '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">';
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-        }
+// Bernardo Castilho's DragDropTouch Polyfill to map touch events to HTML5 drag-and-drop
+const POLYFILL_SCRIPT = '<script src="https://cdn.jsdelivr.net/npm/drag-drop-touch-polyfill@1.0.0/DragDropTouch.min.js"></script>';
 
-        h1 {
-            color: var(--red);
-            text-transform: uppercase;
-            text-align: center;
-            border-bottom: 3px solid var(--red);
-        }
-
-        .game {
-            background: var(--white);
-            border: 2px solid var(--red);
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 5px 5px 0 var(--light);
-        }
-
-        h2 {
-            color: var(--dark);
-            margin-top: 0;
-        }
-
-        button {
-            background: var(--red);
-            color: var(--white);
-            border: 2px solid var(--dark);
-            padding: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background: var(--white);
-            color: var(--red);
-        }
-
-        .box {
-            background: var(--light);
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            border: 2px dashed var(--red);
-            margin-bottom: 15px;
-        }
-    </style>
-  <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch-polyfill@1.0.0/DragDropTouch.min.js"></script>
-  
+// Mobile-responsive CSS overrides
+const MOBILE_RESPONSIVE_STYLE = `
 <style>
 /* ========================================================
    UNIVERSAL MOBILE RESPONSIVE OVERRIDES (AUTOMATICALLY INJECTED)
@@ -248,68 +180,10 @@
   }
 }
 </style>
+`;
 
-</head>
-
-<body>
-    <div class="container">
-        <h1>2.4 Causes of Dot-Com Failures</h1>
-
-        <div class="game">
-            <h2>Sim 1: Dot-Bomb Swipe</h2>
-            <div class="box" id="s1-q">"Spend the whole $5M seed round on a Super Bowl TV ad to get big fast."</div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="s1Ans(false)">Smart Move</button>
-                <button onclick="s1Ans(true)" style="background:var(--white); color:var(--red);">Dot-Bomb!</button>
-            </div>
-        </div>
-
-        <div class="game">
-            <h2>Sim 2: Cash Burn Racer</h2>
-            <p>You have $1M in VC funding. The year 2000 crash is coming. Make a choice:</p>
-            <div id="s2-meter"
-                style="background:var(--red); color:white; padding:10px; text-align:center; margin-bottom:10px; width:100%;">
-                Bank: $1,000,000</div>
-            <div style="display:flex; gap:10px;" id="s2-btns">
-                <button onclick="s2Act('marketing')">Buy Ads (-$800k)</button>
-                <button onclick="s2Act('infra')">Build Logistics (-$200k)</button>
-            </div>
-            <p id="s2-res" style="text-align:center; font-weight:bold;"></p>
-        </div>
-
-        <div class="game">
-            <h2>Sim 3: The Autopsy Match</h2>
-            <p>Which historical dot-com failure is this: <em>"Ignored the massive cost of warehousing and delivering
-                    heavy groceries."</em></p>
-            <button onclick="s3Ans('webvan')">Webvan</button>
-            <button onclick="s3Ans('pets')">Pets.com</button>
-            <p id="s3-res" style="text-align:center; font-weight:bold; color:var(--red);"></p>
-        </div>
-    </div>
-
-    <script>
-        function s1Ans(isBomb) {
-            let b = document.getElementById('s1-q');
-            if (isBomb) b.innerHTML = "<span style='color:red'>CORRECT! That caused instant bankruptcy for many.</span>";
-            else b.innerHTML = "WRONG! That's how Pets.com died.";
-        }
-        function s2Act(t) {
-            let res = document.getElementById('s2-res');
-            document.getElementById('s2-btns').style.display = 'none';
-            if (t === 'marketing') {
-                document.getElementById('s2-meter').style.width = "20%"; document.getElementById('s2-meter').innerText = "$200,000";
-                res.innerHTML = "<span style='color:red'>CRASH! You ran out of cash to build a product. DOT-BOMB!</span>";
-            } else {
-                document.getElementById('s2-meter').style.width = "80%"; document.getElementById('s2-meter').innerText = "$800,000";
-                res.innerHTML = "SURVIVOR! You managed your burn rate wisely.";
-            }
-        }
-        function s3Ans(c) {
-            if (c === 'webvan') document.getElementById('s3-res').innerText = "CORRECT! Webvan's logistics failure is legendary.";
-            else document.getElementById('s3-res').innerText = "WRONG! Pets.com failed on shipping heavy dog food, but Webvan was the grocery giant.";
-        }
-    </script>
-
+// Touch interaction helper script to automatically attach touch coordinates to the UI detective magnifier loupe
+const TOUCH_INTERACTION_SCRIPT = `
 <script>
 /* ========================================================
    UNIVERSAL MOBILE TOUCH INTERACTION HELPERS (AUTOMATICALLY INJECTED)
@@ -327,8 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const isMobile = window.matchMedia('(max-width: 768px)').matches;
       const offsetY = isMobile ? -45 : 0;
       
-      loupe.style.left = `${x}px`;
-      loupe.style.top = `${y + offsetY}px`;
+      loupe.style.left = \`\${x}px\`;
+      loupe.style.top = \`\${y + offsetY}px\`;
     };
     
     sandbox.addEventListener('touchstart', (e) => {
@@ -356,7 +230,66 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+`;
 
-</body>
+// Recursively find all simulation files and inject mobile updates
+function processDirectory(dir) {
+  const files = fs.readdirSync(dir);
+  
+  files.forEach(file => {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    
+    if (stat.isDirectory()) {
+      processDirectory(fullPath);
+    } else if (file === 'index.html') {
+      // Skip main subject portals indices, only target individual simulation index.htmls
+      // The subject indices are: simulations/ui-programming/index.html, simulations/python-programming/index.html, simulations/digital-business-transformation/index.html
+      const relative = path.relative(SIM_DIR, fullPath);
+      const isSubjectPortal = relative.split(path.sep).length === 2; // e.g. "ui-programming/index.html"
+      
+      if (!isSubjectPortal) {
+        optimizeFile(fullPath);
+      }
+    }
+  });
+}
 
-</html>
+function optimizeFile(filePath) {
+  let content = fs.readFileSync(filePath, 'utf8');
+  let originalContent = content;
+  
+  // 1. Manage Viewport tag
+  // Remove any existing viewport tags first to keep it clean and unified
+  content = content.replace(/<meta\s+name="viewport"\s+content="[^"]*"\s*\/?>/gi, '');
+  
+  // Inject mobile viewport at the start of the <head>
+  content = content.replace(/<head>/i, `<head>\n  ${MOBILE_VIEWPORT}`);
+  
+  // 2. Inject DragDropTouch Polyfill
+  if (!content.includes('DragDropTouch.min.js')) {
+    // Inject polyfill script right before </head>
+    content = content.replace(/<\/head>/i, `  ${POLYFILL_SCRIPT}\n</head>`);
+  }
+
+  // 3. Inject CSS Mobile Responsive Overrides
+  if (!content.includes('UNIVERSAL MOBILE RESPONSIVE OVERRIDES')) {
+    content = content.replace(/<\/head>/i, `  ${MOBILE_RESPONSIVE_STYLE}\n</head>`);
+  }
+
+  // 4. Inject Touch event logic helper
+  if (!content.includes('UNIVERSAL MOBILE TOUCH INTERACTION HELPERS')) {
+    content = content.replace(/<\/body>/i, `${TOUCH_INTERACTION_SCRIPT}\n</body>`);
+  }
+
+  if (content !== originalContent) {
+    fs.writeFileSync(filePath, content, 'utf8');
+    console.log(`Optimized: ${path.relative(__dirname, filePath)}`);
+  } else {
+    console.log(`Already optimized: ${path.relative(__dirname, filePath)}`);
+  }
+}
+
+console.log('Starting optimization of simulations...');
+processDirectory(SIM_DIR);
+console.log('All simulations optimized successfully!');
