@@ -9,7 +9,7 @@ const MOBILE_VIEWPORT = '<meta name="viewport" content="width=device-width, init
 // Bernardo Castilho's DragDropTouch Polyfill to map touch events to HTML5 drag-and-drop
 const POLYFILL_SCRIPT = '<script src="https://cdn.jsdelivr.net/npm/drag-drop-touch-polyfill@1.0.0/DragDropTouch.min.js"></script>';
 
-// Mobile-responsive CSS overrides targeting tablet/mobile sizes up to 1024px
+// Comprehensive mobile-responsive CSS overrides targeting tablet/mobile sizes up to 1024px
 const MOBILE_RESPONSIVE_STYLE = `
 <style>
 /* ========================================================
@@ -25,6 +25,41 @@ const MOBILE_RESPONSIVE_STYLE = `
     overflow-y: auto !important;
     overflow-x: hidden !important;
     position: relative !important;
+  }
+
+  /* Prevent elements from extending past the viewport boundary */
+  input, select, textarea, img, iframe, canvas, svg, table, pre, code,
+  .activity-canvas, .lab-card, .sidebar-card, .explanation-panel, .learning-recap-card,
+  .detective-sandbox-wrapper, .mock-banking-screen, .chart-container, .chart-controls,
+  .swipe-container, .inventory, .dropzone, .dnd-card, .builder-mobile-screen,
+  .welcome-mini-card, .feedback-bubble, .audit-questions-box {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Automatically collapse all multi-column grid layouts (CSS classes and inline styling) to 1-column */
+  .detective-container, .repair-layout-grid, .builder-layout, .side-by-side-screens,
+  .dnd-grid, .portal-card-grid, .welcome-card-grid, .grid-2, .grid-3, .grid-4,
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  /* Scale font sizes for headings so they do not cause layout breaks on small screens */
+  h1, .welcome-title {
+    font-size: 1.6rem !important;
+    line-height: 1.25 !important;
+  }
+  h2, .lab-card-title, header.dashboard-header h1 {
+    font-size: 1.25rem !important;
+    line-height: 1.25 !important;
+  }
+  h3, .canvas-header h2 {
+    font-size: 1.1rem !important;
   }
 
   /* App shell header & body scaling */
@@ -56,7 +91,7 @@ const MOBILE_RESPONSIVE_STYLE = `
     border-right: none !important;
     border-bottom: 1.5px solid var(--border-grey) !important;
     height: auto !important;
-    max-height: 220px !important;
+    max-height: 200px !important;
     overflow-y: auto !important;
     padding: 12px 16px !important;
   }
@@ -78,15 +113,6 @@ const MOBILE_RESPONSIVE_STYLE = `
     min-width: 100% !important;
     padding: 16px !important;
   }
-  
-  /* Grids and flex containers stack vertically */
-  .detective-container, .repair-layout-grid, .builder-layout, .side-by-side-screens {
-    grid-template-columns: 1fr !important;
-    display: flex !important;
-    flex-direction: column !important;
-    height: auto !important;
-    gap: 16px !important;
-  }
   .builder-toolbox {
     max-height: 180px !important;
     width: 100% !important;
@@ -100,10 +126,6 @@ const MOBILE_RESPONSIVE_STYLE = `
   }
   .detective-sandbox-wrapper.touch-active .loupe-cursor {
     display: block !important;
-  }
-  .welcome-card-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
   }
   .hint-popover {
     width: calc(100% - 32px) !important;
@@ -128,7 +150,7 @@ const MOBILE_RESPONSIVE_STYLE = `
   .sidebar {
     width: 100% !important;
     height: auto !important;
-    max-height: 220px !important;
+    max-height: 200px !important;
     border-right: none !important;
     border-bottom: 1.5px solid var(--border-color) !important;
     overflow-y: auto !important;
@@ -157,7 +179,7 @@ const MOBILE_RESPONSIVE_STYLE = `
   }
   .chart-container {
     width: 100% !important;
-    height: 320px !important;
+    height: 300px !important;
     padding: 10px !important;
   }
   .chart-controls {
@@ -168,8 +190,20 @@ const MOBILE_RESPONSIVE_STYLE = `
   }
   .swipe-container {
     max-width: 100% !important;
-    width: 320px !important;
+    width: 290px !important;
     height: 380px !important;
+    margin: 0 auto !important;
+  }
+  .swipe-card {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 1.5rem !important;
+  }
+  .card-title {
+    font-size: 1.15rem !important;
+  }
+  .card-desc {
+    font-size: 0.85rem !important;
   }
   .legend {
     flex-direction: column !important;
@@ -185,7 +219,7 @@ const MOBILE_RESPONSIVE_STYLE = `
     padding: 16px !important;
   }
   header.dashboard-header h1 {
-    font-size: 1.5rem !important;
+    font-size: 1.4rem !important;
   }
   .level-navigator {
     margin-top: 16px !important;
